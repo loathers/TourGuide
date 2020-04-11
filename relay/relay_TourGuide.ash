@@ -2,7 +2,7 @@
 
 since 17.12; //the earliest main release that supports get_fuel()
 //These settings are for development. Don't worry about editing them.
-string __version = "1.4.40";
+string __version = "1.5.0";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -4363,6 +4363,8 @@ void initialiseIOTMsUsable()
         }
         if (campground[lookupItem("Asdon Martin keyfob")] > 0)
             __iotms_usable[lookupItem("Asdon Martin keyfob")] = true;
+        if (campground[lookupItem("diabolic pizza cube")] > 0)
+            __iotms_usable[lookupItem("diabolic pizza cube")] = true;
     }
     if (get_property_boolean("hasDetectiveSchool"))
         __iotms_usable[$item[detective school application]] = true;
@@ -7746,8 +7748,13 @@ void PageInit()
 	PageAddCSSClass("", "r_centre", "margin-left:auto; margin-right:auto;text-align:center;");
 	PageAddCSSClass("", "r_bold", "font-weight:bold;");
 	PageAddCSSClass("", "r_end_floating_elements", "clear:both;");
+
+	PageAddCSSClass("", "r_element_important", "color: red;");
 	
-	
+	PageAddCSSClass("", "r_element_good", "color: rgb(0, 128, 0);");
+	PageAddCSSClass("", "r_element_awesome", "color: rgb(0, 0, 255);");
+	PageAddCSSClass("", "r_element_epic", "color: rgb(138, 43, 226);");
+
 	PageAddCSSClass("", "r_element_stench", "color:green;");
 	PageAddCSSClass("", "r_element_hot", "color:red;");
 	PageAddCSSClass("", "r_element_cold", "color:blue;");
@@ -47769,6 +47776,8 @@ void IOTMBoxingDaycareGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 }
 
+// 2019
+
 
 RegisterTaskGenerationFunction("IOTMKramcoSausageOMaticGenerateTasks");
 void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -47929,6 +47938,28 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntryTagEntry("banish"));
     }
 }
+
+RegisterResourceGenerationFunction("IOTMVampireCloakGenerateResource");
+void IOTMVampireCloakGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (!$item[vampyric cloake].have())
+		return;
+    if (!(__misc_state["in run"] && in_ronin())) return;
+    
+    int uses_left = clampi(10 - get_property_int("_vampyreCloakeFormUses"), 0, 10);
+    if (uses_left > 0 && my_path_id() != PATH_POCKET_FAMILIARS)
+	{
+		string [int] skills;
+        skills.listAppend("Wolf: +50% muscle, +50% meat");
+        skills.listAppend("Mist: +2 all res");
+        skills.listAppend("Bat: +50% item");
+        
+		string [int] description;
+        description.listAppend("In-combat cast one of the Become skills, to gain a buff for that fight:|*" + skills.listJoinComponents("|*"));
+        resource_entries.listAppend(ChecklistEntryMake("__item vampyric cloake", "", ChecklistSubentryMake(pluralise(uses_left, "vampyric skill use", "vampyric skill uses"), "", description), 5));
+    }
+}
+// PirateRealm
 RegisterTaskGenerationFunction("IOTMMaySaberPartyGenerateTasks");
 void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -47992,25 +48023,88 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 	
 }
 
-RegisterResourceGenerationFunction("IOTMVampireCloakGenerateResource");
-void IOTMVampireCloakGenerateResource(ChecklistEntry [int] resource_entries)
+//moonTuned
+RegisterResourceGenerationFunction("IOTMRuneSpoonGenerateResource");
+void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!$item[vampyric cloake].have())
-		return;
-    if (!(__misc_state["in run"] && in_ronin())) return;
-    
-    int uses_left = clampi(10 - get_property_int("_vampyreCloakeFormUses"), 0, 10);
-    if (uses_left > 0 && my_path_id() != PATH_POCKET_FAMILIARS)
+	item spoon = lookupItem("hewn moon-rune spoon");
+	if (!spoon.have() && spoon.closet_amount() == 0) return;
+	
+	if (!get_property_boolean("moonTuned"))
 	{
-		string [int] skills;
-        skills.listAppend("Wolf: +50% muscle, +50% meat");
-        skills.listAppend("Mist: +2 all res");
-        skills.listAppend("Bat: +50% item");
+		stat [string] stat_for_sign = 
+        {
+        	"Mongoose":$stat[Muscle],
+            "Wallaby":$stat[Mysticality],
+            "Vole":$stat[Moxie],
+            
+            "Platypus":$stat[Muscle],
+            "Opossum":$stat[Mysticality],
+            "Marmot":$stat[Moxie],
+            
+            "Wombat":$stat[Muscle],
+            "Blender":$stat[Mysticality],
+            "Packrat":$stat[Moxie],
+        };
+		string [string] signs = 
+        {
+            "Mongoose":"+20% physical damage, knoll access, and free smithing",
+            "Wallaby":"+20% spell damage, knoll access, and free smithing",
+            "Vole":"+20% init, knoll access, and free smithing",
+            
+            "Platypus":"+5 familiar weight and canadia access",
+            "Opossum":"+5 adventures/day from food and canadia access",
+        	"Marmot":"+1 extra clover/day and canadia access",
+            
+            "Wombat":"+20% meat and gnome access",
+            "Blender":"+5 adventures/day from drinks and gnome access",
+            "Packrat":"+10% item and gnome access",
+            
+        };
+        boolean [string] signs_to_output_as_ideas = $strings[Marmot,Platypus,Opossum,Blender,Packrat];
         
+        if (!__misc_state["in run"])
+        	signs_to_output_as_ideas = $strings[Platypus,Opossum,Wombat,Blender,Packrat];
+        boolean our_sign_is_currently_good_for_stats = stat_for_sign[my_sign()] == my_primestat();
 		string [int] description;
-        description.listAppend("In-combat cast one of the Become skills, to gain a buff for that fight:|*" + skills.listJoinComponents("|*"));
-        resource_entries.listAppend(ChecklistEntryMake("__item vampyric cloake", "", ChecklistSubentryMake(pluralise(uses_left, "vampyric skill use", "vampyric skill uses"), "", description), 5));
-    }
+        description.listAppend("Use the hewn moon-rune spoon. Lets you switch to any other moon sign.");
+        if ($strings[Mongoose,Wallaby,Vole] contains my_sign())
+        {
+        	string [int] todo;
+        	if (!__misc_state["desert beach available"])
+        		todo.listAppend("assemble a bitchin' meatcar");
+            if (!have_outfit_components("Bugbear Costume"))
+                todo.listAppend("buy a bugbear costume");
+            if (todo.count() > 0)
+            	description.listAppend("May want to " + todo.listJoinComponents(", ", "and") + " before switching signs.");
+        }
+        string [int] options;
+        
+        foreach sign, desc in signs
+        {
+        	if (my_sign() == sign) continue;
+            if (!signs_to_output_as_ideas[sign]) continue;
+            if (sign == "Platypus" && __misc_state["familiars temporarily blocked"]) continue;
+            if (sign == "Opossum" && (!__misc_state["can eat just about anything"] || my_path_id() == PATH_SLOW_AND_STEADY)) continue;
+            if (sign == "Blender" && (!__misc_state["can drink just about anything"] || my_path_id() == PATH_SLOW_AND_STEADY)) continue;
+        	boolean this_sign_is_good_for_mainstat_gain = stat_for_sign[sign] == my_primestat();
+            string line = "<strong>" + sign + "</strong>: " + desc + ".";
+            if (!this_sign_is_good_for_mainstat_gain && __misc_state["need to level"] && __misc_state["in run"])
+            	line += " <strong>Won't</strong> give mainstat gains.";
+            else if (this_sign_is_good_for_mainstat_gain && __misc_state["need to level"] && __misc_state["in run"])
+            	line += " <strong>Will</strong> give mainstat gains."; 
+        	options.listAppend(line);
+        }
+        
+        description.listAppend("Currently " + my_sign() + ": " + signs[my_sign()] + ".");
+        if (options.count() > 0)
+	        description.listAppend("Ideas:|*" + options.listJoinComponents("<hr>"));
+        
+        string url = "inv_use.php?whichitem=10254&pwd=" + my_hash();
+        if (!spoon.have() && spoon.closet_amount() > 0)
+        	url = "closet.php?which=2";
+		resource_entries.listAppend(ChecklistEntryMake("__item " + spoon, url, ChecklistSubentryMake("Moon sign tunable", "", description), 10));
+	}
 }
 
 RegisterResourceGenerationFunction("IOTMBeachCombGenerateResource");
@@ -48115,89 +48209,258 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "shop.php?whichshop=campfire", ChecklistSubentryMake(pluralise(firewood), "", description), 5).ChecklistEntryTagEntry("getaway campsite"));
     }
 }
-
-//moonTuned
-RegisterResourceGenerationFunction("IOTMRuneSpoonGenerateResource");
-void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMPocketProfessorResource");
+void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
 {
-	item spoon = lookupItem("hewn moon-rune spoon");
-	if (!spoon.have() && spoon.closet_amount() == 0) return;
+    ChecklistSubentry getLecture() {
+        int calculateMaxLectures() {
+            int [int] WEIGHT_REQUIREMENTS = { 1, 2, 5, 10, 17, 26, 37, 50, 65, 82, 101, 122, 145, 170, 197 };
+            int currentWeight = familiar_weight($familiar[Pocket Professor]);
+
+            foreach weightRequirement in WEIGHT_REQUIREMENTS {
+                if (currentWeight < weightRequirement) {
+                    return weightRequirement;
+                }
+            }
+
+            return 5;
+        }
+
+        // Title
+        int maxLectures = calculateMaxLectures();
+        int lecturesUsed = get_property_int("_pocketProfessorLectures");
+        int numOfLectures = maxLectures - lecturesUsed;
+
+        string main_title = numOfLectures + " lectures";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+        if (numOfLectures > 0) {
+            description.listAppend(HTMLGenerateSpanOfClass("Relativity:", "r_bold") + " Instant copy");
+            description.listAppend(HTMLGenerateSpanOfClass("Mass:", "r_bold") + " 3 chances for item drops");
+            description.listAppend(HTMLGenerateSpanOfClass("Velocity:", "r_bold") + " Delevel");
+        } else {
+            description.listAppend("Increase weight for more lectures");
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+    ChecklistSubentry getDeliverYourThesis() {
+        // Title
+        string main_title = "Deliver thesis";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+        if (!get_property_boolean("_thesisDelivered")) {
+            description.listAppend(HTMLGenerateSpanOfClass("1 instakill", "r_bold") + " but lose 200 familiar xp");
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (!lookupFamiliar("Pocket Professor").familiar_is_usable()) return;
+
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__familiar pocket professor";
+    entry.url = "main.php?eowkeeper=1";
+
+    ChecklistSubentry lectures = getLecture();
+    if (lectures.entries.count() > 0) {
+        entry.subentries.listAppend(lectures);
+    }
+
+    ChecklistSubentry thesis = getDeliverYourThesis();
+    if (thesis.entries.count() > 0) {
+        entry.subentries.listAppend(thesis);
+    }
+
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
+RegisterResourceGenerationFunction("IOTMEightDaysAWeekPillsGenerateResource");
+void IOTMEightDaysAWeekPillsGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    ChecklistSubentry getPills() {
+        // Title
+        string main_title = "Take a Pill";
+
+        // Subtitle
+        string subtitle = "First is Free!";
+        if (get_property_boolean("_freePillKeeperUsed")) {
+            subtitle = "-3 Spleen";
+        }
+
+        // Entries
+        string [int] description;
+        description.listAppend(HTMLGenerateSpanOfClass("Monday:", "r_bold") + " Yellow ray (30 turns)");
+        description.listAppend(HTMLGenerateSpanOfClass("Tuesday:", "r_bold") + " Double potion length");
+        description.listAppend(HTMLGenerateSpanOfClass("Wednesday:", "r_bold") + " Force Non-Combat");
+        description.listAppend(HTMLGenerateSpanOfClass("Thursday:", "r_bold") + " +4 all res (30 turns)");
+        description.listAppend(HTMLGenerateSpanOfClass("Friday:", "r_bold") + " +100% all stats (30 turns)");
+        description.listAppend(HTMLGenerateSpanOfClass("Saturday:", "r_bold") + " Familiars 20 pounds (30 turns)");
+        description.listAppend(HTMLGenerateSpanOfClass("Sunday:", "r_bold") + " Force semi-rare");
+        description.listAppend(HTMLGenerateSpanOfClass("Funday:", "r_bold") + " Random adventures (30 turns)");
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (!lookupItem("Eight Days a Week Pill Keeper").have()) return;
 	
-	if (!get_property_boolean("moonTuned"))
-	{
-		stat [string] stat_for_sign = 
-        {
-        	"Mongoose":$stat[Muscle],
-            "Wallaby":$stat[Mysticality],
-            "Vole":$stat[Moxie],
-            
-            "Platypus":$stat[Muscle],
-            "Opossum":$stat[Mysticality],
-            "Marmot":$stat[Moxie],
-            
-            "Wombat":$stat[Muscle],
-            "Blender":$stat[Mysticality],
-            "Packrat":$stat[Moxie],
-        };
-		string [string] signs = 
-        {
-            "Mongoose":"+20% physical damage, knoll access, and free smithing",
-            "Wallaby":"+20% spell damage, knoll access, and free smithing",
-            "Vole":"+20% init, knoll access, and free smithing",
-            
-            "Platypus":"+5 familiar weight and canadia access",
-            "Opossum":"+5 adventures/day from food and canadia access",
-        	"Marmot":"+1 extra clover/day and canadia access",
-            
-            "Wombat":"+20% meat and gnome access",
-            "Blender":"+5 adventures/day from drinks and gnome access",
-            "Packrat":"+10% item and gnome access",
-            
-        };
-        boolean [string] signs_to_output_as_ideas = $strings[Marmot,Platypus,Opossum,Blender,Packrat];
-        
-        if (!__misc_state["in run"])
-        	signs_to_output_as_ideas = $strings[Platypus,Opossum,Wombat,Blender,Packrat];
-        boolean our_sign_is_currently_good_for_stats = stat_for_sign[my_sign()] == my_primestat();
-		string [int] description;
-        description.listAppend("Use the hewn moon-rune spoon. Lets you switch to any other moon sign.");
-        if ($strings[Mongoose,Wallaby,Vole] contains my_sign())
-        {
-        	string [int] todo;
-        	if (!__misc_state["desert beach available"])
-        		todo.listAppend("assemble a bitchin' meatcar");
-            if (!have_outfit_components("Bugbear Costume"))
-                todo.listAppend("buy a bugbear costume");
-            if (todo.count() > 0)
-            	description.listAppend("May want to " + todo.listJoinComponents(", ", "and") + " before switching signs.");
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__item Eight Days a Week Pill Keeper";
+    entry.url = "main.php?eowkeeper=1";
+
+    ChecklistSubentry pills = getPills();
+    if (pills.entries.count() > 0) {
+        entry.subentries.listAppend(pills);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
+RegisterResourceGenerationFunction("IOTMPizzaCube");
+void IOTMPizzaCube(ChecklistEntry [int] resource_entries)
+{
+    ChecklistSubentry getQuestItems() {
+        // Title
+        string main_title = "Make Pizza";
+
+        // Subtitle
+        string subtitle = "Some ingredients give useful items";
+
+        // Entries
+        string [int] description;
+
+        if (fullness_limit() - my_fullness() > 3) {
+            description.listAppend(HTMLGenerateSpanOfClass("cheese/milk:", "r_bold") + " 3 goat cheese");
+            description.listAppend(HTMLGenerateSpanOfClass("lucky:", "r_bold") + " clover");
+            description.listAppend(HTMLGenerateSpanOfClass("warlike:", "r_bold") + " 3 of sonar-in-a-biscuit, Duskwalker syringe, cocktail napkin, unnamed cocktail, cigarette lighter, glark cable, short writ of habeas corpus");
         }
-        string [int] options;
-        
-        foreach sign, desc in signs
-        {
-        	if (my_sign() == sign) continue;
-            if (!signs_to_output_as_ideas[sign]) continue;
-            if (sign == "Platypus" && __misc_state["familiars temporarily blocked"]) continue;
-            if (sign == "Opossum" && (!__misc_state["can eat just about anything"] || my_path_id() == PATH_SLOW_AND_STEADY)) continue;
-            if (sign == "Blender" && (!__misc_state["can drink just about anything"] || my_path_id() == PATH_SLOW_AND_STEADY)) continue;
-        	boolean this_sign_is_good_for_mainstat_gain = stat_for_sign[sign] == my_primestat();
-            string line = "<strong>" + sign + "</strong>: " + desc + ".";
-            if (!this_sign_is_good_for_mainstat_gain && __misc_state["need to level"] && __misc_state["in run"])
-            	line += " <strong>Won't</strong> give mainstat gains.";
-            else if (this_sign_is_good_for_mainstat_gain && __misc_state["need to level"] && __misc_state["in run"])
-            	line += " <strong>Will</strong> give mainstat gains."; 
-        	options.listAppend(line);
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+    ChecklistSubentry getBuffs() {
+        // Title
+        string main_title = "Buffs";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+
+        if (fullness_limit() - my_fullness() > 3) {
+            description.listAppend("Get any wishable buff");
         }
-        
-        description.listAppend("Currently " + my_sign() + ": " + signs[my_sign()] + ".");
-        if (options.count() > 0)
-	        description.listAppend("Ideas:|*" + options.listJoinComponents("<hr>"));
-        
-        string url = "inv_use.php?whichitem=10254&pwd=" + my_hash();
-        if (!spoon.have() && spoon.closet_amount() > 0)
-        	url = "closet.php?which=2";
-		resource_entries.listAppend(ChecklistEntryMake("__item " + spoon, url, ChecklistSubentryMake("Moon sign tunable", "", description), 10));
-	}
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+    if (!__iotms_usable[lookupItem("diabolic pizza cube")]) return;
+
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__item diabolic pizza";
+    entry.url = "campground.php?action=workshed";
+
+    ChecklistSubentry questItems = getQuestItems();
+    if (questItems.entries.count() > 0) {
+        entry.subentries.listAppend(questItems);
+    }
+
+    ChecklistSubentry buffs = getBuffs();
+    if (buffs.entries.count() > 0) {
+        entry.subentries.listAppend(buffs);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
+RegisterResourceGenerationFunction("IOTMRedNosedSnapperResource");
+void IOTMRedNosedSnapperResource(ChecklistEntry [int] resource_entries)
+{
+    ChecklistSubentry getPhylumRewards() {
+        // Title
+        string redSnapperPhylum = get_property("redSnapperPhylum");
+        int redSnapperProgress = get_property_int("redSnapperProgress");
+        string main_title = "Track monsters";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+        if (redSnapperPhylum != "") {
+            description.listAppend(HTMLGenerateSpanOfClass("Dudes:", "r_bold") + " Free banish item");
+            description.listAppend(HTMLGenerateSpanOfClass("Goblins:", "r_bold") + " 3-size " + HTMLGenerateSpanOfClass("awesome", "r_element_awesome") + " food");
+            description.listAppend(HTMLGenerateSpanOfClass("Orcs:", "r_bold") + " 3-size " + HTMLGenerateSpanOfClass("awesome", "r_element_awesome") + " booze");
+            description.listAppend(HTMLGenerateSpanOfClass("Undead:", "r_bold") + " +5 " + HTMLGenerateSpanOfClass("spooky", "r_element_spooky") + " res potion");
+            description.listAppend(HTMLGenerateSpanOfClass("Constellations:", "r_bold") + " Yellow ray");
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (!lookupFamiliar("Red Nosed Snapper").familiar_is_usable()) return;
+
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__familiar red-nosed snapper";
+
+    ChecklistSubentry rewards = getPhylumRewards();
+    if (rewards.entries.count() > 0) {
+        entry.subentries.listAppend(rewards);
+    }
+
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
+
+RegisterTaskGenerationFunction("IOTMRedNosedSnapperTask");
+void IOTMRedNosedSnapperTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    ChecklistSubentry getChoosePhylum() {
+        // Title
+        string redSnapperPhylum = get_property("redSnapperPhylum");
+        int redSnapperProgress = get_property_int("redSnapperProgress");
+        string main_title = "Track monsters";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+        if (redSnapperPhylum == "" && my_familiar() == $familiar[Red-Nosed Snapper]) {
+            description.listAppend(HTMLGenerateSpanOfClass("Choose a phylum", "r_element_important"));
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (!lookupFamiliar("Red Nosed Snapper").familiar_is_usable()) return;
+
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__familiar red-nosed snapper";
+    entry.importance_level = -10;
+
+    ChecklistSubentry choosePhylum = getChoosePhylum();
+    if (choosePhylum.entries.count() > 0) {
+        entry.subentries.listAppend(choosePhylum);
+    }
+
+    if (entry.subentries.count() > 0) {
+        task_entries.listAppend(entry);
+    }
 }
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
