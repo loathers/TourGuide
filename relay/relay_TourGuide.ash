@@ -2,7 +2,7 @@
 
 since 17.12; //the earliest main release that supports get_fuel()
 //These settings are for development. Don't worry about editing them.
-string __version = "1.6.1";
+string __version = "1.6.2";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2311,8 +2311,6 @@ void testItemIngredients()
     testItemIngredients();
 }*/
 
-
-
 static
 {
     int PATH_UNKNOWN = -1;
@@ -2361,7 +2359,6 @@ static
     int PATH_EXPLODED = 37;
     int PATH_OF_THE_PLUMBER = 38;
 }
-
 
 int __my_path_id_cached = -11;
 
@@ -2669,7 +2666,6 @@ static
 {
     monster [location] __protonic_monster_for_location {$location[Cobb's Knob Treasury]:$monster[The ghost of Ebenoozer Screege], $location[The Haunted Conservatory]:$monster[The ghost of Lord Montague Spookyraven], $location[The Haunted Gallery]:$monster[The ghost of Waldo the Carpathian], $location[The Haunted Kitchen]:$monster[The Icewoman], $location[The Haunted Wine Cellar]:$monster[The ghost of Jim Unfortunato], $location[The Icy Peak]:$monster[The ghost of Sam McGee], $location[Inside the Palindome]:$monster[Emily Koops, a spooky lime], $location[Madness Bakery]:$monster[the ghost of Monsieur Baguelle], $location[The Old Landfill]:$monster[The ghost of Vanillica "Trashblossom" Gorton], $location[The Overgrown Lot]:$monster[the ghost of Oily McBindle], $location[The Skeleton Store]:$monster[boneless blobghost], $location[The Smut Orc Logging Camp]:$monster[The ghost of Richard Cockingham], $location[The Spooky Forest]:$monster[The Headless Horseman]};
 }
-
 
 
 static
@@ -5615,6 +5611,11 @@ float [monster] appearance_rates_adjusted(location l)
             source_altered[m] = v / minimum_monster_appearance;
     }
     
+    // @todo Update this once mafia is fixed.
+    if (($locations[The Dark Elbow of the Woods,The Dark Heart of the Woods,The Dark Neck of the Woods] contains l)) {
+        source_altered[$monster[none]] = 0.05;
+    }
+
     boolean lawyers_relocated = get_property_ascension("relocatePygmyLawyer");
     boolean janitors_relocated = get_property_ascension("relocatePygmyJanitor");
     if (l == $location[the hidden park])
@@ -10169,6 +10170,10 @@ void QLevel6Init()
 	__quest_state["Friars"] = state;
 }
 
+int __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc = 0;
+int __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc = 0;
+int __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc = 0;
+
 float QLevel6TurnsToCompleteArea(location place)
 {
     //FIXME not sure how accurate these calculations are.
@@ -10190,6 +10195,12 @@ float QLevel6TurnsToCompleteArea(location place)
         foreach key, s in location_ncs
         {
             if (area_known_ncs contains s)
+                if (place == $location[the dark neck of the woods])
+                    __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                if (place == $location[the dark heart of the woods])
+                    __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                if (place == $location[the dark elbow of the woods])
+                    __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
                 ncs_found += 1;
         }
     }
@@ -10197,7 +10208,7 @@ float QLevel6TurnsToCompleteArea(location place)
         return 0.0;
     
     float turns_remaining = 0.0;
-    int ncs_remaining = MAX(0, 3 - ncs_found);
+    int ncs_remaining = MAX(0, 4 - ncs_found);
     
     float combat_rate = 0.95 + combat_rate_modifier() / 100.0;
     float noncombat_rate = 1.0 - combat_rate;
@@ -10206,8 +10217,15 @@ float QLevel6TurnsToCompleteArea(location place)
         turns_remaining = ncs_remaining / noncombat_rate;
     else
         turns_remaining = 10000.0; //how do you refer to infinity in this language?
-    
-    return MIN(turns_remaining, MAX(0.0, 16.0 - turns_spent_in_zone.to_float()));
+
+    int max_turns_remaining = ncs_remaining * 5;
+    if (place == $location[the dark neck of the woods])
+        max_turns_remaining += __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc;
+    if (place == $location[the dark heart of the woods])
+        max_turns_remaining += __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc;
+    if (place == $location[the dark elbow of the woods])
+        max_turns_remaining += __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc;
+    return MIN(turns_remaining, max_turns_remaining);
 }
 
 
@@ -40105,17 +40123,13 @@ buffer generateLocationBar(boolean displaying_navbar)
     location l = __last_adventure_location;
     if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar") && get_property_location("nextAdventure") != $location[none]) //setting exists for ascension scripts that alter my_location() to a null value/noob cave whenever they're not adventuring somewhere specific, to avoid environment-based effects on modifiers.
         l = get_property_location("nextAdventure");
-    //l = my_location();
     
     if (l == $location[none] || __misc_state["In valhalla"])
         return "".to_buffer();
     
-    
     string url = l.getClickableURLForLocation();
     
-    
     float [monster] monster_appearance_rates = l.appearance_rates_adjusted();
-    
     
     int nc_rate = MAX(0.0, monster_appearance_rates[$monster[none]]);
     
@@ -48697,7 +48711,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
         // Entries
         string [int] description;
         if (freeFightsLeft > 0) {
-            description.listAppend("Free a piranha plant");
+            description.listAppend("Fight a piranha plant");
             if (my_path_id() == PATH_OF_THE_PLUMBER) {
                 description.listAppend("Drops extra coins and mushrooms");
             }
