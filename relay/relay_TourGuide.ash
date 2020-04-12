@@ -2,7 +2,7 @@
 
 since 17.12; //the earliest main release that supports get_fuel()
 //These settings are for development. Don't worry about editing them.
-string __version = "1.6.2";
+string __version = "1.6.3";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -10166,19 +10166,21 @@ void QLevel6Init()
 	if (my_level() >= 6 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
 	
+    state.state_int["dark neck turns on last nc"] = 0;
+    state.state_int["dark heart turns on last nc"] = 0;
+    state.state_int["dark elbow turns on last nc"] = 0;
+
 	__quest_state["Level 6"] = state;
 	__quest_state["Friars"] = state;
 }
-
-int __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc = 0;
-int __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc = 0;
-int __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc = 0;
 
 float QLevel6TurnsToCompleteArea(location place)
 {
     //FIXME not sure how accurate these calculations are.
     int turns_spent_in_zone = turnsAttemptedInLocation(place); //not always accurate
     int ncs_found = noncombatTurnsAttemptedInLocation(place);
+
+	QuestState base_quest_state = __quest_state["Level 6"];
     
     boolean [string] area_known_ncs;
     if (place == $location[the dark neck of the woods])
@@ -10196,11 +10198,11 @@ float QLevel6TurnsToCompleteArea(location place)
         {
             if (area_known_ncs contains s)
                 if (place == $location[the dark neck of the woods])
-                    __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                    base_quest_state.state_int["dark neck turns on last nc"] = turns_spent_in_zone;
                 if (place == $location[the dark heart of the woods])
-                    __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                    base_quest_state.state_int["dark heart turns on last nc"] = turns_spent_in_zone;
                 if (place == $location[the dark elbow of the woods])
-                    __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc = turns_spent_in_zone;
+                    base_quest_state.state_int["dark elbow turns on last nc"] = turns_spent_in_zone;
                 ncs_found += 1;
         }
     }
@@ -10220,11 +10222,11 @@ float QLevel6TurnsToCompleteArea(location place)
 
     int max_turns_remaining = ncs_remaining * 5;
     if (place == $location[the dark neck of the woods])
-        max_turns_remaining += __quest_level_6_dark_neck_of_the_woods_total_turns_on_last_nc;
+        max_turns_remaining += base_quest_state.state_int["dark neck turns on last nc"];
     if (place == $location[the dark heart of the woods])
-        max_turns_remaining += __quest_level_6_dark_heart_of_the_woods_total_turns_on_last_nc;
+        max_turns_remaining += base_quest_state.state_int["dark heart turns on last nc"];
     if (place == $location[the dark elbow of the woods])
-        max_turns_remaining += __quest_level_6_dark_elbow_of_the_woods_total_turns_on_last_nc;
+        max_turns_remaining += base_quest_state.state_int["dark elbow turns on last nc"];
     return MIN(turns_remaining, max_turns_remaining);
 }
 
@@ -10439,7 +10441,14 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		if (evilness > 26 && my_path_id() != PATH_G_LOVER)
 		{
             subentry.modifiers.listAppend("+400% item");
-            float item_drop = (100.0 + $location[the defiled nook].item_drop_modifier_for_location()) / 100.0;
+			subentry.modifiers.listAppend("banish party skelteon");
+
+			float [monster] appearance_rates = $location[the defiled nook].appearance_rates_adjusted_cancel_nc();
+        	float chance_of_monster_with_eye = 0.0;
+			chance_of_monster_with_eye += 1.0 * appearance_rates[$monster[spiny skelelton]] / 100.0;
+			chance_of_monster_with_eye += 1.0 * appearance_rates[$monster[toothy sklelton]] / 100.0;
+
+            float item_drop = (100.0 + chance_of_monster_with_eye * $location[the defiled nook].item_drop_modifier_for_location()) / 100.0;
             
 			float eyes_per_adventure = MIN(1.0, (item_drop) * 0.2);
             float eyes_value = 3.0;
@@ -10479,7 +10488,6 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			}
 		}
 		
-		
 		entry.subentries.listAppend(subentry);
 	}
 	if (!base_quest_state.state_boolean["niche finished"])
@@ -10492,18 +10500,16 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         
         float [monster] appearance_rates = $location[the defiled niche].appearance_rates_adjusted_cancel_nc();
         float evilness_removed_per_adventure = 0.0;
+		evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[basic lihc]] / 100.0;
         evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[slick lihc]] / 100.0;
         evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[senile lihc]] / 100.0;
         evilness_removed_per_adventure += 3.0 * appearance_rates[$monster[dirty old lihc]] / 100.0;
         
-        float turns_remaining = MAX(0, evilness - 25);
-        
+        float evilness_remaining = MAX(0, evilness - 25);
+        int turns_remaining = evilness_remaining;
+
         if (evilness_removed_per_adventure != 0.0)
-            turns_remaining = MAX(1, turns_remaining / evilness_removed_per_adventure);
-        
-        if (floor(turns_remaining) * 3 < evilness)
-            turns_remaining = ceiling(turns_remaining);
-        
+            turns_remaining = MAX(1, ceiling(evilness_remaining / evilness_removed_per_adventure));
         
 		if (evilness > 26 && (appearance_rates[$monster[slick lihc]] > 0.0 || appearance_rates[$monster[senile lihc]] > 0.0))
         {
@@ -10512,7 +10518,6 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         }
 		if (evilness > 25)
             subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining to boss.");
-		
 		
 		entry.subentries.listAppend(subentry);
 	}
