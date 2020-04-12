@@ -2,7 +2,7 @@
 
 since 17.12; //the earliest main release that supports get_fuel()
 //These settings are for development. Don't worry about editing them.
-string __version = "1.5.0";
+string __version = "1.6.0";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2359,6 +2359,7 @@ static
     int PATH_EXPLOSIONS = 37;
     int PATH_EXPLODING = 37;
     int PATH_EXPLODED = 37;
+    int PATH_OF_THE_PLUMBER = 38;
 }
 
 
@@ -2438,6 +2439,8 @@ int initialiseMyPathID()
         __my_path_id_cached = PATH_2CRS;
     else if (path_name == "37" || path_name == "Kingdom of Exploathing")
     	__my_path_id_cached = PATH_EXPLOSION;
+    else if (path_name == "38" || path_name == "Path of the Plumber")
+    	__my_path_id_cached = PATH_OF_THE_PLUMBER;
     else
         __my_path_id_cached = PATH_UNKNOWN;
     return __my_path_id_cached;
@@ -4361,10 +4364,16 @@ void initialiseIOTMsUsable()
             if (campground[it] > 0)
                 __iotms_usable[it] = true;
         }
+        // Workshed
         if (campground[lookupItem("Asdon Martin keyfob")] > 0)
             __iotms_usable[lookupItem("Asdon Martin keyfob")] = true;
         if (campground[lookupItem("diabolic pizza cube")] > 0)
             __iotms_usable[lookupItem("diabolic pizza cube")] = true;
+
+        // Garden
+        if (campground[lookupItem("packet of mushroom spores")] > 0)
+            __iotms_usable[lookupItem("packet of mushroom spores")] = true;
+
     }
     if (get_property_boolean("hasDetectiveSchool"))
         __iotms_usable[$item[detective school application]] = true;
@@ -10163,17 +10172,16 @@ void QLevel6Init()
 float QLevel6TurnsToCompleteArea(location place)
 {
     //FIXME not sure how accurate these calculations are.
-    //First NC will always happen at 6, second at 11, third at 16.
     int turns_spent_in_zone = turnsAttemptedInLocation(place); //not always accurate
     int ncs_found = noncombatTurnsAttemptedInLocation(place);
     
     boolean [string] area_known_ncs;
     if (place == $location[the dark neck of the woods])
-        area_known_ncs = $strings[How Do We Do It? Quaint and Curious Volume!,Strike One!,Dodecahedrariffic!];
+        area_known_ncs = $strings[How Do We Do It? Quaint and Curious Volume!,Strike One!,Olive My Love To You\, Oh.,Dodecahedrariffic!];
     if (place == $location[The Dark Heart of the Woods])
-        area_known_ncs = $strings[Moon Over the Dark Heart,Running the Lode,Imp Be Nimble\, Imp Be Quick];
+        area_known_ncs = $strings[Moon Over the Dark Heart,Running the Lode,I\, Martin,Imp Be Nimble\, Imp Be Quick];
     if (place == $location[The Dark Elbow of the Woods])
-        area_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,Butter Knife? I'll Take the Knife];
+        area_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,A Secret\, But Not the Secret You're Looking For,Butter Knife? I'll Take the Knife];
     
     if (area_known_ncs.count() > 0)
     {
@@ -10185,13 +10193,13 @@ float QLevel6TurnsToCompleteArea(location place)
                 ncs_found += 1;
         }
     }
-    if (ncs_found == 3)
+    if (ncs_found == 4)
         return 0.0;
     
     float turns_remaining = 0.0;
     int ncs_remaining = MAX(0, 3 - ncs_found);
     
-    float combat_rate = 0.9 + combat_rate_modifier() / 100.0;
+    float combat_rate = 0.95 + combat_rate_modifier() / 100.0;
     float noncombat_rate = 1.0 - combat_rate;
     
     if (noncombat_rate != 0.0)
@@ -46901,6 +46909,8 @@ void IOTMPortablePantogramGenerateTasks(ChecklistEntry [int] task_entries, Check
     optional_task_entries.listAppend(ChecklistEntryMake("__item portable pantogram", "inv_use.php?pwd=" + my_hash() + "&whichitem=9573", ChecklistSubentryMake("Summon pants", "", description), 1));
 }
 
+// 2018
+
 RegisterTaskGenerationFunction("IOTMGarbageToteGenerateTasks");
 void IOTMGarbageToteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -47028,268 +47038,8 @@ void IOTMZutaraGenerateResource(ChecklistEntry [int] resource_entries)
     if (entry.subentries.count() > 0)
 	    resource_entries.listAppend(entry);
 }
-RegisterTaskGenerationFunction("IOTMNeverendingPartyGenerateTasks");
-void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    if (!mafiaIsPastRevision(18865))
-        return;
-    if (!__iotms_usable[lookupItem("Neverending Party invitation envelope")])
-        return;
-    //Quest suggestions:
-    //_partyHard (boolean), _questPartyFair (Quest), _questPartyFairProgress (integer?), _questPartyFairQuest (string? - "partiers", )
-    
-    QuestState quest_state = QuestState("_questPartyFair");
-    //_questPartyFair is "" instead of unstarted if they didn't start it.
-    if (quest_state.in_progress)
-    {
-        string quest_name = get_property("_questPartyFairQuest");
-        //strange - went from "unstarted" to "step1" when accepting the partiers quest
-        boolean party_hard = get_property_boolean("_partyHard");
-        int [int] progress_split;
-        foreach key, v in get_property("_questPartyFairProgress").split_string(" ")
-        {
-        	if (v == "") continue;
-            progress_split.listAppend(v.to_int());
-        }
-        int progress = progress_split[0];
-        
-        string [int] modifiers;
-        string [int] description;
-        string url = "place.php?whichplace=town_wrong";
-        boolean finished = false;
-        if (party_hard && lookupItem("PARTY HARD T-shirt").equipped_amount() == 0)
-        {
-            description.listAppend(HTMLGenerateSpanFont("Equip the PARTY HARD T-shirt.", "red"));
-            url = "inventory.php?which=2";
-        }
-        //partiers - progress starts at 50 in not-hard
-        if (quest_name == "partiers")
-        {
-            if (progress > 0)
-            {
-            	description.listAppend(pluralise(progress, "partier", "partiers") + " remain.");
-                if (lookupItem("intimidating chainsaw").available_amount() == 0)
-                {
-                	description.listAppend("Collect the intimidating chainsaw.|" + listMake("Investigate the basement", "Grab the chainsaw").listJoinComponents(__html_right_arrow_character));
-                }
-                else if (lookupItem("intimidating chainsaw").equipped_amount() == 0)
-                {
-                	description.listAppend(HTMLGenerateSpanFont("Equip the intimidating chainsaw.", "red"));
-                    url = "inventory.php?which=2";
-                }
-                if (lookupItem("jam band bootleg").item_amount() > 0)
-                {
-                    description.listAppend("Pop in the bootleg.|" + listMake("Head Upstairs", "Pop a bootleg in the stereo").listJoinComponents(__html_right_arrow_character));
-                }
-                else if (!in_ronin())
-                {
-                    description.listAppend("Buy a jam band bootleg in the mall?");
-                }
-                if (lookupItem("Purple Beast energy drink").item_amount() > 0)
-                {
-                    description.listAppend("Pour the energy drink into the pool.|" + listMake("Go to the back yard", "Pour Purple Beast into the pool").listJoinComponents(__html_right_arrow_character));
-                }
-                else if (!in_ronin())
-                {
-                    description.listAppend("Buy a Purple Beast energy drink in the mall?");
-                }
-            }
-            else
-            {
-            	finished = true;
-            }
-        }
-        else if (quest_name == "booze")
-        {
-            //unremarkable duffel bag gives item; from jock
-            
-            if (quest_state.mafia_internal_step < 2)
-            {
-                description.listAppend("Talk to Gerald.|" + listMake("Go to the back yard", "Find Gerald").listJoinComponents(__html_right_arrow_character));
-            }
-            else
-            {
-            	int amount_needed = progress_split[0];
-                item item_needed = progress_split[1].to_item();
-                if (item_needed == $item[none])
-                {
-                	description.listAppend("Unknown item needed.");
-                }
-                else if (item_needed.item_amount() < amount_needed)
-                {
-                	description.listAppend("Need to collect " + amount_needed + " " + item_needed + ".");
-                    description.listAppend("Can collect from unremarkable duffel bags, from the jock.");
-                    modifiers.listAppend("olfact jock");
-                }
-                else
-                    description.listAppend("Talk to Gerald.|" + listMake("Go to the back yard", "Give Gerald the booze").listJoinComponents(__html_right_arrow_character));
-            }
-        }
-        else if (quest_name == "food")
-        {
-            //van key gives item; from burnout
-            
-            if (quest_state.mafia_internal_step < 2)
-            {
-                description.listAppend("Talk to Geraldine.|" + listMake("Check out the kitchen", "Talk to the woman").listJoinComponents(__html_right_arrow_character));
-            }
-            else
-            {
-                int amount_needed = progress_split[0];
-                item item_needed = progress_split[1].to_item();
-                
-                if (item_needed == $item[none])
-                {
-                    description.listAppend("Unknown item needed.");
-                }
-                else if (item_needed.item_amount() < amount_needed)
-                {
-                    description.listAppend("Need to collect " + amount_needed + " " + item_needed + ".");
-                    description.listAppend("Can collect from van keys, from the burnout.");
-                    modifiers.listAppend("olfact burnout");
-                }
-                else
-                	description.listAppend("Talk to Geraldine again.|" + listMake("Check out the kitchen", "Give Geraldine the snacks").listJoinComponents(__html_right_arrow_character));
-            }
-        }
-        else if (quest_name == "trash")
-        {
-            if (true)
-            {
-            	modifiers.listAppend("+200% item");
-                //Progress on this quest seems to be bugged - starts at zero, doesn't change unless we look at the quest log.
-                //description.listAppend("Progress: " + progress);
-                description.listAppend("Run +200% item.");
-                if (lookupItem("gas can").item_amount() > 0)
-                {
-                    description.listAppend(listMake("Check out the kitchen", "Burn some trash").listJoinComponents(__html_right_arrow_character));
-                }
-                else if (!in_ronin())
-                {
-                    description.listAppend("Buy a gas can in the mall?");
-                }
-            }
-            else
-            {
-            	finished = true;
-            }
-        }
-        else if (quest_name == "woots")
-        {
-            if (progress < 100)
-            {
-                description.listAppend(progress + " out of 100 megawoots.");
-                //equip cosmetic football
-                if (lookupItem("cosmetic football").available_amount() == 0 && !in_ronin())
-                {
-                    description.listAppend("Buy the cosmetic football in the mall?");
-                }
-                if (lookupItem("cosmetic football").available_amount() > 0 && lookupItem("cosmetic football").equipped_amount() == 0)
-                {
-                    description.listAppend(HTMLGenerateSpanFont("Equip the cosmetic football.", "red"));
-                    url = "inventory.php?which=2";
-                }
-                //very small red dress
-                if (lookupItem("very small red dress").item_amount() > 0)
-                {
-                    description.listAppend(listMake("Head upstairs", "Toss the red dress on the lamp").listJoinComponents(__html_right_arrow_character));
-                }
-                else if (!in_ronin())
-                {
-                    description.listAppend("Buy a very small red dress in the mall?");
-                }
-                //electronics kit
-                if (lookupItem("electronics kit").item_amount() > 0)
-                {
-                    description.listAppend(listMake("Investigate the basement", "Modify the living room lights").listJoinComponents(__html_right_arrow_character));
-                }
-                else if (!in_ronin())
-                {
-                    description.listAppend("Buy a electronics kit in the mall?");
-                }
-            }
-            else
-            	finished = true;
-        }
-        else if (quest_name == "dj")
-        {
-            if (progress > 0)
-            {
-                modifiers.listAppend("+meat");
-                modifiers.listAppend("olfact jocks");
-                modifiers.listAppend("banish burnouts");
-                description.listAppend(progress + " meat remaining.");
-                description.listAppend("Run +meat, olfact jocks, banish burnouts.");
-                if (my_buffedstat($stat[moxie]) >= 300)
-                {
-                    description.listAppend("Open the safe.|" + listMake("Head upstairs", "Crack the safe").listJoinComponents(__html_right_arrow_character));
-                }
-                else
-                {
-                	description.listAppend("Possibly buff to 300 moxie?");
-                    modifiers.listAppend("300 moxie");
-                }
-            }
-            else
-            	finished = true;
-        }
-        else if (quest_name == "")
-        {
-        }
-        else
-            description.listAppend("Unhandled quest \"" + quest_name + "\"");
-        if (finished)
-        {
-        	description.listAppend("Visit the party one last time to finish the quest.");
-        }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item party hat", url, ChecklistSubentryMake("Neverending Party Quest", modifiers, description), 8, lookupLocations("The Neverending Party")));
-    }
-}
-
-RegisterResourceGenerationFunction("IOTMNeverendingPartyGenerateResource");
-void IOTMNeverendingPartyGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (!mafiaIsPastRevision(18865))
-        return;
-    if (!__iotms_usable[lookupItem("Neverending Party invitation envelope")])
-        return;
-    
-    int free_fights_left = clampi(10 - get_property_int("_neverendingPartyFreeTurns"), 0, 10);
-    if (QuestState("_questPartyFair").finished)
-    	free_fights_left = 0;
-    string [int] modifiers;
-    string [int] description;
-    modifiers.listAppend("+meat");
-    
-    if (free_fights_left >= 2)
-    {
-        if (__misc_state["need to level"])
-        {
-            string [int] directions;
-            if (my_primestat() == $stat[muscle])
-            {
-                directions.listAppend("Kitchen");
-                directions.listAppend("Muscle spice");
-            }
-            else if (my_primestat() == $stat[mysticality])
-            {
-                directions.listAppend("Upstairs");
-                directions.listAppend("Read the tomes");
-            }
-            else if (my_primestat() == $stat[moxie])
-            {
-                directions.listAppend("Basement");
-                directions.listAppend("Use the hair gel");
-            }
-            description.listAppend("Experience buff: " + directions.listJoinComponents(__html_right_arrow_character) + ".");
-        }
-        if (__misc_state["in run"])
-            description.listAppend("ML buff: " + listMake("Backyard", "Candle wax").listJoinComponents(__html_right_arrow_character));
-    }
-    if (free_fights_left > 0)
-	    resource_entries.listAppend(ChecklistEntryMake("__item party hat", "place.php?whichplace=town_wrong", ChecklistSubentryMake(pluralise(free_fights_left, "free party fight", "free party fights"), modifiers, description), lookupLocations("The Neverending Party")).ChecklistEntryTagEntry("daily free fight"));
-    
-}
+// Missing: Pokefam
+// Missing: FantasyRealm
 
 RegisterResourceGenerationFunction("IOTMGodLobsterGenerateResource");
 void IOTMGodLobsterGenerateResource(ChecklistEntry [int] resource_entries)
@@ -47552,6 +47302,268 @@ void IOTMBastilleBattalionGenerateTasks(ChecklistEntry [int] task_entries, Check
     description.listAppend("Suggested configuration: " + HTMLGenerateSpanOfClass(suggested_configuration.listJoinComponents(" / "), "r_bold") + ".");
 	
 	optional_task_entries.listAppend(ChecklistEntryMake("__item Bastille Battalion control rig", url, ChecklistSubentryMake("Collect Bastille rewards", "", description), 8));
+}
+RegisterTaskGenerationFunction("IOTMNeverendingPartyGenerateTasks");
+void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!mafiaIsPastRevision(18865))
+        return;
+    if (!__iotms_usable[lookupItem("Neverending Party invitation envelope")])
+        return;
+    //Quest suggestions:
+    //_partyHard (boolean), _questPartyFair (Quest), _questPartyFairProgress (integer?), _questPartyFairQuest (string? - "partiers", )
+    
+    QuestState quest_state = QuestState("_questPartyFair");
+    //_questPartyFair is "" instead of unstarted if they didn't start it.
+    if (quest_state.in_progress)
+    {
+        string quest_name = get_property("_questPartyFairQuest");
+        //strange - went from "unstarted" to "step1" when accepting the partiers quest
+        boolean party_hard = get_property_boolean("_partyHard");
+        int [int] progress_split;
+        foreach key, v in get_property("_questPartyFairProgress").split_string(" ")
+        {
+        	if (v == "") continue;
+            progress_split.listAppend(v.to_int());
+        }
+        int progress = progress_split[0];
+        
+        string [int] modifiers;
+        string [int] description;
+        string url = "place.php?whichplace=town_wrong";
+        boolean finished = false;
+        if (party_hard && lookupItem("PARTY HARD T-shirt").equipped_amount() == 0)
+        {
+            description.listAppend(HTMLGenerateSpanFont("Equip the PARTY HARD T-shirt.", "red"));
+            url = "inventory.php?which=2";
+        }
+        //partiers - progress starts at 50 in not-hard
+        if (quest_name == "partiers")
+        {
+            if (progress > 0)
+            {
+            	description.listAppend(pluralise(progress, "partier", "partiers") + " remain.");
+                if (lookupItem("intimidating chainsaw").available_amount() == 0)
+                {
+                	description.listAppend("Collect the intimidating chainsaw.|" + listMake("Investigate the basement", "Grab the chainsaw").listJoinComponents(__html_right_arrow_character));
+                }
+                else if (lookupItem("intimidating chainsaw").equipped_amount() == 0)
+                {
+                	description.listAppend(HTMLGenerateSpanFont("Equip the intimidating chainsaw.", "red"));
+                    url = "inventory.php?which=2";
+                }
+                if (lookupItem("jam band bootleg").item_amount() > 0)
+                {
+                    description.listAppend("Pop in the bootleg.|" + listMake("Head Upstairs", "Pop a bootleg in the stereo").listJoinComponents(__html_right_arrow_character));
+                }
+                else if (!in_ronin())
+                {
+                    description.listAppend("Buy a jam band bootleg in the mall?");
+                }
+                if (lookupItem("Purple Beast energy drink").item_amount() > 0)
+                {
+                    description.listAppend("Pour the energy drink into the pool.|" + listMake("Go to the back yard", "Pour Purple Beast into the pool").listJoinComponents(__html_right_arrow_character));
+                }
+                else if (!in_ronin())
+                {
+                    description.listAppend("Buy a Purple Beast energy drink in the mall?");
+                }
+            }
+            else
+            {
+            	finished = true;
+            }
+        }
+        else if (quest_name == "booze")
+        {
+            //unremarkable duffel bag gives item; from jock
+            
+            if (quest_state.mafia_internal_step < 2)
+            {
+                description.listAppend("Talk to Gerald.|" + listMake("Go to the back yard", "Find Gerald").listJoinComponents(__html_right_arrow_character));
+            }
+            else
+            {
+            	int amount_needed = progress_split[0];
+                item item_needed = progress_split[1].to_item();
+                if (item_needed == $item[none])
+                {
+                	description.listAppend("Unknown item needed.");
+                }
+                else if (item_needed.item_amount() < amount_needed)
+                {
+                	description.listAppend("Need to collect " + amount_needed + " " + item_needed + ".");
+                    description.listAppend("Can collect from unremarkable duffel bags, from the jock.");
+                    modifiers.listAppend("olfact jock");
+                }
+                else
+                    description.listAppend("Talk to Gerald.|" + listMake("Go to the back yard", "Give Gerald the booze").listJoinComponents(__html_right_arrow_character));
+            }
+        }
+        else if (quest_name == "food")
+        {
+            //van key gives item; from burnout
+            
+            if (quest_state.mafia_internal_step < 2)
+            {
+                description.listAppend("Talk to Geraldine.|" + listMake("Check out the kitchen", "Talk to the woman").listJoinComponents(__html_right_arrow_character));
+            }
+            else
+            {
+                int amount_needed = progress_split[0];
+                item item_needed = progress_split[1].to_item();
+                
+                if (item_needed == $item[none])
+                {
+                    description.listAppend("Unknown item needed.");
+                }
+                else if (item_needed.item_amount() < amount_needed)
+                {
+                    description.listAppend("Need to collect " + amount_needed + " " + item_needed + ".");
+                    description.listAppend("Can collect from van keys, from the burnout.");
+                    modifiers.listAppend("olfact burnout");
+                }
+                else
+                	description.listAppend("Talk to Geraldine again.|" + listMake("Check out the kitchen", "Give Geraldine the snacks").listJoinComponents(__html_right_arrow_character));
+            }
+        }
+        else if (quest_name == "trash")
+        {
+            if (true)
+            {
+            	modifiers.listAppend("+200% item");
+                //Progress on this quest seems to be bugged - starts at zero, doesn't change unless we look at the quest log.
+                //description.listAppend("Progress: " + progress);
+                description.listAppend("Run +200% item.");
+                if (lookupItem("gas can").item_amount() > 0)
+                {
+                    description.listAppend(listMake("Check out the kitchen", "Burn some trash").listJoinComponents(__html_right_arrow_character));
+                }
+                else if (!in_ronin())
+                {
+                    description.listAppend("Buy a gas can in the mall?");
+                }
+            }
+            else
+            {
+            	finished = true;
+            }
+        }
+        else if (quest_name == "woots")
+        {
+            if (progress < 100)
+            {
+                description.listAppend(progress + " out of 100 megawoots.");
+                //equip cosmetic football
+                if (lookupItem("cosmetic football").available_amount() == 0 && !in_ronin())
+                {
+                    description.listAppend("Buy the cosmetic football in the mall?");
+                }
+                if (lookupItem("cosmetic football").available_amount() > 0 && lookupItem("cosmetic football").equipped_amount() == 0)
+                {
+                    description.listAppend(HTMLGenerateSpanFont("Equip the cosmetic football.", "red"));
+                    url = "inventory.php?which=2";
+                }
+                //very small red dress
+                if (lookupItem("very small red dress").item_amount() > 0)
+                {
+                    description.listAppend(listMake("Head upstairs", "Toss the red dress on the lamp").listJoinComponents(__html_right_arrow_character));
+                }
+                else if (!in_ronin())
+                {
+                    description.listAppend("Buy a very small red dress in the mall?");
+                }
+                //electronics kit
+                if (lookupItem("electronics kit").item_amount() > 0)
+                {
+                    description.listAppend(listMake("Investigate the basement", "Modify the living room lights").listJoinComponents(__html_right_arrow_character));
+                }
+                else if (!in_ronin())
+                {
+                    description.listAppend("Buy a electronics kit in the mall?");
+                }
+            }
+            else
+            	finished = true;
+        }
+        else if (quest_name == "dj")
+        {
+            if (progress > 0)
+            {
+                modifiers.listAppend("+meat");
+                modifiers.listAppend("olfact jocks");
+                modifiers.listAppend("banish burnouts");
+                description.listAppend(progress + " meat remaining.");
+                description.listAppend("Run +meat, olfact jocks, banish burnouts.");
+                if (my_buffedstat($stat[moxie]) >= 300)
+                {
+                    description.listAppend("Open the safe.|" + listMake("Head upstairs", "Crack the safe").listJoinComponents(__html_right_arrow_character));
+                }
+                else
+                {
+                	description.listAppend("Possibly buff to 300 moxie?");
+                    modifiers.listAppend("300 moxie");
+                }
+            }
+            else
+            	finished = true;
+        }
+        else if (quest_name == "")
+        {
+        }
+        else
+            description.listAppend("Unhandled quest \"" + quest_name + "\"");
+        if (finished)
+        {
+        	description.listAppend("Visit the party one last time to finish the quest.");
+        }
+        optional_task_entries.listAppend(ChecklistEntryMake("__item party hat", url, ChecklistSubentryMake("Neverending Party Quest", modifiers, description), 8, lookupLocations("The Neverending Party")));
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMNeverendingPartyGenerateResource");
+void IOTMNeverendingPartyGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!mafiaIsPastRevision(18865))
+        return;
+    if (!__iotms_usable[lookupItem("Neverending Party invitation envelope")])
+        return;
+    
+    int free_fights_left = clampi(10 - get_property_int("_neverendingPartyFreeTurns"), 0, 10);
+    if (QuestState("_questPartyFair").finished)
+    	free_fights_left = 0;
+    string [int] modifiers;
+    string [int] description;
+    modifiers.listAppend("+meat");
+    
+    if (free_fights_left >= 2)
+    {
+        if (__misc_state["need to level"])
+        {
+            string [int] directions;
+            if (my_primestat() == $stat[muscle])
+            {
+                directions.listAppend("Kitchen");
+                directions.listAppend("Muscle spice");
+            }
+            else if (my_primestat() == $stat[mysticality])
+            {
+                directions.listAppend("Upstairs");
+                directions.listAppend("Read the tomes");
+            }
+            else if (my_primestat() == $stat[moxie])
+            {
+                directions.listAppend("Basement");
+                directions.listAppend("Use the hair gel");
+            }
+            description.listAppend("Experience buff: " + directions.listJoinComponents(__html_right_arrow_character) + ".");
+        }
+        if (__misc_state["in run"])
+            description.listAppend("ML buff: " + listMake("Backyard", "Candle wax").listJoinComponents(__html_right_arrow_character));
+    }
+    if (free_fights_left > 0)
+	    resource_entries.listAppend(ChecklistEntryMake("__item party hat", "place.php?whichplace=town_wrong", ChecklistSubentryMake(pluralise(free_fights_left, "free party fight", "free party fights"), modifiers, description), lookupLocations("The Neverending Party")).ChecklistEntryTagEntry("daily free fight"));
+    
 }
 
 RegisterResourceGenerationFunction("IOTMLatteGenerateResource");
@@ -47959,7 +47971,7 @@ void IOTMVampireCloakGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item vampyric cloake", "", ChecklistSubentryMake(pluralise(uses_left, "vampyric skill use", "vampyric skill uses"), "", description), 5));
     }
 }
-// PirateRealm
+// Missing: PirateRealm
 RegisterTaskGenerationFunction("IOTMMaySaberPartyGenerateTasks");
 void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -48462,6 +48474,254 @@ void IOTMRedNosedSnapperTask(ChecklistEntry [int] task_entries, ChecklistEntry [
         task_entries.listAppend(entry);
     }
 }
+
+// 2020
+RegisterResourceGenerationFunction("IOTMBirdADayCalendar");
+void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
+{
+    ChecklistSubentry getBirdMods() {
+
+        string birdMods = get_property("_birdOfTheDayMods");
+        int birdsSought = get_property_int("_birdsSoughtToday");
+
+        // Title
+        string main_title = "Seek Bird";
+
+        // Subtitle
+        string subtitle = "10 Turn Buff";
+
+        // Entries
+        string [int] description;
+        if (get_property_boolean("_canSeekBirds")) {
+            string [int] modStrings = birdMods.split_string(", ");
+            foreach index, modString in modStrings {
+                string [int] modProperties = modString.split_string(": ");
+                string modName = modProperties[0];
+                string modValue = modProperties[1];
+
+                string name = modName + ": ";
+                switch(modName) {
+                    case "Cold Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_cold");
+                        break;  
+                    case "Hot Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_hot");
+                        break;              
+                    case "Sleaze Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_sleaze");
+                        break;
+                    case "Spooky Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_spooky");
+                        break;
+                    case "Stench Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_stench");
+                        break;
+                }
+
+                description.listAppend(HTMLGenerateSpanOfClass(name, "r_bold") + modValue);
+            }
+        }
+        
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+    ChecklistSubentry getFavoriteBird() {
+
+        string favoriteBirdMods = get_property("yourFavoriteBirdMods");
+
+        // Title
+        string main_title = "Favorite";
+
+        // Subtitle
+        string subtitle = "20 Turn Buff";
+
+        // Entries
+        string [int] description;
+
+        if (favoriteBirdMods != "" && get_property_boolean("_canSeekBirds") && !get_property_boolean("_favoriteBirdVisited")) {
+            string [int] modStrings = favoriteBirdMods.split_string(", ");
+            foreach index, modString in modStrings {
+                string [int] modProperties = modString.split_string(": ");
+                string modName = modProperties[0];
+                string modValue = modProperties[1];
+
+                string name = modName + ": ";
+                switch(modName) {
+                    case "Cold Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_cold");
+                        break;  
+                    case "Hot Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_hot");
+                        break;              
+                    case "Sleaze Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_sleaze");
+                        break;
+                    case "Spooky Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_spooky");
+                        break;
+                    case "Stench Resistance":
+                        name = HTMLGenerateSpanOfClass(modName + ": ", "r_element_stench");
+                        break;
+                }
+
+                description.listAppend(HTMLGenerateSpanOfClass(name, "r_bold") + modValue);
+            }
+        }
+        
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+
+    if (!lookupItem("Bird-a-Day calendar").have()) return;
+
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__effect Blessing of the Bird";
+    entry.url = "";
+
+    ChecklistSubentry birdMods = getBirdMods();
+    if (birdMods.entries.count() > 0) {
+        entry.subentries.listAppend(birdMods);
+    }
+
+    ChecklistSubentry favoriteBird = getFavoriteBird();
+    if (favoriteBird.entries.count() > 0) {
+        entry.subentries.listAppend(favoriteBird);
+    }
+
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
+RegisterResourceGenerationFunction("IOTMPowerfulGloveGenerateResource");
+void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    ChecklistSubentry getCharge() {
+        int charge = get_property_int("_powerfulGloveBatteryPowerUsed");
+        int chargeLeft = 100 - charge;
+
+        // Title
+        string main_title = chargeLeft + "% Charge";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+        if (chargeLeft > 0) {
+            description.listAppend(HTMLGenerateSpanOfClass("Invisible Avatar:", "r_bold") + " -10% Combat");
+            description.listAppend(HTMLGenerateSpanOfClass("Triple Size:", "r_bold") + " +200% all attributes");
+            if (chargeLeft > 5) {
+                description.listAppend(HTMLGenerateSpanOfClass("Wednesday:", "r_bold") + " Swap Monster");
+            }
+            description.listAppend(HTMLGenerateSpanOfClass("Thursday:", "r_bold") + " Delevel");
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (!lookupItem("Powerful Glove").have()) return;
+	
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__item Powerful Glove";
+    entry.url = "skillz.php";
+
+    ChecklistSubentry charge = getCharge();
+    if (charge.entries.count() > 0) {
+        entry.subentries.listAppend(charge);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
+
+RegisterTaskGenerationFunction("IOTMPowerfulGloveTask");
+void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    ChecklistSubentry getExtraPixels() {
+        // Title
+        string main_title = "Get extra pixels";
+        if (my_path_id() == PATH_OF_THE_PLUMBER) {
+            main_title = main_title + " and coins";
+        }
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+        if (!have_equipped($item[Powerful Glove])) {
+            description.listAppend("Equip Powerful Glove");
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (!lookupItem("Powerful Glove").have()) return;
+	
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__item white pixel";
+    entry.url = "/place.php?whichplace=forestvillage&action=fv_mystic";
+
+    if (my_path_id() == PATH_OF_THE_PLUMBER) {
+        entry.importance_level = -10;
+    }
+
+    ChecklistSubentry extraPixels = getExtraPixels();
+    if (extraPixels.entries.count() > 0) {
+        entry.subentries.listAppend(extraPixels);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        optional_task_entries.listAppend(entry);
+    }
+}
+RegisterResourceGenerationFunction("IOTMBetterShroomsAndGardensGenerateResource");
+void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    ChecklistSubentry getFreeFights() {
+        int freeFightsUsed = get_property_int("_mushroomGardenFights");
+        int totalFreeFights = 1;
+
+        if (my_path_id() == PATH_OF_THE_PLUMBER) {
+            totalFreeFights = 5;
+        }
+        int freeFightsLeft = totalFreeFights - freeFightsUsed;
+
+        // Title
+        string main_title = freeFightsLeft + " free fight";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+        if (freeFightsLeft > 0) {
+            description.listAppend("Free a piranha plant");
+            if (my_path_id() == PATH_OF_THE_PLUMBER) {
+                description.listAppend("Drops extra coins and mushrooms");
+            }
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (!__iotms_usable[lookupItem("packet of mushroom spores")]) return;
+	
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__item Better Shrooms and Gardens catalog";
+    entry.url = "adventure.php?snarfblat=543";
+
+    ChecklistSubentry pills = getFreeFights();
+    if (pills.entries.count() > 0) {
+        entry.subentries.listAppend(pills);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
+// Missing: Left-Hand Man
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -49387,7 +49647,7 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     tale_for_class[$class[Snake Oiler]] = $item[Tales of the West: Snake Oiling];
     
     boolean [class] have_advanced_skills_for_class;
-    if ($skill[Unleash Cowrruption].have_skill() || $skill[Hard Drinker].have_skill() || $skill[Walk: Cautious Prowl].have_skill())
+    if ($skill[Unleash Cowrruption].have_skill() || $skill[[18008]Hard Drinker].have_skill() || $skill[Walk: Cautious Prowl].have_skill())
         have_advanced_skills_for_class[$class[Cow Puncher]] = true;
     if ($skill[Beancannon].have_skill() || $skill[Prodigious Appetite].have_skill() || $skill[Walk: Prideful Strut].have_skill())
         have_advanced_skills_for_class[$class[Beanslinger]] = true;
@@ -50254,7 +50514,7 @@ void PathHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         skills_for_item[lightning_item].listAppend($skill[Clean-Hair Lightning]);
         skills_for_item[lightning_item].listAppend($skill[Ball Lightning]);
         skills_for_item[lightning_item].listAppend($skill[Sheet Lightning]);
-        skills_for_item[lightning_item].listAppend($skill[Lightning Bolt]);
+        skills_for_item[lightning_item].listAppend($skill[[16025]Lightning Bolt]);
         skills_for_item[lightning_item].listAppend($skill[Lightning Rod]);
         skills_for_item[lightning_item].listAppend($skill[Riding the Lightning]);
         
