@@ -2,7 +2,7 @@
 
 since 17.12; //the earliest main release that supports get_fuel()
 //These settings are for development. Don't worry about editing them.
-string __version = "1.6.5";
+string __version = "1.6.6";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2358,6 +2358,7 @@ static
     int PATH_EXPLODING = 37;
     int PATH_EXPLODED = 37;
     int PATH_OF_THE_PLUMBER = 38;
+    int PATH_LOW_KEY_SUMMER = 39;
 }
 
 int __my_path_id_cached = -11;
@@ -4566,12 +4567,10 @@ void RegisterChecklistGenerationFunction(string function_name)
     __checklist_generation_function_names.listAppend(function_name);
 }
 
-
 string [string][int] __specific_checklist_1_generation_function_names;
 void RegisterSpecificChecklistGenerationFunction1(string function_name, string checklist_name_1)
 {
-    if (!(__specific_checklist_1_generation_function_names contains checklist_name_1))
-    {
+    if (!(__specific_checklist_1_generation_function_names contains checklist_name_1)) {
         __specific_checklist_1_generation_function_names[checklist_name_1] = listMakeBlankString();
     }
     __specific_checklist_1_generation_function_names[checklist_name_1].listAppend(function_name);
@@ -4604,14 +4603,16 @@ void RegisterSpecificChecklistGenerationFunction3(string function_name, string c
     __specific_checklist_generation_requests.listAppend(request);
 }
 
-void RegisterResourceGenerationFunction(string function_name)
-{
+void RegisterTaskGenerationFunction(string function_name) {
+    RegisterSpecificChecklistGenerationFunction3(function_name, "Tasks", "Optional Tasks", "Future Tasks");
+}
+
+void RegisterResourceGenerationFunction(string function_name) {
     RegisterSpecificChecklistGenerationFunction1(function_name, "Resources");
 }
 
-void RegisterTaskGenerationFunction(string function_name)
-{
-    RegisterSpecificChecklistGenerationFunction3(function_name, "Tasks", "Optional Tasks", "Future Tasks");
+void RegisterBannishGenerationFunction(string function_name) {
+    RegisterSpecificChecklistGenerationFunction1(function_name, "Banishes");
 }
 string __close_image_data = "data:image/gif;base64,R0lGODlhgACAANUiAODg4IqKitra2o2NjYGBgdXV1YCAgOPj49vb24eHh4iIiIODg+fn5+Tk5NnZ2YmJidbW1ouLi9zc3M/Pz4WFhdTU1MDAwMfHx8HBwcrKysbGxtjY2Lu7u8XFxfj4+IKCgsTExH9/f/f39wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAACIALAAAAACAAIAAAAb/QJFwmBEMj8ikcslsOp/QaBOgcSIMBKN0y+16v0fAIlRgCgKhUOAAbrvfXcYgnagoL4Z0OuCA+/+AAHN6IRZIV4RpBn2AjY5bYolpZUJnkmkPbI+bnEhylyF1Ihl5oCEPG52qj4KmaSASBK4hi6u2cJGuBmUIEbOZt8Fen64JlCINvq4PjMLOTq3FAEgCsrrNz9lhY7oQSpbLmtraxKYKx0kHaMvY48HR5tNN1bO17u/cpgbeT+CmwPdWlQN1Toq6X+0CNoJHUJ4UetcUssoHap8Xf6AASvQz8FLBLwfZbcQ1KJ4biPoSjoRE8ZLFNxgvaVy5paOkj3BC/lNJkwlD/48O/aCsqKUntJaSXjaKKWmm0SQ2E+F0pDMjT6M/bwZ9NNRl0adCcunjp4ppIqc9oxKaqqqqzKsKs0rduqpr0q8jxVYkK8wsIbQB1ephK8xtU7jP5K6l68xuIgN4x+l1yXecXz2AnQlOQ3ic4bOIVSkezNidY0KQtU1OWlniZUzigm0O0VniZ0J8hI3mXHojAmumstxa/bh1z9dqYm+aXbtng3WmcnPaTbu30d+zhE+sZxxsJeig1jhijs57kuezpPuhrsC6eRHYXWl/Qxx19/dHkIt3Qx4/FPSuqOcFe+75N0R8wUUWRX16KGVgP+Bdsl9NJRFU3oNOABhdaGFUCP8UhlwgCMp8R3EHYhf6KadEfyd2oWF4cBHY4hciXkLiNibO+EWKUHl404U6bvGihF/JGGQbNUqiHYOK3HfkQxFKsgZ7QD7pYpRSAdeQlX4kOUtxXP6BnDlVhvnFkF9WZ2YjXo61piNjclbmm200oMCXFBRI54AffJnanoH4GJ6CgA6IlHyEFirFbBKqqOiCgqYZQKKPLsHklzdWysRsFJQSnaOadjhLAgDoR2mll+4iRJt6ZBrqbMbkhyVuoCpKHannzarHpKGGdShqVbKahqt7wjonArruUauZtxaIZiK8FprqnEcIGwKxVhq7BbLpLatjs1emd+qJ09KopY3jPqj/LRjcBuitgeC68Sxu6ZpXLhzWYovful0mm1yL8QIy7671rnSvI/kWLBG/j7T7qX8BczLwHgpL9muD1P6RsHcMr+JweO9KFqkeuDozsRoVD3exIhlvsvFIHTvzcaMbRazNydHec/A9L48TszszSxnyJjYrhHPKuKxMS8vZ9HzLz775O+EqRdN0tC07g+X0I1BfJ/XQA45Mh54rXe1I1v5t/UbX7wUNLdhPVP2g2W6gfaLaXLCNodu0giH3jMmIa2g9TGMYS3YV661jL91K8beVgQeYrt1rHo6oE4pzybi7PokdCtlcRh6dgpQXanmCnngea68HKvNwWKqDTqfog4pQT3qlHohw+ogCXDBq4YpuboohBdx5ScmsM0E7IRRMMAQELgGv6e56OH8EBomsnvwTwqfBgRLFj729FJE3zwT0qo4vxeHWM9GB9OojgEESQQAAOw==";
 string __new_window_image_data = "data:image/gif;base64,R0lGODlhgACAANU7AImJiZiYmKCgoKenp/Dw8MjIyKGhoYyMjKioqLW1tZmZmYiIiISEhICAgIWFhfPz8+7u7ry8vIeHh6Ojo4aGhunp6dTU1JeXl+Tk5JycnLGxsaSkpI6Ojpubm4qKisXFxYKCgvb29u/v75+fn7S0tK6urqWlpb29vaKiotbW1q2trdPT08fHx9DQ0K+vr+3t7Y2NjZGRkaamptHR0bq6ure3t8bGxtfX16mpqbKysn9/f/f39wAAAAAAAAAAAAAAACH5BAEAADsALAAAAACAAIAAAAb/wJ1wSCwaj8ikcslsOp/QqHRKrVqv2Kx2y+16v+CweExGYjSZS2DNbrvf8Lh8Tq+/L5kcZrxq6P6AgYKDhIWGh4iJiQ0WYS8AipGSk5SUABBgNJWbnJ2TEWATnqOkpRtgI6Wqq5MCYAKssbKEBq+zt7O1X7C4vaq6XryDFALFxsfIycrLzM3OzQ6FwF3Cggpl2DsB0raE19lk27Tdg9/gYuKD01zVgebnYOmC61vtgO/wXvKB9Fr2f/jycdkHqF+WfzoCCtRC8I9BLAgVLsTSUMfDKxEn6uO2q5BEjVUqXrSSEeQWkeSsmTzJMZjHlQxbUnsJk6JMdjRrWkHZ0ZvO/ys8Xfr8GfJmvZxEpQSdOTSpUqP+kDp9shRn06lUoR6UipUJzwoRTEwYQLas2bNoz3ootCCt27dw45KVgQIHiwc2x1nw46tvJQ4VgEqrIMGvYUodBNNScbixpBs7pcFwTBlRjci0olXePKgEZnVrOYv+Q+LzvAOjRycwzQ91as6ri9JyPQgEgNu4c+verZsBgwW8gwsfTvw230GxqYikLQhBVyiQCCWfsryQ8+dOoiNnXZB5oOvYmWgXNP3pbOvhm4wPVD5KdULg0ydZD6g9lPeD4ss/Qv+P/aznwbefEv3p8J8T+DU34HyFHNhEgt8tiESBDnoljXeA6CehEBRy5/8Qhn9ouGGHsqkDog4iSkiicheit2ERK1LXooAvEhGjeSa6WCOHDXpo0YkpLnijezPmt+MQQ95XpIJH7pAkgDnSeOSTCC4ZYZNUPmhlhk062WOJp+m4Y5YWBmgkll+yaCaTU6Yp45pXtimdjwYA2SWZS0DIJZpzgtmamDXiqYSeId7pJo5hSjnmoUTCuaec2/nZHaAvCpoEoSga2qeaUZ4JqSAxyAVXYY4WyqdhdVI6YmOpKlrjAqza2aRmhgkg65EMNLbBrTvCetgJvAZ6GAUEBFvpYR/sYOyqhDBQ3LML/DZBCkIsqyKjWlgrJLZZaDugpVJ4ux+4UYgrH7lQmJvJHrpPqBseu064ix28Tcj7HL1M2NsVvkvoixW/Svg7FcBJCOwUwUgYnBTCRyhMFMNGOPwTxEVIrBPFRFhcE8ZDaAwTx9Wqeu2mXXi8EsjKirwtyVycGEABMMcs88w012zzzTjnjDOt5IFx4mt+VVjFz0D7IjQVRBeNy9FTkKp0YxqAQcHTjrkARgdUN5bsFy1kbdgCmIAxgNd92SDGAxFwQLYsDSgwAzYPiEDA3HTXbffdeOet99589303BCF0KfjghBdu+OGIgxMEADs=";
@@ -8946,8 +8947,6 @@ string ChecklistGenerateModifierSpan(string modifier)
 void ChecklistInit()
 {
 	PageAddCSSClass("a", "r_cl_internal_anchor", "");
-	//PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.80em; color:" + __setting_modifier_colour + ";");
-	//PageAddCSSClass("", "r_cl_modifier", "font-size:0.80em; color:" + __setting_modifier_colour + "; display:block;");
     PageAddCSSClass("", "r_cl_modifier_inline", "font-size:0.85em; color:" + __setting_modifier_colour + ";");
     PageAddCSSClass("", "r_cl_modifier", "font-size:0.85em; color:" + __setting_modifier_colour + "; display:block;");
 	
@@ -8958,7 +8957,6 @@ void ChecklistInit()
     
     string gradient = "background: #ffffff;background: -moz-linear-gradient(left, #ffffff 50%, #F0F0F0 75%, #F0F0F0 100%);background: -webkit-gradient(linear, left top, right top, color-stop(50%,#ffffff), color-stop(75%,#F0F0F0), color-stop(100%,#F0F0F0));background: -webkit-linear-gradient(left, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);background: -o-linear-gradient(left, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);background: -ms-linear-gradient(left, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);background: linear-gradient(to right, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#F0F0F0',GradientType=1 );"; //help
 	PageAddCSSClass("div", "r_cl_l_container_highlighted", gradient + "padding-top:5px;padding-bottom:5px;");
-    
     
 	PageAddCSSClass("div", "r_cl_l_left", "float:left;width:" + __setting_image_width_large + "px;margin-left:20px;overflow:hidden;");
 	PageAddCSSClass("div", "r_cl_l_right_container", "width:100%;margin-left:" + (-__setting_image_width_large - 20) + "px;float:right;text-align:left;vertical-align:top;");
@@ -9029,7 +9027,6 @@ void ChecklistInit()
         {
             PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:10px;margin-right:3px;min-width:80%;", 0, __setting_media_query_small_size);
             PageAddCSSClass("", "r_cl_image_container_small", "display:block;float:left;", 0, __setting_media_query_small_size);
-            //PageAddCSSClass("", "r_small_float_indention", "display:inline;width:0.5em;height:" + (__setting_image_width_small - 10) + "px;float:left;", 0, __setting_media_query_small_size);
             PageAddCSSClass("", "r_small_float_indention", "display:inline;width:0.5em;float:left;", 0, __setting_media_query_small_size);
             PageAddCSSClass("", "r_indention_not_small", "margin-left:0.75em;", 0, __setting_media_query_small_size);
             PageAddCSSClass("", "r_indention_not_small", "margin-left:0.75em;", 0, __setting_media_query_tiny_size);
@@ -9057,29 +9054,23 @@ Checklist lookupChecklist(Checklist [int] checklists, string title)
 	return cl;
 }
 
-void ChecklistFormatSubentry(ChecklistSubentry subentry)
-{
-    foreach i in subentry.entries
-    {
+void ChecklistFormatSubentry(ChecklistSubentry subentry) {
+    foreach i in subentry.entries {
         string [int] line_split = split_string_alternate(subentry.entries[i], "\\|");
-        foreach l in line_split
-        {
-            if (stringHasPrefix(line_split[l], "*"))
-            {
-                //remove prefix:
-                //indent:
+        foreach l in line_split {
+            if (stringHasPrefix(line_split[l], "*")) {
+                // Indent
                 line_split[l] = HTMLGenerateIndentedText(substring(line_split[l], 1));
             }
         }
-        //Recombine:
+
+        // Recombine
         buffer building_line;
         boolean first = true;
         boolean last_was_indention = false;
-        foreach key in line_split
-        {
+        foreach key in line_split {
             string line = line_split[key];
-            if (!contains_text(line, "class=\"r_indention\"") && !first && !last_was_indention) //hack way of testing for indention
-            {
+            if (!contains_text(line, "class=\"r_indention\"") && !first && !last_was_indention) {
                 building_line.append("<br>");
             }
             last_was_indention = contains_text(line, "class=\"r_indention\"");
@@ -9090,54 +9081,48 @@ void ChecklistFormatSubentry(ChecklistSubentry subentry)
     }
 }
 
-buffer ChecklistGenerateEntryHTML(ChecklistEntry entry, ChecklistSubentry [int] subentries, boolean outputting_anchor, buffer anchor_prefix_html, buffer anchor_suffix_html, boolean setting_use_holding_containers_per_subentry)
-{
+buffer ChecklistGenerateEntryHTML(ChecklistEntry entry, ChecklistSubentry [int] subentries, boolean outputting_anchor, buffer anchor_prefix_html, buffer anchor_suffix_html, boolean setting_use_holding_containers_per_subentry) {
     Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large, 75);
     Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium, 50);
     Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small, 50);
-    if (__setting_small_size_uses_full_width)
+    if (__setting_small_size_uses_full_width) {
         max_image_dimensions_small = Vec2iMake(__setting_image_width_small,__setting_image_width_small);
-    buffer result;
-    if (true)
-    {
-        
-        buffer image_container;
-        
-        if (outputting_anchor && !__setting_entire_area_clickable)
-            image_container.append(anchor_prefix_html);
-        
-        image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
-        image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
-        if (!__setting_small_size_uses_full_width)
-            image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
-        
-        if (outputting_anchor && !__setting_entire_area_clickable)
-            image_container.append(anchor_suffix_html);
-        
-        result.append(HTMLGenerateDivOfClass(image_container, "r_cl_l_left"));
-        
     }
-    else
-        result.append(HTMLGenerateDivOfClass(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large), "r_cl_l_left"));
+
+    buffer result;
+    buffer image_container;
     
+    if (outputting_anchor && !__setting_entire_area_clickable) {
+        image_container.append(anchor_prefix_html);
+    }
     
+    image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
+    image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
+
+    if (!__setting_small_size_uses_full_width) {
+        image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
+    }
+    
+    if (outputting_anchor && !__setting_entire_area_clickable) {
+        image_container.append(anchor_suffix_html);
+    }
+    
+    result.append(HTMLGenerateDivOfClass(image_container, "r_cl_l_left"));
     result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_container")));
     
-    if (outputting_anchor && !__setting_entire_area_clickable)
+    if (outputting_anchor && !__setting_entire_area_clickable) {
         result.append(anchor_prefix_html);
+    }
+
     result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_content")));
     
-    if (__setting_small_size_uses_full_width)
-    {
+    if (__setting_small_size_uses_full_width) {
         result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
-        
         result.append(HTMLGenerateTagWrap("div", "", mapMake("class", "r_small_float_indention", "style", "height: " + __kol_image_generate_image_html_return_final_size.y + "px;")));
-        //result.append(HTMLGenerateDivOfClass("", "r_small_float_indention")); //&nbsp; to have it display. hack
     }
     
     boolean first = true;
-    foreach j in subentries
-    {
+    foreach j in subentries {
         ChecklistSubentry subentry = subentries[j];
         if (subentry.header == "")
             continue;
@@ -9196,74 +9181,71 @@ buffer ChecklistGenerateEntryHTML(ChecklistEntry entry, ChecklistSubentry [int] 
     return result;
 }
 
-buffer ChecklistGenerate(Checklist cl, boolean output_borders)
-{
+/**
+Generates HTML for a checklist and appends it to the DOM
+@param cl The checklist being appended to the DOM
+@param output_borders Whether or not to add borders
+*/
+buffer ChecklistGenerate(Checklist cl, boolean output_borders) {
 	ChecklistEntry [int] entries = cl.entries;
 	
 	//Combine entries with identical combination tags:
 	ChecklistEntry [string] combination_tag_entries;
-	foreach key, entry in entries
-	{
+	foreach key, entry in entries {
 		if (entry.combination_tag == "") continue;
         if (entry.only_show_as_extra_important_pop_up) continue; //do not support this feature with this
         if (entry.subentries_on_mouse_over.count() > 0) continue;
         if (entry.container_div_attributes.count() > 0) continue;
         
-        if (!(combination_tag_entries contains entry.combination_tag))
-        {
+        if (!(combination_tag_entries contains entry.combination_tag)) {
         	entry.importance_level -= 1; //combined entries gain a hack; a level above everything else
         	combination_tag_entries[entry.combination_tag] = entry;
             continue;
         }
+
         ChecklistEntry master_entry = combination_tag_entries[entry.combination_tag];
         
-        if (entry.should_highlight)
+        if (entry.should_highlight) {
         	master_entry.should_highlight = true;
-        if (master_entry.url == "" && entry.url != "")
+        }
+
+        if (master_entry.url == "" && entry.url != "") {
         	master_entry.url = entry.url;
+        }
+
         master_entry.importance_level = min(master_entry.importance_level, entry.importance_level - 1);
-        foreach key, subentry in entry.subentries
-        { 
+        
+        foreach key, subentry in entry.subentries { 
         	master_entry.subentries.listAppend(subentry);
         }
+
         remove entries[key];
 	}
 	
 	//Sort by importance:
 	sort entries by value.importance_level;
-    
 	
-	if (true)
-	{
-		//Format subentries:
-		foreach i in entries
-		{
-			ChecklistEntry entry = entries[i];
-			foreach j in entry.subentries
-			{
-                ChecklistFormatSubentry(entry.subentries[j]);
-			}
-			foreach j in entry.subentries_on_mouse_over
-			{
-                ChecklistFormatSubentry(entry.subentries_on_mouse_over[j]);
-			}
-		}
-	}
+    //Format subentries:
+    foreach index in entries {
+        ChecklistEntry entry = entries[index];
+        foreach subentryIndex in entry.subentries {
+            ChecklistFormatSubentry(entry.subentries[subentryIndex]);
+        }
+        foreach subentryIndex in entry.subentries_on_mouse_over {
+            ChecklistFormatSubentry(entry.subentries_on_mouse_over[subentryIndex]);
+        }
+    }
 
 	boolean skip_first_entry = false;
 	string special_subheader = "";
-	if (entries.count() > 0)
-	{
-		if (entries[0].image_lookup_name == "special subheader")
-		{
-			if (entries[0].subentries.count() > 0)
-			{
+	if (entries.count() > 0) {
+		if (entries[0].image_lookup_name == "special subheader") {
+			if (entries[0].subentries.count() > 0) {
 				special_subheader = entries[0].subentries[0].header;
 				skip_first_entry = true;
 			}
 		}
 	}
-	
 	
 	buffer result;
     if (output_borders)
@@ -9436,8 +9418,6 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 		}
 		else
 		{
-			//div-based layout:
-            //result.append(ChecklistGenerateEntryHTML(entry, entry.subentries, outputting_anchor, anchor_prefix_html, anchor_suffix_html, setting_use_holding_containers_per_subentry));
             result.append(generated_subentry_html);
 		}
         result.append("</div>");
@@ -9457,10 +9437,12 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders)
 	return result;
 }
 
-
-buffer ChecklistGenerate(Checklist cl)
-{
-    return ChecklistGenerate(cl, true);
+/**
+Attaches checklist to DOM.
+@param checklist The checklist being appended.
+*/
+buffer ChecklistGenerate(Checklist checklist) {
+    return ChecklistGenerate(checklist, true);
 }
 
 
@@ -36031,7 +36013,7 @@ void generateDailyResources(Checklist [int] checklists)
 		resource_entries.listAppend(ChecklistEntryMake("Superhuman Cocktailcrafting", "shop.php?whichshop=still", ChecklistSubentryMake(pluralise(stills_available(), "still use", "still uses"), "", description), 10));
     }
     
-    if (__last_adventure_location == $location[The Red Queen's Garden])
+    if (__last_adventure_location == $location[The Red Queen\'s Garden])
     {
         string will_need_effect = "";
         if ($effect[down the rabbit hole].have_effect() == 0)
@@ -37865,9 +37847,9 @@ void generateMisc(Checklist [int] checklists)
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}
 	
-	if (availableDrunkenness() < 0 && ($item[drunkula's wineglass].equipped_amount() == 0 || my_adventures() == 0))
+	if (availableDrunkenness() < 0 && ($item[drunkula\'s wineglass].equipped_amount() == 0 || my_adventures() == 0))
 	{
-        //They're drunk, so tasks aren't as relevant. Re-arrange everything:
+        //They arere drunk, so tasks are not as relevant. Re-arrange everything:
         string url;
         
         //Give them something to mindlessly click on:
@@ -37886,7 +37868,7 @@ void generateMisc(Checklist [int] checklists)
 		lookupChecklist(checklists, "Optional Tasks").entries.listClear();
 		lookupChecklist(checklists, "Unimportant Tasks").entries.listClear();
         
-        //Remove extra-important popups, because they won't work anymore:
+        //Remove extra-important popups, because they will not work anymore:
         Checklist future_checklist = lookupChecklist(checklists, "Future Tasks");
         foreach key, c in future_checklist.entries
         {
@@ -38104,15 +38086,12 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	
 	//Go through desired output order:
 	string [int] setting_desired_output_order = split_string_alternate("Tasks,Optional Tasks,Unimportant Tasks,Future Tasks,Resources,Future Unimportant Tasks,Required Items,Suggested Pulls,Florist Friar,Strategy", ",");
-	foreach key in setting_desired_output_order
-	{
+	foreach key in setting_desired_output_order {
 		string title = setting_desired_output_order[key];
 		//Find title in checklists:
-		foreach key2 in checklists
-		{
+		foreach key2 in checklists {
 			Checklist cl = checklists[key2];
-			if (cl.title == title)
-			{
+			if (cl.title == title) {
 				ordered_output_checklists.listAppend(cl);
 				keys_to_remove.listAppend(key2);
 				break;
@@ -38123,74 +38102,71 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
 	listClear(keys_to_remove);
 	
 	//Add remainder:
-	foreach key in checklists
-	{
+	foreach key in checklists {
 		Checklist cl = checklists[key];
 		ordered_output_checklists.listAppend(cl);
 	}
 }
 
-
-
-void outputChecklists(Checklist [int] ordered_output_checklists)
-{
-    if (__misc_state["in run"] && playerIsLoggedIn())
+/**
+Adds the checklists to the DOM.
+@param ordered_output_checklists Checklists to output.
+*/
+void outputChecklists(Checklist [int] ordered_output_checklists) {
+    // Turn Count
+    if (__misc_state["in run"] && playerIsLoggedIn()) {
         PageWrite(HTMLGenerateDivOfClass("Day " + my_daycount() + ". " + pluralise(my_turncount(), "turn", "turns") + " played.", "r_bold"));
-	if (my_path() != "" && my_path() != "None" && playerIsLoggedIn())
-	{
+    }
+
+    // Path
+	if (my_path() != "" && my_path() != "None" && playerIsLoggedIn()) {
 		PageWrite(HTMLGenerateDivOfClass(my_path(), "r_bold"));
 	}
     
-    
-    string chosen_message = generateRandomMessage();
-    if (chosen_message != "")
-        PageWrite(HTMLGenerateDivOfStyle(chosen_message, "padding-left:20px;padding-right:20px;"));
+    // Random Message
+    PageWrite(HTMLGenerateDivOfStyle(generateRandomMessage(), "padding-left:20px;padding-right:20px;"));
+
     PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "extra_words_at_top")));
 	
-	
-	if (__misc_state["Example mode"])
-	{
+    // Example mode
+	if (__misc_state["Example mode"]) {
 		PageWrite("<br>");
 		PageWrite(HTMLGenerateDivOfStyle("Example ascension", "text-align:center; font-weight:bold;"));
 	}
     
     Checklist extra_important_tasks;
     
-	//And output:
-	foreach i in ordered_output_checklists
-	{
+	// Checklists:
+	foreach i in ordered_output_checklists {
 		Checklist cl = ordered_output_checklists[i];
         
-        if (__show_importance_bar && cl.title == "Tasks")
-        {
-            foreach key in cl.entries
-            {
+        // Check for Pin
+        if (__show_importance_bar && cl.title == "Tasks") {
+            foreach key in cl.entries {
                 ChecklistEntry entry = cl.entries[key];
-                if (entry.importance_level <= -11)
-                {
+                if (entry.importance_level <= -11) {
                     extra_important_tasks.entries.listAppend(entry);
-                    if (entry.only_show_as_extra_important_pop_up)
+                    if (entry.only_show_as_extra_important_pop_up) {
                         remove cl.entries[key];
-                }
-                    
+                    }
+                }  
             }
         }
+
+        // Output
 		PageWrite(ChecklistGenerate(cl));
 	}
     
-    if (__show_importance_bar && extra_important_tasks.entries.count() > 0)
-    {
+    if (__show_importance_bar && extra_important_tasks.entries.count() > 0) {
         extra_important_tasks.title = "Tasks";
         extra_important_tasks.disable_generating_id = true;
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "importance_bar", "style", "z-index:3;position:fixed; top:0;width:100%;max-width:" + __setting_horizontal_width + "px;visibility:hidden;")));
 		PageWrite(ChecklistGenerate(extra_important_tasks, false));
         
-        //string background = "background: -moz-linear-gradient(top, rgba(100,100,100,1) 0%, rgba(255,255,255,0) 100%);background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(100,100,100,1)), color-stop(100%,rgba(255,255,255,0)));background: -webkit-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: -o-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: -ms-linear-gradient(top, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);background: linear-gradient(to bottom, rgba(100,100,100,1) 0%,rgba(255,255,255,0) 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#646464', endColorstr='#00ffffff',GradientType=0 );"; //this looks correct in safari, but not others
         string background = "background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAUCAYAAABMDlehAAAAb0lEQVR42gFkAJv/AFFRUf8AVlZW+ABcXFzvAGRjY+QAa2xr2AB1dHXLAH5+fr0AiIiIrgCTk5KfAJ2dnZAAqKiofwCzs7JwAL69vmAAyMjIUQDS0tJBANzb3DMA5eXlJwDt7e0bAPT09BAA+vr6B861MNMaArkVAAAAAElFTkSuQmCC);background-repeat:repeat-x;"; //use this gradient image, because alpha gradients are not consistent across browsers (compare black to white, 100% to zero opacity, on safari versus firefox)
 
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "importance_bar_gradient", "style", "height:20px;transition:opacity 0.25s;opacity:0;" + background)));
         PageWrite(HTMLGenerateTagSuffix("div"));
-        
     }
 }
 
@@ -47584,7 +47560,6 @@ void IOTMNeverendingPartyGenerateResource(ChecklistEntry [int] resource_entries)
 	    resource_entries.listAppend(ChecklistEntryMake("__item party hat", "place.php?whichplace=town_wrong", ChecklistSubentryMake(pluralise(free_fights_left, "free party fight", "free party fights"), modifiers, description), lookupLocations("The Neverending Party")).ChecklistEntryTagEntry("daily free fight"));
     
 }
-
 RegisterResourceGenerationFunction("IOTMLatteGenerateResource");
 void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -47604,19 +47579,6 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
     {
     	url = "inventory.php?which=2";
         latte_needs_equipping = true;
-    }
-    if (banishes_available > 0)
-    {
-    	string banish_url = url;
-    	string [int] description;
-     	description.listAppend("Free run/banish." + (latte_needs_equipping ? " Equip latte first." : "") + "|Throw Latte on Opponent in combat.");
-         
-        if (banish_used)
-        {
-        	banish_url = "main.php?latte=1";
-        	description.listAppend(HTMLGenerateSpanFont("Must refill latte first.", "red"));
-        }
-        resource_entries.listAppend(ChecklistEntryMake("__item latte lovers member's mug", banish_url, ChecklistSubentryMake(pluralise(banishes_available, "latte banish", "latte banishes"), "", description), 0).ChecklistEntryTagEntry("banish"));
     }
     
     ChecklistEntry entry;
@@ -47648,6 +47610,55 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if (entry.subentries.count() > 0)
     	resource_entries.listAppend(entry);
+}
+
+RegisterBannishGenerationFunction("IOTMLatteGenerateBanish");
+void IOTMLatteGenerateBanish(ChecklistEntry [int] banish_entries) {
+
+    int refillsRemaining = clampi(3 - get_property_int("_latteRefillsUsed"), 0, 3);
+    boolean banishUsed = get_property_boolean("_latteBanishUsed");
+    int banishesAvailable = refillsRemaining + (!banishUsed ? 1 : 0);
+    boolean copyUsed = get_property_boolean("_latteCopyUsed");
+
+    ChecklistSubentry getBanishes() {
+        // Title
+        string main_title = banishesAvailable + " latte throws";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+
+        if (!have_equipped(lookupItem("latte lovers member's mug"))) {
+            description.listAppend(HTMLGenerateSpanFont("Equip the latte first", "red"));
+        } else if (banishUsed) {
+            description.listAppend(HTMLGenerateSpanFont("Refill the latte first", "red"));
+        } else if (banishesAvailable > 0) {
+            description.listAppend("Throw in Combat");
+        }
+
+        if (!copyUsed) {
+            description.listAppend(HTMLGenerateSpanFont("May want to use copy first", "red"));
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (!lookupItem("latte lovers member's mug").have()) return;
+	
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__item latte lovers member's mug";
+    entry.url = "inventory.php?which=2";
+
+    if (banishesAvailable > 0) {
+        ChecklistSubentry banishes = getBanishes();
+        entry.subentries.listAppend(banishes);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        banish_entries.listAppend(entry);
+    }
 }
 
 //Throw your voting boot:
@@ -47947,26 +47958,47 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(instakills_left, "chest x-ray", "chest x-rays"), "", description), 0).ChecklistEntryTagEntry("free instakill"));
         
     }
-	//Reflex Hammer: Banish
-    int banishes_left = clampi(3 - get_property_int("_reflexHammerUsed"), 0, 3);
-    if (banishes_left > 0)
-    {
-        string url;
+}
+
+RegisterBannishGenerationFunction("IOTMLilDoctorBagBanish");
+void IOTMLilDoctorBagBanish(ChecklistEntry [int] banish_entries) {
+
+    int banishesAvailable = clampi(3 - get_property_int("_reflexHammerUsed"), 0, 3);
+
+    ChecklistSubentry getBanishes() {
+        // Title
+        string main_title = banishesAvailable + " reflex hammers";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
         string [int] description;
-        description.listAppend("Free run/banish.");
-        Banish banish_entry = BanishByName("Reflex Hammer");
-        int turns_left_of_banish = banish_entry.BanishTurnsLeft();
-        if (turns_left_of_banish > 0)
-        {
-            //is this relevant? we don't describe this for pantsgiving
-            description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
+
+        if (banishesAvailable > 0) {
+            if (!have_equipped(lookupItem("Lil' Doctor&trade; bag"))) {
+                description.listAppend(HTMLGenerateSpanFont("Equip the Lil Doctor Bag first", "red"));
+            } else {
+                description.listAppend("Use reflex hammer in combat");
+            }
         }
-        if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0)
-        {
-            description.listAppend("Equip the Lil'l Doctor™ bag first.");
-            url = "inventory.php?which=3";
-        }
-        resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntryTagEntry("banish"));
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (lookupItem("Lil' Doctor&trade; bag").available_amount() == 0) return;
+	
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__item Lil' Doctor&trade; bag";
+    entry.url = "inventory.php?which=2";
+
+    if (banishesAvailable > 0) {
+        ChecklistSubentry banishes = getBanishes();
+        entry.subentries.listAppend(banishes);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        banish_entries.listAppend(entry);
     }
 }
 
@@ -48052,6 +48084,48 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 		
 	}
 	
+}
+
+RegisterBannishGenerationFunction("IOTMMaySaberBanish");
+void IOTMMaySaberBanish(ChecklistEntry [int] banish_entries) {
+
+    int banishesAvailable = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
+
+    ChecklistSubentry getBanishes() {
+        // Title
+        string main_title = banishesAvailable + " force uses";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+
+        if (banishesAvailable > 0) {
+            if (!have_equipped(lookupItem("Fourth of May Cosplay Saber"))) {
+                description.listAppend(HTMLGenerateSpanFont("Equip the Fourth of May saber first", "red"));
+            } else {
+                description.listAppend("Use Force in combat and then choose 'I am not the adventurer...'");
+            }
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+	if (lookupItem("Fourth of May Cosplay Saber").available_amount() == 0) return;
+	
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__item Fourth of May Cosplay Saber";
+    entry.url = "inventory.php?which=2";
+
+    if (banishesAvailable > 0) {
+        ChecklistSubentry banishes = getBanishes();
+        entry.subentries.listAppend(banishes);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        banish_entries.listAppend(entry);
+    }
 }
 
 //moonTuned
@@ -48281,6 +48355,9 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
     }
 
     ChecklistSubentry getDeliverYourThesis() {
+        int experience = $familiar[Pocket Professor].experience;
+        int experienceLeft = 400 - experience;
+
         // Title
         string main_title = "Deliver thesis";
 
@@ -48290,7 +48367,11 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
         // Entries
         string [int] description;
         if (!get_property_boolean("_thesisDelivered")) {
-            description.listAppend(HTMLGenerateSpanOfClass("1 instakill", "r_bold") + " but lose 200 familiar xp");
+            if (experience >= 400) {
+                description.listAppend(HTMLGenerateSpanOfClass("1 instakill", "r_bold") + " but lose 200 familiar xp");
+            } else {
+                description.listAppend("Need " + experienceLeft + " more experience");
+            }
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
@@ -48630,9 +48711,9 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(HTMLGenerateSpanOfClass("Invisible Avatar:", "r_bold") + " -10% Combat");
             description.listAppend(HTMLGenerateSpanOfClass("Triple Size:", "r_bold") + " +200% all attributes");
             if (chargeLeft > 5) {
-                description.listAppend(HTMLGenerateSpanOfClass("Wednesday:", "r_bold") + " Swap Monster");
+                description.listAppend(HTMLGenerateSpanOfClass("Replace Enemy:", "r_bold") + " Swap Monster");
             }
-            description.listAppend(HTMLGenerateSpanOfClass("Thursday:", "r_bold") + " Delevel");
+            description.listAppend(HTMLGenerateSpanOfClass("Shrink Enemy:", "r_bold") + " Delevel");
         }
 
         return ChecklistSubentryMake(main_title, subtitle, description);
@@ -51999,7 +52080,7 @@ void runMain(string relay_filename)
         //Gray text at the bottom:
         string line;
         line = HTMLGenerateTagWrap("span", "<br>Automatic refreshing disabled.", mapMake("id", "refresh_status"));
-        line += HTMLGenerateTagWrap("a", "<br>Written by Ezandora.", generateMainLinkMap("showplayer.php?who=1557284"));
+        line += HTMLGenerateTagWrap("a", "<br>Created by Ezandora and cdrock", generateMainLinkMap("showplayer.php?who=1557284"));
         line += "<br>" + __version;
         
         PageWrite(HTMLGenerateDivOfStyle(line, "font-size:0.777em;color:gray;"));
