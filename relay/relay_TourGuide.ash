@@ -2,7 +2,7 @@
 
 since 17.12; //the earliest main release that supports get_fuel()
 //These settings are for development. Don't worry about editing them.
-string __version = "1.7.0";
+string __version = "1.7.1";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -4593,10 +4593,6 @@ void RegisterTaskGenerationFunction(string function_name) {
 
 void RegisterResourceGenerationFunction(string function_name) {
     RegisterSpecificChecklistGenerationFunction1(function_name, "Resources");
-}
-
-void RegisterBannishGenerationFunction(string function_name) {
-    RegisterSpecificChecklistGenerationFunction1(function_name, "Banishes");
 }
 
 void RegisterLowKeyGenerationFunction(string function_name) {
@@ -29858,8 +29854,9 @@ static
     __banish_source_length["kgb tranquilizer dart"] = 20;
     __banish_source_length["spring-loaded front bumper"] = 30;
     __banish_source_length["mafia middle finger ring"] = 60;
-    __banish_source_length["throw latte on opponent"] = 30; //Throw Latte on Opponent
+    __banish_source_length["throw latte on opponent"] = 30;
     __banish_source_length["saber force"] = 30;
+    __banish_source_length["human musk"] = -1;
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;
@@ -47541,13 +47538,17 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
     {
     	string banish_url = url;
     	string [int] description;
-     	description.listAppend("Free run/banish." + (latte_needs_equipping ? " Equip latte first." : "") + "|Throw Latte on Opponent in combat.");
-         
-        if (banish_used)
-        {
-        	banish_url = "main.php?latte=1";
-        	description.listAppend(HTMLGenerateSpanFont("Must refill latte first.", "red"));
+
+        if (banish_used) {
+            banish_url = "main.php?latte=1";
+            description.listAppend(HTMLGenerateSpanFont("Must refill latte first.", "red"));
+        } else if (latte_needs_equipping) {
+            banish_url = "inventory.php?which=3";
+            description.listAppend(HTMLGenerateSpanFont("Equip the latte first", "red"));
+        } else {
+            description.listAppend("Free run/banish");
         }
+
         resource_entries.listAppend(ChecklistEntryMake("__item latte lovers member's mug", banish_url, ChecklistSubentryMake(pluralise(banishes_available, "latte banish", "latte banishes"), "", description), 0).ChecklistEntryTagEntry("banish"));
     }
     
@@ -47884,18 +47885,11 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string url;
         string [int] description;
-        description.listAppend("Free run/banish.");
-        Banish banish_entry = BanishByName("Reflex Hammer");
-        int turns_left_of_banish = banish_entry.BanishTurnsLeft();
-        if (turns_left_of_banish > 0)
-        {
-            //is this relevant? we don't describe this for pantsgiving
-            description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
-        }
-        if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0)
-        {
-            description.listAppend("Equip the Lil'l Doctor™ bag first.");
+        if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0) {
+            description.listAppend(HTMLGenerateSpanFont("Equip the Lil'l Doctor™ bag first", "red"));
             url = "inventory.php?which=3";
+        } else {
+            description.listAppend("Free run/banish");
         }
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntryTagEntry("banish"));
     }
@@ -47963,8 +47957,7 @@ RegisterResourceGenerationFunction("IOTMMaySaberGenerateResource");
 void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (lookupItem("Fourth of May Cosplay Saber").available_amount() == 0) return;
-	if (get_property_int("_saberForceUses") < 5)
-	{
+	if (get_property_int("_saberForceUses") < 5) {
 		int uses_remaining = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
 		string url = "";
         if (!lookupItem("Fourth of May Cosplay Saber").equipped())
@@ -47980,13 +47973,11 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
         }
         //description.listAppend("Choose one of:|*" + options.listJoinComponents("|*"));
         resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", url, ChecklistSubentryMake(pluralise(uses_remaining, "force use", "forces uses"), "", description), 0));
-		
-	}
-	
+	}	
 }
 
-RegisterBannishGenerationFunction("IOTMMaySaberBanish");
-void IOTMMaySaberBanish(ChecklistEntry [int] banish_entries) {
+RegisterResourceGenerationFunction("IOTMMaySaberBanishResource");
+void IOTMMaySaberBanishResource(ChecklistEntry [int] resource_entries) {
 
     int banishesAvailable = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
 
@@ -48004,7 +47995,7 @@ void IOTMMaySaberBanish(ChecklistEntry [int] banish_entries) {
             if (!have_equipped(lookupItem("Fourth of May Cosplay Saber"))) {
                 description.listAppend(HTMLGenerateSpanFont("Equip the Fourth of May saber first", "red"));
             } else {
-                description.listAppend("Use Force in combat and then choose 'I am not the adventurer...'");
+                description.listAppend("Free run/banish");
             }
         }
 
@@ -48014,6 +48005,7 @@ void IOTMMaySaberBanish(ChecklistEntry [int] banish_entries) {
 	if (lookupItem("Fourth of May Cosplay Saber").available_amount() == 0) return;
 	
     ChecklistEntry entry;
+    entry.ChecklistEntryTagEntry("banish");
     entry.image_lookup_name = "__item Fourth of May Cosplay Saber";
     entry.url = "inventory.php?which=2";
 
@@ -48023,7 +48015,7 @@ void IOTMMaySaberBanish(ChecklistEntry [int] banish_entries) {
     }
     
     if (entry.subentries.count() > 0) {
-        banish_entries.listAppend(entry);
+        resource_entries.listAppend(entry);
     }
 }
 
@@ -48233,7 +48225,7 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
 
         // Title
         int lecturesUsed = get_property_int("_pocketProfessorLectures");
-        int numOfLectures = calculateMaxLectures() - lecturesUsed;
+        int numOfLectures = MAX(0,calculateMaxLectures() - lecturesUsed);
 
         string main_title = numOfLectures + " lectures";
 
@@ -48471,6 +48463,42 @@ void IOTMRedNosedSnapperTask(ChecklistEntry [int] task_entries, ChecklistEntry [
 
     if (entry.subentries.count() > 0) {
         task_entries.listAppend(entry);
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMHumanMuskBanish");
+void IOTMHumanMuskBanish(ChecklistEntry [int] resource_entries) {
+    ChecklistSubentry gerResource() {
+        int humanMuskUses = get_property_int("_humanMuskUses");
+        int humanMuskUsesLeft = MAX(0, 3 - humanMuskUses);
+        int availableHumanMusks = MIN(humanMuskUsesLeft, $item[human musk].available_amount());
+
+        // Title
+        string main_title = availableHumanMusks + " human musks";
+
+        // Subtitle
+        string subtitle = "";
+
+        // Entries
+        string [int] description;
+        if (availableHumanMusks > 0) {
+            description.listAppend("Free run/banish");
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+
+    ChecklistEntry entry;
+    entry.ChecklistEntryTagEntry("banish");
+    entry.image_lookup_name = "__item human musk";
+
+    ChecklistSubentry resource = gerResource();
+    if (resource.entries.count() > 0) {
+        entry.subentries.listAppend(resource);
+    }
+
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
     }
 }
 
