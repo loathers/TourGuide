@@ -600,7 +600,7 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             subentry.entries.listAppend("|*Or +moxie/sleaze resistance and choose the third option at the NC.");
         }
         
-        if (get_property("questM15Lol") != "finished" && ($item[bridge].available_amount() > 0 || $item[dictionary].available_amount() == 0) && false) //it's gone!
+        /*if (get_property("questM15Lol") != "finished" && ($item[bridge].available_amount() > 0 || $item[dictionary].available_amount() == 0) && false) //it's gone!
         {
             if ($item[bridge].available_amount() > 0)
                 subentry.entries.listAppend("Place the bridge.");
@@ -608,7 +608,8 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 subentry.entries.listAppend("Untinker the abridged dictionary.");
             else
                 subentry.entries.listAppend("Acquire an abridged dictionary from the pirates, untinker it.");
-        }
+        }*/
+        
 		int fasteners_needed = base_quest_state.state_int["bridge fasteners needed"];
 		int lumber_needed = base_quest_state.state_int["bridge lumber needed"];
 		

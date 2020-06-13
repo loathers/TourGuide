@@ -34,19 +34,12 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
     if (__quest_state["Level 11"].mafia_internal_step < 3) //need diary
         return false;
     
-    int pirate_insult_count = 0;
-    for i from 1 to 8 {
-        if (get_property_boolean("lastPirateInsult" + i))
-            pirate_insult_count += 1;
-    }
-    if ($item[pirate fledges].available_amount() == 0 && pirate_insult_count == 0) //they haven't started the pirate quest... hm... {
-        return true;
-    }
-    
     //want: output this in aftercore if they're adventuring there
-    //want: output this in paths that do not allow the pirates (if such paths exist)
-    //want: output this in-run if they're adventuring there
+    //want: output this in-run by default
     //soooo...
+    
+    if (__misc_state["in run"])
+        return true;
     
     if (which_route == "ron" && $location[the red zeppelin].turns_spent > 0)
         return true;
@@ -54,11 +47,6 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
         return true;
     if (which_route == "shen" && $location[the copperhead club].turns_spent > 0)
         return true;
-    
-    if (__misc_state["in run"] && ($location[a mob of zeppelin protesters].turns_spent + $location[the red zeppelin].turns_spent + $location[the copperhead club].turns_spent) > 0)
-        return true;
-    
-    if (!$item[Talisman o' Namsilat].have()) return true;
     
     return false;
 }

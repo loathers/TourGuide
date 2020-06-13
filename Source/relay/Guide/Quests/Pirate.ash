@@ -8,12 +8,10 @@ void QPirateInit()
 	state.quest_name = "Pirate Quest";
 	state.image_name = "pirate quest";
 	
-	state.state_boolean["valid"] = true;
-	if (__misc_state["mysterious island available"] && !(myPathId() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"]))
-	{
+	state.state_boolean["valid"] = false; // now invalid by default since the 2020 change
+	if (__misc_state["mysterious island available"]) {
 		state.startable = true;
-		if (!state.in_progress && !state.finished)
-		{
+		if (!state.in_progress && !state.finished) {
 			QuestStateParseMafiaQuestPropertyValue(state, "started");
 		}
 	}
@@ -29,8 +27,7 @@ void QPirateInit()
     
     
 	int insult_count = 0;
-	for i from 1 to 8
-	{
+	for i from 1 to 8 {
 		if (get_property_boolean("lastPirateInsult" + i))
 			insult_count += 1;
 	}
@@ -39,17 +36,13 @@ void QPirateInit()
     if ($item[Orcish Frat House blueprints].available_amount() > 0 && state.mafia_internal_step <3 )
         QuestStateParseMafiaQuestPropertyValue(state, "step2");
     
-	//Certain characters are in weird states, I think?
-    if ($item[pirate fledges].available_amount() > 0 || $item[talisman o\' namsilat].available_amount() > 0)
-        QuestStateParseMafiaQuestPropertyValue(state, "finished");
+	//Certain characters are in weird states, I think? (now obsolete; these two quests are no longer linked)
+    /*if ($item[pirate fledges].available_amount() > 0 || $item[talisman o\' namsilat].available_amount() > 0)
+        QuestStateParseMafiaQuestPropertyValue(state, "finished");*/
 	__quest_state["Pirate Quest"] = state;
 	
-	if (myPathId() == PATH_POCKET_FAMILIARS || myPathId() == PATH_G_LOVER || true)
-	{
-		state.state_boolean["valid"] = false;
-        state.state_boolean["hot wings relevant"] = false;
-        state.state_boolean["need more hot wings"] = false;
-	}
+	if (my_path_id() == PATH_LOW_KEY_SUMMER)
+		state.state_boolean["valid"] = true;
 }
 
 
@@ -57,8 +50,6 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Pirate Quest"].in_progress)
 		return;
-    if (!__quest_state["Pirate Quest"].state_boolean["valid"] && !(get_property_boolean("kingLiberated") && $locations[Barrrney's Barrr,The F'c'le,The Poop Deck,Belowdecks] contains __last_adventure_location))
-        return;
         
 	QuestState base_quest_state = __quest_state["Pirate Quest"];
 	ChecklistSubentry subentry;
@@ -87,18 +78,16 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     boolean delay_for_future = false;
     boolean can_acquire_cocktail_napkins = false;
     
-    if (in_ronin() && $item[Talisman o\' Namsilat].available_amount() == 0)
+    if (in_ronin() && $item[Talisman o\' Namsilat].available_amount() == 0 && my_path_id() != PATH_LOW_KEY_SUMMER)
     	subentry.entries.listAppend(HTMLGenerateSpanFont("Pirates won't help you in-run anymore.", "red"));
 	
-	if (!have_outfit)
-	{
+	if (!have_outfit) {
         url = "island.php";
 		string line = "Acquire outfit.";
 		
 		item [int] outfit_pieces = outfit_pieces("Swashbuckling Getup");
 		item [int] outfit_pieces_needed;
-		foreach key in outfit_pieces
-		{
+		foreach key in outfit_pieces {
 			item piece = outfit_pieces[key];
 			if (piece.available_amount() == 0)
 				outfit_pieces_needed.listAppend(piece);
@@ -130,14 +119,11 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             turns_remaining = outfit_pieces_needed.count().to_float() / average_useful_nc_rate;
 		subentry.entries.listAppend("Run -combat in the obligatory pirate's cove." + "|~" + turns_remaining.roundForOutput(1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
         
-        if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"])
-        {
+        if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"]) {
             subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
             delay_for_future = true;
         }
-	}
-	else
-	{
+	} else {
         url = "place.php?whichplace=cove";
         
         if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0)
@@ -145,60 +131,46 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
         boolean have_all_fcle_items = false;
         
-		if (base_quest_state.mafia_internal_step == 1)
-		{
+		if (base_quest_state.mafia_internal_step == 1) {
             can_acquire_cocktail_napkins = true;
 			//caronch gave you a map
-			if ($item[Cap'm Caronch's nasty booty].available_amount() == 0 && $item[Cap'm Caronch's Map].available_amount() > 0)
-			{
+			if ($item[Cap'm Caronch's nasty booty].available_amount() == 0 && $item[Cap'm Caronch's Map].available_amount() > 0) {
                 url = "inventory.php?ftext=cap'm+caronch's+map";
 				subentry.entries.listAppend("Use Cap'm Caronch's Map, fight a booty crab.");
 				subentry.entries.listAppend("Possibly run +meat. (300 base drop)");
                 subentry.modifiers.listAppend("+meat");
-			}
-			else if (have_outfit)
-            {
+			} else if (have_outfit) {
                 subentry.modifiers.listAppend("-combat");
 				subentry.entries.listAppend("Find Cap'm Caronch in Barrrney's Barrr.");
             }
-		}
-		else if (base_quest_state.mafia_internal_step == 2)
-		{
+		} else if (base_quest_state.mafia_internal_step == 2) {
             can_acquire_cocktail_napkins = true;
 			//give booty back to caronch
 			subentry.entries.listAppend("Find Cap'm Caronch in Barrrney's Barrr.");
-		}
-		else if (base_quest_state.mafia_internal_step == 3)
-		{
+		} else if (base_quest_state.mafia_internal_step == 3) {
             can_acquire_cocktail_napkins = true;
 			//have blueprints, catburgle
 			string line = "Use the Orcish Frat House blueprints";
-			if (insult_count < 6)
-            {
+			if (insult_count < 6) {
                 subentry.modifiers.listAppend("+20% combat");
 				line += ", once you have at least six insults"; //in certain situations five might be slightly faster? but that skips a lot of combats, so probably not
             }
 			line += ".";
 			
             string method;
-			if (have_outfit_components("Frat Boy Ensemble") && __misc_state["can equip just about any weapon"])
-			{
+			if (have_outfit_components("Frat Boy Ensemble") && __misc_state["can equip just about any weapon"]) {
 				string [int] todo;
 				if (!is_wearing_outfit("Frat Boy Ensemble"))
 					todo.listAppend("wear frat boy ensemble");
 				todo.listAppend("attempt a frontal assault");
 				method = todo.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".";
-			}
-			else if ($item[mullet wig].available_amount() > 0 && $item[briefcase].available_amount() > 0)
-			{
+			} else if ($item[mullet wig].available_amount() > 0 && $item[briefcase].available_amount() > 0) {
 				string [int] todo;
 				if ($item[mullet wig].equipped_amount() == 0)
 					todo.listAppend("wear mullet wig");
 				todo.listAppend("go in through the side door");
 				method = todo.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".";
-			}
-			else if (knoll_available() || ($item[frilly skirt].available_amount() > 0 && $item[hot wing].available_amount() >= 3))
-			{
+			} else if (knoll_available() || ($item[frilly skirt].available_amount() > 0 && $item[hot wing].available_amount() >= 3)) {
 				string [int] todo;
                 if (insult_count < 6)
                     todo.listAppend("acquire at least six insults");
@@ -209,15 +181,12 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				todo.listAppend("catburgle");
                 string line2 = todo.listJoinComponents(", ", "then").capitaliseFirstLetter() + ".";
 				method = line2;
-			}
-			else
-			{
+			} else {
                 //Non-knoll sign.
                 //I think the fastest method is frilly skirt?
                 if ($item[hot wing].available_amount() >= 3 && my_familiar() != $familiar[black cat])
                     method = "Farm a frilly skirt in the knoll gym. (+300% item)";
-                else
-                {
+                else {
                     method = "Acquire a frat boy outfit in the frat house? (-combat" + (my_level() < 9 ? " after level 9" : "") + ")";
                     if (!__quest_state["Level 6"].finished)
                         method += "|Or collect hot wings from the friar demons" + ($item[frilly skirt].available_amount() == 0 ? ", and frilly skirt from the knoll gym" : "") + ".";
@@ -225,20 +194,14 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			}
             line += "|" + method;
 			subentry.entries.listAppend(line);
-		}
-		else if (base_quest_state.mafia_internal_step == 4)
-		{
+		} else if (base_quest_state.mafia_internal_step == 4) {
 			//acquired teeth, give them back
 			subentry.entries.listAppend("Find Cap'm Caronch in Barrrney's Barrr. (next adventure)");
-		}
-		else if (base_quest_state.mafia_internal_step == 5)
-		{
+		} else if (base_quest_state.mafia_internal_step == 5) {
 			//ricketing
 			subentry.entries.listAppend("Play beer pong.");
 			subentry.entries.listAppend("If you want more insults now, adventure in the Obligatory Pirate's Cove, not in the Barrr.");
-		}
-		else if (base_quest_state.mafia_internal_step == 6)
-		{
+		} else if (base_quest_state.mafia_internal_step == 6) {
 			//f'c'le
 			//We can't tell them which ones they need, precisely, since they may have already used them.
 			//We can tell them which ones they have... but it's still unreliable. I guess a single message if they have all three?
@@ -247,15 +210,12 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
             item [int] missing_washing_items = $items[rigging shampoo,mizzenmast mop,ball polish].items_missing();
             
-			if (missing_washing_items.count() == 0)
-            {
+			if (missing_washing_items.count() == 0) {
                 have_all_fcle_items = true;
                 //url = "inventory.php?which=3";
                 line += " Adventure once to complete quest.";
 				//line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red") + ", then adventure to complete quest.";
-            }
-			else
-			{
+            } else {
                 subentry.modifiers.listAppend("+234% item");
                 subentry.modifiers.listAppend("+20% combat");
 				line += " Run +234% item, +combat, and collect " + missing_washing_items.listJoinComponents(", ", "and") + ".";
@@ -263,8 +223,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 					additional_line = "This location can be a nightmare without +234% item.";
                     
                 subentry.modifiers.listAppend("banish chatty/crusty pirate");
-                if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING)
-                {
+                if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING) {
                     monster [int] monsters_left;
                     if ($item[rigging shampoo].available_amount() == 0)
                         monsters_left.listAppend($monster[cleanly pirate]);
@@ -272,11 +231,9 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                         monsters_left.listAppend($monster[curmudgeonly pirate]);
                     if ($item[ball polish].available_amount() == 0)
                         monsters_left.listAppend($monster[creamy pirate]);
-                    if (monsters_left.count() > 0)
-                    {
+                    if (monsters_left.count() > 0) {
                         string [int] monsters_left_string;
-                        foreach key, m in monsters_left
-                        {
+                        foreach key, m in monsters_left {
                             if (last_monster() == m)
                                 monsters_left_string.listAppend(HTMLGenerateSpanOfClass(m, "r_bold"));
                             else
@@ -296,14 +253,12 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			subentry.entries.listAppend(line);
 			if (additional_line != "")
 				subentry.entries.listAppend(additional_line);
-            if (!($monster[clingy pirate (female)].is_banished() || $monster[clingy pirate (male)].is_banished()) && $item[cocktail napkin].available_amount() > 0 && !have_all_fcle_items)
-            {
+            if (!($monster[clingy pirate (female)].is_banished() || $monster[clingy pirate (male)].is_banished()) && $item[cocktail napkin].available_amount() > 0 && !have_all_fcle_items) {
                 subentry.entries.listAppend("Use cocktail napkin on clingy pirate to " + (__misc_state["free runs usable"] ? "free run/" : "") + "banish.");
             }
 		}
         
-        if (base_quest_state.mafia_internal_step <= 3 && my_inebriety() > 0)
-        {
+        if (base_quest_state.mafia_internal_step <= 3 && my_inebriety() > 0) {
             subentry.entries.listAppend("Could wait until rollover; one of the non-combats can become a combat at zero drunkenness.");
         }
         
@@ -317,8 +272,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if (base_quest_state.mafia_internal_step >= 6)
 		should_output_insult_data = false;
 		
-	if (should_output_insult_data)
-	{
+	if (should_output_insult_data) {
 		string line = "At " + pluralise(insult_count, "insult", "insults") + ". " + roundForOutput(insult_success_likelyhood[insult_count] * 100, 1) + "% chance of beer pong success.";
 		if (insult_count < 8)
 			line += "|Insult every pirate with the big book of pirate insults.";
@@ -327,14 +281,12 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	if ($item[the big book of pirate insults].available_amount() == 0 && base_quest_state.mafia_internal_step < 6 && have_outfit)
 		subentry.entries.listAppend(HTMLGenerateSpanFont("Buy the big book of pirate insults.", "red"));
 	
-    if (can_acquire_cocktail_napkins && $item[cocktail napkin].available_amount() == 0)
-    {
+    if (can_acquire_cocktail_napkins && $item[cocktail napkin].available_amount() == 0) {
         subentry.modifiers.listAppend("+item");
         subentry.entries.listAppend("Try to acquire a cocktail napkin to speed up F'c'le. (10% drop, marginal)");
     }
     
-	if (!is_wearing_outfit("Swashbuckling Getup") && have_outfit)
-    {
+	if (!is_wearing_outfit("Swashbuckling Getup") && have_outfit) {
         string [int] stats_needed;
         if (my_basestat($stat[moxie]) < 25)
             stats_needed.listAppend("moxie");
@@ -342,16 +294,47 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             stats_needed.listAppend("mysticality");
         string line = "Wear swashbuckling getup.";
         
-        if (stats_needed.count() > 0)
-        {
+        if (stats_needed.count() > 0) {
             delay_for_future = true;
             line += HTMLGenerateSpanOfClass(" Need 25 " + stats_needed.listJoinComponents(", ", "and"), "r_bold") + ".";
         }
 		subentry.entries.listAppend(line);
     }
-        
-    if (delay_for_future)
-        future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
-    else
+
+	if (__misc_state["in run"] && $locations[Barrrney's Barrr,The F'c'le,The Poop Deck] contains __last_adventure_location)
+        return;
+    
+	if (__quest_state["Pirate Quest"].state_boolean["valid"]) {
+    	if (delay_for_future)
+        	future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
+		else
+			task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
+	} else if ($locations[Barrrney's Barrr,The F'c'le,The Poop Deck] contains __last_adventure_location)
         task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
+	else
+		optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
 }
+
+/*
+	if (my_path_id() == PATH_LOW_KEY_SUMMER && $item[pirate fledges].available_amount() > 0) {
+		subentry.modifiers.listAppend("-combat");
+		subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
+		subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 1, "unlock belowdecks"));
+		
+		if (__misc_state["need to level"])// && $location[the poop deck].noncombat_queue.contains_text("O Cap'm")) {
+			if (my_meat() < 977) {
+				subentry.entries.listAppend(HTMLGenerateSpanFont("Possibly acquire 977 meat first", "red") + ", to gain extra stats from the other NC.");
+			} else {
+				string coordinates;
+				if (my_primestat() == $stat[muscle])
+					coordinates = "(56, 14)";
+				else if (my_primestat() == $stat[mysticality])
+					coordinates = "(3, 35)";
+				else if (my_primestat() == $stat[moxie])
+					coordinates = "(5, 39)";
+				if (coordinates != "")
+					subentry.entries.listAppend("If you encounter the wheel/O Cap'm adventure, take the helm, and sail to " + coordinates + ". (costs a turn for stats)");
+			}
+		}
+	}
+*/

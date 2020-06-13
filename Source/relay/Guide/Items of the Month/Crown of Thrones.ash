@@ -151,8 +151,7 @@ void IOTMCOTGenerateSuggestions(string [int] description)
         suggestion_sets.listAppend(COTSuggestionSetMake(suggestions));
     }*/
     //hot wings from reanimator
-    if (true)
-    {
+    if (true) {
         string [int] reanimator_reasons;
         
         if (__quest_state["Pirate Quest"].state_boolean["need more hot wings"])

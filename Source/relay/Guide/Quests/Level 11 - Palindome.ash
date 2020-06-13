@@ -40,92 +40,18 @@ void QLevel11PalindomeGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     subentry.header = base_quest_state.quest_name;
     string url;
     
-    if (base_quest_state.mafia_internal_step < 2 && $item[talisman o' namsilat].available_amount() == 0 && $items[Copperhead Charm,Copperhead Charm (rampant)].items_missing().count() == 0)
-    {
+    if (base_quest_state.mafia_internal_step < 2 && $item[talisman o' namsilat].available_amount() == 0 && $items[Copperhead Charm,Copperhead Charm (rampant)].items_missing().count() == 0) {
         url = "craft.php?mode=combine";
         subentry.entries.listAppend("Paste the two copperhead charms together to acquire the talisman o' nam.");
-    }
-    else if (base_quest_state.mafia_internal_step < 2 && $item[talisman o' namsilat].available_amount() == 0)
-    {
+    } else if (base_quest_state.mafia_internal_step < 2 && $item[talisman o' namsilat].available_amount() == 0) {
         //1 -> find palindome
-        url = "place.php?whichplace=cove";
-        if (__quest_state["Pirate Quest"].state_boolean["valid"])
-        	subentry.entries.listAppend("Find the palindome. The pirates will know the way.");
-        else
-        {
-        	string [int] quests;
-            if (!__quest_state["Level 11 Shen"].finished)
-            	quests.listAppend("copperhead");
-            if (!__quest_state["Level 11 Ron"].finished)
-                quests.listAppend("zeppelin");
-            subentry.entries.listAppend("Find the palindome by completing the " + quests.listJoinComponents("/") + " quest.");
-        }
-        
-        if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0 && $item[pirate fledges].available_amount() > 0)
-        {
-            if ($item[pirate fledges].available_amount() > 0 && $item[pirate fledges].can_equip())
-                subentry.entries.listAppend("Equip the pirate fledges first.");
-            else
-                subentry.entries.listAppend("Equip the Swashbuckling Getup first.");
-            url = "inventory.php?which=2";
-        }
-        
-        if (!__quest_state["Pirate Quest"].state_boolean["valid"])
-        {
-        }
-        else if ($location[the poop deck].noncombat_queue.contains_text("It's Always Swordfish") || $location[belowdecks].turnsAttemptedInLocation() > 0)
-        {
-            if ($items[gaudy key,snakehead charrrm].available_amount() < 2)
-            {
-                if ($items[gaudy key,snakehead charrrm].available_amount() == 0)
-                {
-                    subentry.modifiers.listAppend("olfact gaudy pirate");
-                    string line = "Olfact/copy gaudy pirate belowdecks";
-                    line += ".";
-                    subentry.entries.listAppend(line);
-                }
-                else
-                    subentry.entries.listAppend("Find a single gaudy pirate.");
-            }
-            else
-                url = "inventory.php?which=3";
-            if ($item[gaudy key].available_amount() > 0)
-                subentry.entries.listAppend("Use " + $item[gaudy key].pluralise() + ".");
-        }
-        else if ($item[pirate fledges].available_amount() > 0)
-        {
-            subentry.modifiers.listAppend("-combat");
-            subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
-            subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 1, "unlock belowdecks"));
-            
-            if (__misc_state["need to level"])// && $location[the poop deck].noncombat_queue.contains_text("O Cap'm"))
-            {
-                if (my_meat() < 977)
-                {
-                    subentry.entries.listAppend(HTMLGenerateSpanFont("Possibly acquire 977 meat first", "red") + ", to gain extra stats from the other NC.");
-                }
-                else
-                {
-                    string coordinates;
-                    if (my_primestat() == $stat[muscle])
-                        coordinates = "(56, 14)";
-                    else if (my_primestat() == $stat[mysticality])
-                        coordinates = "(3, 35)";
-                    else if (my_primestat() == $stat[moxie])
-                        coordinates = "(5, 39)";
-                    if (coordinates != "")
-                        subentry.entries.listAppend("If you encounter the wheel/O Cap'm adventure, take the helm, and sail to " + coordinates + ". (costs a turn for stats)");
-                }
-            }
-        }
-        else
-        {
-            subentry.entries.listAppend("Do pirate quest first.");
-        }
-            
-    }
-    else
-    {
+        string [int] quests;
+        if (!__quest_state["Level 11 Shen"].finished)
+            quests.listAppend("copperhead");
+        if (!__quest_state["Level 11 Ron"].finished)
+            quests.listAppend("zeppelin");
+        subentry.entries.listAppend("Find the palindome by completing the " + quests.listJoinComponents("/") + " quest.");    
+    } else {
         url = "place.php?whichplace=palindome";
         if ($item[talisman o' namsilat].equipped_amount() == 0)
             url = "inventory.php?ftext=talisman+o'+namsilat";

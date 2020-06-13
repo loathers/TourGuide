@@ -28,7 +28,7 @@ void IOTMXOSkeletonGenerateResource(ChecklistEntry [int] resource_entries)
 	            options.listAppend("banshee librarian (killing jar)");
             if (get_property_int("hiddenApartmentProgress") < 7 || get_property_int("hiddenOfficeProgress") < 7)
 	            options.listAppend("pygmy witch lawyer (short writs)");
-            if (!have_outfit_components("Swashbuckling Getup"))
+            if (!have_outfit_components("Swashbuckling Getup") && __quest_state["Pirate Quest"].state_boolean["valid"])
 	            options.listAppend("obligatory pirate's cove (outfit)");
             if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] >= 90)
 	            options.listAppend("Whatsian Commando Ghost (ghost free runaway)");
