@@ -223,7 +223,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 					additional_line = "This location can be a nightmare without +234% item.";
                     
                 subentry.modifiers.listAppend("banish chatty/crusty pirate");
-                if (myPathId() == PATH_ACTUALLY_ED_THE_UNDYING) {
+                if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) {
                     monster [int] monsters_left;
                     if ($item[rigging shampoo].available_amount() == 0)
                         monsters_left.listAppend($monster[cleanly pirate]);
