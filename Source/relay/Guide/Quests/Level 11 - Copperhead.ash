@@ -77,8 +77,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
      
     if (base_quest_state.mafia_internal_step <= 2 && base_quest_state.state_int["protestors remaining"] <= 1) {
         subentry.entries.listAppend("Adventure in the mob of protestors.");
-    }
-    else if (base_quest_state.mafia_internal_step <= 2) {
+    } else if (base_quest_state.mafia_internal_step <= 2) {
         //Fight your way through the mob of zeppelin protesters.
         subentry.entries.listAppend("Scare away " + pluraliseWordy(base_quest_state.state_int["protestors remaining"], "more protestor", "more protestors") + ".");
         subentry.modifiers.listAppend("-combat");
@@ -177,8 +176,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
         if (!__quest_state["Level 11 Shen"].finished && $item[Flamin' Whatshisname].available_amount() == 0)
             subentry.entries.listAppend("Could adventure in the Copperhead Club first for Flamin' Whatshisnames.");
-    }
-    else if (base_quest_state.mafia_internal_step <= 4) {
+    } else if (base_quest_state.mafia_internal_step <= 4) {
         //All aboard! All aboard the Red Zeppelin!
         subentry.entries.listAppend("Search for Ron in the zeppelin.");
         //possibly 50% chance of no progress without a ticket (unconfirmed chat rumour)
@@ -225,8 +223,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             subentry.entries.listAppend("Acquire a Red Zeppelin ticket from the black market.");
             url = "shop.php?whichshop=blackmarket";
         }
-    }
-    else if (base_quest_state.mafia_internal_step == 5) {
+    } else if (base_quest_state.mafia_internal_step == 5) {
         //Barge into Ron Copperhead's cabin in the Red Zeppelin and beat him up!
         subentry.entries.listAppend("Defeat Ron in the zeppelin.");
     }
@@ -292,44 +289,35 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         subentry.entries.listAppend("This will give you unremovable -5 stat poison.");
         if (my_daycount() == 1 && my_path_id() != PATH_EXPLOSIONS)
             subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
-    }
-    else if (base_quest_state.mafia_internal_step == 2) {
+    } else if (base_quest_state.mafia_internal_step == 2) {
         if (quest_location != $location[none]) {
             subentry.entries.listAppend("Adventure in " + quest_location + ".");
             url = quest_location.getClickableURLForLocation();
-        }
-        else {
+        } else {
             subentry.entries.listAppend("Fight the first monster wherever Shen told you to go.");
             url = "";
         }
-    }
-    else if (base_quest_state.mafia_internal_step == 3) {
+    } else if (base_quest_state.mafia_internal_step == 3) {
         want_club_details = true;
-    }
-    else if (base_quest_state.mafia_internal_step == 4) {
+    } else if (base_quest_state.mafia_internal_step == 4) {
         if (quest_location != $location[none]) {
             subentry.entries.listAppend("Adventure in " + quest_location + ".");
             url = quest_location.getClickableURLForLocation();
-        }
-        else {
+        } else {
             subentry.entries.listAppend("Fight the second monster wherever Shen told you to go.");
             url = "";
         }
-    }
-    else if (base_quest_state.mafia_internal_step == 5) {
+    } else if (base_quest_state.mafia_internal_step == 5) {
         want_club_details = true;
-    }
-    else if (base_quest_state.mafia_internal_step == 6) {
+    } else if (base_quest_state.mafia_internal_step == 6) {
         if (quest_location != $location[none]) {
             subentry.entries.listAppend("Adventure in " + quest_location + ".");
             url = quest_location.getClickableURLForLocation();
-        }
-        else {
+        } else {
             subentry.entries.listAppend("Fight the third monster wherever Shen told you to go.");
             url = "";
         }
-    }
-    else if (base_quest_state.mafia_internal_step == 7) {
+    } else if (base_quest_state.mafia_internal_step == 7) {
         want_club_details = true;
     }
     //FIXME is shen scheduled?
@@ -364,8 +352,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         
         if (need_diamond) {
             subentry.entries.listAppend("Try to acquire a priceless diamond. (complicated)");
-        }
-        else if (need_flaming_whathisname) {
+        } else if (need_flaming_whathisname) {
             subentry.entries.listAppend("Could try to acquire Flamin' Whatshisname. (complicated)");
         }
     }
