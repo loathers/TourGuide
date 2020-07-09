@@ -1,11 +1,16 @@
 RegisterTaskGenerationFunction("IOTMGuzzlrQuestGenerateTask");
 void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-    if (get_property("questGuzzlr") == "unstarted") return;
+    if (get_property("questGuzzlr") == "unstarted" || !lookupItem("Guzzlr tablet").have()) return;
     location questLocation = get_property("guzzlrQuestLocation").to_location();
     
     ChecklistSubentry gigEconomy() {
-        item questBooze = get_property("guzzlrQuestBooze").to_item();
         string questTier = get_property("guzzlrQuestTier");
+        item questBooze = get_property("guzzlrQuestBooze").to_item();
+        boolean [item] questBoozePlatinum;
+        foreach platinumDrink in $strings[Steamboat, Ghiaccio Colada, Nog-on-the-Cob, Sourfinger, Buttery Boy] {
+            questBoozePlatinum [lookupItem(platinumDrink)] = true;
+        }
+
         int guzzlrQuestNumber = min(8, get_property_int("_guzzlrDeliveries") + 1);
 
         int [int] [boolean] guzzlrDeliveryTurnRange; //int= value of guzzlrQuestNumber; boolean= using shoes
@@ -18,14 +23,15 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
             guzzlrDeliveryTurnRange [7] [false] = 25; guzzlrDeliveryTurnRange [7] [true] = 17;
             guzzlrDeliveryTurnRange [8] [false] = 34; guzzlrDeliveryTurnRange [8] [true] = 25;
 
-        boolean hasBooze = questBooze.available_amount() > 0;
+        boolean hasBooze;
+        boolean hasBoozeSomewhere;
 
         if (questTier == "platinum") {
-            hasBooze = lookupItem("Steamboat").available_amount() > 0
-                || lookupItem("Ghiaccio Colada").available_amount() > 0
-                || lookupItem("Nog-on-the-Cob").available_amount() > 0
-                || lookupItem("Sourfinger").available_amount() > 0
-                || lookupItem("Buttery Boy").available_amount() > 0;
+            hasBooze = questBoozePlatinum.item_amount() > 0;
+            hasBoozeSomewhere = questBoozePlatinum.available_amount() + questBoozePlatinum.display_amount() > 0;
+        } else {
+            hasBooze = questBooze.item_amount() > 0;
+            hasBoozeSomewhere = questBooze.available_amount() + questBooze.display_amount() > 0;
         }
 
         boolean hasShoes = lookupItem("Guzzlr shoes").available_amount() > 0;
@@ -54,16 +60,51 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
         string [int] description;
 
         if (hasBooze) {
-            if (questTier == "platinum") {
-                description.listAppend("Deliver platinum booze by adventuring in " + questLocation + ".");
-            } else {
-                description.listAppend("Deliver " + questBooze + " by adventuring in " + questLocation + ".");
-            }
+            description.listAppend("Deliver " + (questTier == "platinum" ? "platinum booze" : questBooze) + " by adventuring in " + questLocation + ".");
         } else {
+            string color_of_reminder_to_get_drink = __last_adventure_location == questLocation ? "red" : "dark";
+
             if (questTier == "platinum") {
-                description.listAppend("Obtain one of the following:" + HTMLGenerateIndentedText("| • Steamboat | • Ghiaccio Colada | • Nog-on-the-Cob | • Sourfinger | • Buttery Boy")); //todo: strikethrough unobtainable booze? Tell how to get each?
+                int [item] creatablePlatinumDrinks = questBoozePlatinum.creatable_items();
+                buffer message;
+
+                message.append(HTMLGenerateSpanFont("Obtain one of the following:", color_of_reminder_to_get_drink));
+                message.append(to_buffer("| • Steamboat" + (creatablePlatinumDrinks contains lookupItem("Steamboat") ? " (can make with a miniature boiler)" : "") + " | • Ghiaccio Colada" + (creatablePlatinumDrinks contains lookupItem("Ghiaccio Colada") ? " (can make with a cold wad)" : "") + " | • Nog-on-the-Cob" + (creatablePlatinumDrinks contains lookupItem("Nog-on-the-Cob") ? " (can make with a robin's egg)" : "") + " | • Sourfinger" + (creatablePlatinumDrinks contains lookupItem("Sourfinger") ? " (can make with a mangled finger)" : "") + " | • Buttery Boy" + (creatablePlatinumDrinks contains lookupItem("Buttery Boy") ? " (can make with a Dish of Clarified Butter)" : "") ) );
+                description.listAppend(message);
+
+                if (hasBoozeSomewhere) {
+                    string [int] goLookThere;
+
+                    if (get_property_boolean("autoSatisfyWithStorage") && questBoozePlatinum.storage_amount() > 0 && can_interact())
+                        goLookThere.listAppend("in hagnk's storage");
+                    if (get_property_boolean("autoSatisfyWithCloset") && questBoozePlatinum.closet_amount() > 0)
+                        goLookThere.listAppend("in your closet");
+                    if (get_property_boolean("autoSatisfyWithStash") && questBoozePlatinum.stash_amount() > 0)
+                        goLookThere.listAppend("in your clan stash");
+                    if (questBoozePlatinum.display_amount() > 0) // there's no relevant mafia property; is never taken into consideration
+                        goLookThere.listAppend("in your display case");
+
+                    description.listAppend("Go look " + (goLookThere.count() > 0 ? goLookThere.listJoinComponents(", ", "or") + "." : "...somewhere?"));
+                }
             } else {
-                description.listAppend("Obtain a " + questBooze + ".");
+                description.listAppend(HTMLGenerateSpanFont("Obtain a " + questBooze + ".", color_of_reminder_to_get_drink));
+                if (hasBoozeSomewhere) {
+                    string [int] goLookThere;
+
+                    if (get_property_boolean("autoSatisfyWithStorage") && questBooze.storage_amount() > 0 && can_interact())
+                        goLookThere.listAppend(questBooze.storage_amount() + " in hagnk's storage");
+                    if (get_property_boolean("autoSatisfyWithCloset") && questBooze.closet_amount() > 0)
+                        goLookThere.listAppend(questBooze.closet_amount() + " in your closet");
+                    if (get_property_boolean("autoSatisfyWithStash") && questBooze.stash_amount() > 0)
+                        goLookThere.listAppend(questBooze.stash_amount() + " in your clan stash");
+                    if (questBooze.display_amount() > 0)
+                        goLookThere.listAppend(questBooze.display_amount() + " in your display case");
+
+                    description.listAppend("Have " + (goLookThere.count() > 0 ? goLookThere.listJoinComponents(", ", "and") + "." : "some... somewhere..?"));
+                }
+
+                if (questBooze.creatable_amount() > 0)
+                    description.listAppend("Could craft one.");
             }
         }
 
@@ -92,8 +133,6 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
         return ChecklistSubentryMake(main_title, subtitle, description);
     }
 
-	if (!lookupItem("Guzzlr tablet").have()) return;
-
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Guzzlrbuck";
     entry.url = questLocation.getClickableURLForLocation();
@@ -110,6 +149,8 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
 
 RegisterTaskGenerationFunction("IOTMGuzzlrTabletGenerateTask");
 void IOTMGuzzlrTabletGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+
+    if (!lookupItem("Guzzlr tablet").have()) return;
 
     ChecklistSubentry getGuzzling() { // for either telling the player to accept a quest, or reminding them if they can abandon it
         boolean startedQuest = get_property("questGuzzlr") != "unstarted";
@@ -174,8 +215,6 @@ void IOTMGuzzlrTabletGenerateTask(ChecklistEntry [int] task_entries, ChecklistEn
         return ChecklistSubentryMake(main_title, subtitle, description);
     }
 
-
-    if (!lookupItem("Guzzlr tablet").have()) return;
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Guzzlr tablet";
