@@ -1,3 +1,4 @@
+import "relay/Guide/Quests/Level 11.ash";
 
 void QPirateInit()
 {
@@ -48,7 +49,8 @@ void QPirateInit()
 
 void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!__quest_state["Pirate Quest"].in_progress)
+    //Show the tile IF: they started the quest, and the quest is valid in this path, OR, they started the quest, and are adventuring in the relevant locations, OR, they started the quest, and are out of run, OR, they are adventuring in the Poop Deck (at all).
+    if (!(__quest_state["Pirate Quest"].in_progress && (__quest_state["Pirate Quest"].state_boolean["valid"] = true || $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le] contains __last_adventure_location || !__misc_state["in run"])) && $location[The Poop Deck] != __last_adventure_location)
         return;
         
     QuestState base_quest_state = __quest_state["Pirate Quest"];
@@ -212,49 +214,44 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
             if (missing_washing_items.count() == 0) {
                 have_all_fcle_items = true;
-                //url = "inventory.php?which=3";
-                line += " Adventure once to complete quest.";
-                //line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red") + ", then adventure to complete quest.";
+                url = "inventory.php?which=3";
+                line += " " + HTMLGenerateSpanFont("Use rigging shampoo, mizzenmast mop, and ball polish", "red") + ", then adventure to complete quest.";
             } else {
                 subentry.modifiers.listAppend("+234% item");
                 subentry.modifiers.listAppend("+20% combat");
-                line += " Run +234% item, +combat, and collect " + missing_washing_items.listJoinComponents(", ", "and") + ".";
+                string [int] missing_washing_items_wordy;
+                foreach key in missing_washing_items {
+                    if (missing_washing_items [key] == $item[rigging shampoo])
+                        missing_washing_items_wordy.listAppend("rigging shampoo (cleanly pirate)");
+                    else if (missing_washing_items [key] == $item[mizzenmast mop])
+                        missing_washing_items_wordy.listAppend("mizzenmast mop (curmudgeonly pirate)");
+                    else if (missing_washing_items [key] == $item[ball polish])
+                        missing_washing_items_wordy.listAppend("ball polish (creamy pirate)");
+                }
+                line += " Run +234% item, +combat, and collect " + missing_washing_items_wordy.listJoinComponents(", ", "and") + ".";
                 if ($location[the f'c'le].item_drop_modifier_for_location() < 234.0)
                     additional_line = "This location can be a nightmare without +234% item.";
                     
                 subentry.modifiers.listAppend("banish chatty/crusty pirate");
-                if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) {
-                    monster [int] monsters_left;
-                    if ($item[rigging shampoo].available_amount() == 0)
-                        monsters_left.listAppend($monster[cleanly pirate]);
-                    if ($item[mizzenmast mop].available_amount() == 0)
-                        monsters_left.listAppend($monster[curmudgeonly pirate]);
-                    if ($item[ball polish].available_amount() == 0)
-                        monsters_left.listAppend($monster[creamy pirate]);
-                    if (monsters_left.count() > 0) {
-                        string [int] monsters_left_string;
-                        foreach key, m in monsters_left {
-                            if (last_monster() == m)
-                                monsters_left_string.listAppend(HTMLGenerateSpanOfClass(m, "r_bold"));
-                            else
-                                monsters_left_string.listAppend(m);
-                        }
-                        string line2 = "Use";
-                        if ($item[Talisman of Renenutet].available_amount() == 0)
-                            line2 = "Acquire and use";
-                        line2 += " the Talisman of Renenutet on " + monsters_left_string.listJoinComponents(", ", "and") + ".";
-                        if ($item[Talisman of Renenutet].available_amount() == 0)
-                            line2 = HTMLGenerateSpanFont(line2, "red");
-                        subentry.entries.listAppend(line2);
-                    }
-                }
             }
             
             subentry.entries.listAppend(line);
+            if (!have_all_fcle_items)
+                subentry.entries.listAppend("Don't use the items right away: we can't tell if you did!");
             if (additional_line != "")
                 subentry.entries.listAppend(additional_line);
             if (!($monster[clingy pirate (female)].is_banished() || $monster[clingy pirate (male)].is_banished()) && $item[cocktail napkin].available_amount() > 0 && !have_all_fcle_items) {
                 subentry.entries.listAppend("Use cocktail napkin on clingy pirate to " + (__misc_state["free runs usable"] ? "free run/" : "") + "banish.");
+            }
+        } else if (base_quest_state.mafia_internal_step == 7) {
+            //The Poop Deck
+            if (__quest_state["Level 11"].mafia_internal_step < 3) {
+                //Any way to tell if they just... can't get the diary, at all??
+                subentry.entries.listAppend("Come back when you've read from your father's MacGuffin diary, or you'll keep getting beaten up by a recurring non-combat.");
+            } else {
+                subentry.modifiers.listAppend("-combat");
+                subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
+                subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 1, "unlock belowdecks"));
             }
         }
         
@@ -301,15 +298,12 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         subentry.entries.listAppend(line);
     }
 
-    if (__misc_state["in run"] && $locations[Barrrney's Barrr,The F'c'le,The Poop Deck] contains __last_adventure_location)
-        return;
-    
-    if (__quest_state["Pirate Quest"].state_boolean["valid"]) {
+    if (__misc_state["in run"] && __quest_state["Pirate Quest"].state_boolean["valid"]) {
         if (delay_for_future)
             future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
         else
             task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
-    } else if ($locations[Barrrney's Barrr,The F'c'le,The Poop Deck] contains __last_adventure_location)
+    } else if ($locations[the obligatory pirate's cove, Barrrney's Barrr,The F'c'le,The Poop Deck] contains __last_adventure_location)
         task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
     else
         optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
@@ -337,4 +331,8 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             }
         }
     }
+
+    //still need to add cap'o'cap'm helper
+    //if they "can" go there, just add normal reminder that they can in optional_tasks
+    //if they ARE there, be more thorough
 */
