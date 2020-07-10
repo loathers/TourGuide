@@ -197,6 +197,7 @@ static
 
         building_images["bookshelf"] = KOLImageMake("images/otherimages/campground/bookshelf.gif", Vec2iMake(100,100), RectMake(0, 26, 99, 99));
         building_images["pirate quest"] = KOLImageMake("images/otherimages/trophy/party_on_the_big_boat.gif", Vec2iMake(100,100), RectMake(18, 3, 87, 64));
+        building_images["ship wheel"] = KOLImageMake("images/adventureimages/shipwheel.gif", Vec2iMake(100,100));
         building_images["meat"] = KOLImageMake("images/itemimages/meat.gif", Vec2iMake(30,30));
         building_images["monk"] = KOLImageMake("images/itemimages/monkhead.gif", Vec2iMake(30,30));
         

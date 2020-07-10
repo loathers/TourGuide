@@ -246,8 +246,11 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         } else if (base_quest_state.mafia_internal_step == 7) {
             //The Poop Deck
             if (__quest_state["Level 11"].mafia_internal_step < 3) {
-                //Any way to tell if they just... can't get the diary, at all??
-                subentry.entries.listAppend("Come back when you've read from your father's MacGuffin diary, or you'll keep getting beaten up by a recurring non-combat.");
+                if (my_path_id() == PATH_COMMUNITY_SERVICE || __quest_state["Level 11"].mafia_internal_step == 0 && get_property_int("lastCouncilVisit") >= 11) { //They CANNOT get the password, and are only here for the zone itself
+                    QuestStateParseMafiaQuestPropertyValue(base_quest_state, "finished");
+                    subentry.entries.listAppend("Watch out for that recurring non-combat...");
+                } else
+                    subentry.entries.listAppend("Come back when you've read from your father's MacGuffin diary, or you'll keep getting beaten up by the recurring non-combat.");
             } else {
                 subentry.modifiers.listAppend("-combat");
                 subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
@@ -298,41 +301,62 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         subentry.entries.listAppend(line);
     }
 
+    ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le,The Poop Deck]);
+    entry.combination_tag = "pirates";
+    
     if (__misc_state["in run"] && __quest_state["Pirate Quest"].state_boolean["valid"]) {
         if (delay_for_future)
-            future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
+            future_task_entries.listAppend(entry);
         else
-            task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
+            task_entries.listAppend(entry);
     } else if ($locations[the obligatory pirate's cove, Barrrney's Barrr,The F'c'le,The Poop Deck] contains __last_adventure_location)
-        task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
-    else
-        optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le]));
-}
+        task_entries.listAppend(entry);
+    else if (__quest_state["Pirate Quest"].in_progress)
+        optional_task_entries.listAppend(entry);
+    
+    
+    
+    //O Cap'm, My Cap'm helper; the main feature of this section, now!
+    if ($location[The Poop Deck] == __last_adventure_location || base_quest_state.mafia_internal_step == 7) {
+        ChecklistSubentry subentry2;
+        subentry2.header = "Sail the sea";
 
-/*
-    if (my_path_id() == PATH_LOW_KEY_SUMMER && $item[pirate fledges].available_amount() > 0) {
-        subentry.modifiers.listAppend("-combat");
-        subentry.entries.listAppend("Run -combat on the Poop Deck to unlock belowdecks.");
-        subentry.entries.listAppend(generateTurnsToSeeNoncombat(80, 1, "unlock belowdecks"));
-        
-        if (__misc_state["need to level"])// && $location[the poop deck].noncombat_queue.contains_text("O Cap'm")) {
+        if (true) { //for when the last o'cap'm, my cap'm property will be implemented (if)
             if (my_meat() < 977) {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Possibly acquire 977 meat first", "red") + ", to gain extra stats from the other NC.");
+                subentry2.entries.listAppend(HTMLGenerateSpanOfClass("Start by acquiring 977 meat.", "r_bold") + (__misc_state["need to level"] ? ", to gain extra stats from the other NC" : "") + ".");
             } else {
-                string coordinates;
-                if (my_primestat() == $stat[muscle])
-                    coordinates = "(56, 14)";
-                else if (my_primestat() == $stat[mysticality])
-                    coordinates = "(3, 35)";
-                else if (my_primestat() == $stat[moxie])
-                    coordinates = "(5, 39)";
-                if (coordinates != "")
-                    subentry.entries.listAppend("If you encounter the wheel/O Cap'm adventure, take the helm, and sail to " + coordinates + ". (costs a turn for stats)");
+                subentry2.modifiers.listAppend("-combat");
+                subentry2.entries.listAppend("Adventure on the Poop Deck until you get O Cap'm, My Cap'm.");
             }
+        } else {
+            //how many turns they'll need to burn in the zone to get the adventure again
         }
-    }
 
-    //still need to add cap'o'cap'm helper
-    //if they "can" go there, just add normal reminder that they can in optional_tasks
-    //if they ARE there, be more thorough
-*/
+        subentry2.entries.listAppend("*Sail to (48,47) to get an El Vibrato power sphere (or buy from mall).");
+        if (item_amount_almost_everywhere(lookupItem("El Vibrato trapezoid")) == 0 && $location[El Vibrato Island].turns_spent == 0) {
+            string line = "*Sail to (63,29) to get an El Vibrato trapezoid. " + HTMLGenerateSpanFont("Don't do this if you've already set up a portal at your campground.", "red");
+            if (lookupItem("El Vibrato power sphere").item_amount() == 0)
+                line += "|*Need an El Vibrato power sphere in inventory. Buy from mall?";
+            line += "|*Gives an item that creates a portal to El Vibrato Island at your campground (will need to keep it charged with more power spheres).";
+            subentry2.entries.listAppend(line);
+        }
+        subentry2.entries.listAppend("*Or sail to (1,1) to get a random ancient cursed key/chest.");
+        if (__misc_state["need to level"]) {
+            string coordinates;
+            if (my_primestat() == $stat[muscle])
+                coordinates = "(56, 14)";
+            else if (my_primestat() == $stat[mysticality])
+                coordinates = "(3, 35)";
+            else if (my_primestat() == $stat[moxie])
+                coordinates = "(5, 39)";
+            if (coordinates != "")
+                subentry2.entries.listAppend("Could sail to " + coordinates + " for stats?");
+        }
+
+        ChecklistEntry entry2 = ChecklistEntryMake("ship wheel", url, subentry2, $locations[The Poop Deck]).ChecklistEntryTagEntry(entry.combination_tag);
+        if ($location[The Poop Deck] == __last_adventure_location)
+            task_entries.listAppend(entry2);
+        else
+            optional_task_entries.listAppend(entry2);
+    }
+}
