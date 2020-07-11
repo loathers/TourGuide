@@ -50,7 +50,7 @@ void QPirateInit()
 void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //Show the tile IF: they started the quest, and the quest is valid in this path, OR, they started the quest, and are adventuring in the relevant locations, OR, they started the quest, and are out of run, OR, they are adventuring in the Poop Deck (at all).
-    if (!(__quest_state["Pirate Quest"].in_progress && (__quest_state["Pirate Quest"].state_boolean["valid"] = true || $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le] contains __last_adventure_location || !__misc_state["in run"])) && $location[The Poop Deck] != __last_adventure_location)
+    if (!(__quest_state["Pirate Quest"].in_progress && (__quest_state["Pirate Quest"].state_boolean["valid"] || $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le] contains __last_adventure_location || !__misc_state["in run"])) && $location[The Poop Deck] != __last_adventure_location)
         return;
         
     QuestState base_quest_state = __quest_state["Pirate Quest"];
