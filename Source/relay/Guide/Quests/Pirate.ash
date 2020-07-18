@@ -47,12 +47,8 @@ void QPirateInit()
 }
 
 
-void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void QPirateCoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    //Show the tile IF: they started the quest, and the quest is valid in this path, OR, they started the quest, and are adventuring in the relevant locations, OR, they started the quest, and are out of run, OR, they are adventuring in the Poop Deck (at all).
-    if (!(__quest_state["Pirate Quest"].in_progress && (__quest_state["Pirate Quest"].state_boolean["valid"] || $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le] contains __last_adventure_location || !__misc_state["in run"])) && $location[The Poop Deck] != __last_adventure_location)
-        return;
-        
     QuestState base_quest_state = __quest_state["Pirate Quest"];
     ChecklistSubentry subentry;
     subentry.header = base_quest_state.quest_name;
@@ -62,6 +58,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     boolean have_outfit = have_outfit_components("Swashbuckling Getup");
     if ($item[pirate fledges].available_amount() > 0)
         have_outfit = true;
+    boolean is_a_pirate = is_wearing_outfit("Swashbuckling Getup") || $item[pirate fledges].equipped_amount() > 0;
         
     int insult_count = base_quest_state.state_int["insult count"];
     
@@ -128,7 +125,7 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     } else {
         url = "place.php?whichplace=cove";
         
-        if (!is_wearing_outfit("Swashbuckling Getup") && $item[pirate fledges].equipped_amount() == 0)
+        if (!is_a_pirate)
             url = "inventory.php?which=2";
             
         boolean have_all_fcle_items = false;
@@ -286,17 +283,22 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         subentry.entries.listAppend("Try to acquire a cocktail napkin to speed up F'c'le. (10% drop, marginal)");
     }
     
-    if (!is_wearing_outfit("Swashbuckling Getup") && have_outfit) {
-        string [int] stats_needed;
-        if (my_basestat($stat[moxie]) < 25)
-            stats_needed.listAppend("moxie");
-        if (my_basestat($stat[mysticality]) < 25)
-            stats_needed.listAppend("mysticality");
-        string line = "Wear swashbuckling getup.";
-        
-        if (stats_needed.count() > 0) {
-            delay_for_future = true;
-            line += HTMLGenerateSpanOfClass(" Need 25 " + stats_needed.listJoinComponents(", ", "and"), "r_bold") + ".";
+    if (have_outfit && !is_a_pirate) {
+        string line;
+        if ($item[pirate fledges].available_amount() > 0 && my_basestat($stat[mysticality]) >= 60) {
+            line = "Wear pirate fledges.";
+        } else if (!is_wearing_outfit("Swashbuckling Getup")) {
+            string [int] stats_needed;
+            if (my_basestat($stat[moxie]) < 25)
+                stats_needed.listAppend("moxie");
+            if (my_basestat($stat[mysticality]) < 25)
+                stats_needed.listAppend("mysticality");
+            line = "Wear swashbuckling getup.";
+            
+            if (stats_needed.count() > 0) {
+                delay_for_future = true;
+                line += HTMLGenerateSpanOfClass(" Need 25 " + stats_needed.listJoinComponents(", ", "and"), "r_bold") + ".";
+            }
         }
         subentry.entries.listAppend(line);
     }
@@ -304,59 +306,74 @@ void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le,The Poop Deck]);
     entry.combination_tag = "pirates";
     
-    if (__misc_state["in run"] && __quest_state["Pirate Quest"].state_boolean["valid"]) {
+    if (__misc_state["in run"] && base_quest_state.state_boolean["valid"]) {
         if (delay_for_future)
             future_task_entries.listAppend(entry);
         else
             task_entries.listAppend(entry);
-    } else if ($locations[the obligatory pirate's cove, Barrrney's Barrr,The F'c'le,The Poop Deck] contains __last_adventure_location)
-        task_entries.listAppend(entry);
-    else if (__quest_state["Pirate Quest"].in_progress)
+    } else
         optional_task_entries.listAppend(entry);
-    
-    
-    
+}
+
+void QPoopDeckGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
     //O Cap'm, My Cap'm helper; the main feature of this section, now!
-    if ($location[The Poop Deck] == __last_adventure_location || base_quest_state.mafia_internal_step == 7) {
-        ChecklistSubentry subentry2;
-        subentry2.header = "Sail the sea";
+    ChecklistSubentry subentry;
+    subentry.header = "Sail the sea";
+    string url = "place.php?whichplace=cove";
 
-        if (true) { //for when the last o'cap'm, my cap'm property will be implemented (if)
-            if (my_meat() < 977) {
-                subentry2.entries.listAppend(HTMLGenerateSpanOfClass("Start by acquiring 977 meat.", "r_bold") + (__misc_state["need to level"] ? ", to gain extra stats from the other NC" : "") + ".");
-            } else {
-                subentry2.modifiers.listAppend("-combat");
-                subentry2.entries.listAppend("Adventure on the Poop Deck until you get O Cap'm, My Cap'm.");
-            }
-        } else {
-            //how many turns they'll need to burn in the zone to get the adventure again
-        }
-
-        subentry2.entries.listAppend("*Sail to (48,47) to get an El Vibrato power sphere (or buy from mall).");
-        if (item_amount_almost_everywhere(lookupItem("El Vibrato trapezoid")) == 0 && $location[El Vibrato Island].turns_spent == 0) {
-            string line = "*Sail to (63,29) to get an El Vibrato trapezoid. " + HTMLGenerateSpanFont("Don't do this if you've already set up a portal at your campground.", "red");
-            if (lookupItem("El Vibrato power sphere").item_amount() == 0)
-                line += "|*Need an El Vibrato power sphere in inventory. Buy from mall?";
-            line += "|*Gives an item that creates a portal to El Vibrato Island at your campground (will need to keep it charged with more power spheres).";
-            subentry2.entries.listAppend(line);
-        }
-        subentry2.entries.listAppend("*Or sail to (1,1) to get a random ancient cursed key/chest.");
-        if (__misc_state["need to level"]) {
-            string coordinates;
-            if (my_primestat() == $stat[muscle])
-                coordinates = "(56, 14)";
-            else if (my_primestat() == $stat[mysticality])
-                coordinates = "(3, 35)";
-            else if (my_primestat() == $stat[moxie])
-                coordinates = "(5, 39)";
-            if (coordinates != "")
-                subentry2.entries.listAppend("Could sail to " + coordinates + " for stats?");
-        }
-
-        ChecklistEntry entry2 = ChecklistEntryMake("ship wheel", url, subentry2, $locations[The Poop Deck]).ChecklistEntryTagEntry(entry.combination_tag);
-        if ($location[The Poop Deck] == __last_adventure_location)
-            task_entries.listAppend(entry2);
-        else
-            optional_task_entries.listAppend(entry2);
+    if ($item[pirate fledges].equipped_amount() == 0) {
+        subentry.entries.listAppend("Wear pirate fledges.");
+        url = "inventory.php?ftext=pirate+fledges";
     }
+
+    if (true) { //for when the last o'cap'm, my cap'm property will be implemented (if)
+        if (my_meat() < 977) {
+            subentry.entries.listAppend(HTMLGenerateSpanOfClass("Start by acquiring 977 meat.", "r_bold") + (__misc_state["need to level"] ? ", to gain extra stats from the other NC" : "") + ".");
+        } else {
+            subentry.modifiers.listAppend("-combat");
+            subentry.entries.listAppend("Adventure on the Poop Deck until you get O Cap'm, My Cap'm.");
+        }
+    } else {
+        //how many turns they'll need to burn in the zone to get the adventure again
+    }
+
+    subentry.entries.listAppend("*Sail to (48,47) to get an El Vibrato power sphere (or buy from mall).");
+    if (item_amount_almost_everywhere(lookupItem("El Vibrato trapezoid")) == 0 && $location[El Vibrato Island].turns_spent == 0) {
+        string line = "*Sail to (63,29) to get an El Vibrato trapezoid. " + HTMLGenerateSpanFont("Don't do this if you've already set up a portal at your campground.", "red");
+        if (lookupItem("El Vibrato power sphere").item_amount() == 0)
+            line += "|*Need an El Vibrato power sphere in inventory. Buy from mall?";
+        line += "|*Gives an item that creates a portal to El Vibrato Island at your campground (will need to keep it charged with more power spheres).";
+        subentry.entries.listAppend(line);
+    }
+    subentry.entries.listAppend("*Or sail to (1,1) to get a random ancient cursed key/chest.");
+    if (__misc_state["need to level"]) {
+        string coordinates;
+        if (my_primestat() == $stat[muscle])
+            coordinates = "(56, 14)";
+        else if (my_primestat() == $stat[mysticality])
+            coordinates = "(3, 35)";
+        else if (my_primestat() == $stat[moxie])
+            coordinates = "(5, 39)";
+        if (coordinates != "")
+            subentry.entries.listAppend("Could sail to " + coordinates + " for stats?");
+    }
+
+    ChecklistEntry entry = ChecklistEntryMake("ship wheel", url, subentry, $locations[The Poop Deck]);
+    entry.combination_tag = "pirates";
+
+    if (__misc_state["in run"] && __quest_state["Pirate Quest"].state_boolean["valid"] && __quest_state["Pirate Quest"].in_progress) //To match if QPirateCoveGenerateTasks is being displayed in task or optional_task
+        task_entries.listAppend(entry);
+    else
+        optional_task_entries.listAppend(entry);
+}
+
+void QPirateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    //Show the tile IF: they started the quest, and the quest is valid in this path, OR, they started the quest, and are adventuring in the relevant locations, OR, they started the quest, and are out of run.
+    if (__quest_state["Pirate Quest"].in_progress && (__quest_state["Pirate Quest"].state_boolean["valid"] || $locations[the obligatory pirate's cove, barrrney's barrr, the f'c'le, the poop deck] contains __last_adventure_location || !__misc_state["in run"]))
+        QPirateCoveGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+
+    if ($location[The Poop Deck] == __last_adventure_location || __quest_state["Pirate Quest"].mafia_internal_step == 7)
+        QPoopDeckGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
