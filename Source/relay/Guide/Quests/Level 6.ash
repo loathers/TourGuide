@@ -88,8 +88,8 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         want_hell_ramen = false;
     want_hell_ramen = false; //this needs rethinking
     
-	boolean hot_wings_relevant = __quest_state["Pirate Quest"].state_boolean["hot wings relevant"];
-	boolean need_more_hot_wings = __quest_state["Pirate Quest"].state_boolean["need more hot wings"];
+	boolean hot_wings_relevant = __quest_state["Pirate Quest"].state_boolean["hot wings relevant"] && __quest_state["Pirate Quest"].state_boolean["valid"];
+	boolean need_more_hot_wings = __quest_state["Pirate Quest"].state_boolean["need more hot wings"] && __quest_state["Pirate Quest"].state_boolean["valid"];
 	
 	QuestState base_quest_state = __quest_state["Level 6"];
 	ChecklistSubentry subentry;
