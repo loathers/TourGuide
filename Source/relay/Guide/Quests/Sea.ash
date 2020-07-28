@@ -495,17 +495,29 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         }
     }
             
-    if ($item[damp old boot].available_amount() > 0) {
+    if (get_property("questS01OldGuy") != "finished" && monkees_quest_state.mafia_internal_step >= 3) {
+        string url;
+        string title;
+        string modifiers;
         string [int] description;
-        if ($item[fishy pipe].available_amount() == 0)
-            description.listAppend("Choose the fishy pipe.");
-        else if ($item[das boot].available_amount() == 0)
-            description.listAppend("Choose the das boot.");
-        else
-            description.listAppend("Choose the damp old wallet.");
-        
-        optional_task_entries.listAppend(ChecklistEntryMake("__item damp old boot", "place.php?whichplace=sea_oldman", ChecklistSubentryMake("Return damp old boot to the old man", "", description)));
-        
+        if (get_property_boolean("dampOldBootPurchased")) {
+            url = "place.php?whichplace=sea_oldman";
+            title = "Return damp old boot to the old man";
+            if ($item[fishy pipe].available_amount() == 0)
+                description.listAppend("Choose the fishy pipe.");
+            else if ($item[das boot].available_amount() == 0)
+                description.listAppend("Choose the das boot.");
+            else
+                description.listAppend("Choose the damp old wallet.");
+        } else {
+            url = "monkeycastle.php?who=2";
+            title = "Buy the old man's boot from Big Brother";
+            modifiers = "50 sand dollars";
+            int sand_dollars = $item[sand dollar].item_amount();
+            if (sand_dollars < 50)
+                description.listAppend("Have " + sand_dollars.pluralise("sand dollar", "sand dollars") + " on hand.");
+        }
+        optional_task_entries.listAppend(ChecklistEntryMake("__item damp old boot", url, ChecklistSubentryMake(title, modifiers, description)));
     }
     if ($items[Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note].available_amount() > 0) {
         string line = "Optionally, rescue grandma.";
