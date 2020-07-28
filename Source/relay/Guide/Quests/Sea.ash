@@ -35,7 +35,7 @@ void QSeaInit()
     if (true) {
         QuestState state;
         
-        QuestStateParseMafiaQuestProperty(state, "questS02Monkees", false); //don't issue a quest load
+        QuestStateParseMafiaQuestProperty(state, "questS02Monkees");
         state.quest_name = "Hey, Hey, They're Sea Monkees";
         state.image_name = "Sea";
         
