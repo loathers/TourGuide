@@ -234,6 +234,9 @@ static
         building_images["Sea"] = KOLImageMake("images/adventureimages/wizardfish.gif", Vec2iMake(100,100), RectMake(18, 23, 61, 72));
         building_images["Sea"].erase_zones.listAppend(RectMake(18, 23, 27, 28));
         building_images["Sea"].erase_zones.listAppend(RectMake(48, 23, 62, 35));
+        building_images["Sea Monkey Castle"] = KOLImageMake("images/otherimages/ocean/monkeycastle.gif", Vec2iMake(100,100), RectMake(29, 36, 66, 82));
+        building_images["Sea Monkey Castle"].erase_zones.listAppend(RectMake(29, 36, 39, 39));
+        building_images["Sea Monkey Castle"].erase_zones.listAppend(RectMake(60, 36, 66, 42));
         building_images["Spooky little girl"] = KOLImageMake("images/adventureimages/axelgirl.gif", Vec2iMake(100,100), RectMake(37, 25, 63, 74));
         
         //hermit.gif and oldman.gif are almost identical. twins?

@@ -12,23 +12,27 @@ void QSeaInit()
         }
     }
     //don't list the quest unless they've started on the path under the sea:
-    if (!have_adventured_in_relevant_area && $items[Mer-kin trailmap,Mer-kin lockkey,Mer-kin stashbox,wriggling flytrap pellet,damp old boot,Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note].available_amount() == 0)
+    if (!have_adventured_in_relevant_area && $items[Mer-kin trailmap,Mer-kin lockkey,Mer-kin stashbox,wriggling flytrap pellet,damp old boot,Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note,black glass].available_amount() == 0)
         return;
         
     
-    //FIXME support mom
     if (true) {
         QuestState state;
         
-        string quest_path = get_property("merkinQuestPath");
-        if (quest_path == "done")
+        state.state_string["path"] = get_property("merkinQuestPath");
+        if (state.state_string["path"] == "done")
             QuestStateParseMafiaQuestPropertyValue(state, "finished");
-        else {
+        else
             QuestStateParseMafiaQuestPropertyValue(state, "started");
-        }
         
         state.quest_name = "Sea Quest";
         state.image_name = "Sea";
+        
+        boolean have_crappy_disguise = have_outfit_components("Crappy Mer-kin Disguise");
+        state.state_boolean["have scholar disguise"] = have_outfit_components("Mer-kin Scholar's Vestments");
+        state.state_boolean["have gladiator disguise"] = have_outfit_components("Mer-kin Gladiatorial Gear");
+        state.state_boolean["can fight dad sea monkee"] = $items[Goggles of Loathing,Stick-Knife of Loathing,Scepter of Loathing,Jeans of Loathing,Treads of Loathing,Belt of Loathing,Pocket Square of Loathing].items_missing().count() <= 1;
+        state.state_boolean["have one outfit"] = have_crappy_disguise || state.state_boolean["have scholar disguise"] || state.state_boolean["have gladiator disguise"];
         
         __quest_state["Sea Temple"] = state;
     }
@@ -37,31 +41,20 @@ void QSeaInit()
         
         QuestStateParseMafiaQuestProperty(state, "questS02Monkees");
         state.quest_name = "Hey, Hey, They're Sea Monkees";
-        state.image_name = "Sea";
+        state.image_name = "Sea Monkey Castle";
         
         
         __quest_state["Sea Monkees"] = state;
     }
 }
 
-void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name)
+void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name, QuestState temple_quest_state)
 {
-    string path = get_property("merkinQuestPath");
+    string path = temple_quest_state.state_string["path"];
+    boolean can_fight_dad_sea_monkee = temple_quest_state.state_boolean["can fight dad sea monkee"];
+    boolean have_any_outfit = temple_quest_state.state_boolean["have one outfit"] || temple_quest_state.state_boolean["can fight dad sea monkee"];
     
-    boolean can_fight_dad_sea_monkee = $items[Goggles of Loathing,Stick-Knife of Loathing,Scepter of Loathing,Jeans of Loathing,Treads of Loathing,Belt of Loathing,Pocket Square of Loathing].items_missing().count() <= 1;
-    
-    boolean have_one_outfit = false;
-    if (can_fight_dad_sea_monkee)
-        have_one_outfit = true;
-    foreach outfit_name in $strings[Mer-kin Scholar's Vestments,Mer-kin Gladiatorial Gear,Crappy Mer-kin Disguise] {
-        if (have_outfit_components(outfit_name)) {
-            have_one_outfit = true;
-            break;
-        }
-    }
-    
-    
-    if (!have_one_outfit) {
+    if (!have_any_outfit) {
         subentry.entries.listAppend("Acquire crappy mer-kin disguise from grandma sea monkee.");
         return;
     }
@@ -118,8 +111,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             if (my_mp() > 0)
                 description.listAppend(HTMLGenerateSpanFont("Try to reduce your MP to 0", "red") + " before fighting him.");
         } else {
-            if (!have_outfit_components("Mer-kin Gladiatorial Gear")) {
-                description.listAppend("Acquire gladiatorial outfit.|Components can be found by running +combat in the gymnasium.");
+            if (!temple_quest_state.state_boolean["have gladiator disguise"]) {
+                description.listAppend("Acquire gladiatorial outfit.|Components can be found by running +combat in the gymnasium.|Make the outfit with grandma.");
                 modifiers.listAppend("+combat");
             } else {
                 string shrap_suggestion = "Shrap is nice for this.";
@@ -172,8 +165,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             }
             description.listAppend("Potential healing items:|*" + description_healers.listJoinComponents("|*"));
         } else {
-            if (!have_outfit_components("Mer-kin Scholar's Vestments")) {
-                description.listAppend("Acquire scholar outfit.|Components can be found by running -combat in the elementary school.");
+            if (!temple_quest_state.state_boolean["have scholar disguise"]) {
+                description.listAppend("Acquire scholar outfit.|Components can be found by running -combat in the elementary school.|Make the outfit with grandma.");
                 modifiers.listAppend("-combat");
             } else {
                 if ($item[Mer-kin dreadscroll].available_amount() == 0) {
@@ -326,32 +319,77 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     if (!__misc_state["in aftercore"] && !monkees_quest_state.started)
         return;
 
-    boolean have_something_to_do_in_sea = false;
-    if (!temple_quest_state.finished && (temple_quest_state.in_progress || temple_quest_state.startable))
-        have_something_to_do_in_sea = true;
+    //Will have 4 possible tiles. 1 is the main questline, and always appear, and the 3 others only appear once they diverge from the main questline (if unfinished, of course)
+    //Tile 1 is the old man's boot (first since needs no adventuring once diverged). Diverges from the main questline when freeing big brother.
+    //Tile 2 is the main questline, which goes up to the Mer-Kin temple boss(es). (in other words, main questline = mer-kin questline, with all of its prerequisites)
+    //Tile 3 is the sea monkey questline (ends with finding Mom sea monkey). Diverges from the main questline when asking grandpa about grandma.
+    //Tile 4 is the skate park. Diverges from the main questline when freeing big brother. Only shows once you buy the map to the skate park.
 
-    ChecklistSubentry subentry;
+    //Tile 1
+    if (get_property("questS01OldGuy") != "finished" && monkees_quest_state.mafia_internal_step >= 3) {
+        string url, title, modifiers;
+        string [int] description;
+        if (get_property_boolean("dampOldBootPurchased")) {
+            url = "place.php?whichplace=sea_oldman";
+            title = "Return damp old boot to the old man";
+            if ($item[fishy pipe].available_amount() == 0)
+                description.listAppend("Choose the fishy pipe.");
+            else if ($item[das boot].available_amount() == 0)
+                description.listAppend("Choose the das boot.");
+            else
+                description.listAppend("Choose the damp old wallet.");
+        } else {
+            url = "monkeycastle.php?who=2";
+            title = "Buy the old man's boot from Big Brother";
+            modifiers = "50 sand dollars";
+            int sand_dollars = $item[sand dollar].item_amount();
+            if (sand_dollars < 50)
+                description.listAppend("Have " + sand_dollars.pluralise("sand dollar", "sand dollars") + " on hand.");
+        }
+        optional_task_entries.listAppend(ChecklistEntryMake("__item damp old boot", url, ChecklistSubentryMake(title, modifiers, description)));
+    }
+
+
+    //Tiles 2, 3 and 4 all want fishy, but we don't want to put the full notification in each of them. So instead, we initialize the 3 ChecklistSubentries here, add the general reminder to all of them, and add the how_to to the first that will be displayed.
+    ChecklistSubentry temple_subentry, sea_monkey_subentry, skate_park_subentry;
+
+    boolean should_output_temple_questline = !temple_quest_state.finished;
+    boolean should_output_sea_monkey_questline = !monkees_quest_state.finished && monkees_quest_state.mafia_internal_step >= 7;
+
+    string get_fishy, how_to_get_fishy;
+    if ($effect[fishy].have_effect() == 0) {
+        get_fishy = "Acquire fishy.";
+        how_to_get_fishy = "|*Easy way: Semi-rare in the brinier deeps, 50 turns.";
+        if ($item[fishy pipe].available_amount() > 0 && !get_property_boolean("_fishyPipeUsed"))
+            how_to_get_fishy += "|*Use fishy pipe.";
+
+        if (should_output_temple_questline) {
+            temple_subentry.entries.listAppend(get_fishy + how_to_get_fishy);
+            sea_monkey_subentry.entries.listAppend(get_fishy);
+            skate_park_subentry.entries.listAppend(get_fishy);
+        } else if (should_output_sea_monkey_questline) {
+            sea_monkey_subentry.entries.listAppend(get_fishy + how_to_get_fishy);
+            skate_park_subentry.entries.listAppend(get_fishy);
+        } else
+            skate_park_subentry.entries.listAppend(get_fishy + how_to_get_fishy);
+    }
+
+
+    //Tile 2
     string image_name = temple_quest_state.image_name;
-
-    subentry.header = temple_quest_state.quest_name;
     string url = "seafloor.php";
+
+    temple_subentry.header = temple_quest_state.quest_name;
     boolean need_minus_combat_modifier = false;
 
 
-    if ($effect[fishy].have_effect() == 0) {
-        string line = "Acquire fishy.|*Easy way: Semi-rare in the brinier deeps, 50 turns.";
-        if ($item[fishy pipe].available_amount() > 0 && !get_property_boolean("_fishyPipeUsed"))
-            line += "|*Use fishy pipe.";
-        subentry.entries.listAppend(line);
-    }
-        
-    if (!temple_quest_state.finished) {
+    if (should_output_temple_questline) {
         if (get_property("seahorseName").length() == 0) {
             boolean professional_roper = false;
             //merkinLockkeyMonster questS01OldGuy questS02Monkees
             //Need to reach the temple:
             if (get_property("lassoTraining") != "expertly") {
-                string line = "";
+                string line;
                 if ($item[sea lasso].item_amount() == 0)
                     line += HTMLGenerateSpanFont((in_ronin() ? "Acquire" : "Buy") + " and use a sea lasso in each combat.", "red");
                 else
@@ -360,19 +398,19 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                     line += "|*Wear a sea cowboy hat to improve roping.";
                 if ($item[sea chaps].equipped_amount() == 0)
                     line += "|*Wear sea chaps to improve roping.";
-                subentry.entries.listAppend(line);
+                temple_subentry.entries.listAppend(line);
             } else {
                 professional_roper = true;
-                string line = "";
+                string line;
                 if ($item[sea lasso].item_amount() == 0)
                     line += "Buy a sea lasso.";
-                if ($item[sea cowbell].item_amount() <3 ) {
+                if ($item[sea cowbell].item_amount() < 3) {
                     int needed_amount = MAX(3 - $item[sea cowbell].item_amount(), 0);
                     if (line != "") line += " ";
                     line += "Buy " + pluraliseWordy(needed_amount, "sea cowbell", "sea cowbells") + ".";
                 }
                 if (line != "")
-                    subentry.entries.listAppend(line);
+                    temple_subentry.entries.listAppend(line);
             }
             location class_grandpa_location;
             if (my_primestat() == $stat[muscle])
@@ -408,10 +446,10 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 //Coral corral. Banish strategy.
                 string sea_horse_details;
                 if (!professional_roper)
-                    sea_horse_details = "|But first, train up your roping skills.";
+                    sea_horse_details = HTMLGenerateSpanFont("|But first, train up your roping skills.", "red");
                 else
                     sea_horse_details = "|Once found, use three sea cowbells on him, then a sea lasso.";
-                subentry.entries.listAppend("Look for your sea horse in the Coral Corral." + sea_horse_details);
+                temple_subentry.entries.listAppend("Look for your sea horse in the Coral Corral." + sea_horse_details);
                 string [int] banish_monsters;
                 monster [int] monster_list = $location[the coral corral].get_monsters();
                 foreach key in monster_list {
@@ -420,16 +458,16 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                         banish_monsters.listAppend(m.to_string());
                 }
                 if (banish_monsters.count() > 1)
-                    subentry.entries.listAppend("Banish " + banish_monsters.listJoinComponents(", ", "and") + " with separate banish sources to speed up area.");
+                    temple_subentry.entries.listAppend("Banish " + banish_monsters.listJoinComponents(", ", "and") + " with separate banish sources to speed up area.");
             } else if (monkees_quest_state.mafia_internal_step >= 7 || $location[the mer-kin outpost].turnsAttemptedInLocation() > 0) {
                 //Find lockkey as well.
                 //Then stash box. Mention monster source.
                 //Use trailmap.
                 //Ask grandpa about currents.
                 if ($item[Mer-kin trailmap].available_amount() > 0) {
-                    subentry.entries.listAppend("Use Mer-kin trailmap.");
+                    temple_subentry.entries.listAppend("Use Mer-kin trailmap.");
                 } else if ($item[Mer-kin stashbox].available_amount() > 0) {
-                    subentry.entries.listAppend("Open stashbox.");
+                    temple_subentry.entries.listAppend("Open stashbox.");
                 } else if ($item[Mer-kin lockkey].available_amount() > 0) {
                     string nc_details = "";
                     monster lockkey_monster = get_property_monster("merkinLockkeyMonster");
@@ -442,104 +480,139 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                     }
                     
                     need_minus_combat_modifier = true;
-                    subentry.entries.listAppend("Adventure in the Mer-Kin outpost, find non-combat.|" + nc_details);
+                    temple_subentry.entries.listAppend("Adventure in the Mer-Kin outpost, find non-combat.|" + nc_details);
                 } else {
-                    subentry.entries.listAppend("Adventure in the Mer-Kin outpost to acquire a lockkey.");
-                    subentry.entries.listAppend("Unless you discovered the currents already (can't tell), in which case go ask grandpa about currents.");
+                    temple_subentry.entries.listAppend("Adventure in the Mer-Kin outpost to acquire a lockkey.");
+                    temple_subentry.entries.listAppend("Unless you discovered the currents already (can't tell), in which case go ask grandpa about currents.");
                 }
             } else if (monkees_quest_state.mafia_internal_step == 6 || grandpa_ncs_remaining == 0) {
-                subentry.entries.listAppend("Ask grandpa about his wife to unlock the Mer-Kin outpost.");
+                url = "monkeycastle.php?who=3";
+                temple_subentry.entries.listAppend("Ask grandpa about his wife to unlock the Mer-Kin outpost.");
             } else if (monkees_quest_state.mafia_internal_step == 5 || class_grandpa_location.turnsAttemptedInLocation() > 0) {
                 //Find grandpa in one of the three zones.
                 need_minus_combat_modifier = true;
-                subentry.entries.listAppend("Find grandpa sea monkee in " + class_grandpa_location + ".|" + pluraliseWordy(grandpa_ncs_remaining, "non-combat remains", "non-combats remain").capitaliseFirstLetter() + ".");
+                temple_subentry.entries.listAppend("Find grandpa sea monkee in " + class_grandpa_location + ".|" + pluraliseWordy(grandpa_ncs_remaining, "non-combat remains", "non-combats remain").capitaliseFirstLetter() + ".");
             } else if (monkees_quest_state.mafia_internal_step == 4) {
                 //Talk to little brother.
-                subentry.entries.listAppend("Talk to little brother.");
+                temple_subentry.entries.listAppend("Talk to little brother.");
                 url = "monkeycastle.php";
             } else if (monkees_quest_state.mafia_internal_step == 3) {
                 //Talk to big brother.
-                subentry.entries.listAppend("Talk to big brother.");
+                temple_subentry.entries.listAppend("Talk to big brother.");
                 url = "monkeycastle.php";
             } else if (monkees_quest_state.mafia_internal_step == 2 || $location[The Wreck of the Edgar Fitzsimmons].turnsAttemptedInLocation() > 0) {
                 //Adventure in wreck, free big brother.
                 need_minus_combat_modifier = true;
-                subentry.entries.listAppend("Free big brother. Adventure in the wreck.|Then talk to him and little brother, find grandpa.");
+                temple_subentry.entries.listAppend("Free big brother. Adventure in the wreck.|Then talk to him and little brother, find grandpa.");
             } else if (monkees_quest_state.mafia_internal_step == 1) {
                 if ($item[wriggling flytrap pellet].available_amount() > 0) {
                     url = "inventory.php?ftext=wriggling+flytrap+pellet";
-                    subentry.entries.listAppend("Open a wriggling flytrap pellet, talk to little brother.");
+                    temple_subentry.entries.listAppend("Open a wriggling flytrap pellet, talk to little brother.");
                 } else {
                     //Talk to little brother
-                    subentry.entries.listAppend("Talk to little brother.");
+                    temple_subentry.entries.listAppend("Talk to little brother.");
                     url = "monkeycastle.php";
                 }
             } else {
                 //Octopus's garden, obtain wriggling flytrap pellet
                 if ($item[wriggling flytrap pellet].available_amount() == 0) {
-                    subentry.entries.listAppend("Adventure in octopus's garden, find a wriggling flytrap pellet from a Neptune flytrap.");
-                    subentry.modifiers.listAppend("olfact Neptune flytrap");
+                    temple_subentry.entries.listAppend("Adventure in octopus's garden, find a wriggling flytrap pellet from a Neptune flytrap.");
+                    temple_subentry.modifiers.listAppend("olfact Neptune flytrap");
                 } else {
                     url = "inventory.php?ftext=wriggling+flytrap+pellet";
-                    subentry.entries.listAppend("Open a wriggling flytrap pellet, talk to little brother.");
+                    temple_subentry.entries.listAppend("Open a wriggling flytrap pellet, talk to little brother.");
                 }
             }
             
             //Find grandma IF they don't have a disguise/cloathing.
         } else {
             url = "seafloor.php?action=currents";
-            StringHandle image_name_handle;
+            StringHandle image_name_handle; //fredg1 - What's the point????? you get the same result by just using 'string image_name_handle;' (and changing the temple function's asked datatype) ???? Why not use image_name directly??
             image_name_handle.s = image_name;
-            QSeaGenerateTempleEntry(subentry, image_name_handle);
+            QSeaGenerateTempleEntry(temple_subentry, image_name_handle, temple_quest_state);
             image_name = image_name_handle.s;
         }
     }
-            
-    if (get_property("questS01OldGuy") != "finished" && monkees_quest_state.mafia_internal_step >= 3) {
-        string url;
-        string title;
-        string modifiers;
-        string [int] description;
-        if (get_property_boolean("dampOldBootPurchased")) {
-            url = "place.php?whichplace=sea_oldman";
-            title = "Return damp old boot to the old man";
-            if ($item[fishy pipe].available_amount() == 0)
-                description.listAppend("Choose the fishy pipe.");
-            else if ($item[das boot].available_amount() == 0)
-                description.listAppend("Choose the das boot.");
-            else
-                description.listAppend("Choose the damp old wallet.");
-        } else {
+    
+    if (need_minus_combat_modifier)
+        temple_subentry.modifiers.listAppend("-combat");
+
+    if (should_output_temple_questline)
+        optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, temple_subentry, $locations[the brinier deepers, an octopus's garden,the wreck of the edgar fitzsimmons, the mer-kin outpost, madness reef,the marinara trench, the dive bar,anemone mine, the coral corral, mer-kin elementary school,mer-kin library,mer-kin gymnasium,mer-kin colosseum,the caliginous abyss]));
+
+
+    //Tile 3
+    url = "seafloor.php";
+    boolean [location] relevant_locations = {$location[the caliginous abyss]:true};
+
+    sea_monkey_subentry.header = monkees_quest_state.quest_name;
+    need_minus_combat_modifier = false;
+
+
+    if (should_output_sea_monkey_questline) {
+        if (monkees_quest_state.mafia_internal_step == 13) {
+            //Have black glass; only need to find mom. No progress tracking yet (the progress mechanic for this zone is not yet fully understood...)
+            string line;
+            line += "Adventure in the Caliginous Abyss. Find Mom Sea Monkey.";
+            if ($item[shark jumper].equipped_amount() == 0)
+                line += "|*Wear a shark jumper to speed up area.";
+            if ($item[scale-mail underwear].equipped_amount() == 0)
+                line += "|*Wear a scale-mail underwear to speed up area.";
+            if ($effect[Jelly Combed].have_effect() == 0)
+                line += "|*Use a Comb jelly to speed up area.";
+
+            sea_monkey_subentry.entries.listAppend(line);
+
+            if ($item[black glass].equipped_amount() == 0) {
+                url = "inventory.php?ftext=black+glass";
+                sea_monkey_subentry.entries.listAppend("Equip the black glass.");
+            }
+        } else if (monkees_quest_state.mafia_internal_step == 12) {
             url = "monkeycastle.php?who=2";
-            title = "Buy the old man's boot from Big Brother";
-            modifiers = "50 sand dollars";
+            sea_monkey_subentry.modifiers.listAppend("13 sand dollars");
+            sea_monkey_subentry.entries.listAppend('"Buy" the black glass from big brother. Will get a full refund.');
+            
             int sand_dollars = $item[sand dollar].item_amount();
-            if (sand_dollars < 50)
-                description.listAppend("Have " + sand_dollars.pluralise("sand dollar", "sand dollars") + " on hand.");
-        }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item damp old boot", url, ChecklistSubentryMake(title, modifiers, description)));
-    }
-    if ($items[Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note].available_amount() > 0) {
-        string line = "Optionally, rescue grandma.";
-        if ($item[grandma's map].available_amount() > 0) {
-            line += "|Adventure at the mer-kin outpost, find her.";
+            if (sand_dollars < 13)
+                sea_monkey_subentry.entries.listAppend("Have " + sand_dollars.pluralise("sand dollar", "sand dollars") + " on hand.");
+        } else if (monkees_quest_state.mafia_internal_step == 11) {
+            //Discover the existence of the black glass
+            url = "monkeycastle.php";
+            sea_monkey_subentry.entries.listAppend("Talk to big brother.");
+        } else if (monkees_quest_state.mafia_internal_step == 10) {
+            //Lil' bro caught big bro acting weird, and it's not linked to puberty...
+            url = "monkeycastle.php";
+            sea_monkey_subentry.entries.listAppend("Talk to little brother.");
+        } else if (monkees_quest_state.mafia_internal_step == 9) {
+            //assembled grandma's map, now to find her
             need_minus_combat_modifier = true;
-        } else {
+            relevant_locations[$location[the mer-kin outpost]] = true;
+            sea_monkey_subentry.entries.listAppend("Adventure at the mer-kin outpost, find grandma.");
+        } else if (monkees_quest_state.mafia_internal_step == 8 || !temple_quest_state.state_boolean["have one outfit"] && monkees_quest_state.mafia_internal_step == 7) {
+            //7=unlocked outpost, but didn't find grandma's note. 8=found grandma's note
+            string line = "Optionally, rescue grandma.|";
             item [int] missing_items = $items[Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note].items_missing();
             
             if (missing_items.count() == 0) {
-                line += "|Ask grandpa about the note.";
+                url = "monkeycastle.php?who=3";
+                line += "Ask grandpa about the note.";
             } else {
-                line += "|Adventure at the mer-kin outpost, find " + missing_items.listJoinComponents(", ", "and") + ".";
                 need_minus_combat_modifier = true;
+                relevant_locations[$location[the mer-kin outpost]] = true;
+                line += "Adventure at the mer-kin outpost, find " + missing_items.listJoinComponents(", ", "and") + ".";
             }
-        }
-        subentry.entries.listAppend(line);
+            sea_monkey_subentry.entries.listAppend(line);
+        } else
+            should_output_sea_monkey_questline = false;
     }
-    
-    if (need_minus_combat_modifier)
-        subentry.modifiers.listAppend("-combat");
 
-    if (have_something_to_do_in_sea)
-        optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the brinier deepers, an octopus's garden,the wreck of the edgar fitzsimmons, the mer-kin outpost, madness reef,the marinara trench, the dive bar,anemone mine, the coral corral, mer-kin elementary school,mer-kin library,mer-kin gymnasium,mer-kin colosseum,the caliginous abyss]));
+    if (need_minus_combat_modifier)
+        sea_monkey_subentry.modifiers.listAppend("-combat");
+
+    if (should_output_sea_monkey_questline)
+        optional_task_entries.listAppend(ChecklistEntryMake(monkees_quest_state.image_name, url, sea_monkey_subentry, relevant_locations));
+
+
+    //Tile 4
+    //skate_park_entry.image_lookup_name = //TBD
 }
