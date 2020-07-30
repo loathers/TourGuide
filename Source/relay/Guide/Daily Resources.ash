@@ -161,14 +161,14 @@ void generateDailyResources(Checklist [int] checklists)
                 }
                 if (shotglassDrinkAvailable)
                     description.listAppend("1 free 1-drunkenness booze available.");
+                subentries.listAppend(ChecklistSubentryMake(title, "", description));
             } else if (availableDrunkenness() == -1 && couldEquipStooper) {
                 importance = -11;
                 title = HTMLGenerateSpanFont("Equip the Stooper", "red");
                 image_name = "__familiar stooper";
                 description.listAppend("Can keep adventuring/overdrink further as long as it's equipped.");
-            }
-            if (description.count() > 0)
                 subentries.listAppend(ChecklistSubentryMake(title, "", description));
+            }
         }
         if (availableSpleen() > 0) {
             if (subentries.count() == 0)
