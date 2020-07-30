@@ -127,6 +127,48 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 description.listAppend("Fight in the colosseum!");
                 description.listAppend("Easy way is to buff mysticality and spell damage percent, then cast powerful spells.<br>" + shrap_suggestion);
                 description.listAppend("There's another way, but it's a bit complicated. Check the wiki?");
+
+                if (get_property("lastColosseumRoundWon") != "") { //backwards compatibility
+                    int colosseum_round = get_property_int("lastColosseumRoundWon");
+                    int enemy_level = colosseum_round / 3;
+                    string enemy_type, counter_weapon, counter_weapon_property;
+
+                    switch (colosseum_round % 3) {
+                        case 0:
+                            //missing the net GAIN cue: 1 turn of Gutballed (-300% muscle)
+                            //missing the net LOSS cue: increase... monster level..?
+                            //missing the net NEUTRALITY cue: reduces every future incoming damage to 1, for a few rounds
+                            enemy_type = (enemy_level > 3 ? "Georgepaul, the B" : "a mer-kin b") + "alldodger";
+                            counter_weapon = "Mer-kin dragnet";
+                            counter_weapon_property = "gladiatorNetMovesKnown";
+                            break;
+                        case 1:
+                            //missing the blade SLING cue: heals
+                            //missing the blade ROLLER ("rolls") cue: 1 turn of Nettled (-300% moxie)
+                            //missing the blade RUNNER cue: hits for 1/2 of you max HP
+                            enemy_type = (enemy_level > 3 ? "Johnringo, the N" : "a mer-kin n") + "etdragger";
+                            counter_weapon = "Mer-kin switchblade";
+                            counter_weapon_property = "gladiatorBladeMovesKnown";
+                            break;
+                        case 2:
+                            //missing the ball BUST cue: reflects all damage for a few rounds
+                            //missing the ball SWEAT cue: increase attack? shrug off delevels?
+                            //missing the ball SACK cue: unequips your weapon
+                            enemy_type = (enemy_level > 3 ? "Ringogeorge, the B" : "a mer-kin b") + "ladeswitcher";
+                            counter_weapon = "Mer-kin dodgeball";
+                            counter_weapon_property = "gladiatorBallMovesKnown";
+                            break;
+                    }
+                    int colosseum_skills_known = get_property_int(counter_weapon_property);
+
+                    description.listAppend("Next fight is against " + enemy_type + ".");
+                    if (counter_weapon.to_item().equipped_amount() == 0 && colosseum_skills_known > 0)
+                        description.listAppend("Equip your " + counter_weapon + (colosseum_skills_known == 3 ? "." : "..?"));
+                    //could be developped more?
+                }
+
+                //if ($item[Mer-kin gladiator mask].equipped_amount() == 0 || $item[Mer-kin gladiator tailpiece].equipped_amount() == 0)
+                    //description.listAppend("Equip the Mer-kin Gladiatorial Gear.");
             }
         }
         string modifier_string = "";
@@ -191,13 +233,21 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                     Mer-kin Library 3 -> dreadScroll8
                     */
                     
+                    int known_clue_count = 0;
+                    boolean [int] known_clues;
                     int library_clues_known = 0;
-                    if (get_property_int("dreadScroll1") > 0)
-                        library_clues_known += 1;
-                    if (get_property_int("dreadScroll6") > 0)
-                        library_clues_known += 1;
-                    if (get_property_int("dreadScroll8") > 0)
-                        library_clues_known += 1;
+                    for i from 1 to 8 {
+                        string property_name = "dreadScroll" + i;
+                        int property_value = get_property_int(property_name);
+                        
+                        if (property_value >= 1 && property_value <= 4) {
+                            known_clue_count += 1;
+                            known_clues[i] = true;
+
+                            if (i == 1 || i == 6 || i == 8)
+                                library_clues_known += 1;
+                        }
+                    }
                     
                     boolean need_to_learn_vocabulary = false;
                     
@@ -205,33 +255,23 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                         unknown_clues.listAppend((3 - library_clues_known).int_to_wordy().capitaliseFirstLetter() + " non-combats in the library. (vocabulary)");
                         need_to_learn_vocabulary = true;
                     }
-                    if (get_property_int("dreadScroll5") == 0) {
+                    if (!known_clues[5]) {
                         unknown_clues.listAppend("Use a mer-kin killscroll in combat. (vocabulary)");
                         need_to_learn_vocabulary = true;
                     }
-                    if (get_property_int("dreadScroll2") == 0) {
+                    if (!known_clues[2]) {
                         unknown_clues.listAppend("Use a mer-kin healscroll in combat. (vocabulary)");
                         need_to_learn_vocabulary = true;
                     }
-                    if (get_property_int("dreadScroll4") == 0)
+                    if (!known_clues[4])
                         unknown_clues.listAppend("Use a mer-kin knucklebone.");
-                    if (get_property_int("dreadScroll3") == 0)
+                    if (!known_clues[3])
                         unknown_clues.listAppend("Cast deep dark visions.");
-                    if (get_property_int("dreadScroll7") == 0)
+                    if (!known_clues[7])
                         unknown_clues.listAppend("Eat sushi with mer-kin worktea.");
                     
                     if (unknown_clues.count() > 0)
                         description.listAppend("Clues are from:|*-" + unknown_clues.listJoinComponents("|*-"));
-                    
-                    int known_clue_count = 0;
-                    for i from 1 to 8 {
-                        string property_name = "dreadScroll" + i;
-                        int property_value = get_property_int(property_name);
-                        
-                        if (property_value >= 1 && property_value <= 4) {
-                            known_clue_count += 1;
-                        }
-                    }
                     
                     if (need_to_learn_vocabulary) {
                         int vocabulary = get_property_int("merkinVocabularyMastery");
