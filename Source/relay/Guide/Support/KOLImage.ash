@@ -237,6 +237,14 @@ static
         building_images["Sea Monkey Castle"] = KOLImageMake("images/otherimages/ocean/monkeycastle.gif", Vec2iMake(100,100), RectMake(29, 36, 66, 82));
         building_images["Sea Monkey Castle"].erase_zones.listAppend(RectMake(29, 36, 39, 39));
         building_images["Sea Monkey Castle"].erase_zones.listAppend(RectMake(60, 36, 66, 42));
+        building_images["Skate Park"] = KOLImageMake("images/otherimages/ocean/rumble_a.gif", Vec2iMake(100,100), RectMake(20, 37, 79, 94));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 37, 40, 71));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 37, 45, 53));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(57, 44, 79, 52));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(64, 37, 79, 69));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 77, 22, 94));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 85, 27, 94));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(57, 93, 79, 94));
         building_images["Spooky little girl"] = KOLImageMake("images/adventureimages/axelgirl.gif", Vec2iMake(100,100), RectMake(37, 25, 63, 74));
         
         //hermit.gif and oldman.gif are almost identical. twins?

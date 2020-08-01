@@ -43,6 +43,9 @@ void QSeaInit()
         state.quest_name = "Hey, Hey, They're Sea Monkees";
         state.image_name = "Sea Monkey Castle";
         
+        if (get_property_boolean("mapToTheSkateParkPurchased"))
+            state.state_string["skate park status"] = get_property("skateParkStatus"); //"", "war", "ice", "roller", "peace"
+        
         
         __quest_state["Sea Monkees"] = state;
     }
@@ -162,7 +165,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                     int colosseum_skills_known = get_property_int(counter_weapon_property);
 
                     description.listAppend("Next fight is against " + enemy_type + ".");
-                    if (counter_weapon.to_item().equipped_amount() == 0 && colosseum_skills_known > 0)
+                    if (counter_weapon.to_item().equipped_amount() == 0 && colosseum_skills_known > 0 && enemy_level > 0)
                         description.listAppend("Equip your " + counter_weapon + (colosseum_skills_known == 3 ? "." : "..?"));
                     //could be developped more?
                 }
@@ -654,5 +657,66 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 
 
     //Tile 4
-    //skate_park_entry.image_lookup_name = //TBD
+    if (monkees_quest_state.state_string["skate park status"] == "war") { //map purchased, and conflict still ongoing
+        skate_park_subentry.header = "Sea Side Story";
+        skate_park_subentry.modifiers.listAppend("-combat");
+
+        int [item] skate_park_ncs_progress = { $item[skate blade]:0, $item[brand new key]:0, $item[skate board]:0 };
+
+        //Match NC names to prevent other NCs interfering with tracking:
+        int [item] [string] noncombat_names;
+        noncombat_names[$item[skate blade]]["Prayer of the Roller Skates"] = 1;
+        noncombat_names[$item[skate blade]]["Rollerbawl"] = 2;
+        noncombat_names[$item[skate blade]]["Holey Rollers"] = 3; //park now ice
+        noncombat_names[$item[brand new key]]["The Onbringing"] = 1;
+        noncombat_names[$item[brand new key]]["Choreography Amongst the Coral"] = 2;
+        noncombat_names[$item[brand new key]]["The Last of the Ice Skates"] = 3; //park now roller
+        noncombat_names[$item[skate board]]["A Boarding Party"] = 1;
+        noncombat_names[$item[skate board]]["A Board of Education"] = 2;
+        noncombat_names[$item[skate board]]["A Boarding Pass"] = 3; //park now peace
+        foreach faction_weapon, nc in noncombat_names {
+            if ($location[The Skate Park].noncombat_queue.contains_text(nc))
+                skate_park_ncs_progress[faction_weapon] = MAX(skate_park_ncs_progress[faction_weapon], noncombat_names[faction_weapon][nc]);
+        }
+        
+        int highest_progress_seen;
+        item [int] factions_at_highest_progress;
+
+        foreach faction_weapon, faction_progress in skate_park_ncs_progress {
+            if (faction_progress >= highest_progress_seen && faction_progress > 0) {
+                if (faction_progress > highest_progress_seen) {
+                    factions_at_highest_progress.listClear();
+                    highest_progress_seen = faction_progress;
+                }
+                factions_at_highest_progress.listAppend(faction_weapon);
+            }
+        }
+
+        string [int] factions;
+
+        foreach faction_weapon, faction_progress in skate_park_ncs_progress {
+            string line;
+
+            line += "• Use a " + faction_weapon.name + " for ";
+
+            if (faction_weapon == $item[skate blade])
+                line += "Fishy";
+            else if (faction_weapon == $item[brand new key])
+                line += "-30% pressure penalty (not recommended)";
+            else if (faction_weapon == $item[skate board])
+                line += "1 sand dollar/combat, +25% item drop and +10 fam weight (all 3 apply in underwater zones only)";
+
+            if (faction_weapon.equipped_amount() > 0 && $slot[weapon].equipped_item() != faction_weapon)
+                line += "<br>" + HTMLGenerateSpanFont("Weapon needs to be in your " + (faction_weapon.weapon_hands() > 1 ? "HANDS" : "MAIN-hand"), "red");
+
+            factions.listAppend(line.HTMLGenerateSpanFont(highest_progress_seen > 0 && highest_progress_seen > faction_progress && faction_weapon.equipped_amount() == 0 ? "gray" : "dark"));
+        }
+
+        skate_park_subentry.entries.listAppend("Adventure in A Rumble Near the Fountain with a faction's weapon to unlock (a) daily 30 turns buff(s)." + factions.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+
+        if (factions_at_highest_progress.count() > 0)
+            skate_park_subentry.entries.listAppend("At " + highest_progress_seen + "/3 NCs with " + factions_at_highest_progress.listJoinComponents(", ", "and") + (factions_at_highest_progress.count() > 1 ? " (will have to make a decision)" : "") + ".");
+
+        optional_task_entries.listAppend(ChecklistEntryMake("Skate Park", "sea_skatepark.php", skate_park_subentry, $locations[The Skate Park]));
+    }
 }
