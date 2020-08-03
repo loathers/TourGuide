@@ -405,6 +405,8 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         how_to_get_fishy = "|*Easy way: Semi-rare in the brinier deeps, 50 turns.";
         if ($item[fishy pipe].available_amount() > 0 && !get_property_boolean("_fishyPipeUsed"))
             how_to_get_fishy += "|*Use fishy pipe.";
+        if (monkees_quest_state.state_string["skate park status"] == "ice" && !get_property_boolean("_skateBuff1"))
+            how_to_get_fishy += "|*Visit Lutz at the Skate Park.";
 
         if (should_output_temple_questline) {
             temple_subentry.entries.listAppend(get_fishy + how_to_get_fishy);

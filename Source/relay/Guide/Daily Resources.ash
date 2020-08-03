@@ -395,6 +395,48 @@ void generateDailyResources(Checklist [int] checklists)
     }
     
     //FIXME skate park?
+    if (true) {
+        string [string] dailySkateParkBuffs;
+
+        switch (__quest_state["Sea Monkees"].state_string["skate park status"]) {
+            case "ice":
+                if (!get_property_boolean("_skateBuff1"))
+                    dailySkateParkBuffs["Lutz, the Ice Skate"] = "Fishy";
+                break;
+            case "roller":
+                if (!get_property_boolean("_skateBuff2"))
+                    dailySkateParkBuffs["Comet, the Roller Skate"] = "-30% pressure penalty";
+                break;
+            case "peace":
+                if (!get_property_boolean("_skateBuff3"))
+                    dailySkateParkBuffs["The Bandshell"] = "+1 sand dollar/underwater combat";
+                if (!get_property_boolean("_skateBuff4"))
+                    dailySkateParkBuffs["A Merry-Go Round"] = "+25% underwater item";
+                if (!get_property_boolean("_skateBuff5"))
+                    dailySkateParkBuffs["The Eclectic Eels"] = "+10 underwater familiar weight";
+                break;
+        }
+
+        if (dailySkateParkBuffs.count() > 0) {
+            ChecklistEntry entry;
+            entry.image_lookup_name = "Skate Park";
+            entry.url = "sea_skatepark.php";
+            entry.importance_level = 5;
+
+            if (dailySkateParkBuffs.count() > 1) {
+                entry.subentries.listAppend(ChecklistSubentryMake("Daily Skate Park buffs (30 turns each)"));
+                entry.should_indent_after_first_subentry = true; //to make it clear(er) that they are not mutually exclusive
+                foreach whoYouGonnaCall, buff in dailySkateParkBuffs {
+                    entry.subentries.listAppend(ChecklistSubentryMake(whoYouGonnaCall, "", buff));
+                }
+            } else {
+                foreach whoYouGonnaCall, buff in dailySkateParkBuffs //We know there's only 1 key, but I think it's the only way to get it?
+                    entry.subentries.listAppend(ChecklistSubentryMake("Daily Skate Park buff (30 turns)", "", HTMLGenerateSpanOfClass(whoYouGonnaCall, "r_bold") + ": " + buff));
+            }
+
+            resource_entries.listAppend(entry);
+        }
+    }
     
     if (my_path_id() != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["in aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"])) {
         //Not really worthwhile? But I suppose we can track it if they've started it, and are either in aftercore or haven't flyered yet.
