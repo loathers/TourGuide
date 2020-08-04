@@ -214,7 +214,7 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if (window_name == "Romantic Monster")
         {
             fighting_monster = get_property_monster("romanticTarget");
-            window_display_name = "Arrowed " + __misc_state_string["Romantic Monster Name"].to_lower_case();
+            window_display_name = "Arrowed " + __misc_state_string["Romantic Monster Name"].to_lower_case() + " (" + get_property_int("_romanticFightsLeft") + " left)";
         }
         if (window_name == "Nemesis Assassin" && __quest_state["Nemesis"].mafia_internal_step >= 26)
         {
