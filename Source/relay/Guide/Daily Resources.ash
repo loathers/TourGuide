@@ -394,8 +394,8 @@ void generateDailyResources(Checklist [int] checklists)
         resource_entries.listAppend(ChecklistEntryMake("__effect sleepy", __misc_state_string["resting url"], ChecklistSubentryMake(pluraliseWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitaliseFirstLetter(), "", description), 10));
     }
     
-    //FIXME skate park?
     if (true) {
+        //FIXME Detect if they can breathe underwater
         string [string] dailySkateParkBuffs;
 
         switch (__quest_state["Sea Monkees"].state_string["skate park status"]) {
@@ -436,6 +436,27 @@ void generateDailyResources(Checklist [int] checklists)
 
             resource_entries.listAppend(entry);
         }
+    }
+    
+    if (__quest_state["Sea Monkees"].finished && !get_property_boolean("_momFoodReceived")) {
+        //FIXME Detect if they can breathe underwater, to go meet her
+        string [int] description;
+
+        if (__misc_state["in run"]) { //who knows...
+            string [int] elemental_buffs;
+        	elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Hot Sweat", "r_element_hot"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Cold Sweat", "r_element_cold"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Rank Sweat", "r_element_stench"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Black Sweat", "r_element_spooky"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Flop Sweat", "r_element_sleaze"));
+        
+            description.listAppend("<strong>" + elemental_buffs.listJoinComponents(" / ") + ":</strong> +7 X resistance.");
+        }
+
+        description.listAppend("<strong>Mark of Candy Cain:</strong> +20% critical & spell critical hit.");
+        description.listAppend("<strong>Cereal Killer:</strong> +200 stats/fight.");
+
+        resource_entries.listAppend(ChecklistEntryMake("Mom Monkey Castle Window", "monkeycastle.php?who=4", ChecklistSubentryMake('Have Mom "make breakfast"', "50 turns", description), 5));
     }
     
     if (my_path_id() != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["in aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"])) {

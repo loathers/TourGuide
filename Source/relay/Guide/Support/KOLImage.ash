@@ -237,6 +237,11 @@ static
         building_images["Sea Monkey Castle"] = KOLImageMake("images/otherimages/ocean/monkeycastle.gif", Vec2iMake(100,100), RectMake(29, 36, 66, 82));
         building_images["Sea Monkey Castle"].erase_zones.listAppend(RectMake(29, 36, 39, 39));
         building_images["Sea Monkey Castle"].erase_zones.listAppend(RectMake(60, 36, 66, 42));
+        building_images["Mom Monkey Castle Window"] = KOLImageMake("images/adventureimages/momwindow.gif", Vec2iMake(100,100), RectMake(15, 16, 81, 78));
+        building_images["Mom Monkey Castle Window"].erase_zones.listAppend(RectMake(71, 16, 81, 21));
+        building_images["Mom Monkey Castle Window"].erase_zones.listAppend(RectMake(81, 16, 81, 43));
+        building_images["Mom Monkey Castle Window"].erase_zones.listAppend(RectMake(15, 16, 25, 24));
+        building_images["Mom Monkey Castle Window"].erase_zones.listAppend(RectMake(15, 16, 21, 28));
         building_images["Skate Park"] = KOLImageMake("images/otherimages/ocean/rumble_a.gif", Vec2iMake(100,100), RectMake(20, 37, 79, 94));
         building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 37, 40, 71));
         building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 37, 45, 53));
