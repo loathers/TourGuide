@@ -316,82 +316,157 @@ void generateDailyResources(Checklist [int] checklists)
     
     
     if (__misc_state_int["free rests remaining"] > 0) {
+        ChecklistEntry entry;
+        entry.image_lookup_name = "__effect sleepy";
+        entry.importance_level = 10;
+
+        //Build the entries in an order dependant on user preferences
+        boolean go_chateau = get_property_boolean("restUsingChateau");
+        boolean go_away = get_property_boolean("restUsingCampAwayTent");
+        string [int] order;
+        order [go_chateau ? 0 : 1] = "Chateau Magenta";
+        order [go_chateau ? 1 : 0] = go_away ? "Getaway Campsite" : "Your Campsite";
+        order [2] = go_away ? "Your Campsite" : "Getaway Campsite";
+
+
+        string [int] url;
+        ChecklistSubentry [int] subentries_handle;
         string [int] description;
-        
-        if (__misc_state["recommend resting at campsite"]) {
-            float resting_hp_percent = numeric_modifier("resting hp percent") / 100.0;
-            float resting_mp_percent = numeric_modifier("resting mp percent") / 100.0;
-            
-            //FIXME trace down every rest effect and make this more accurate, instead of an initial guess.
-            
-            //If grimace or ronald is full, they double the gains of everything else.
-            //This is reported as a modifier of +100% - so with pagoda, that's +200% HP
-            //But, it's actually +300%, or 400% total. I could be wrong about this - my knowledge of rest mechanics is limited.
-            //So, we'll explicitly check for grimace or ronald being full, then recalculate. Not great, but should work okay?
-            //This is probably inaccurate in a great number of cases, due to the complication of resting.
-            
-            float overall_multiplier_hp = 1.0;
-            float overall_multiplier_mp = 1.0;
-            float bonus_resting_hp = numeric_modifier("bonus resting hp");
-            float after_bonus_resting_hp = 0.0;
-            int grimace_light = moon_phase() / 2;
-            int ronald_light = moon_phase() % 8;
-            if (grimace_light == 4) {
-                resting_hp_percent -= 1.0;
-                overall_multiplier_hp += 1.0;
+
+        foreach i, loc in order {
+            ChecklistSubentry subentry;
+            switch {
+                case loc == "Chateau Magenta" && __misc_state["Chateau Mantegna available"]:
+                    subentry.header = "At your Chateau Magenta:";
+                    url.listAppend(__misc_state_string["resting url Chateau Mantegna"]);
+
+                    stat nightstand_stat = $stat[none];
+                    int [item] chateau = get_chateau();
+
+                    if (chateau[$item[electric muscle stimulator]] > 0)
+                        nightstand_stat = $stat[muscle];
+                    else if (chateau[$item[foreign language tapes]] > 0)
+                        nightstand_stat = $stat[mysticality];
+                    else if (chateau[$item[bowl of potpourri]] > 0)
+                        nightstand_stat = $stat[moxie];
+
+                    string nightstand_message;
+                    if (nightstand_stat != $stat[none] && my_path_id() != PATH_THE_SOURCE) {
+                        float experience_multiplier = (100 + numeric_modifier(nightstand_stat + " Experience Percent")) / 100;
+                        int nightstand_statgain = clampi(12 * my_level(), 0, 100) * experience_multiplier;
+                        nightstand_message = ", " + nightstand_statgain + " " + nightstand_stat + " stats";
+                    }
+
+                    subentry.entries.listAppend("250 HP, 125 MP" + nightstand_message + ".");
+                    
+                    if (my_level() < 9 && my_path_id() != PATH_THE_SOURCE)
+                        subentry.entries.listAppend("May want to wait until level 9(?) for more stats from resting.");
+                    
+                    item [int] items_equipping = generateEquipmentToEquipForExtraExperienceOnStat(nightstand_stat);
+                    if (items_equipping.count() > 0 && __misc_state["need to level"])
+                        subentry.entries.listAppend("Could equip " + items_equipping.listJoinComponents(", ", "or") + " for more stats.");
+
+                    subentries_handle.listAppend(subentry);
+                    break;
+                case loc == "Getaway Campsite" && __misc_state["Getaway Campsite available"]:
+                    subentry.header = "At your Getaway Campsite:";
+                    url.listAppend(__misc_state_string["resting url Getaway Campsite"]);
+
+                    int tent_decoration = get_property_int("campAwayDecoration");
+                    effect tent_decoration_effect = $effect[none]; //Not actually used...
+                    string tent_decoration_stat;
+
+                    switch (tent_decoration) {
+                        case 1:
+                            tent_decoration_effect = $effect[Muscular Intentions];
+                            tent_decoration_stat = "muscle";
+                            break;
+                        case 2:
+                            tent_decoration_effect = $effect[Mystical Intentions];
+                            tent_decoration_stat = "myst";
+                            break;
+                        case 3:
+                            tent_decoration_effect = $effect[Moxious Intentions];
+                            tent_decoration_stat = "moxie";
+                            break;
+                    }
+                    
+                    subentry.entries.listAppend("250 HP, 125 MP, removes negative effects.");
+
+                    if (tent_decoration != 0)
+                        subentry.entries.listAppend("Gives 20 turns of +3 " + tent_decoration_stat + " stats/fight.");
+
+                    subentries_handle.listAppend(subentry);
+                    break;
+                case loc == "Your Campsite" && __misc_state["recommend resting at campsite"]:
+                    subentry.header = "At your Campsite:";
+                    url.listAppend(__misc_state_string["resting url campsite"]);
+                    
+                    subentry.entries.listAppend(__misc_state_int["rest hp restore"] + " HP, " + __misc_state_int["rest mp restore"] + " MP.");
+                    if ($item[pantsgiving].available_amount() > 0) {
+                        if ($item[pantsgiving].equipped_amount() == 0)
+                            subentry.entries.listAppend("Wear pantsgiving for extra HP/MP.");
+                        if (availableFullness() > 0)
+                            subentry.entries.listAppend("Eat more for +" + (availableFullness() * 5) + " extra HP/MP.");
+                    }
+
+                    if (__resting_bonuses.count() > 0) {
+                        boolean saw_a_limit;
+                        string [int] bonus_messages;
+                        foreach source, bonus in __resting_bonuses {
+                            string message;
+
+                            if (source == $item[Confusing LED clock] && my_adventures() < 5)
+                                continue; //won't activate
+
+                            if (bonus.duration > 0) {
+                                if (source == $item[Lucky cat statue]) //SETS the remaining duration of that effect to 5 adv
+                                    message += pluralise(bonus.duration - bonus.given_effect.have_effect(), "turn", "turns") + " of ";
+                                else if (bonus.tasteful && bonus.given_effect.have_effect() > 1)
+                                    continue; //won't activate
+                                else
+                                    message += bonus.duration.pluralise("turn", "turns") + " of ";
+                            }
+
+                            message += bonus.given_effect == $effect[none] ? bonus.header : bonus.given_effect + " (" + bonus.header + ")";
+
+                            if (bonus.limit > 0) {
+                                saw_a_limit = true;
+                                message += ", " + bonus.limit + (bonus.limit > 1 ? "x" : "") + "/day";
+                            }
+
+                            //if (bonus.tasteful) //player should already be well aware of this; not relevant
+                            //  message += ", breaks after 3-5 uses";
+
+                            message += ".";
+
+                            bonus_messages.listAppend(message);
+                        }
+
+                        if (saw_a_limit) //tell the player that the tiles don't mean that the buffs are still obtainable today; we can't know if they reached the limits
+                            subentry.modifiers.listAppend("Can't tell if you got them, sorry...");
+                        
+                        if (bonus_messages.count() > 1)
+                            subentry.entries.listAppend("Will give:" + HTMLGenerateIndentedText(bonus_messages.listJoinComponents("<hr>")));
+                        else if (bonus_messages.count() == 1)
+                            subentry.entries.listAppend("Will give " + bonus_messages[0]);
+                    }
+
+                    subentries_handle.listAppend(subentry);
+                    break;
             }
-            if (ronald_light == 4) {
-                resting_mp_percent -= 1.0;
-                overall_multiplier_mp += 1.0;
-            }
-            
-            if ($effect[L'instinct F&eacute;lin].have_effect() > 0) { //not currently tracked by mafia. Seems to triple HP/MP gains.
-                overall_multiplier_hp *= 3.0;
-                overall_multiplier_mp *= 3.0;
-            }
-            
-            if ((get_campground() contains $item[gauze hammock])) {
-                //Gauze hammock appears to be a flat addition applied after everything else, including grimace, pagoda, and l'instinct.
-                //It shows up it bonus resting hp - we'll remove that, and add it back at the end.
-                bonus_resting_hp -= 60.0;
-                after_bonus_resting_hp += 60.0;
-            }
-            
-            //FIXME chateau restore is different
-            float rest_hp_restore = after_bonus_resting_hp + overall_multiplier_hp * (numeric_modifier("base resting hp") * (1.0 + resting_hp_percent) + bonus_resting_hp);
-            float rest_mp_restore = overall_multiplier_mp * (numeric_modifier("base resting mp") * (1.0 + resting_mp_percent) + numeric_modifier("bonus resting mp"));
-            description.listAppend(rest_hp_restore.floor() + " HP, " + rest_mp_restore.floor() + " MP");
-            
-            if ($item[pantsgiving].available_amount() > 0) { //FIXME is pantsgiving intended to help at chateau?
-                if ($item[pantsgiving].equipped_amount() == 0)
-                    description.listAppend("Wear pantsgiving for extra HP/MP.");
-                if (availableFullness() > 0)
-                    description.listAppend("Eat more for +" + (availableFullness() * 5) + " extra HP/MP.");
-            }
-        } else if (__misc_state_string["resting description"] == "Chateau Mantegna") {
-            //FIXME what goes here
-            if (my_path_id() == PATH_THE_SOURCE)
-                description.listAppend("HP/MP.");
-            else
-                description.listAppend("HP/MP/stats.");
-            if (my_level() < 9 && my_path_id() != PATH_THE_SOURCE)
-                description.listAppend("May want to wait until level 9(?) for more stats from resting.");
-            
-            stat desired_stat = $stat[none];
-            int [item] chateau = get_chateau();
-            
-            if (chateau[$item[electric muscle stimulator]] > 0)
-                desired_stat = $stat[muscle];
-            else if (chateau[$item[foreign language tapes]] > 0)
-                desired_stat = $stat[mysticality];
-            else if (chateau[$item[bowl of potpourri]] > 0)
-                desired_stat = $stat[moxie];
-            item [int] items_equipping = generateEquipmentToEquipForExtraExperienceOnStat(desired_stat);
-            if (items_equipping.count() > 0 && __misc_state["need to level"])
-                description.listAppend("Could equip " + items_equipping.listJoinComponents(", ", "or") + " for more stats.");
         }
-        
-        resource_entries.listAppend(ChecklistEntryMake("__effect sleepy", __misc_state_string["resting url"], ChecklistSubentryMake(pluraliseWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitaliseFirstLetter(), "", description), 10));
+
+        entry.url = url [0];
+
+        if (subentries_handle.count() > 1) {
+            entry.should_indent_after_first_subentry = true; //that feature is awesome!
+            entry.subentries = subentries_handle;
+            entry.subentries.listPrepend(ChecklistSubentryMake(pluralise(__misc_state_int["free rests remaining"], "free rest", "free rests"))); //entire entry acts as a "title"
+        } else if (subentries_handle.count() == 1)
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(__misc_state_int["free rests remaining"], "free rest", "free rests"), "", subentries_handle[0].entries));
+
+        resource_entries.listAppend(entry);
     }
     
     //FIXME skate park?

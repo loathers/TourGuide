@@ -1,3 +1,5 @@
+import "relay/Guide/Support/Campground.ash"
+
 boolean [item] __iotms_usable;
 
 void initialiseIOTMsUsable()
@@ -9,21 +11,20 @@ void initialiseIOTMsUsable()
     
     if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
-        int [item] campground = get_campground();
         //Campground items:
         foreach it in $items[source terminal, haunted doghouse, Witchess Set, potted tea tree, portable mayo clinic, Little Geneticist DNA-Splicing Lab, cornucopia]
         {
-            if (campground[it] > 0)
+            if (__campground[it] > 0)
                 __iotms_usable[it] = true;
         }
         // Workshed
-        if (campground[lookupItem("Asdon Martin keyfob")] > 0)
+        if (__campground[lookupItem("Asdon Martin keyfob")] > 0)
             __iotms_usable[lookupItem("Asdon Martin keyfob")] = true;
-        if (campground[lookupItem("diabolic pizza cube")] > 0)
+        if (__campground[lookupItem("diabolic pizza cube")] > 0)
             __iotms_usable[lookupItem("diabolic pizza cube")] = true;
 
         // Garden
-        if (campground[lookupItem("packet of mushroom spores")] > 0)
+        if (__campground[lookupItem("packet of mushroom spores")] > 0)
             __iotms_usable[lookupItem("packet of mushroom spores")] = true;
 
     }

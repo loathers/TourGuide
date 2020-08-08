@@ -1,3 +1,5 @@
+import "relay/Guide/Support/Campground.ash"
+
 void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (!hippy_stone_broken())
@@ -467,7 +469,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         else if (mini == "Most Things Eaten")
         {
         	string line = "Eat as many one-fullness foods as possible.";
-            if (get_campground()[$item[portable mayo clinic]] > 0 && availableDrunkenness() > 0)
+            if (__campground[$item[portable mayo clinic]] > 0 && availableDrunkenness() > 0)
                 line += "|Also use mayodiol.";
             description.listAppend(line);
         }
