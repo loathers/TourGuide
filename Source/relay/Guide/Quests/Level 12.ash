@@ -194,7 +194,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             tasks.listAppend("make a fence out of the barbed wire");
             tasks.listAppend("knock over the lantern");
             tasks.listAppend("dump out the drum");
-            details.listAppend("Remember to use a chaos butterfly in combat before clearing the barn.|Then " + tasks.listJoinComponents(", ", "and") + ".");
+            details.listAppend((!get_property_boolean("chaosButterflyThrown") ? "Remember to use a chaos butterfly in combat before clearing the barn.|Then " : "Remember: ") + tasks.listJoinComponents(", ", "and") + ".");
             
             
             if (__misc_state["free runs available"])
