@@ -1,3 +1,5 @@
+import "relay/Guide/Support/Campground.ash"
+
 void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if ($item[the crown of ed the undying].equipped_amount() > 0 && get_property("edPiece").length() == 0) {
@@ -790,7 +792,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item " + grimstone_mask, "inventory.php?ftext=grimstone+mask", ChecklistSubentryMake(grimstone_mask.pluralise(), "", description), importance_level_item));
     }
     
-    if (get_campground()[$item[spinning wheel]] > 0 && !get_property_boolean("_spinningWheel")) {
+    if (__campground[$item[spinning wheel]] > 0 && !get_property_boolean("_spinningWheel")) {
         string [int] description;
         int meat_gained = powi(MIN(30, my_level()), 3);
         description.listAppend("Will gain " + meat_gained + " meat.");

@@ -1,3 +1,5 @@
+import "relay/Guide/Support/Campground.ash"
+
 void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //To implement:
@@ -76,14 +78,14 @@ void SAftercoreThingsToDoGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     }
     
     
-    if (false) //disabled for now - we don't have suggestions for every path, and this may be too much information to list? need to decide
+    if (false) //FIXME disabled for now - we don't have suggestions for every path, and this may be too much information to list? need to decide
     {
         //Grimstone:
         string [item] grimstone_paths;
         grimstone_paths[$item[silver cow creamer]] = "stepmother";
         grimstone_paths[$item[wolf whistle]] = "wolf";
         grimstone_paths[$item[witch's bra]] = "witch";
-        if (get_campground()[$item[spinning wheel]] == 0)
+        if (__campground[$item[spinning wheel]] == 0)
             grimstone_paths[$item[spinning wheel]] = "gnome";
         grimstone_paths[$item[hare pin]] = "hare";
         
@@ -228,13 +230,11 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if (!__misc_state["in aftercore"])
         return;
     //Campground items:
-    int [item] campground_items = get_campground();
-    
-    if (campground_items[$item[clockwork maid]] == 0)
+    if (__campground[$item[clockwork maid]] == 0)
     {
         optional_task_entries.listAppend(ChecklistEntryMake("__item sprocket", "", ChecklistSubentryMake("Install a clockwork maid", "", listMake("+8 adventures/day.", "Buy from mall."))));
     }
-    if (campground_items[$item[pagoda plans]] == 0 && $location[Pandamonium Slums].locationAvailable())
+    if (__campground[$item[pagoda plans]] == 0 && $location[Pandamonium Slums].locationAvailable())
     {
         string url;
         string [int] details;
