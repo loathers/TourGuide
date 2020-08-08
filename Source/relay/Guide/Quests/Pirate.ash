@@ -339,8 +339,11 @@ void QPoopDeckGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
     }
 
     subentry.entries.listAppend("*Sail to (48,47) to get an El Vibrato power sphere (or buy from mall).");
-    if (item_amount_almost_everywhere(lookupItem("El Vibrato trapezoid")) == 0 && $location[El Vibrato Island].turns_spent == 0) {
-        string line = "*Sail to (63,29) to get an El Vibrato trapezoid. " + HTMLGenerateSpanFont("Don't do this if you've already set up a portal at your campground.", "red");
+    if (item_amount_almost_everywhere(lookupItem("El Vibrato trapezoid")) == 0 && $location[El Vibrato Island].turns_spent == 0 && __campground[lookupItem("El Vibrato trapezoid")] == 0) { //mafia only registers the trapezoid in the campground from revisiton 20267 and onward
+        string line = "*Sail to (63,29) to get an El Vibrato trapezoid.";
+        if (!mafiaIsPastRevision(20267)) //Means that we can't trust "__campground[lookupItem("El Vibrato trapezoid")] == 0" to be accurate
+            line += HTMLGenerateSpanFont(" Don't do this if you've already set up a portal at your campground.", "red");
+
         if (lookupItem("El Vibrato power sphere").item_amount() == 0)
             line += "|*Need an El Vibrato power sphere in inventory. Buy from mall?";
         line += "|*Gives an item that creates a portal to El Vibrato Island at your campground (will need to keep it charged with more power spheres).";
