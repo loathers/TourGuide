@@ -138,6 +138,10 @@ void generateDailyResources(Checklist [int] checklists)
                 description.listAppend(pluralise($effect[Got Milk]) + " available (woah).");
             if (!get_property_boolean("_milkOfMagnesiumUsed") && lookupItem("milk of magnesium").available_amount() > 0)
                 description.listAppend("Use Milk of Magnesium for +5 adv.");
+            if ($effect[barrel of laughs].have_effect() >= 5) {
+                int turns = $effect[barrel of laughs].have_effect();
+                description.listAppend(pluralise($effect[barrel of laughs]) + " available" + (turns % 5 > 0 ? " (" + (turns - turns % 5) + ")" : "") + ".");
+            }
             subentries.listAppend(ChecklistSubentryMake(availableFullness() + " fullness", "", description));
         }
         if (inebriety_limit() > 0) {
@@ -151,6 +155,12 @@ void generateDailyResources(Checklist [int] checklists)
                     image_name = "__item gibson";
                 if ($effect[ode to booze].have_effect() > 0)
                     description.listAppend(pluralise($effect[ode to booze]) + " available.");
+                if ($effect[salty mouth].have_effect() > 0)
+                    description.listAppend(pluralise($effect[salty mouth]) + " available. Drink beer for +5 adv!");
+                if ($effect[beer barrel polka].have_effect() >= 5) {
+                    int turns = $effect[beer barrel polka].have_effect();
+                    description.listAppend(pluralise($effect[beer barrel polka]) + " available" + (turns % 5 > 0 ? " (" + (turns - turns % 5) + ")" : "") + ".");
+                }
                 
                 if (availableDrunkenness() > 0)
                     title = availableDrunkenness() + " drunkenness" + (couldEquipStooper ? " + Stooper" : "");
