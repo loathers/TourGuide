@@ -469,7 +469,70 @@ void generateDailyResources(Checklist [int] checklists)
         resource_entries.listAppend(entry);
     }
     
-    //FIXME skate park?
+    if (__quest_state["Sea Monkees"].finished && !get_property_boolean("_momFoodReceived")) {
+        //FIXME Detect if they can breathe underwater, to go meet her
+        string [int] description;
+
+        if (__misc_state["in run"]) { //who knows...
+            string [int] elemental_buffs;
+        	elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Hot Sweat", "r_element_hot"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Cold Sweat", "r_element_cold"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Rank Sweat", "r_element_stench"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Black Sweat", "r_element_spooky"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Flop Sweat", "r_element_sleaze"));
+        
+            description.listAppend("<strong>" + elemental_buffs.listJoinComponents(" / ") + ":</strong> +7 X resistance.");
+        }
+
+        description.listAppend("<strong>Mark of Candy Cain:</strong> +20% critical & spell critical hit.");
+        description.listAppend("<strong>Cereal Killer:</strong> +200 stats/fight.");
+
+        resource_entries.listAppend(ChecklistEntryMake("Mom Monkey Castle Window", "monkeycastle.php?who=4", ChecklistSubentryMake('Have Mom "make breakfast"', "50 turns", description), 5));
+    }
+    
+    if (true) {
+        //FIXME Detect if they can breathe underwater
+        string [string] dailySkateParkBuffs;
+
+        switch (__quest_state["Sea Monkees"].state_string["skate park status"]) {
+            case "ice":
+                if (!get_property_boolean("_skateBuff1"))
+                    dailySkateParkBuffs["Lutz, the Ice Skate"] = "Fishy";
+                break;
+            case "roller":
+                if (!get_property_boolean("_skateBuff2"))
+                    dailySkateParkBuffs["Comet, the Roller Skate"] = "-30% pressure penalty";
+                break;
+            case "peace":
+                if (!get_property_boolean("_skateBuff3"))
+                    dailySkateParkBuffs["The Bandshell"] = "+1 sand dollar/underwater combat";
+                if (!get_property_boolean("_skateBuff4"))
+                    dailySkateParkBuffs["A Merry-Go Round"] = "+25% underwater item";
+                if (!get_property_boolean("_skateBuff5"))
+                    dailySkateParkBuffs["The Eclectic Eels"] = "+10 underwater familiar weight";
+                break;
+        }
+
+        if (dailySkateParkBuffs.count() > 0) {
+            ChecklistEntry entry;
+            entry.image_lookup_name = "Skate Park";
+            entry.url = "sea_skatepark.php";
+            entry.importance_level = 5;
+
+            if (dailySkateParkBuffs.count() > 1) {
+                entry.subentries.listAppend(ChecklistSubentryMake("Daily Skate Park buffs (30 turns each)"));
+                entry.should_indent_after_first_subentry = true; //to make it clear(er) that they are not mutually exclusive
+                foreach whoYouGonnaCall, buff in dailySkateParkBuffs {
+                    entry.subentries.listAppend(ChecklistSubentryMake(whoYouGonnaCall, "", buff));
+                }
+            } else {
+                foreach whoYouGonnaCall, buff in dailySkateParkBuffs //We know there's only 1 key, but I think it's the only way to get it?
+                    entry.subentries.listAppend(ChecklistSubentryMake("Daily Skate Park buff (30 turns)", "", HTMLGenerateSpanOfClass(whoYouGonnaCall, "r_bold") + ": " + buff));
+            }
+
+            resource_entries.listAppend(entry);
+        }
+    }
     
     if (my_path_id() != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["in aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"])) {
         //Not really worthwhile? But I suppose we can track it if they've started it, and are either in aftercore or haven't flyered yet.
