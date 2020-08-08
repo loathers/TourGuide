@@ -326,7 +326,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] potential_copies;
     if (true)
     {
-        //√ghuol whelps, √modern zmobies, √wine racks, √gaudy pirates, √lobsterfrogmen, √ninja assassin
+        //√ghuol whelps, √modern zmobies, √wine racks, √lobsterfrogmen, √ninja assassin
         if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
             potential_copies.listAppend("Lobsterfrogman.");
         if (__quest_state["Level 7"].state_boolean["cranny needs speed tricks"])
@@ -336,7 +336,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
         if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
             potential_copies.listAppend("Ninja assassin.");
         //if (!__quest_state["Level 11"].finished && !__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[gaudy key,snakehead charrrm].available_amount() < 2 && my_path_id() != PATH_G_LOVER)
-            //potential_copies.listAppend("Gaudy pirate - copy once for extra key.");
+            //potential_copies.listAppend("Gaudy pirate - copy once for extra key."); //now obsolete
         //√baa'baa. astronomer? √nuns trick brigand
         //FIXME astronomer when we can calculate that
         //if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])

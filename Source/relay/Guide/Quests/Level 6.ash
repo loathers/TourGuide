@@ -88,8 +88,8 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         want_hell_ramen = false;
     want_hell_ramen = false; //this needs rethinking
     
-	boolean hot_wings_relevant = __quest_state["Pirate Quest"].state_boolean["hot wings relevant"];
-	boolean need_more_hot_wings = __quest_state["Pirate Quest"].state_boolean["need more hot wings"];
+	boolean hot_wings_relevant = __quest_state["Pirate Quest"].state_boolean["hot wings relevant"] && __quest_state["Pirate Quest"].state_boolean["valid"];
+	boolean need_more_hot_wings = __quest_state["Pirate Quest"].state_boolean["need more hot wings"] && __quest_state["Pirate Quest"].state_boolean["valid"];
 	
 	QuestState base_quest_state = __quest_state["Level 6"];
 	ChecklistSubentry subentry;
@@ -107,20 +107,17 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     
     boolean hipster_fights_needed = false;
     boolean need_minus_combat = false;
-	if ($item[dodecagram].available_amount() == 0)
-    {
+	if ($item[dodecagram].available_amount() == 0) {
         hipster_fights_needed = true;
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Neck of the Woods", "r_bold") + ", acquire dodecagram.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[the dark neck of the woods]), 1) + " average turns remain at " + combat_rate_modifier().floor() + "% combat.");
         need_minus_combat = true;
     }
-	if ($item[box of birthday candles].available_amount() == 0)
-    {
+	if ($item[box of birthday candles].available_amount() == 0) {
         hipster_fights_needed = true;
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Heart of the Woods", "r_bold") + ", acquire box of birthday candles.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[the Dark Heart of the Woods]), 1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
         need_minus_combat = true;
     }
-	if ($item[Eldritch butterknife].available_amount() == 0)
-    {
+	if ($item[Eldritch butterknife].available_amount() == 0) {
         hipster_fights_needed = true;
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Elbow of the Woods", "r_bold") + ", acquire Eldritch butterknife.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[the Dark Elbow of the Woods]), 1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
         need_minus_combat = true;
@@ -132,8 +129,7 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         //subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
 	
     string [int] needed_modifiers;
-    if (need_minus_combat)
-    {
+    if (need_minus_combat) {
         subentry.modifiers.listAppend("-combat");
         needed_modifiers.listAppend("-combat");
     }
@@ -142,14 +138,10 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     if (needed_modifiers.count() > 0)
         subentry.entries.listAppend("Run " + needed_modifiers.listJoinComponents(", ", "and") + ".");
     
-	if ($item[dodecagram].available_amount() + $item[box of birthday candles].available_amount() + $item[Eldritch butterknife].available_amount() == 3)
-    {
-        if (!(hot_wings_relevant && $item[hot wing].available_amount() <3))
-        {
+	if ($item[dodecagram].available_amount() + $item[box of birthday candles].available_amount() + $item[Eldritch butterknife].available_amount() == 3) {
+        if (!(hot_wings_relevant && $item[hot wing].available_amount() <3)) {
             subentry.entries.listAppend("Go to the cairn stones!");
-        }
-        else
-        {
+        } else {
             subentry.entries.listAppend("Visit the dark heart of the woods for hot wings.");
         }
     }
@@ -157,16 +149,14 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         subentry.entries.listAppend("Potentially find a heavy-duty bendy straw, first.|From fallen archfiends in the dark heart of the woods.");
 	if (__misc_state_int["ruby w needed"] > 0)
 		subentry.entries.listAppend("Potentially find ruby W, if not clovering (w imp, dark neck, 30% drop)");
-	if (hot_wings_relevant)
-    {
+	if (hot_wings_relevant) {
         if ($item[hot wing].available_amount() <3 )
             subentry.entries.listAppend((MIN(3, $item[hot wing].available_amount())) + "/3 hot wings for pirate quest. (optional, 30% drop)");
         else
             subentry.entries.listAppend((MIN(3, $item[hot wing].available_amount())) + "/3 hot wings for pirate quest.");
     }
 	boolean should_delay = false;
-	if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"] && need_minus_combat)
-	{
+	if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"] && need_minus_combat) {
 		subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
 		should_delay = true;
 	}

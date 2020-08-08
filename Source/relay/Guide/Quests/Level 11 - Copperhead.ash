@@ -2,12 +2,12 @@
 
 void QLevel11CopperheadInit()
 {
-	if (true) {
-		QuestState state;
-		QuestStateParseMafiaQuestProperty(state, "questL11Ron");
-    	if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-		state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
-		state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
+    if (true) {
+        QuestState state;
+        QuestStateParseMafiaQuestProperty(state, "questL11Ron");
+        if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
+        state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
         
         state.state_int["protestors remaining"] = clampi(80 - get_property_int("zeppelinProtestors"), 0, 80);
         
@@ -17,16 +17,16 @@ void QLevel11CopperheadInit()
         if (state.state_int["protestors remaining"] <= 1)
             state.state_boolean["need protestor speed tricks"] = false;
         
-		__quest_state["Level 11 Ron"] = state;
-	}
-	if (true) {
-		QuestState state;
-		QuestStateParseMafiaQuestProperty(state, "questL11Shen");
-    	if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-		state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
-		state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
-		__quest_state["Level 11 Shen"] = state;
-	}
+        __quest_state["Level 11 Ron"] = state;
+    }
+    if (true) {
+        QuestState state;
+        QuestStateParseMafiaQuestProperty(state, "questL11Shen");
+        if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
+        state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
+        __quest_state["Level 11 Shen"] = state;
+    }
 }
 
 boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
@@ -34,19 +34,12 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
     if (__quest_state["Level 11"].mafia_internal_step < 3) //need diary
         return false;
     
-    int pirate_insult_count = 0;
-    for i from 1 to 8 {
-        if (get_property_boolean("lastPirateInsult" + i))
-            pirate_insult_count += 1;
-    }
-    if ($item[pirate fledges].available_amount() == 0 && pirate_insult_count == 0) { //they haven't started the pirate quest... hm...
-        return true;
-    }
-    
     //want: output this in aftercore if they're adventuring there
-    //want: output this in paths that do not allow the pirates (if such paths exist)
-    //want: output this in-run if they're adventuring there
+    //want: output this in-run by default
     //soooo...
+    
+    if (__misc_state["in run"])
+        return true;
     
     if (which_route == "ron" && $location[the red zeppelin].turns_spent > 0)
         return true;
@@ -54,11 +47,6 @@ boolean QLevel11ShouldOutputCopperheadRoute(string which_route)
         return true;
     if (which_route == "shen" && $location[the copperhead club].turns_spent > 0)
         return true;
-    
-    if (__misc_state["in run"] && ($location[a mob of zeppelin protesters].turns_spent + $location[the red zeppelin].turns_spent + $location[the copperhead club].turns_spent) > 0)
-        return true;
-    
-    if (!$item[Talisman o' Namsilat].have()) return true;
     
     return false;
 }
@@ -83,14 +71,13 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     subentry.header = base_quest_state.quest_name;
     
     string url = $location[A Mob of Zeppelin Protesters].getClickableURLForLocation();
-	if (base_quest_state.finished)
-		return;
+    if (base_quest_state.finished)
+        return;
     
      
     if (base_quest_state.mafia_internal_step <= 2 && base_quest_state.state_int["protestors remaining"] <= 1) {
         subentry.entries.listAppend("Adventure in the mob of protestors.");
-    }
-    else if (base_quest_state.mafia_internal_step <= 2) {
+    } else if (base_quest_state.mafia_internal_step <= 2) {
         //Fight your way through the mob of zeppelin protesters.
         subentry.entries.listAppend("Scare away " + pluraliseWordy(base_quest_state.state_int["protestors remaining"], "more protestor", "more protestors") + ".");
         subentry.modifiers.listAppend("-combat");
@@ -132,14 +119,14 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             int current_sleaze_damage = numeric_modifier("sleaze damage") + numeric_modifier("sleaze spell damage");
             string [int] options;
             if ($effect[Fifty Ways to Bereave Your Lover].have_effect() == 0)
-            	options.listAppend("Fifty Ways to Bereave Your Lover for +100 sleaze damage");
+                options.listAppend("Fifty Ways to Bereave Your Lover for +100 sleaze damage");
             if ($effect[Dirty Pear].have_effect() == 0)
                 options.listAppend("Dirty Pear for 2x sleaze damage; currently +" + current_sleaze_damage + " total damage");
             string line = "Could wish for sleaze damage";
             if (options.count() > 0)
-            	line += ", like " + options.listJoinComponents(", ", "or");
+                line += ", like " + options.listJoinComponents(", ", "or");
             line += ".";
-        	subentry.entries.listAppend(line);
+            subentry.entries.listAppend(line);
         }
         float sleaze_protestors_cleared = MAX(3.0, sqrt(numeric_modifier("sleaze damage") + numeric_modifier("sleaze spell damage")));
         if (sleaze_protestors_cleared > 3)
@@ -189,8 +176,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
         if (!__quest_state["Level 11 Shen"].finished && $item[Flamin' Whatshisname].available_amount() == 0)
             subentry.entries.listAppend("Could adventure in the Copperhead Club first for Flamin' Whatshisnames.");
-    }
-    else if (base_quest_state.mafia_internal_step <= 4) {
+    } else if (base_quest_state.mafia_internal_step <= 4) {
         //All aboard! All aboard the Red Zeppelin!
         subentry.entries.listAppend("Search for Ron in the zeppelin.");
         //possibly 50% chance of no progress without a ticket (unconfirmed chat rumour)
@@ -216,13 +202,18 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             else
                 subentry.entries.listAppend("No ticket.");
         }
-            
-        if (get_property_int("_glarkCableUses") < 5 && my_path_id() != PATH_POCKET_FAMILIARS) {
-            if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
-                subentry.entries.listAppend("Olfact red butlers for glark cables.");
-            
-            if ($item[glark cable].available_amount() > 0) {
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red"));
+        
+        if (my_path_id() != PATH_POCKET_FAMILIARS) {
+            if (get_property_int("_glarkCableUses") < 5) {
+                if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
+                    subentry.entries.listAppend("Olfact red butlers for glark cables.");
+                
+                if ($item[glark cable].available_amount() > 0) {
+                    subentry.entries.listAppend(HTMLGenerateSpanFont("Use glark cable in-combat.", "red"));
+                }
+                subentry.entries.listAppend(get_property_int("_glarkCableUses") + " / 5 glark cables used today (free kills).");
+            } else {
+                subentry.entries.listAppend("Already used all 5 glark cables for the day.");
             }
         }
             
@@ -232,8 +223,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             subentry.entries.listAppend("Acquire a Red Zeppelin ticket from the black market.");
             url = "shop.php?whichshop=blackmarket";
         }
-    }
-    else if (base_quest_state.mafia_internal_step == 5) {
+    } else if (base_quest_state.mafia_internal_step == 5) {
         //Barge into Ron Copperhead's cabin in the Red Zeppelin and beat him up!
         subentry.entries.listAppend("Defeat Ron in the zeppelin.");
     }
@@ -282,15 +272,15 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     item quest_item = get_property_item("shenQuestItem");
     
     location [item] quest_items_to_locations = {$item[Murphy's Rancid Black Flag]:$location[The Castle in the Clouds in the Sky (Top Floor)],
-    	$item[The Stankara Stone]:$location[The Batrat and Ratbat Burrow],
+        $item[The Stankara Stone]:$location[The Batrat and Ratbat Burrow],
         $item[The First Pizza]:$location[Lair of the Ninja Snowmen],
         $item[The Eye of the Stars]:$location[The Hole in the Sky],
         $item[The Lacrosse Stick of Lacoronado]:$location[The Smut Orc Logging Camp],
         $item[The Shield of Brook]:$location[The VERY Unquiet Garves]};
     location quest_location = quest_items_to_locations[quest_item]; 
     
-	if (base_quest_state.finished)
-		return;
+    if (base_quest_state.finished)
+        return;
     string url = $location[the copperhead club].getClickableURLForLocation();
     
     boolean want_club_details = false;
@@ -298,45 +288,36 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         subentry.entries.listAppend("Adventure in the Copperhead Club and meet Shen.");
         subentry.entries.listAppend("This will give you unremovable -5 stat poison.");
         if (my_daycount() == 1 && my_path_id() != PATH_EXPLOSIONS)
-        	subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
-    }
-    else if (base_quest_state.mafia_internal_step == 2) {
-    	if (quest_location != $location[none]) {
-            subentry.entries.listAppend("Adventure in " + quest_location + ".");
-            url = quest_location.getClickableURLForLocation();
-        }
-        else {
-	        subentry.entries.listAppend("Fight the first monster wherever Shen told you to go.");
-        	url = "";
-        }
-    }
-    else if (base_quest_state.mafia_internal_step == 3) {
-        want_club_details = true;
-    }
-    else if (base_quest_state.mafia_internal_step == 4) {
+            subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
+    } else if (base_quest_state.mafia_internal_step == 2) {
         if (quest_location != $location[none]) {
             subentry.entries.listAppend("Adventure in " + quest_location + ".");
             url = quest_location.getClickableURLForLocation();
+        } else {
+            subentry.entries.listAppend("Fight the first monster wherever Shen told you to go.");
+            url = "";
         }
-        else {
-        	subentry.entries.listAppend("Fight the second monster wherever Shen told you to go.");
-        	url = "";
-        }
-    }
-    else if (base_quest_state.mafia_internal_step == 5) {
+    } else if (base_quest_state.mafia_internal_step == 3) {
         want_club_details = true;
-    }
-    else if (base_quest_state.mafia_internal_step == 6) {
+    } else if (base_quest_state.mafia_internal_step == 4) {
         if (quest_location != $location[none]) {
             subentry.entries.listAppend("Adventure in " + quest_location + ".");
             url = quest_location.getClickableURLForLocation();
+        } else {
+            subentry.entries.listAppend("Fight the second monster wherever Shen told you to go.");
+            url = "";
         }
-        else {
-        	subentry.entries.listAppend("Fight the third monster wherever Shen told you to go.");
-        	url = "";
+    } else if (base_quest_state.mafia_internal_step == 5) {
+        want_club_details = true;
+    } else if (base_quest_state.mafia_internal_step == 6) {
+        if (quest_location != $location[none]) {
+            subentry.entries.listAppend("Adventure in " + quest_location + ".");
+            url = quest_location.getClickableURLForLocation();
+        } else {
+            subentry.entries.listAppend("Fight the third monster wherever Shen told you to go.");
+            url = "";
         }
-    }
-    else if (base_quest_state.mafia_internal_step == 7) {
+    } else if (base_quest_state.mafia_internal_step == 7) {
         want_club_details = true;
     }
     //FIXME is shen scheduled?
@@ -371,14 +352,13 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         
         if (need_diamond) {
             subentry.entries.listAppend("Try to acquire a priceless diamond. (complicated)");
-        }
-        else if (need_flaming_whathisname) {
+        } else if (need_flaming_whathisname) {
             subentry.entries.listAppend("Could try to acquire Flamin' Whatshisname. (complicated)");
         }
     }
     
     
-	ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the copperhead club]);
+    ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the copperhead club]);
     
     if (!__misc_state["in run"] || $item[talisman o' namsilat].available_amount() > 0)
         optional_task_entries.listAppend(entry);

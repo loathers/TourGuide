@@ -438,8 +438,8 @@ void generatePullList(Checklist [int] checklists)
         }
     }
     
-    //alas
-    if (($item[talisman o' namsilat].available_amount() == 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && false)// && !__quest_state["Pirate Quest"].finished)
+    //alas, now obsolete
+    /*if (($item[talisman o' namsilat].available_amount() == 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
     {
         item [int] missing_outfit_components = missing_outfit_components("Swashbuckling Getup");
         if (missing_outfit_components.count() > 0)
@@ -451,7 +451,7 @@ void generatePullList(Checklist [int] checklists)
             	entry += "|No, really! You can get a free bridge!";
             pullable_item_list.listAppend(GPItemMake("Swashbuckling Getup", "__item " + missing_outfit_components[0], entry));
         }
-    }
+    }*/
     
     //FIXME suggest machetito?
     //FIXME suggest super marginal stuff in SCO or S&S
