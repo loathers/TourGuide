@@ -4,6 +4,7 @@
 import "relay/Guide/Support/Error.ash"
 import "relay/Guide/Support/List.ash"
 import "relay/Guide/Support/Library.ash"
+import "relay/Guide/Support/Campground.ash"
 import "relay/Guide/Settings.ash"
 import "relay/Guide/QuestState.ash"
 
@@ -558,23 +559,23 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[fear man\'s level]:
         case $location[doubt man\'s level]:
         case $location[regret man\'s level]:
-            return get_campground()[$item[jar of psychoses (The Crackpot Mystic)]] > 0;
+            return __campground[$item[jar of psychoses (The Crackpot Mystic)]] > 0;
         case $location[the gourd!]:
-            return get_campground()[$item[jar of psychoses (The Captain of the Gourd)]] > 0;
+            return __campground[$item[jar of psychoses (The Captain of the Gourd)]] > 0;
         case $location[The Nightmare Meatrealm]:
-            return get_campground()[$item[jar of psychoses (The Meatsmith)]] > 0;
+            return __campground[$item[jar of psychoses (The Meatsmith)]] > 0;
         case $location[A Kitchen Drawer]:
         case $location[A Grocery Bag]:
-            return get_campground()[$item[jar of psychoses (The Pretentious Artist)]] > 0;
+            return __campground[$item[jar of psychoses (The Pretentious Artist)]] > 0;
         case $location[Chinatown Shops]: //needs tracking for the quest? maybe use the items?
-            return get_campground()[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0 && $item[strange goggles].available_amount() == 0;
+            return __campground[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0 && $item[strange goggles].available_amount() == 0;
         case $location[Triad Factory]:
-            return $item[zaibatsu lobby card].available_amount() > 0 && $item[strange goggles].available_amount() == 0 && get_campground()[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0;
+            return $item[zaibatsu lobby card].available_amount() > 0 && $item[strange goggles].available_amount() == 0 && __campground[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0;
         //case $location[1st Floor, Shiawase-Mitsuhama Building]:
         //case $location[2nd Floor, Shiawase-Mitsuhama Building]:
         //case $location[3rd Floor, Shiawase-Mitsuhama Building]:
         case $location[Chinatown Tenement]:
-            return $item[test site key].available_amount() > 0 && get_campground()[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0;
+            return $item[test site key].available_amount() > 0 && __campground[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0;
         case $location[whitey\'s grove]:
             return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
         case $location[the Obligatory pirate\'s cove]:

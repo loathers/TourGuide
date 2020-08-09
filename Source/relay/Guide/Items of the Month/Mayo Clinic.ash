@@ -3,7 +3,7 @@ void IOTMMayoClinicGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (__misc_state["campground unavailable"])
         return;
-    if (get_campground()[$item[portable Mayo Clinic]] == 0 || in_bad_moon())
+    if (__campground[$item[portable Mayo Clinic]] == 0 || in_bad_moon())
         return;
     
     //mayoLevel

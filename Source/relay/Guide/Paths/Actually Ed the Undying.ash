@@ -226,8 +226,6 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
             talismen_of_horus_wanted += 2;
         if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
             talismen_of_horus_wanted += 2;
-        if ($item[pirate fledges].available_amount() == 0 && $item[talisman o' namsilat].available_amount() == 0)
-            talismen_of_horus_wanted += 2;
         if (talismen_of_horus_wanted == 0) //where else do you need +combat? pirate's cove?
             talismen_of_horus_wanted = 1;
         if ($item[talisman of Horus].available_amount() < talismen_of_horus_wanted)

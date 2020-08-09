@@ -1,3 +1,4 @@
+import "relay/Guide/Support/Campground.ash"
 import "relay/Guide/QuestState.ash"
 import "relay/Guide/Quests.ash"
 import "relay/Guide/Sets.ash"
@@ -275,14 +276,13 @@ void setUpState()
         __misc_state["yellow ray almost certainly impossible"] = true;
     }
     
-    int [item] campground_items = get_campground();
     __misc_state["can cook for free"] = false;
-    if (campground_items[$item[chef-in-the-box]] > 0 || campground_items[$item[clockwork chef-in-the-box]] > 0 || $effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
+    if (__campground[$item[chef-in-the-box]] > 0 || __campground[$item[clockwork chef-in-the-box]] > 0 || $effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
         __misc_state["can cook for free"] = true;
     
     
     __misc_state["can bartend for free"] = false;
-    if (campground_items[$item[bartender-in-the-box]] > 0 || campground_items[$item[clockwork bartender-in-the-box]] > 0 || $effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
+    if (__campground[$item[bartender-in-the-box]] > 0 || __campground[$item[clockwork bartender-in-the-box]] > 0 || $effect[Inigo's Incantation of Inspiration].have_effect() >= 5)
         __misc_state["can bartend for free"] = true;
     
     if ($skill[Rapid Prototyping].skill_is_usable() && get_property_int("_rapidPrototypingUsed") < 5)
@@ -713,23 +713,85 @@ void setUpState()
                 __misc_state[s + " airport available"] = true;
         }
     }
-    
-    if (get_property_boolean("chateauAvailable") && !in_bad_moon() && $item[Chateau Mantegna room key].is_unrestricted())
-    {
+
+    if (get_property_boolean("chateauAvailable") && !in_bad_moon() && $item[Chateau Mantegna room key].is_unrestricted()) {
         __misc_state["Chateau Mantegna available"] = true;
+        __misc_state_string["resting url Chateau Mantegna"] = "place.php?whichplace=chateau";
+    }
+
+    if (get_property_boolean("getawayCampsiteUnlocked") && !in_bad_moon() && $item[Distant Woods Getaway Brochure].is_unrestricted()) {
+        __misc_state["Getaway Campsite available"] = true;
+        __misc_state_string["resting url Getaway Campsite"] = "place.php?whichplace=campaway";
     }
     
     
-    __misc_state_string["resting url"] = "campground.php";
-    __misc_state_string["resting description"] = "your campsite";
-    __misc_state["recommend resting at campsite"] = true;
-    if (__misc_state["Chateau Mantegna available"])// && (my_level() < 13 || __misc_state["need to level"] || $item[pantsgiving].available_amount() == 0))
-    {
-        __misc_state_string["resting url"] = "place.php?whichplace=chateau";
+    __misc_state_string["resting url campsite"] = "campground.php";
+
+
+    //Calculate how much HP/MP will be gained if resting at your campground
+    float resting_hp_percent = numeric_modifier("resting hp percent") / 100.0;
+    float resting_mp_percent = numeric_modifier("resting mp percent") / 100.0;
+    
+    //FIXME trace down every rest effect and make this more accurate, instead of an initial guess.
+    
+    //If grimace or ronald is full, they double the gains of everything else.
+    //This is reported as a modifier of +100% - so with pagoda, that's +200% HP
+    //But, it's actually +300%, or 400% total. I could be wrong about this - my knowledge of rest mechanics is limited.
+    //So, we'll explicitly check for grimace or ronald being full, then recalculate. Not great, but should work okay?
+    //This is probably inaccurate in a great number of cases, due to the complication of resting.
+    
+    float overall_multiplier_hp = 1.0;
+    float overall_multiplier_mp = 1.0;
+    float bonus_resting_hp = numeric_modifier("bonus resting hp");
+    float after_bonus_resting_hp = 0.0;
+    int grimace_light = moon_phase() / 2;
+    int ronald_light = moon_phase() % 8;
+    if (grimace_light == 4) {
+        resting_hp_percent -= 1.0;
+        overall_multiplier_hp += 1.0;
+    }
+    if (ronald_light == 4) {
+        resting_mp_percent -= 1.0;
+        overall_multiplier_mp += 1.0;
+    }
+    
+    if ($effect[L'instinct F&eacute;lin].have_effect() > 0) { //not currently tracked by mafia. Seems to triple HP/MP gains.
+        overall_multiplier_hp *= 3.0;
+        overall_multiplier_mp *= 3.0;
+    }
+    
+    if (__campground contains $item[gauze hammock]) {
+        //Gauze hammock appears to be a flat addition applied after everything else, including grimace, pagoda, and l'instinct.
+        //It shows up it bonus resting hp - we'll remove that, and add it back at the end.
+        bonus_resting_hp -= 60.0;
+        after_bonus_resting_hp += 60.0;
+    }
+    
+    __misc_state_int["rest hp restore"] = after_bonus_resting_hp + overall_multiplier_hp * (numeric_modifier("base resting hp") * (1.0 + resting_hp_percent) + bonus_resting_hp);
+    __misc_state_int["rest mp restore"] = overall_multiplier_mp * (numeric_modifier("base resting mp") * (1.0 + resting_mp_percent) + numeric_modifier("bonus resting mp"));
+
+    
+    if (__misc_state["Chateau Mantegna available"] && get_property_boolean("restUsingChateau")) {
+        __misc_state_string["resting url"] = __misc_state_string["resting url Chateau Mantegna"];
         __misc_state_string["resting description"] = "Chateau Mantegna";
         __misc_state["recommend resting at campsite"] = false;
+    } else if (__misc_state["Getaway Campsite available"] && get_property_boolean("restUsingCampAwayTent")) {
+        __misc_state_string["resting url"] = __misc_state_string["resting url Getaway Campsite"];
+        __misc_state_string["resting description"] = "Getaway Campsite";
+        __misc_state["recommend resting at campsite"] = false;
+    } else {
+        __misc_state_string["resting url"] = __misc_state_string["resting url campsite"];
+        __misc_state_string["resting description"] = "your campsite";
+        __misc_state["recommend resting at campsite"] = true;
+    }
+
+    if (!__misc_state["recommend resting at campsite"]) { //chance of redemption
+        boolean still_have_reason_to_rest_at_campsite = __resting_bonuses.count() > 0 || __misc_state_int["rest hp restore"] > 250 || __misc_state_int["rest mp restore"] > 125;
+        __misc_state["recommend resting at campsite"] = still_have_reason_to_rest_at_campsite;
     }
     
+
+
     if ($classes[seal clubber,turtle tamer] contains my_class())
         __misc_state["guild open"] = QuestState("questG09Muscle").finished;
     else if ($classes[pastamancer,sauceror] contains my_class())

@@ -1,49 +1,36 @@
-RegisterTaskGenerationFunction("IOTMGuzzlrQuestGenerateTask");
-void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-    if (get_property("questGuzzlr") == "unstarted" || !lookupItem("Guzzlr tablet").have()) return;
-    location questLocation = get_property("guzzlrQuestLocation").to_location();
-    
-    ChecklistSubentry gigEconomy() {
-        string questTier = get_property("guzzlrQuestTier");
+RegisterTaskGenerationFunction("IOTMGuzzlrGenerateTask");
+void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+
+    if (!lookupItem("Guzzlr tablet").have()) return;
+
+    boolean startedQuest = get_property("questGuzzlr") != "unstarted";
+    string questTier = get_property("guzzlrQuestTier");
+
+    int guzzlrQuestProgressLeft = 100 - get_property_int("guzzlrDeliveryProgress");
+    float guzzlrQuestIncrement = max(3, 10 - get_property_int("_guzzlrDeliveries"));
+    float guzzlrQuestShoedIncrement = floor(1.5 * guzzlrQuestIncrement);
+    int guzzlrQuestFightsLeft = ceil(guzzlrQuestProgressLeft / guzzlrQuestIncrement);
+    int guzzlrQuestShoedFightsLeft = ceil(guzzlrQuestProgressLeft / guzzlrQuestShoedIncrement);
+
+    boolean hasShoes = lookupItem("Guzzlr shoes").available_amount() > 0;
+    boolean hasPants = lookupItem("Guzzlr pants").available_amount() > 0;
+
+    if (startedQuest) {
+        boolean hasShoesEquipped = lookupItem("Guzzlr shoes").equipped_amount() > 0;
+        boolean hasPantsEquipped = lookupItem("Guzzlr pants").equipped_amount() > 0;
+
+        location questLocation = get_property("guzzlrQuestLocation").to_location();
         item questBooze = get_property("guzzlrQuestBooze").to_item();
         boolean [item] questBoozePlatinum;
         foreach platinumDrink in $strings[Steamboat, Ghiaccio Colada, Nog-on-the-Cob, Sourfinger, Buttery Boy] {
             questBoozePlatinum [lookupItem(platinumDrink)] = true;
         }
 
-        int guzzlrQuestNumber = min(8, get_property_int("_guzzlrDeliveries") + 1);
+        boolean hasBooze = questTier == "platinum" ? questBoozePlatinum.item_amount() > 0 : questBooze.item_amount() > 0;
+        boolean hasBoozeSomewhere = questTier == "platinum" ? questBoozePlatinum.available_amount() + questBoozePlatinum.display_amount() > 0 : questBooze.available_amount() + questBooze.display_amount() > 0;
 
-        int [int] [boolean] guzzlrDeliveryTurnRange; //int= value of guzzlrQuestNumber; boolean= using shoes
-            guzzlrDeliveryTurnRange [1] [false] = 10; guzzlrDeliveryTurnRange [1] [true] = 7;
-            guzzlrDeliveryTurnRange [2] [false] = 12; guzzlrDeliveryTurnRange [2] [true] = 8;
-            guzzlrDeliveryTurnRange [3] [false] = 13; guzzlrDeliveryTurnRange [3] [true] = 9;
-            guzzlrDeliveryTurnRange [4] [false] = 15; guzzlrDeliveryTurnRange [4] [true] = 10;
-            guzzlrDeliveryTurnRange [5] [false] = 17; guzzlrDeliveryTurnRange [5] [true] = 12;
-            guzzlrDeliveryTurnRange [6] [false] = 20; guzzlrDeliveryTurnRange [6] [true] = 15;
-            guzzlrDeliveryTurnRange [7] [false] = 25; guzzlrDeliveryTurnRange [7] [true] = 17;
-            guzzlrDeliveryTurnRange [8] [false] = 34; guzzlrDeliveryTurnRange [8] [true] = 25;
+        boolean oneFightRemains = hasShoesEquipped && guzzlrQuestShoedFightsLeft <= 1 || !hasShoesEquipped && guzzlrQuestFightsLeft <= 1;
 
-        boolean hasBooze;
-        boolean hasBoozeSomewhere;
-
-        if (questTier == "platinum") {
-            hasBooze = questBoozePlatinum.item_amount() > 0;
-            hasBoozeSomewhere = questBoozePlatinum.available_amount() + questBoozePlatinum.display_amount() > 0;
-        } else {
-            hasBooze = questBooze.item_amount() > 0;
-            hasBoozeSomewhere = questBooze.available_amount() + questBooze.display_amount() > 0;
-        }
-
-        boolean hasShoes = lookupItem("Guzzlr shoes").available_amount() > 0;
-        boolean hasPants = lookupItem("Guzzlr pants").available_amount() > 0;
-
-        boolean hasShoesEquipped = lookupItem("Guzzlr shoes").equipped_amount() > 0;
-        boolean hasPantsEquipped = lookupItem("Guzzlr pants").equipped_amount() > 0;
-
-        // Title
-        string main_title = "Deliver booze";
-
-        // Subtitle
         string subtitle = "free fights";
         initialiseLocationCombatRates(); //not done anywhere else in this script
         if (__location_combat_rates contains questLocation) {
@@ -56,7 +43,6 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
         } else //if unlisted
             subtitle += ", +combat";
 
-        // Entries
         string [int] description;
 
         if (hasBooze) {
@@ -108,78 +94,39 @@ void IOTMGuzzlrQuestGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
             }
         }
 
-        if (hasShoes) {
-            description.listAppend("Takes " + guzzlrDeliveryTurnRange [guzzlrQuestNumber] [true] + " fights if you always wear the shoes.");
-            description.listAppend("Takes " + guzzlrDeliveryTurnRange [guzzlrQuestNumber] [false] + " fights if you never wear the shoes.");
-        } else
-            description.listAppend("Takes " + guzzlrDeliveryTurnRange [guzzlrQuestNumber] [false] + " fights.");
-
-        if (hasShoes && !hasShoesEquipped) {
+        if (guzzlrQuestProgressLeft <= 0)
+            description.listAppend("Shouldn't this be over already?");
+        else if (!hasShoes || guzzlrQuestFightsLeft == guzzlrQuestShoedFightsLeft) // if no shoes or if doesn't matter at that point
+            description.listAppend("Takes " + pluralise(guzzlrQuestFightsLeft, "more fight", "more fights") + ".");
+        else if (hasShoesEquipped)
+            description.listAppend("Takes " + pluralise(guzzlrQuestShoedFightsLeft, "more fight", "more fights") + " (" + guzzlrQuestFightsLeft + " without shoes).");
+        else {
+            description.listAppend("Takes " + guzzlrQuestFightsLeft + " more fights (" + guzzlrQuestShoedFightsLeft + " with shoes).");
             description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
         }
 
-        if (hasPants && !hasPantsEquipped) {
-            description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr pants for more Guzzlrbucks.", "red"));
-        }
+        if (hasPants && !hasPantsEquipped)
+            description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr pants for more Guzzlrbucks.", (oneFightRemains ? "red" : "dark")));
 
-        if (!hasShoes) {
+        if (!hasShoes)
             description.listAppend(HTMLGenerateSpanFont("Could buy Guzzlr shoes for quicker deliveries.", "grey"));
-        }
-
-        if (!hasPants) {
+        if (!hasPants)
             description.listAppend(HTMLGenerateSpanFont("Could buy Guzzlr pants for more Guzzlrbucks.", "grey"));
-        }
 
-        return ChecklistSubentryMake(main_title, subtitle, description);
+        optional_task_entries.listAppend(ChecklistEntryMake("__item Guzzlrbuck", questLocation.getClickableURLForLocation(), ChecklistSubentryMake("Deliver booze", subtitle, description)));
     }
 
-    ChecklistEntry entry;
-    entry.image_lookup_name = "__item Guzzlrbuck";
-    entry.url = questLocation.getClickableURLForLocation();
 
-    ChecklistSubentry delivery = gigEconomy();
-    if (delivery.entries.count() > 0) {
-        entry.subentries.listAppend(delivery);
-    }
-
-    if (entry.subentries.count() > 0) {
-        optional_task_entries.listAppend(entry);
-    }
-}
-
-RegisterTaskGenerationFunction("IOTMGuzzlrTabletGenerateTask");
-void IOTMGuzzlrTabletGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-
-    if (!lookupItem("Guzzlr tablet").have()) return;
-
-    ChecklistSubentry getGuzzling() { // for either telling the player to accept a quest, or reminding them if they can abandon it
-        boolean startedQuest = get_property("questGuzzlr") != "unstarted";
+    if (true) { // for either telling the player to accept a quest, or reminding them if they can abandon it
         boolean canAbandonQuest = !get_property_boolean("_guzzlrQuestAbandoned");
-        string questTier = get_property("guzzlrQuestTier");
         int platinumDeliveriesLeft = 1 - get_property_int("_guzzlrPlatinumDeliveries");
         int goldDeliveriesLeft = 3 - get_property_int("_guzzlrGoldDeliveries");
+        int bronzeDeliveriesTotal = get_property_int("guzzlrBronzeDeliveries");
         boolean canAcceptPlatinum = get_property_int("guzzlrGoldDeliveries") >= 5;
-        boolean canAcceptGold = get_property_int("guzzlrBronzeDeliveries") >= 5;
-        boolean hasShoes = lookupItem("Guzzlr shoes").available_amount() > 0;
-        int guzzlrQuestNumber = min(8, get_property_int("_guzzlrDeliveries") + 1);
+        boolean canAcceptGold = bronzeDeliveriesTotal >= 5;
 
-        string [int] guzzlrDeliveryTurnRange; //int= value of guzzlrQuestNumber
-            guzzlrDeliveryTurnRange [1] = hasShoes ? "7-10" : "10";
-            guzzlrDeliveryTurnRange [2] = hasShoes ? "8-12" : "12";
-            guzzlrDeliveryTurnRange [3] = hasShoes ? "9-13" : "13";
-            guzzlrDeliveryTurnRange [4] = hasShoes ? "10-15" : "15";
-            guzzlrDeliveryTurnRange [5] = hasShoes ? "12-17" : "17";
-            guzzlrDeliveryTurnRange [6] = hasShoes ? "15-20" : "20";
-            guzzlrDeliveryTurnRange [7] = hasShoes ? "17-25" : "25";
-            guzzlrDeliveryTurnRange [8] = hasShoes ? "25-34" : "34";
-
-        // Title
         string main_title;
-
-        // Subtitle
         string subtitle;
-
-        // Entries
         string [int] description;
 
         if (startedQuest && canAbandonQuest) {
@@ -195,40 +142,28 @@ void IOTMGuzzlrTabletGenerateTask(ChecklistEntry [int] task_entries, ChecklistEn
                 description.listAppend(canAbandonQuest ? "Then, abandon the quest." : "Will be stuck with this quest for the rest of the day.");
             } else if (!__misc_state["in run"]) {
                 main_title = "Accept a booze delivery quest";
-                string chooseDeliveryMessage = "Start a delivery by choosing a client:" + HTMLGenerateIndentedText("| • Bronze");
+                string [int] chooseDeliveryMessage;
 
-                if (goldDeliveriesLeft > 0 && canAcceptGold) {
-                    chooseDeliveryMessage += HTMLGenerateIndentedText("| • Gold " + HTMLGenerateSpanFont("(" + goldDeliveriesLeft + " available)", "grey")); 
-                }
+                if (bronzeDeliveriesTotal < 196)
+                    chooseDeliveryMessage.listAppend("• Bronze");
 
-                if (platinumDeliveriesLeft > 0 && canAcceptPlatinum) {
-                    chooseDeliveryMessage += HTMLGenerateIndentedText("| • Platinum " + HTMLGenerateSpanFont("(" + platinumDeliveriesLeft + " available)", "grey") + (canAbandonQuest ? " (Abandon for free cocktail set?)" : ""));
-                }
-                description.listAppend(chooseDeliveryMessage);
-                description.listAppend("Will take " + guzzlrDeliveryTurnRange [guzzlrQuestNumber] + " fights.");
-                if (canAbandonQuest) {
-                    description.listAppend("Can abandon 1 more quest today.");
+                if (goldDeliveriesLeft > 0 && canAcceptGold)
+                    chooseDeliveryMessage.listAppend("• Gold " + HTMLGenerateSpanFont("(" + goldDeliveriesLeft + " available)", "grey"));
+
+                if (platinumDeliveriesLeft > 0 && canAcceptPlatinum)
+                    chooseDeliveryMessage.listAppend("• Platinum " + HTMLGenerateSpanFont("(" + platinumDeliveriesLeft + " available)", "grey") + (canAbandonQuest ? " (Abandon for free cocktail set?)" : ""));
+
+                if (chooseDeliveryMessage.count() > 0) {
+                    description.listAppend("Start a delivery by choosing a client:" + chooseDeliveryMessage.HTMLGenerateIndentedText());
+                    description.listAppend("Will take " + (hasShoes ? guzzlrQuestShoedFightsLeft + "-" : "") + guzzlrQuestFightsLeft + " fights.");
+                    if (canAbandonQuest)
+                        description.listAppend("Can abandon 1 more quest today.");
                 }
             }
         }
 
-        return ChecklistSubentryMake(main_title, subtitle, description);
-    }
-
-
-    if (!lookupItem("Guzzlr tablet").have()) return;
-
-    ChecklistEntry entry;
-    entry.image_lookup_name = "__item Guzzlr tablet";
-    entry.url = "inventory.php?tap=guzzlr";
-
-    ChecklistSubentry guzzls = getGuzzling();
-    if (guzzls.entries.count() > 0) {
-        entry.subentries.listAppend(guzzls);
-    }
-
-    if (entry.subentries.count() > 0) {
-        optional_task_entries.listAppend(entry);
+        if (description.count() > 0)
+            optional_task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", "inventory.php?tap=guzzlr", ChecklistSubentryMake(main_title, subtitle, description)));
     }
 }
-//todo: a separate tile to suggest how to use a spare cocktail set, when in run?
+//FIXME todo: a separate tile to suggest how to use a spare cocktail set, when in run?

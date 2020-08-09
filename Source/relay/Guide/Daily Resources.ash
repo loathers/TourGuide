@@ -138,6 +138,10 @@ void generateDailyResources(Checklist [int] checklists)
                 description.listAppend(pluralise($effect[Got Milk]) + " available (woah).");
             if (!get_property_boolean("_milkOfMagnesiumUsed") && lookupItem("milk of magnesium").available_amount() > 0)
                 description.listAppend("Use Milk of Magnesium for +5 adv.");
+            if ($effect[barrel of laughs].have_effect() >= 5) {
+                int turns = $effect[barrel of laughs].have_effect();
+                description.listAppend(pluralise($effect[barrel of laughs]) + " available" + (turns % 5 > 0 ? " (" + (turns - turns % 5) + ")" : "") + ".");
+            }
             subentries.listAppend(ChecklistSubentryMake(availableFullness() + " fullness", "", description));
         }
         if (inebriety_limit() > 0) {
@@ -151,6 +155,12 @@ void generateDailyResources(Checklist [int] checklists)
                     image_name = "__item gibson";
                 if ($effect[ode to booze].have_effect() > 0)
                     description.listAppend(pluralise($effect[ode to booze]) + " available.");
+                if ($effect[salty mouth].have_effect() > 0)
+                    description.listAppend(pluralise($effect[salty mouth]) + " available. Drink beer for +5 adv!");
+                if ($effect[beer barrel polka].have_effect() >= 5) {
+                    int turns = $effect[beer barrel polka].have_effect();
+                    description.listAppend(pluralise($effect[beer barrel polka]) + " available" + (turns % 5 > 0 ? " (" + (turns - turns % 5) + ")" : "") + ".");
+                }
                 
                 if (availableDrunkenness() > 0)
                     title = availableDrunkenness() + " drunkenness" + (couldEquipStooper ? " + Stooper" : "");
@@ -161,14 +171,14 @@ void generateDailyResources(Checklist [int] checklists)
                 }
                 if (shotglassDrinkAvailable)
                     description.listAppend("1 free 1-drunkenness booze available.");
+                subentries.listAppend(ChecklistSubentryMake(title, "", description));
             } else if (availableDrunkenness() == -1 && couldEquipStooper) {
                 importance = -11;
                 title = HTMLGenerateSpanFont("Equip the Stooper", "red");
                 image_name = "__familiar stooper";
                 description.listAppend("Can keep adventuring/overdrink further as long as it's equipped.");
-            }
-            if (description.count() > 0)
                 subentries.listAppend(ChecklistSubentryMake(title, "", description));
+            }
         }
         if (availableSpleen() > 0) {
             if (subentries.count() == 0)
@@ -316,85 +326,223 @@ void generateDailyResources(Checklist [int] checklists)
     
     
     if (__misc_state_int["free rests remaining"] > 0) {
+        ChecklistEntry entry;
+        entry.image_lookup_name = "__effect sleepy";
+        entry.importance_level = 10;
+
+        //Build the entries in an order dependant on user preferences
+        boolean go_chateau = get_property_boolean("restUsingChateau");
+        boolean go_away = get_property_boolean("restUsingCampAwayTent");
+        string [int] order;
+        order [go_chateau ? 0 : 1] = "Chateau Magenta";
+        order [go_chateau ? 1 : 0] = go_away ? "Getaway Campsite" : "Your Campsite";
+        order [2] = go_away ? "Your Campsite" : "Getaway Campsite";
+
+
+        string [int] url;
+        ChecklistSubentry [int] subentries_handle;
         string [int] description;
-        
-        if (__misc_state["recommend resting at campsite"]) {
-            float resting_hp_percent = numeric_modifier("resting hp percent") / 100.0;
-            float resting_mp_percent = numeric_modifier("resting mp percent") / 100.0;
-            
-            //FIXME trace down every rest effect and make this more accurate, instead of an initial guess.
-            
-            //If grimace or ronald is full, they double the gains of everything else.
-            //This is reported as a modifier of +100% - so with pagoda, that's +200% HP
-            //But, it's actually +300%, or 400% total. I could be wrong about this - my knowledge of rest mechanics is limited.
-            //So, we'll explicitly check for grimace or ronald being full, then recalculate. Not great, but should work okay?
-            //This is probably inaccurate in a great number of cases, due to the complication of resting.
-            
-            float overall_multiplier_hp = 1.0;
-            float overall_multiplier_mp = 1.0;
-            float bonus_resting_hp = numeric_modifier("bonus resting hp");
-            float after_bonus_resting_hp = 0.0;
-            int grimace_light = moon_phase() / 2;
-            int ronald_light = moon_phase() % 8;
-            if (grimace_light == 4) {
-                resting_hp_percent -= 1.0;
-                overall_multiplier_hp += 1.0;
+
+        foreach i, loc in order {
+            ChecklistSubentry subentry;
+            switch {
+                case loc == "Chateau Magenta" && __misc_state["Chateau Mantegna available"]:
+                    subentry.header = "At your Chateau Magenta:";
+                    url.listAppend(__misc_state_string["resting url Chateau Mantegna"]);
+
+                    stat nightstand_stat = $stat[none];
+                    int [item] chateau = get_chateau();
+
+                    if (chateau[$item[electric muscle stimulator]] > 0)
+                        nightstand_stat = $stat[muscle];
+                    else if (chateau[$item[foreign language tapes]] > 0)
+                        nightstand_stat = $stat[mysticality];
+                    else if (chateau[$item[bowl of potpourri]] > 0)
+                        nightstand_stat = $stat[moxie];
+
+                    string nightstand_message;
+                    if (nightstand_stat != $stat[none] && my_path_id() != PATH_THE_SOURCE) {
+                        float experience_multiplier = (100 + numeric_modifier(nightstand_stat + " Experience Percent")) / 100;
+                        int nightstand_statgain = clampi(12 * my_level(), 0, 100) * experience_multiplier;
+                        nightstand_message = ", " + nightstand_statgain + " " + nightstand_stat + " stats";
+                    }
+
+                    subentry.entries.listAppend("250 HP, 125 MP" + nightstand_message + ".");
+                    
+                    if (my_level() < 9 && my_path_id() != PATH_THE_SOURCE)
+                        subentry.entries.listAppend("May want to wait until level 9(?) for more stats from resting.");
+                    
+                    item [int] items_equipping = generateEquipmentToEquipForExtraExperienceOnStat(nightstand_stat);
+                    if (items_equipping.count() > 0 && __misc_state["need to level"])
+                        subentry.entries.listAppend("Could equip " + items_equipping.listJoinComponents(", ", "or") + " for more stats.");
+
+                    subentries_handle.listAppend(subentry);
+                    break;
+                case loc == "Getaway Campsite" && __misc_state["Getaway Campsite available"]:
+                    subentry.header = "At your Getaway Campsite:";
+                    url.listAppend(__misc_state_string["resting url Getaway Campsite"]);
+
+                    int tent_decoration = get_property_int("campAwayDecoration");
+                    effect tent_decoration_effect = $effect[none]; //Not actually used...
+                    string tent_decoration_stat;
+
+                    switch (tent_decoration) {
+                        case 1:
+                            tent_decoration_effect = $effect[Muscular Intentions];
+                            tent_decoration_stat = "muscle";
+                            break;
+                        case 2:
+                            tent_decoration_effect = $effect[Mystical Intentions];
+                            tent_decoration_stat = "myst";
+                            break;
+                        case 3:
+                            tent_decoration_effect = $effect[Moxious Intentions];
+                            tent_decoration_stat = "moxie";
+                            break;
+                    }
+                    
+                    subentry.entries.listAppend("250 HP, 125 MP, removes negative effects.");
+
+                    if (tent_decoration != 0)
+                        subentry.entries.listAppend("Gives 20 turns of +3 " + tent_decoration_stat + " stats/fight.");
+
+                    subentries_handle.listAppend(subentry);
+                    break;
+                case loc == "Your Campsite" && __misc_state["recommend resting at campsite"]:
+                    subentry.header = "At your Campsite:";
+                    url.listAppend(__misc_state_string["resting url campsite"]);
+                    
+                    subentry.entries.listAppend(__misc_state_int["rest hp restore"] + " HP, " + __misc_state_int["rest mp restore"] + " MP.");
+                    if ($item[pantsgiving].available_amount() > 0) {
+                        if ($item[pantsgiving].equipped_amount() == 0)
+                            subentry.entries.listAppend("Wear pantsgiving for extra HP/MP.");
+                        if (availableFullness() > 0)
+                            subentry.entries.listAppend("Eat more for +" + (availableFullness() * 5) + " extra HP/MP.");
+                    }
+
+                    if (__resting_bonuses.count() > 0) {
+                        boolean saw_a_limit;
+                        string [int] bonus_messages;
+                        foreach source, bonus in __resting_bonuses {
+                            string message;
+
+                            if (source == $item[Confusing LED clock] && my_adventures() < 5)
+                                continue; //won't activate
+
+                            if (bonus.duration > 0) {
+                                if (source == $item[Lucky cat statue]) //SETS the remaining duration of that effect to 5 adv
+                                    message += pluralise(bonus.duration - bonus.given_effect.have_effect(), "turn", "turns") + " of ";
+                                else if (bonus.tasteful && bonus.given_effect.have_effect() > 1)
+                                    continue; //won't activate
+                                else
+                                    message += bonus.duration.pluralise("turn", "turns") + " of ";
+                            }
+
+                            message += bonus.given_effect == $effect[none] ? bonus.header : bonus.given_effect + " (" + bonus.header + ")";
+
+                            if (bonus.limit > 0) {
+                                saw_a_limit = true;
+                                message += ", " + bonus.limit + (bonus.limit > 1 ? "x" : "") + "/day";
+                            }
+
+                            //if (bonus.tasteful) //player should already be well aware of this; not relevant
+                            //  message += ", breaks after 3-5 uses";
+
+                            message += ".";
+
+                            bonus_messages.listAppend(message);
+                        }
+
+                        if (saw_a_limit) //tell the player that the tiles don't mean that the buffs are still obtainable today; we can't know if they reached the limits
+                            subentry.modifiers.listAppend("Can't tell if you got them, sorry...");
+                        
+                        if (bonus_messages.count() > 1)
+                            subentry.entries.listAppend("Will give:" + HTMLGenerateIndentedText(bonus_messages.listJoinComponents("<hr>")));
+                        else if (bonus_messages.count() == 1)
+                            subentry.entries.listAppend("Will give " + bonus_messages[0]);
+                    }
+
+                    subentries_handle.listAppend(subentry);
+                    break;
             }
-            if (ronald_light == 4) {
-                resting_mp_percent -= 1.0;
-                overall_multiplier_mp += 1.0;
-            }
-            
-            if ($effect[L'instinct F&eacute;lin].have_effect() > 0) { //not currently tracked by mafia. Seems to triple HP/MP gains.
-                overall_multiplier_hp *= 3.0;
-                overall_multiplier_mp *= 3.0;
-            }
-            
-            if ((get_campground() contains $item[gauze hammock])) {
-                //Gauze hammock appears to be a flat addition applied after everything else, including grimace, pagoda, and l'instinct.
-                //It shows up it bonus resting hp - we'll remove that, and add it back at the end.
-                bonus_resting_hp -= 60.0;
-                after_bonus_resting_hp += 60.0;
-            }
-            
-            //FIXME chateau restore is different
-            float rest_hp_restore = after_bonus_resting_hp + overall_multiplier_hp * (numeric_modifier("base resting hp") * (1.0 + resting_hp_percent) + bonus_resting_hp);
-            float rest_mp_restore = overall_multiplier_mp * (numeric_modifier("base resting mp") * (1.0 + resting_mp_percent) + numeric_modifier("bonus resting mp"));
-            description.listAppend(rest_hp_restore.floor() + " HP, " + rest_mp_restore.floor() + " MP");
-            
-            if ($item[pantsgiving].available_amount() > 0) { //FIXME is pantsgiving intended to help at chateau?
-                if ($item[pantsgiving].equipped_amount() == 0)
-                    description.listAppend("Wear pantsgiving for extra HP/MP.");
-                if (availableFullness() > 0)
-                    description.listAppend("Eat more for +" + (availableFullness() * 5) + " extra HP/MP.");
-            }
-        } else if (__misc_state_string["resting description"] == "Chateau Mantegna") {
-            //FIXME what goes here
-            if (my_path_id() == PATH_THE_SOURCE)
-                description.listAppend("HP/MP.");
-            else
-                description.listAppend("HP/MP/stats.");
-            if (my_level() < 9 && my_path_id() != PATH_THE_SOURCE)
-                description.listAppend("May want to wait until level 9(?) for more stats from resting.");
-            
-            stat desired_stat = $stat[none];
-            int [item] chateau = get_chateau();
-            
-            if (chateau[$item[electric muscle stimulator]] > 0)
-                desired_stat = $stat[muscle];
-            else if (chateau[$item[foreign language tapes]] > 0)
-                desired_stat = $stat[mysticality];
-            else if (chateau[$item[bowl of potpourri]] > 0)
-                desired_stat = $stat[moxie];
-            item [int] items_equipping = generateEquipmentToEquipForExtraExperienceOnStat(desired_stat);
-            if (items_equipping.count() > 0 && __misc_state["need to level"])
-                description.listAppend("Could equip " + items_equipping.listJoinComponents(", ", "or") + " for more stats.");
         }
-        
-        resource_entries.listAppend(ChecklistEntryMake("__effect sleepy", __misc_state_string["resting url"], ChecklistSubentryMake(pluraliseWordy(__misc_state_int["free rests remaining"], "free rest", "free rests").capitaliseFirstLetter(), "", description), 10));
+
+        entry.url = url [0];
+
+        if (subentries_handle.count() > 1) {
+            entry.should_indent_after_first_subentry = true; //that feature is awesome!
+            entry.subentries = subentries_handle;
+            entry.subentries.listPrepend(ChecklistSubentryMake(pluralise(__misc_state_int["free rests remaining"], "free rest", "free rests"))); //entire entry acts as a "title"
+        } else if (subentries_handle.count() == 1)
+            entry.subentries.listAppend(ChecklistSubentryMake(pluralise(__misc_state_int["free rests remaining"], "free rest", "free rests"), "", subentries_handle[0].entries));
+
+        resource_entries.listAppend(entry);
     }
     
-    //FIXME skate park?
+    if (__quest_state["Sea Monkees"].finished && !get_property_boolean("_momFoodReceived")) {
+        //FIXME Detect if they can breathe underwater, to go meet her
+        string [int] description;
+
+        if (__misc_state["in run"]) { //who knows...
+            string [int] elemental_buffs;
+        	elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Hot Sweat", "r_element_hot"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Cold Sweat", "r_element_cold"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Rank Sweat", "r_element_stench"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Black Sweat", "r_element_spooky"));
+            elemental_buffs.listAppend(HTMLGenerateSpanOfClass("Flop Sweat", "r_element_sleaze"));
+        
+            description.listAppend("<strong>" + elemental_buffs.listJoinComponents(" / ") + ":</strong> +7 X resistance.");
+        }
+
+        description.listAppend("<strong>Mark of Candy Cain:</strong> +20% critical & spell critical hit.");
+        description.listAppend("<strong>Cereal Killer:</strong> +200 stats/fight.");
+
+        resource_entries.listAppend(ChecklistEntryMake("Mom Monkey Castle Window", "monkeycastle.php?who=4", ChecklistSubentryMake('Have Mom "make breakfast"', "50 turns", description), 5));
+    }
+    
+    if (true) {
+        //FIXME Detect if they can breathe underwater
+        string [string] dailySkateParkBuffs;
+
+        switch (__quest_state["Sea Monkees"].state_string["skate park status"]) {
+            case "ice":
+                if (!get_property_boolean("_skateBuff1"))
+                    dailySkateParkBuffs["Lutz, the Ice Skate"] = "Fishy";
+                break;
+            case "roller":
+                if (!get_property_boolean("_skateBuff2"))
+                    dailySkateParkBuffs["Comet, the Roller Skate"] = "-30% pressure penalty";
+                break;
+            case "peace":
+                if (!get_property_boolean("_skateBuff3"))
+                    dailySkateParkBuffs["The Bandshell"] = "+1 sand dollar/underwater combat";
+                if (!get_property_boolean("_skateBuff4"))
+                    dailySkateParkBuffs["A Merry-Go Round"] = "+25% underwater item";
+                if (!get_property_boolean("_skateBuff5"))
+                    dailySkateParkBuffs["The Eclectic Eels"] = "+10 underwater familiar weight";
+                break;
+        }
+
+        if (dailySkateParkBuffs.count() > 0) {
+            ChecklistEntry entry;
+            entry.image_lookup_name = "Skate Park";
+            entry.url = "sea_skatepark.php";
+            entry.importance_level = 5;
+
+            if (dailySkateParkBuffs.count() > 1) {
+                entry.subentries.listAppend(ChecklistSubentryMake("Daily Skate Park buffs (30 turns each)"));
+                entry.should_indent_after_first_subentry = true; //to make it clear(er) that they are not mutually exclusive
+                foreach whoYouGonnaCall, buff in dailySkateParkBuffs {
+                    entry.subentries.listAppend(ChecklistSubentryMake(whoYouGonnaCall, "", buff));
+                }
+            } else {
+                foreach whoYouGonnaCall, buff in dailySkateParkBuffs //We know there's only 1 key, but I think it's the only way to get it?
+                    entry.subentries.listAppend(ChecklistSubentryMake("Daily Skate Park buff (30 turns)", "", HTMLGenerateSpanOfClass(whoYouGonnaCall, "r_bold") + ": " + buff));
+            }
+
+            resource_entries.listAppend(entry);
+        }
+    }
     
     if (my_path_id() != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["in aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"])) {
         //Not really worthwhile? But I suppose we can track it if they've started it, and are either in aftercore or haven't flyered yet.

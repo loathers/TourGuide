@@ -197,6 +197,7 @@ static
 
         building_images["bookshelf"] = KOLImageMake("images/otherimages/campground/bookshelf.gif", Vec2iMake(100,100), RectMake(0, 26, 99, 99));
         building_images["pirate quest"] = KOLImageMake("images/otherimages/trophy/party_on_the_big_boat.gif", Vec2iMake(100,100), RectMake(18, 3, 87, 64));
+        building_images["ship wheel"] = KOLImageMake("images/adventureimages/shipwheel.gif", Vec2iMake(100,100));
         building_images["meat"] = KOLImageMake("images/itemimages/meat.gif", Vec2iMake(30,30));
         building_images["monk"] = KOLImageMake("images/itemimages/monkhead.gif", Vec2iMake(30,30));
         
@@ -234,6 +235,22 @@ static
         building_images["Sea"] = KOLImageMake("images/adventureimages/wizardfish.gif", Vec2iMake(100,100), RectMake(18, 23, 61, 72));
         building_images["Sea"].erase_zones.listAppend(RectMake(18, 23, 27, 28));
         building_images["Sea"].erase_zones.listAppend(RectMake(48, 23, 62, 35));
+        building_images["Sea Monkey Castle"] = KOLImageMake("images/otherimages/ocean/monkeycastle.gif", Vec2iMake(100,100), RectMake(29, 36, 66, 82));
+        building_images["Sea Monkey Castle"].erase_zones.listAppend(RectMake(29, 36, 39, 39));
+        building_images["Sea Monkey Castle"].erase_zones.listAppend(RectMake(60, 36, 66, 42));
+        building_images["Mom Monkey Castle Window"] = KOLImageMake("images/adventureimages/momwindow.gif", Vec2iMake(100,100), RectMake(15, 16, 81, 78));
+        building_images["Mom Monkey Castle Window"].erase_zones.listAppend(RectMake(71, 16, 81, 21));
+        building_images["Mom Monkey Castle Window"].erase_zones.listAppend(RectMake(81, 16, 81, 43));
+        building_images["Mom Monkey Castle Window"].erase_zones.listAppend(RectMake(15, 16, 25, 24));
+        building_images["Mom Monkey Castle Window"].erase_zones.listAppend(RectMake(15, 16, 21, 28));
+        building_images["Skate Park"] = KOLImageMake("images/otherimages/ocean/rumble_a.gif", Vec2iMake(100,100), RectMake(20, 37, 79, 94));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 37, 40, 71));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 37, 45, 53));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(57, 44, 79, 52));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(64, 37, 79, 69));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 77, 22, 94));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(20, 85, 27, 94));
+        building_images["Skate Park"].erase_zones.listAppend(RectMake(57, 93, 79, 94));
         building_images["Spooky little girl"] = KOLImageMake("images/adventureimages/axelgirl.gif", Vec2iMake(100,100), RectMake(37, 25, 63, 74));
         
         //hermit.gif and oldman.gif are almost identical. twins?

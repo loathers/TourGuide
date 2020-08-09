@@ -41,7 +41,7 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
             {
                 options.listAppend("Cigarette lighters, from the zeppelin protesters.");
             }
-            if ($item[talisman o' namsilat].available_amount() == 0 && !have_outfit_components("Swashbuckling Getup"))
+            if ($item[pirate fledges].available_amount() == 0 && !have_outfit_components("Swashbuckling Getup") && __quest_state["Pirate Quest"].state_boolean["valid"])
             {
             	options.listAppend("Pirate outfit.");
             }

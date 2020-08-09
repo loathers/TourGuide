@@ -150,7 +150,7 @@ void PathKOLHSGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
             int importance = -11;
             string [int] description;
             description.listAppend("Next one won't show up until you do.");
-            if (get_campground()[$item[portable mayo clinic]] > 0)
+            if (__campground[$item[portable mayo clinic]] > 0)
             {
                 importance = -10;
                 description.listAppend("Or drink via the mayo clinic.");
