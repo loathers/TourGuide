@@ -22310,7 +22310,7 @@ void QSleazeAirportUMDGenerateTasks(ChecklistEntry [int] task_entries)
         
         if (today_day_in_year - day_in_year_acquired_umd >= 7)
             has_been_seven_days = true;
-        if (has_been_seven_days||true) {
+        if (has_been_seven_days) {
             string [int] description;
             description.listAppend("Adventure in the Sunken Party Yacht.|Choose the first option from a non-combat that appears every twenty adventures.");
             description.listAppend("Found once every seven days.");
