@@ -10,7 +10,11 @@ void QPirateInit()
     state.image_name = "pirate quest";
     
     state.state_boolean["valid"] = false; // now invalid by default since the 2020 change
-    if (__misc_state["mysterious island available"]) {
+    
+    if (my_path_id() == PATH_LOW_KEY_SUMMER)
+        state.state_boolean["valid"] = true;
+    
+    if (__misc_state["mysterious island available"] && state.state_boolean["valid"]) {
         state.startable = true;
         if (!state.in_progress && !state.finished) {
             QuestStateParseMafiaQuestPropertyValue(state, "started");
@@ -41,9 +45,6 @@ void QPirateInit()
     /*if ($item[pirate fledges].available_amount() > 0 || $item[talisman o\' namsilat].available_amount() > 0)
         QuestStateParseMafiaQuestPropertyValue(state, "finished");*/
     __quest_state["Pirate Quest"] = state;
-    
-    if (my_path_id() == PATH_LOW_KEY_SUMMER)
-        state.state_boolean["valid"] = true;
 }
 
 
