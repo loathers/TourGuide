@@ -359,7 +359,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     QuestState temple_quest_state = __quest_state["Sea Temple"];
     QuestState monkees_quest_state = __quest_state["Sea Monkees"];
 
-    if (!__misc_state["in aftercore"] && !monkees_quest_state.started)
+    if (!__misc_state["in aftercore"] && !monkees_quest_state.started || temple_quest_state.quest_name == "")
         return;
 
     //Will have 4 possible tiles. 1 is the main questline, and always appear, and the 3 others only appear once they diverge from the main questline (if unfinished, of course)
@@ -487,7 +487,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             
             //Detect where we are:
             //This won't work beyond talking to little brother, my apologies (fixed since)
-            if (get_property_boolean("corralUnlocked") == true || $location[the coral corral].turnsAttemptedInLocation() > 0) {
+            if (get_property_boolean("corralUnlocked") || $location[the coral corral].turnsAttemptedInLocation() > 0) {
                 //Coral corral. Banish strategy.
                 string sea_horse_details;
                 if (!professional_roper)
