@@ -257,11 +257,11 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 if ($effect[thrice-cursed].have_effect() > 0) {
                     subentry.entries.listAppend("You're thrice-cursed. Fight the protector spirit!");
                 } else if ($effect[twice-cursed].have_effect() > 0) {
-                    subentry.entries.listAppend("Need 1 more curse. Get cursed by:" + curseSources);
+                    subentry.entries.listAppend("Need 1 more curse. Get cursed by:" + curseSources.HTMLGenerateIndentedText());
                 } else if ($effect[once-cursed].have_effect() > 0) {
-                    subentry.entries.listAppend("Need 2 more curses." + curseSources);
+                    subentry.entries.listAppend("Need 2 more curses. Get cursed by:" + curseSources.HTMLGenerateIndentedText());
                 } else {
-                    subentry.entries.listAppend("Need 3 more curses. Get cursed by:" + HTMLGenerateIndentedText(curseSources));
+                    subentry.entries.listAppend("Need 3 more curses. Get cursed by:" + curseSources.HTMLGenerateIndentedText());
                 }
 
                 if (delayForNextNoncombat > 0) {
