@@ -235,7 +235,7 @@ void generateMissingItems(Checklist [int] checklists)
         items_needed_entries.listAppend(ChecklistEntryMake("__item beehive", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Beehive", "-combat", description)));
     }
     
-    if (!__quest_state["Level 13"].state_boolean["Init race completed"])
+    if (!__quest_state["Level 13"].state_boolean["past races"])
     {
         ChecklistSubentry subentry = ChecklistSubentryMake("Sources", "", "For the lair races.");
         string [int] sources;
