@@ -148,7 +148,7 @@ void QNemesisGenerateIslandTasks(ChecklistSubentry subentry)
                 int missing_cult_memos = MAX(0, 5 - $item[cult memo].available_amount());
                 if (missing_cult_memos > 0)
                 {
-                    subentry.entries.listAppend("Acquire " + pluralise(missing_cult_memos, $item[cult memo]) + " more from middle-managers.");
+                    subentry.entries.listAppend("Acquire another " + pluralise(missing_cult_memos, $item[cult memo]) + " from middle-managers.");
                 }
                 else if ($item[encoded cult documents].available_amount() > 0)
                 {
