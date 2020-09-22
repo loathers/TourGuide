@@ -20,7 +20,7 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
         
         affirmation_combat_uses[lookupItem("Daily Affirmation: Adapt to Change Eventually")] = "reroll monster"; //monster change
         affirmation_combat_uses[lookupItem("Daily Affirmation: Always be Collecting")] = "duplicate item drops";
-        affirmation_combat_uses[lookupItem("Daily Affirmation: Be a Mind Master")] = "banish for 80 turns";
+        affirmation_combat_uses[lookupItem("Daily Affirmation: Be a Mind Master")] = "banish for 80 turns (<strong>not free</strong>)";
         if (!__misc_state["have reusable olfaction equivalent"])
             affirmation_combat_uses[lookupItem("Daily Affirmation: Be Superficially interested")] = "olfact weakly";
         if (hippy_stone_broken())
