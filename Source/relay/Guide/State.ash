@@ -183,6 +183,11 @@ void setUpState()
 	string yellow_ray_image_name = "__effect everything looks yellow";
 	boolean yellow_ray_potentially_available = false;
     
+    if (__iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (!get_property_boolean("_freePillKeeperUsed") || spleen_limit() - my_spleen_use() >= 3))
+    { //One of the shortest, but also one of the worst, since you activate it BEFORE a fight starts
+        yellow_ray_available = true;
+        yellow_ray_source = "pill keeper Explodinall";
+    }
     foreach source in $items[4766,5229,6673,7013]
     {
         if (!(source.available_amount() > 0 || (source == $item[4766] && $item[4761].available_amount() > 0)))

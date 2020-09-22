@@ -1,6 +1,9 @@
 RegisterResourceGenerationFunction("IOTMEightDaysAWeekPillsGenerateResource");
 void IOTMEightDaysAWeekPillsGenerateResource(ChecklistEntry [int] resource_entries)
 {
+    if (!__iotms_usable[lookupItem("Eight Days a Week Pill Keeper")]) return;
+    if (get_property_boolean("_freePillKeeperUsed") && spleen_limit() - my_spleen_use() < 3) return;
+
     ChecklistSubentry getPills() {
         // Title
         string main_title = "Take a pill";
@@ -25,9 +28,6 @@ void IOTMEightDaysAWeekPillsGenerateResource(ChecklistEntry [int] resource_entri
         return ChecklistSubentryMake(main_title, subtitle, description);
     }
 
-	if (!lookupItem("Eight Days a Week Pill Keeper").have()) return;
-    if (spleen_limit() - my_spleen_use() < 3) return; 
-	
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Eight Days a Week Pill Keeper";
     entry.url = "main.php?eowkeeper=1";

@@ -80,6 +80,8 @@ void initialiseIOTMsUsable()
     	__iotms_usable[lookupItem("Boxing Day care package")] = true;
     if (get_property_boolean("getawayCampsiteUnlocked"))
         __iotms_usable[lookupItem("Distant Woods Getaway Brochure")] = true;
+    if (lookupItem("Eight Days a Week Pill Keeper").available_amount() > 0)
+        __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] = true;
     if ($item[clan vip lounge key].item_amount() > 0)
     {
     	//FIXME all
