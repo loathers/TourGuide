@@ -286,6 +286,8 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         have_alternate_uv_source = true;
     if (my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
         have_alternate_uv_source = true;
+    if (my_familiar() == lookupFamiliar("Melodramedary"))
+        have_alternate_uv_source = true;
     if (__last_adventure_location == $location[the arid\, extra-dry desert] && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __misc_state["in run"] && !have_alternate_uv_source && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
     {
         boolean have_uv_compass_equipped = __quest_state["Level 11 Desert"].state_boolean["Have UV-Compass eqipped"];

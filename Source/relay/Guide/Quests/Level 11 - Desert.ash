@@ -18,12 +18,11 @@ void QLevel11DesertInit()
     if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         state.state_int["Desert Exploration"] = 100;
     state.state_boolean["Desert Explored"] = (state.state_int["Desert Exploration"] == 100);
-    if (state.finished) //in case mafia doesn't detect it properly
-    {
+    if (state.finished) { //in case mafia doesn't detect it properly
         state.state_int["Desert Exploration"] = 100;
         state.state_boolean["Desert Explored"] = true;
     }
-        
+    
     
     
     boolean have_uv_compass_equipped = false;
@@ -42,17 +41,16 @@ void QLevel11DesertInit()
 
 void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__quest_state["Level 11 Desert"].in_progress && __quest_state["Level 11"].mafia_internal_step <3)
+    if (!__quest_state["Level 11 Desert"].in_progress && __quest_state["Level 11"].mafia_internal_step < 3)
         return;
     QuestState base_quest_state = __quest_state["Level 11 Desert"];
     ChecklistSubentry subentry;
     subentry.header = base_quest_state.quest_name;
-    string url = "";
+    string url = "place.php?whichplace=desertbeach";
 
     if (base_quest_state.state_boolean["Desert Explored"])
         return;
-        
-    url = "place.php?whichplace=desertbeach";
+
     int exploration = base_quest_state.state_int["Desert Exploration"];
     int exploration_remaining = 100 - exploration;
     float exploration_per_turn = 1.0;
@@ -67,13 +65,18 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     if (have_blacklight_bulb)
         exploration_per_turn += 2.0;
     //FIXME deal with ultra-hydrated
+
+    familiar camel = lookupFamiliar("Melodramedary");
+    boolean canCamel = camel.familiar_is_usable();
+    boolean haveCamel = my_familiar() == camel && camel != $familiar[none];
+    if (haveCamel)
+        exploration_per_turn += 1.0;
+
     int combats_remaining = exploration_remaining;
     combats_remaining = ceil(to_float(exploration_remaining) / exploration_per_turn);
     subentry.entries.listAppend(exploration_remaining + "% exploration remaining. (" + pluralise(combats_remaining, "combat", "combats") + ")");
-    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
-    {
-        if (__last_adventure_location == $location[the arid, extra-dry desert])
-        {
+    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id() != PATH_G_LOVER) {
+        if (__last_adventure_location == $location[the arid, extra-dry desert]) {
             string [int] description;
             description.listAppend("Adventure in the Oasis.");
             if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
@@ -83,45 +86,32 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         //if (exploration > 0)
             //subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
     }
-    if (exploration < 10)
-    {
+    if (exploration < 10) {
         int turns_until_gnasir_found = -1;
         if (exploration_per_turn != 0.0)
             turns_until_gnasir_found = ceil(to_float(10 - exploration) / exploration_per_turn);
         
         subentry.entries.listAppend("Find Gnasir after " + pluralise(turns_until_gnasir_found, "turn", "turns") + ".");
-    }
-    else if (get_property_int("gnasirProgress") == 0 && exploration <= 14 && !$location[the arid, extra-dry desert].noncombat_queue.contains_text("A Sietch in Time"))
-    {
+    } else if (get_property_int("gnasirProgress") == 0 && exploration <= 14 && !$location[the arid, extra-dry desert].noncombat_queue.contains_text("A Sietch in Time")) {
         subentry.entries.listAppend("Find Gnasir next turn.");
-    }
-    else
-    {
+    } else {
         boolean need_pages = false;
-        if (!base_quest_state.state_boolean["Black Paint Given"])
-        {
-            if ($item[can of black paint].available_amount() == 0)
-            {
+        if (!base_quest_state.state_boolean["Black Paint Given"]) {
+            if ($item[can of black paint].available_amount() == 0) {
                 if (black_market_available())
                     subentry.entries.listAppend("Buy can of black paint, give it to Gnasir.");
-            }
-            else
+            } else
                 subentry.entries.listAppend("Give can of black paint to Gnasir.");
-                
         }
-        if (!base_quest_state.state_boolean["Stone Rose Given"])
-        {
+        if (!base_quest_state.state_boolean["Stone Rose Given"]) {
             if ($item[stone rose].available_amount() > 0)
                 subentry.entries.listAppend("Give stone rose to Gnasir.");
-            else
-            {
+            else {
                 string line = "Potentially adventure in Oasis for stone rose";
                 line += ".";
-                if (delayRemainingInLocation($location[the oasis]) > 0)
-                {
+                if (delayRemainingInLocation($location[the oasis]) > 0) {
                     string hipster_text = "";
-                    if (__misc_state["have hipster"])
-                    {
+                    if (__misc_state["have hipster"]) {
                         hipster_text = " (use " + __misc_state_string["hipster name"] + ")";
                     }
                     line += "|Delay for " + pluralise(delayRemainingInLocation($location[the oasis]), "turn", "turns") + hipster_text + ".";
@@ -129,48 +119,38 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 subentry.entries.listAppend(line);
             }
         }
-        if (my_path_id() == PATH_G_LOVER)
-        {
-        }
-        else if (!base_quest_state.state_boolean["Manual Pages Given"])
-        {
+        if (my_path_id() == PATH_G_LOVER) { //FIXME todo?
+        } else if (!base_quest_state.state_boolean["Manual Pages Given"]) {
             if ($item[worm-riding manual page].available_amount() == 15)
                 subentry.entries.listAppend("Give Gnasir the worm-riding manual pages.");
-            else
-            {
+            else {
                 int remaining = 15 - $item[worm-riding manual page].available_amount();
                 
                 subentry.entries.listAppend("Find " + pluralise(remaining, "more worm-riding manual page", "more worm-riding manual pages") + ".");
                 need_pages = true;
             }
             
-        }
-        else if (!base_quest_state.state_boolean["Wormridden"])
-        {
+        } else if (!base_quest_state.state_boolean["Wormridden"]) {
             subentry.modifiers.listAppend("rhythm");
-            if ($item[drum machine].available_amount() > 0)
-            {
+            if ($item[drum machine].available_amount() > 0) {
                 subentry.entries.listAppend("Use drum machine.");
             }
         }
-        if (!base_quest_state.state_boolean["Wormridden"] && $item[drum machine].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
-        {
+        if (!base_quest_state.state_boolean["Wormridden"] && $item[drum machine].available_amount() == 0 && my_path_id() != PATH_G_LOVER) {
             if (base_quest_state.state_boolean["Manual Pages Given"])
                 subentry.entries.listAppend("Potentially acquire drum machine from blur. (+234% item), use drum machine.");
             else
                 subentry.entries.listAppend("Potentially acquire drum machine from blur. (+234% item), collect/return pages, then use drum machine.");
             subentry.modifiers.listAppend("+234% item");
         }
-        if (!base_quest_state.state_boolean["Killing Jar Given"])
-        {
+        if (!base_quest_state.state_boolean["Killing Jar Given"]) {
             if ($item[killing jar].available_amount() > 0)
                 subentry.entries.listAppend("Give Gnasir the killing jar.");
             else
                 subentry.entries.listAppend("Potentially find killing jar. (banshee, haunted library, 10% drop, YR?)");
         }
         
-        if (__misc_state["have hipster"])
-        {
+        if (__misc_state["have hipster"]) {
             subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
             
             string line = __misc_state_string["hipster name"].capitaliseFirstLetter() + " for free combats";
@@ -180,62 +160,57 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             subentry.entries.listAppend(line);
         }
     }
-    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
-    {
+    if ($effect[ultrahydrated].have_effect() == 0 && my_path_id() != PATH_G_LOVER) {
         if (exploration > 0)
             subentry.entries.listAppend("Acquire ultrahydrated effect from oasis. (potential clover for 20 adventures)");
     }
-    if ($item[desert sightseeing pamphlet].available_amount() > 0)
-    {
+    if ($item[desert sightseeing pamphlet].available_amount() > 0) {
         if ($item[desert sightseeing pamphlet].available_amount() == 1)
             subentry.entries.listAppend("Use your desert sightseeing pamphlet. (+15% exploration)");
         else
             subentry.entries.listAppend("Use your desert sightseeing pamphlets. (+15% exploration)");
     }
-    if (!base_quest_state.state_boolean["Have UV-Compass eqipped"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99)
-    {
+    if (!base_quest_state.state_boolean["Have UV-Compass eqipped"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99) {
         boolean should_output_compass_in_red = true;
         string line = "";
         string line_extra = "";
-        if ($item[ornate dowsing rod].available_amount() > 0)
-        {
+        if ($item[ornate dowsing rod].available_amount() > 0) {
             line = "Equip the ornate dowsing rod.";
             url = "inventory.php?ftext=ornate+dowsing+rod";
-        }
-        else
-        {
-            if ($item[uv-resistant compass].available_amount() == 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert")) && my_path_id() != PATH_EXPLOSIONS)
-            {
+        } else {
+            if ($item[uv-resistant compass].available_amount() == 0 && !(my_path_id() == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert")) && my_path_id() != PATH_EXPLOSIONS) {
                 line = "Acquire";
-                if (have_blacklight_bulb)
-                {
+                if (have_blacklight_bulb || haveCamel) {
                     line = "Possibly acquire";
                     should_output_compass_in_red = false;
                 }
-              
+                
                 line += " UV-resistant compass, equip for faster desert exploration. (shore vacation)";
                 if ($item[Shore Inc. Ship Trip Scrip].available_amount() > 0)
                     url = "shop.php?whichshop=shore";
               
-                if ($item[odd silver coin].available_amount() > 0 || $item[grimstone mask].available_amount() > 0 || get_property("grimstoneMaskPath") != "") //FIXME check for the correct grimstoneMaskPath
-                {
+                if ($item[odd silver coin].available_amount() > 0 || $item[grimstone mask].available_amount() > 0 || get_property("grimstoneMaskPath") != "") { //FIXME check for the correct grimstoneMaskPath
                     line_extra += "|Or acquire ornate dowsing rod from Paul's Boutique? (5 odd silver coins)";
                 }
-              
-            }
-            else if ($item[uv-resistant compass].available_amount() > 0)
-            {
+            
+            } else if ($item[uv-resistant compass].available_amount() > 0) {
                 line = "Equip the UV-resistant compass.";
                 url = "inventory.php?ftext=uv-resistant+compass";
             }
         }
-        if (line != "")
-        {
+        if (canCamel && !haveCamel) {
+            if (line == "")
+                line += "Bring along Melodramedary.";
+            else
+                line_extra += "|Or bring along Melodramedary.";
+        }
+        if (line != "") {
             if (should_output_compass_in_red)
                 line = HTMLGenerateSpanFont(line, "red");
             line += line_extra;
             subentry.entries.listAppend(line);
         }
-    }
+    } else
+        subentry.entries.listAppend("Could bring along Melodramedary.");
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the arid\, extra-dry desert,the oasis]));
 }
