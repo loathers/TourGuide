@@ -653,8 +653,12 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         }
 		if ($item[smut orc keepsake box].available_amount() > 0)
 			subentry.entries.listAppend("Open " + pluralise($item[smut orc keepsake box]) + ".");
-		if (line.count() > 0)
+		if (line.count() > 0) {
 			subentry.entries.listAppend("Need " + line.listJoinComponents(" ", "and") + ".");
+            
+            if (__quest_state["Level 11 Shen"].state_int.getFutureShenAssignments().listInvert() contains $location[The Smut Orc Logging Camp])
+                subentry.entries.listAppend("Could wait before going there? Shen will send you here later.");
+        }
 	}
 	/*else if (base_quest_state.mafia_internal_step == 2)
 	{

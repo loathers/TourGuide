@@ -227,6 +227,57 @@ static
 
 static
 {
+    location [item] __shen_items_to_locations = {
+        $item[Murphy's Rancid Black Flag]:$location[The Castle in the Clouds in the Sky (Top Floor)],
+        $item[The Stankara Stone]:$location[The Batrat and Ratbat Burrow],
+        $item[The First Pizza]:$location[Lair of the Ninja Snowmen],
+        $item[The Eye of the Stars]:$location[The Hole in the Sky],
+        $item[The Lacrosse Stick of Lacoronado]:$location[The Smut Orc Logging Camp],
+        $item[The Shield of Brook]:$location[The VERY Unquiet Garves]};
+    
+    item [int] [int] __shen_start_day_to_assignments = {
+        //Shen's demands are seeded based on what day you're at when first meeting him.
+        1:{1:$item[The Stankara Stone], 2:$item[The First Pizza], 3:$item[Murphy's Rancid Black Flag]},
+        2:{1:$item[The Lacrosse Stick of Lacoronado], 2:$item[The Shield of Brook], 3:$item[The Eye of the Stars]},
+        3:{1:$item[The First Pizza], 2:$item[The Stankara Stone], 3:$item[The Shield of Brook]},
+        4:{1:$item[The Lacrosse Stick of Lacoronado], 2:$item[The Stankara Stone], 3:$item[The Shield of Brook]},
+        5:{1:$item[Murphy's Rancid Black Flag], 2:$item[The Lacrosse Stick of Lacoronado], 3:$item[The Eye of the Stars]},
+        6:{1:$item[Murphy's Rancid Black Flag], 2:$item[The Stankara Stone], 3:$item[The Eye of the Stars]},
+        7:{1:$item[The Lacrosse Stick of Lacoronado], 2:$item[The Shield of Brook], 3:$item[The Eye of the Stars]},
+        8:{1:$item[The Shield of Brook], 2:$item[Murphy's Rancid Black Flag], 3:$item[The Lacrosse Stick of Lacoronado]},
+        9:{1:$item[The Shield of Brook], 2:$item[The Lacrosse Stick of Lacoronado], 3:$item[The Eye of the Stars]},
+        10:{1:$item[The Eye of the Stars], 2:$item[The Stankara Stone], 3:$item[Murphy's Rancid Black Flag]},
+        11:{1:$item[The First Pizza], 2:$item[The Stankara Stone], 3:$item[Murphy's Rancid Black Flag]}};
+
+    item [int] __shen_exploathing_assignments = {1:$item[The Eye of the Stars], 2:$item[The Lacrosse Stick of Lacoronado], 3:$item[The First Pizza]};
+    //tried to develop in case there's more paths with fixed assignments in the future, but gave up. Not worth it without knowing if it'll really happen and how they'll work.
+}
+location [int] shenAssignmentsJoinLocationsStartingAfter(item [int] assignments, int index) { //messy/ugly, but saves a lot of time
+    location [int] destinations;
+
+    //ignores the <index> first elements
+    foreach position, assignment in assignments {
+        if (position > index)
+            destinations.listAppend(__shen_items_to_locations[assignment]);
+    }
+    return destinations;
+}
+location [int] shenAssignmentsJoinLocations(item [int] assignments) {
+    return shenAssignmentsJoinLocationsStartingAfter(assignments, 0);
+}
+location [int] getFutureShenAssignments(int [string] level_11_state_ints) { //QuestState's haven't been set yet, so instead, pass the whole __quest_state["Level 11 Shen"].state_int to the function (this is sooooo stupid, I know, but still simpler than passing the two values every single call)
+    item [int] assignments;
+    if (my_path_id() == PATH_KINGDOM_OF_EXPLOATHING)
+        assignments = __shen_exploathing_assignments;
+    else
+        assignments = __shen_start_day_to_assignments[level_11_state_ints["Shen initiation day"]];
+    
+    //Will, by nature, only return something if you've talked to Shen at least once (unless in Exploathing)
+    return assignments.shenAssignmentsJoinLocationsStartingAfter(level_11_state_ints["Shen meetings"]);
+}
+
+static
+{
     boolean [monster] __snakes;
     void initialiseSnakes()
     {

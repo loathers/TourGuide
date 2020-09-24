@@ -34,6 +34,8 @@ void QLevel11Init()
 		if (my_level() >= 11 || my_path_id() == PATH_EXPLOSIONS)
 			state.startable = true;
         
+        state.state_boolean["have diary"] = state.mafia_internal_step >= 3;
+        
 		__quest_state["Level 11"] = state;
 		__quest_state["MacGuffin"] = state;
 	}

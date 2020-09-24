@@ -535,8 +535,11 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             {
                 subentry.entries.listAppend("Solve the three puzzles at the unknown tomb.");
             }
-            else
+            else {
                 subentry.entries.listAppend("Adventure in the Unquiet Garves until you unlock the tomb of the unknown, then solve the three puzzles.");
+                if (__quest_state["Level 11 Shen"].state_int.getFutureShenAssignments().listInvert() contains $location[The VERY Unquiet Garves])
+                    subentry.entries.listAppend("Could wait before going there? Shen will send you to the garves later.");
+            }
             url = "place.php?whichplace=cemetery";
         }
     }

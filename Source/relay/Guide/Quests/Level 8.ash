@@ -189,6 +189,9 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                                 ninja_path.listAppend((chance * 100.0).roundForOutput(0) + "% chance of assassins.");
                         }
                     }
+                    
+                    if (__quest_state["Level 11 Shen"].state_int.getFutureShenAssignments().listInvert() contains $location[Lair of the Ninja Snowmen])
+                        subentry.entries.listAppend("Could wait before going there? Shen will send you to the Ninja Lair later.");
                 }
                 ninja_path.listAppend(generateNinjaSafetyGuide(true));
             }

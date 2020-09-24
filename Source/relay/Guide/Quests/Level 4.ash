@@ -159,6 +159,10 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if (sonars_needed > 0)
                 subentry.entries.listAppend("Run +item in the batrat and ratbat burrow for biscuits. (15% drop)");
             subentry.modifiers.listAppend("+566% item");
+            
+            //Low chance that they started copperhead without having done this, but who knows; just in case
+            if (__quest_state["Level 11 Shen"].state_int.getFutureShenAssignments().listInvert() contains $location[The Batrat and Ratbat Burrow])
+                subentry.entries.listAppend("Could wait before going there? Shen will send you to the Burrow later.");
         }
         //subentry.entries.listAppend("Run +meat in the boss bat's lair, if you wish. (250 meat drop)");
 	}

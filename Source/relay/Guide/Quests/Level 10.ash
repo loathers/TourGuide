@@ -247,6 +247,18 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 subentry.entries.listClear();
                 subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here; wheel will override semi-rare.", "red"));
             }
+            
+            //Check if Shen is going to send them here (and not to the Hole in the Sky before that)
+            int top_floor_index = 0;
+            int hole_in_the_sky_index = 0;
+            foreach index, destination in __quest_state["Level 11 Shen"].state_int.getFutureShenAssignments() {
+                if (destination == $location[The Castle in the Clouds in the Sky (Top floor)])
+                    top_floor_index = index;
+                else if (destination == $location[The Hole in the Sky])
+                    hole_in_the_sky_index = index;
+            }
+            if (top_floor_index > hole_in_the_sky_index)
+                subentry.entries.listAppend("Hold on before going there; Shen will send you here later.");
 		}
 		else if ($location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable())
 		{

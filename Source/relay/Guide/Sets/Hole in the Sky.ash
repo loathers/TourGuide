@@ -266,6 +266,9 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
                     subentry.entries.listAppend(line);
                 }
             }
+            
+            if (__quest_state["Level 11 Shen"].state_int.getFutureShenAssignments().listInvert() contains $location[The Hole in the Sky])
+                subentry.entries.listAppend("Could wait before going here? Shen will send you here later.");
 		}
         else {
             active_url = "shop.php?whichshop=starchart";
