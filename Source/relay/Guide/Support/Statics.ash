@@ -250,6 +250,72 @@ item lookupAWOLOilForMonster(monster m)
 
 static
 {
+    boolean [item] __ns_tower_door_base_keys = $items[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key];
+}
+
+static
+{
+    record Key {
+        item it;
+        location zone;
+        string enchantment;
+        string condition_for_unlock;
+        string pre_unlock_url;
+        boolean was_used;
+    };
+
+    Key [int] LKS_keys;
+    if (my_path_id() == PATH_LOW_KEY_SUMMER) {
+        Key KeyMake(string name, location zone, string enchantment, string condition_for_unlock, string pre_unlock_url) {
+            Key result;
+            result.it = name.to_item();
+            result.zone = zone;
+            result.enchantment = enchantment;
+            result.condition_for_unlock = condition_for_unlock;
+            result.pre_unlock_url = pre_unlock_url;
+            return result;
+        }
+        Key KeyMake(string name, location zone, string enchantment, string condition_for_unlock) {
+            return KeyMake(name, zone, enchantment, condition_for_unlock, "");
+        }
+        Key KeyMake(string name, location zone, string enchantment) {
+            return KeyMake(name, zone, enchantment, "", "");
+        }
+        void listAppend(Key [int] list, Key entry) {
+            int position = list.count();
+            while (list contains position)
+                position += 1;
+            list[position] = entry;
+        }
+
+        LKS_keys.listAppend(KeyMake("actual skeleton key", $location[The Skeleton Store], "+100 Damage Absorption, +10 Damage Reduction", "accepting the meathsmith\'s quest", "shop.php?whichshop=meatsmith"));
+        LKS_keys.listAppend(KeyMake("anchovy can key", $location[The Haunted Pantry], "+100% Food Drops"));
+        LKS_keys.listAppend(KeyMake("aqu&iacute;", $location[South of the Border], "+3 Hot Res, +15 Hot Damage, +30 Hot Spell Damage", "getting access to the desert beach"));
+        LKS_keys.listAppend(KeyMake("batting cage key", $location[The Bat Hole Entrance], "+3 Stench Res, +15 Stench Damage, +30 Stench Spell Damage", "starting the boss bat quest"));
+        LKS_keys.listAppend(KeyMake("black rose key", $location[The Haunted Conservatory], "+5 Familiar Weight, +2 Familiar Exp"));
+        LKS_keys.listAppend(KeyMake("cactus key", $location[The Arid, Extra-Dry Desert], "Regen HP, Max HP +20", "reading the diary in the McGuffin quest"));
+        LKS_keys.listAppend(KeyMake("clown car key", $location[The \"Fun\" House], "+10 Prismatic Damage, +10 ML", "doing the nemesis quest"));
+        LKS_keys.listAppend(KeyMake("deep-fried key", $location[Madness Bakery], "+3 Sleaze Res, +15 Sleaze Damage, +30 Sleaze Spell Damage", "accepting the Armorer and Leggerer\'s quest", "shop.php?whichshop=armory"));
+        LKS_keys.listAppend(KeyMake("demonic key", $location[Pandamonium Slums], "+20% Myst Gains, Myst +5, -1 MP Skills", "finishing the Friars quest"));
+        LKS_keys.listAppend(KeyMake("discarded bike lock key", $location[The Overgrown Lot], "Max MP + 10, Regen MP", "accepting Doc Galaktik\'s quest", "shop.php?whichshop=doc"));
+        LKS_keys.listAppend(KeyMake("f'c'le sh'c'le k'y", $location[The F\'c\'le], "+20 ML", "doing the pirate\'s quest"));
+        LKS_keys.listAppend(KeyMake("ice key", $location[The Icy Peak], "+3 Cold Res, +15 Cold Damage, +30 Cold Spell Damage", "doing the trapper quest"));
+        LKS_keys.listAppend(KeyMake("kekekey", $location[The Valley of Rof L\'m Fao], "+50% Meat", "finishing the chasm quest"));
+        LKS_keys.listAppend(KeyMake("key sausage", $location[Cobb\'s Knob Kitchens], "-10% Combat", "doing the Cobb\'s Knob quest"));
+        LKS_keys.listAppend(KeyMake("knob labinet key", $location[Cobb\'s Knob Laboratory], "+20% Muscle Gains, Muscle +5, -1 MP Skills", "finding the Cobb's Knob lab key during the Cobb\'s Knob quest"));
+        LKS_keys.listAppend(KeyMake("knob shaft skate key", $location[The Knob Shaft], "Regen HP/MP, +3 Adventures", "finding the Cobb's Knob lab key during the Cobb\'s Knob quest"));
+        LKS_keys.listAppend(KeyMake("knob treasury key", $location[Cobb\'s Knob Treasury], "+50% Meat, +20% Pickpocket", "doing the Cobb\'s Knob quest"));
+        LKS_keys.listAppend(KeyMake("music Box Key", $location[The Haunted Nursery], "+10% Combat", "doing the Spookyraven quest"));
+        LKS_keys.listAppend(KeyMake("peg key", $location[The Obligatory Pirate\'s Cove], "+5 Stats", "doing the pirate\'s quest"));
+        LKS_keys.listAppend(KeyMake("rabbit\'s foot key", $location[The Dire Warren], "All Attributes +10"));
+        LKS_keys.listAppend(KeyMake("scrap metal key", $location[The Old Landfill], "+20% Moxie Gains, Moxie +5, -1MP Skills", "starting the Old Landfill quest"));
+        LKS_keys.listAppend(KeyMake("treasure chest key", $location[Belowdecks], "+30% Item, +30% Meat", "doing the pirate\'s quest"));
+        LKS_keys.listAppend(KeyMake("weremoose key", $location[Cobb\'s Knob Menagerie, Level 2], "+3 Spooky Res, +15 Spooky Damage, +30 Spooky Spell Damage", "finding the  Cobb\'s Knob Menagerie key in the Cobb\'s Knob lab" + ($item[Cobb's Knob Menagerie key].available_amount() == 0 ? ", accessed by doing the Cobb\'s Knob quest" : "")));
+    }
+}
+
+static
+{
     monster [location] __protonic_monster_for_location {$location[Cobb\'s Knob Treasury]:$monster[The ghost of Ebenoozer Screege], $location[The Haunted Conservatory]:$monster[The ghost of Lord Montague Spookyraven], $location[The Haunted Gallery]:$monster[The ghost of Waldo the Carpathian], $location[The Haunted Kitchen]:$monster[The Icewoman], $location[The Haunted Wine Cellar]:$monster[The ghost of Jim Unfortunato], $location[The Icy Peak]:$monster[The ghost of Sam McGee], $location[Inside the Palindome]:$monster[Emily Koops, a spooky lime], $location[Madness Bakery]:$monster[the ghost of Monsieur Baguelle], $location[The Old Landfill]:$monster[The ghost of Vanillica "Trashblossom" Gorton], $location[The Overgrown Lot]:$monster[the ghost of Oily McBindle], $location[The Skeleton Store]:$monster[boneless blobghost], $location[The Smut Orc Logging Camp]:$monster[The ghost of Richard Cockingham], $location[The Spooky Forest]:$monster[The Headless Horseman]};
 }
 

@@ -407,22 +407,19 @@ void QLevel13Init()
     //FIXME what paths don't fight the shadow?
 	state.state_boolean["king waiting to be freed"] = (state.mafia_internal_step >= 14 && !state.finished);
     
-    boolean [string] known_key_names;
-    if (my_path_id() == PATH_LOW_KEY_SUMMER) {
-        known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key,Actual skeleton key,Anchovy can key,Aquí,Batting cage key,Black rose key,Cactus key,Clown car key,Deep-fried key,Demonic key,Discarded bike lock key,F'c'le sh'c'le k'y,Ice key,Kekekey,Key sausage,Knob labinet key,Knob shaft skate key,Knob treasury key,Music Box Key,Peg key,Rabbit\'s foot key,Scrap metal key,Treasure chest key,Weremoose key];
-    } else {
-        known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key];
+    //"<name>,<name>,<name>" => {1:"<name>",2:"<name>",3:"<name>"} => {1:<item>,2:<item>,3:<item>} => {<item>:true,<item>:true,<item>:true}
+    boolean [item] keys_used = get_property("nsTowerDoorKeysUsed").split_string_alternate(",").listConvertToItem().listInvert();
+    
+    foreach base_key in __ns_tower_door_base_keys {
+        state.state_boolean[base_key.name + " used"] = (keys_used contains base_key) || state.state_boolean["past keys"];
     }
 
-    foreach key_name in known_key_names {
-        state.state_boolean[key_name + " used"] = state.state_boolean["past keys"];
-    }
-    
-    if (!state.state_boolean["past keys"]) {   
-        string [int] keys_used = split_string_alternate(get_property("nsTowerDoorKeysUsed"), ",");
-        
-        foreach index, used_key in keys_used {
-            state.state_boolean[used_key + " used"] = true;
+    if (my_path_id() == PATH_LOW_KEY_SUMMER) {
+        foreach index, LKS_key in LKS_keys {
+            if (LKS_key.it != $item[none]) {
+                LKS_key.was_used = (keys_used contains LKS_key.it) || state.state_boolean["past keys"];
+                state.state_boolean[LKS_key.it.name + " used"] = LKS_key.was_used;
+            }
         }
     }
     
@@ -722,22 +719,18 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         url = "place.php?whichplace=nstower_door";
         subentry.header = "Open the tower door";
         
-        boolean [string] known_key_names;
-        if (my_path_id() == PATH_LOW_KEY_SUMMER) {
-            known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key,Actual skeleton key,Anchovy can key,Aquí,Batting cage key,Black rose key,Cactus key,Clown car key,Deep-fried key,Demonic key,Discarded bike lock key,F'c'le sh'c'le k'y,Ice key,Kekekey,Key sausage,Knob labinet key,Knob shaft skate key,Knob treasury key,Music Box Key,Peg key,Rabbit\'s foot key,Scrap metal key,Treasure chest key,Weremoose key];
-        } else {
-            known_key_names = $strings[Boris\'s key,Jarlsberg\'s key,Sneaky Pete\'s key,Richard\'s star key,skeleton key,digital key];
-        }
-
         item [int] missing_keys;
-        foreach key_name in known_key_names {
-            if (!base_quest_state.state_boolean[key_name + " used"]) {
-                item key_item = key_name.to_item();
-                string key_name_output = key_name.replace_string(" key", "");
-                if (key_item.available_amount() == 0) {
-                    key_name_output = HTMLGenerateSpanFont(key_name_output, "grey");
-                    missing_keys.listAppend(key_item);
-                }
+        foreach base_key in __ns_tower_door_base_keys {
+            if (!base_quest_state.state_boolean[base_key.name + " used"] && base_key.available_amount() == 0) {
+                /*string key_name_output = base_key.name.replace_string(" key", "");
+                key_name_output = HTMLGenerateSpanFont(key_name_output, "grey");*/ //unused
+                missing_keys.listAppend(base_key);
+            }
+        }
+        if (my_path_id() == PATH_LOW_KEY_SUMMER) {
+            foreach index, LKS_key in LKS_keys {
+                if (!LKS_key.was_used)
+                    missing_keys.listAppend(LKS_key.it);
             }
         }
         
@@ -747,7 +740,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             subentry.entries.listAppend("Find " + pluraliseWordy(missing_keys.count(), "more key", "more keys") + " for the door");
         }
 
-        if (my_path_id() != PATH_LOW_KEY_SUMMER) {
+        if (my_path_id() != PATH_LOW_KEY_SUMMER) { //has its own file, Low Key.ash, when in Low Key Summer
             foreach keyIndex, key in missing_keys {
                 subentry.entries.listAppend(key);
             }

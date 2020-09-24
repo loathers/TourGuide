@@ -278,7 +278,7 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 
 void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 {
-	if (!__misc_state["in run"] && !__misc_state["Example mode"] && my_path_id() != PATH_LOW_KEY_SUMMER)
+	if (!__misc_state["in run"] && !__misc_state["Example mode"])
 		return;
 	if (__quest_state["Level 13"].state_boolean["Richard\'s star key used"] || $item[richard\'s star key].available_amount() > 0)
 		return;

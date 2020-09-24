@@ -51,9 +51,3 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SMiscItemsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     SPVPGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
-
-
-void SetsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
-{
-    QHitsGenerateMissingItems(items_needed_entries);
-}

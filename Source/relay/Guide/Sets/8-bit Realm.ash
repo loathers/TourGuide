@@ -1,11 +1,11 @@
+
 void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();
         
-	if (__quest_state["Level 13"].state_boolean["digital key used"] || (total_white_pixels >= 30 || $item[digital key].available_amount() > 0))
-    {
+	if (__quest_state["Level 13"].state_boolean["digital key used"] || total_white_pixels >= 30 || $item[digital key].available_amount() > 0)
         return;
-    }
+    
     boolean need_route_output = true;
     //Need white pixels for digital key.
     if (familiar_is_usable($familiar[angry jung man]) && $item[psychoanalytic jar].available_amount() == 0 && $item[jar of psychoses (The Crackpot Mystic)].available_amount() == 0 && !get_property_boolean("_psychoJarUsed"))
@@ -162,5 +162,41 @@ void S8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
         crafting_list.listAppendList(crafting_list_cannot);
         string pixels_have = "Pixel crafting";
         resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10));
+    }
+}
+
+void S8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
+{
+    if (!__misc_state["in run"] && !__misc_state["Example mode"])
+        return;
+    if (__quest_state["Level 13"].state_boolean["digital key used"])
+        return;
+    
+    if ($item[digital key].available_amount() == 0) {
+        string url = "place.php?whichplace=forestvillage&action=fv_mystic"; //forestvillage.php
+        if (my_path_id() == PATH_KINGDOM_OF_EXPLOATHING)
+            url = "shop.php?whichshop=exploathing";
+        string [int] options;
+        if ($item[digital key].creatable_amount() > 0) {
+            options.listAppend("Have enough pixels, make it.");
+        } else {
+            if ($item[psychoanalytic jar].item_is_usable() && (!in_hardcore() || $familiar[angry jung man].familiar_is_usable()))
+                options.listAppend("Fear man's level (jar)");
+            if (__misc_state["fax equivalent accessible"] && in_hardcore()) //not suggesting this in SC
+                options.listAppend("Fax/copy a ghost");
+            if (my_path_id() == PATH_KINGDOM_OF_EXPLOATHING)
+                options.listAppend("Fight invader bullets");
+            else if ($item[continuum transfunctioner].item_is_usable())
+                options.listAppend("8-bit realm (olfact blooper, slow)");
+            if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
+                options.listAppend("Wait for pixellated monsters");
+            if (lookupItem("Powerful Glove").available_amount() > 0)
+                options.listAppend("Adventure with the Powerful Glove equipped");
+            
+            int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();
+            if (total_white_pixels > 0)
+                options.listAppend(total_white_pixels + "/30 white pixels found.");
+        }
+        items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", url, ChecklistSubentryMake("Digital key", "", options)));
     }
 }

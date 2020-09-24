@@ -1,3 +1,4 @@
+
 void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	
@@ -218,4 +219,37 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 		}
 	}
 
+}
+
+void SDailyDungeonGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
+{
+    string url = "da.php";
+    if (my_path_id() == PATH_KINGDOM_OF_EXPLOATHING)
+        url = "shop.php?whichshop=exploathing";
+    
+    string from_daily_dungeon_string = "From daily dungeon";
+    if ($item[fat loot token].available_amount() > 0)
+        from_daily_dungeon_string += "|" + pluralise($item[fat loot token]) + " available";
+    
+    if ($item[sneaky pete\'s key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Sneaky Pete\'s key used"]) {
+        string [int] options;
+        options.listAppend(from_daily_dungeon_string);
+        if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
+            options.listAppend("From key lime pie");
+        items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete\'s key", url, ChecklistSubentryMake("Sneaky Pete\'s key", "", options)));
+    }
+    if ($item[jarlsberg\'s key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Jarlsberg\'s key used"]) {
+        string [int] options;
+        options.listAppend(from_daily_dungeon_string);
+        if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
+            options.listAppend("From key lime pie");
+        items_needed_entries.listAppend(ChecklistEntryMake("__item jarlsberg's key", url, ChecklistSubentryMake("Jarlsberg's key", "", options)));
+    }
+    if ($item[Boris\'s key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Boris\'s key used"]) {
+        string [int] options;
+        options.listAppend(from_daily_dungeon_string);
+        if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
+            options.listAppend("From key lime pie");
+        items_needed_entries.listAppend(ChecklistEntryMake("__item Boris's key", url, ChecklistSubentryMake("Boris's key", "", options)));
+    }
 }
