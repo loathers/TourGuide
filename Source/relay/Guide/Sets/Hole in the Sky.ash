@@ -26,18 +26,11 @@ void QHitsInit()
     int stars_want = 0;
     int lines_want = 0;
     
-	if ($item[richard\'s star key].available_amount() == 0)
+	if ($item[richard\'s star key].available_amount() == 0 && HITSStillRelevant())
     {
 		charts_want += 1;
 		stars_want += 8;
 		lines_want += 7;
-    }
-    
-    if (!HITSStillRelevant())
-    {
-        charts_want = 0;
-        stars_want = 0;
-        lines_want = 0;
     }
     
     state.state_int["star charts needed"] = MAX(0, charts_want - $item[star chart].available_amount());
@@ -274,9 +267,11 @@ void QHitsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
                 }
             }
 		}
-		else
-			subentry.entries.listAppend("Can make Richard's Star Key.");
-	}
+        else {
+            active_url = "shop.php?whichshop=starchart";
+            subentry.entries.listAppend("Can make Richard's Star Key.");
+        }
+    }
 	optional_task_entries.listAppend(ChecklistEntryMake("hole in the sky", active_url, subentry, $locations[the hole in the sky, the castle in the clouds in the sky (top floor)]));
 }
 
@@ -285,18 +280,19 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 {
 	if (!__misc_state["in run"] && !__misc_state["Example mode"] && my_path_id() != PATH_LOW_KEY_SUMMER)
 		return;
-	if (__quest_state["Level 13"].state_boolean["Richard\'s star key used"])
+	if (__quest_state["Level 13"].state_boolean["Richard\'s star key used"] || $item[richard\'s star key].available_amount() > 0)
 		return;
 
+    QuestState state = __quest_state["Hole in the Sky"];
+
     string url = $location[the hole in the sky].getClickableURLForLocation();
-    if (!$location[the hole in the sky].locationAvailable())
+    if (state.state_int["star charts needed"] + state.state_int["stars needed"] + state.state_int["lines needed"] == 0)
+        url = "shop.php?whichshop=starchart";
+    else if (!$location[the hole in the sky].locationAvailable())
         url = $location[The Castle in the Clouds in the Sky (basement)].getClickableURLForLocation();
-	if ($item[richard\'s star key].available_amount() == 0)
-	{
-		string [int] oh_my_stars_and_gauze_garters;
-		oh_my_stars_and_gauze_garters.listAppend(MIN(1, $item[star chart].available_amount()) + "/1 star chart");
-		oh_my_stars_and_gauze_garters.listAppend(MIN(8, $item[star].available_amount()) + "/8 stars");
-		oh_my_stars_and_gauze_garters.listAppend(MIN(7, $item[line].available_amount()) + "/7 lines");
-		items_needed_entries.listAppend(ChecklistEntryMake("__item richard\'s star key", url, ChecklistSubentryMake("Richard\'s star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
-	}
+    string [int] oh_my_stars_and_gauze_garters;
+    oh_my_stars_and_gauze_garters.listAppend(MIN(1, $item[star chart].available_amount()) + "/1 star chart");
+    oh_my_stars_and_gauze_garters.listAppend(MIN(8, $item[star].available_amount()) + "/8 stars");
+    oh_my_stars_and_gauze_garters.listAppend(MIN(7, $item[line].available_amount()) + "/7 lines");
+    items_needed_entries.listAppend(ChecklistEntryMake("__item richard\'s star key", url, ChecklistSubentryMake("Richard\'s star key", "", oh_my_stars_and_gauze_garters.listJoinComponents(", ", "and"))));
 }
