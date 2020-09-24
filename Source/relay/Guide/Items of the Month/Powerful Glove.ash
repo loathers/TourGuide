@@ -1,89 +1,45 @@
 RegisterResourceGenerationFunction("IOTMPowerfulGloveGenerateResource");
 void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    ChecklistSubentry getCharge() {
-        int charge = get_property_int("_powerfulGloveBatteryPowerUsed");
-        int chargeLeft = 100 - charge;
+    if (!lookupItem("Powerful Glove").have()) return;
 
-        // Title
-        string main_title = chargeLeft + "% battery charge";
+    int chargeLeft = 100 - get_property_int("_powerfulGloveBatteryPowerUsed");
 
-        // Subtitle
-        string subtitle = "";
+    if (chargeLeft < 5) return;
 
-        // Entries
-        string [int] description;
-        if (chargeLeft > 0) {
-            description.listAppend(HTMLGenerateSpanOfClass("Invisible Avatar (5% charge):", "r_bold") + " -10% combat.");
-            description.listAppend(HTMLGenerateSpanOfClass("Triple Size (5% charge):", "r_bold") + " +200% all attributes.");
-            if (chargeLeft > 5) {
-                description.listAppend(HTMLGenerateSpanOfClass("Replace Enemy (10% charge):", "r_bold") + " Swap monster.");
-            }
-            description.listAppend(HTMLGenerateSpanOfClass("Shrink Enemy (5% charge):", "r_bold") + " Delevel.");
-        }
+    string url = "skillz.php";
+    if (!lookupItem("Powerful Glove").equipped())
+        url = "inventory.php?ftext=powerful+glove";
 
-        return ChecklistSubentryMake(main_title, subtitle, description);
-    }
+    string [int] description;
+    description.listAppend(HTMLGenerateSpanOfClass("Invisible Avatar (5% charge):", "r_bold") + " -10% combat.");
+    description.listAppend(HTMLGenerateSpanOfClass("Triple Size (5% charge):", "r_bold") + " +200% all attributes.");
+    if (chargeLeft >= 10)
+        description.listAppend(HTMLGenerateSpanOfClass("Replace Enemy (10% charge):", "r_bold") + " Swap monster.");
+    description.listAppend(HTMLGenerateSpanOfClass("Shrink Enemy (5% charge):", "r_bold") + " Delevel.");
 
-	if (!lookupItem("Powerful Glove").have()) return;
-	
-    ChecklistEntry entry;
-    entry.image_lookup_name = "__item Powerful Glove";
-    entry.url = "skillz.php";
-
-    ChecklistSubentry charge = getCharge();
-    if (charge.entries.count() > 0) {
-        entry.subentries.listAppend(charge);
-    }
-    
-    if (entry.subentries.count() > 0) {
-        resource_entries.listAppend(entry);
-    }
+    resource_entries.listAppend(ChecklistEntryMake("__item Powerful Glove", url, ChecklistSubentryMake(chargeLeft + "% battery charge", "", description)));
 }
 
 RegisterTaskGenerationFunction("IOTMPowerfulGloveTask");
 void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__misc_state["in run"]) return;
-	
-	if ((!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
-		|| my_path_id() == PATH_OF_THE_PLUMBER) {
-			ChecklistSubentry getExtraPixels() {
-				// Title
-				string main_title = "Get extra pixels";
-				if (my_path_id() == PATH_OF_THE_PLUMBER) {
-					main_title = main_title + " and coins";
-				}
+    if (!__misc_state["in run"] || !lookupItem("Powerful Glove").have() || lookupItem("Powerful Glove").have_equipped()) return;
 
-				// Subtitle
-				string subtitle = "";
+    boolean is_plumber = my_path_id() == PATH_OF_THE_PLUMBER;
 
-				// Entries
-				string [int] description;
-				if (!have_equipped($item[Powerful Glove])) {
-					description.listAppend("Equip Powerful Glove");
-				}
+    string [int] glove_drops;
 
-				return ChecklistSubentryMake(main_title, subtitle, description);
-			}
+    if (!__quest_state["Level 13"].state_boolean["digital key used"] && $item[digital key].available_amount() + $item[digital key].creatable_amount() == 0)
+        glove_drops.listAppend("pixels");
+    if (is_plumber)
+        glove_drops.listAppend("coins");
+    
+    if (glove_drops.count() == 0) return;
 
-			if (!lookupItem("Powerful Glove").have()) return;
-			
-			ChecklistEntry entry;
-			entry.image_lookup_name = "__item white pixel";
-			entry.url = "/place.php?whichplace=forestvillage&action=fv_mystic";
+    int importance_level;
+    if (is_plumber)
+        importance_level = -10;
 
-			if (my_path_id() == PATH_OF_THE_PLUMBER) {
-				entry.importance_level = -10;
-			}
-
-			ChecklistSubentry extraPixels = getExtraPixels();
-			if (extraPixels.entries.count() > 0) {
-				entry.subentries.listAppend(extraPixels);
-			}
-			
-			if (entry.subentries.count() > 0) {
-				optional_task_entries.listAppend(entry);
-			}
-		}
+    optional_task_entries.listAppend(ChecklistEntryMake("__item white pixel", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake("Equip Powerful Glove", "", "Get extra " + glove_drops.listJoinComponents(" and ") + "."), importance_level));
 }

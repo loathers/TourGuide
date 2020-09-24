@@ -426,10 +426,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         if (gunpowder_needed > 0)
         {
             modifiers = listMake("+combat", "copies");
-            if (gunpowder_needed == 1)
-                details.listAppend("Need " + gunpowder_needed + " more barrel of gunpowder.");
-            else
-                details.listAppend("Need " + gunpowder_needed + " more barrels of gunpowder.");
+            details.listAppend("Need " + gunpowder_needed.pluralise("more barrel", "more barrels") + " of gunpowder.");
             
             
             
@@ -457,9 +454,19 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             
             details.listAppend("~" + roundForOutput(turns_to_complete, 1) + " turns to complete quest at " + combat_rate_modifier().floor() + "% combat.|~" + roundForOutput(turns_per_lobster, 1) + " turns per lobster.");
             
+            string macrometeorite_source;
+
             if ($skill[meteor lore].have_skill() && get_property_int("_macrometeoriteUses") < 10)
+                macrometeorite_source = "macrometeorite";
+            else if (lookupItem("Powerful Glove").have() && 100 - get_property_int("_powerfulGloveBatteryPowerUsed") >= 10)
+                macrometeorite_source = "Replace Enemy";
+            
+            if (macrometeorite_source != "")
             {
-            	details.listAppend("Could use macrometeorite on a wandering monster (portscan, voting) to guarantee an LFM.");
+            	details.listAppend("Could use " + macrometeorite_source + " on a wandering monster (portscan, voting, holiday monster...) to guarantee an LFM.");
+                if (macrometeorite_source == "Replace Enemy" && !lookupItem("Powerful Glove").equipped())
+                    details.listAppend("Equip the Powerful Glove, first.");
+
                 if (lookupItem("&quot;I Voted!&quot; sticker").available_amount() > 0 && get_property_int("_voteFreeFights") >= 3)
                 {
                 	if (total_turns_played() % 11 == 1 && get_property_int("lastVoteMonsterTurn") < total_turns_played())
@@ -472,6 +479,21 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                         details.listAppend("Voting monster will appear in " + pluralise(turns_to_next_voting_monster, "more turn", "more turns") + ".");
                     }
                     
+                }
+            }
+
+            if (lookupItem("Fourth of May Cosplay Saber").available_amount() > 0 && get_property_int("_saberForceUses") < 5 && gunpowder_needed > 1)
+            {
+                int saber_fights_left = MIN(get_property_int("_saberForceMonsterCount"), 3);
+                boolean already_sabering_lfm = get_property_monster("_saberForceMonster") == $monster[lobsterfrogman] && saber_fights_left > 0;
+
+                if (!already_sabering_lfm || already_sabering_lfm && saber_fights_left < gunpowder_needed) {
+                    details.listAppend("Could Use the Force (friends) on a LFM to guarantee two more.");
+                    
+                    if (already_sabering_lfm && saber_fights_left > 1) //sabering now would waste some copies
+                        details.listAppend("Finish fighting " + (saber_fights_left - 1).pluralise("more copy", "more copies") + ", first.");
+                    else if (!lookupItem("Fourth of May Cosplay Saber").equipped())
+                        details.listAppend("Equip the Fourth of May saber, first.");
                 }
             }
         }
