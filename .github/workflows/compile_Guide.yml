@@ -22,6 +22,6 @@ jobs:
           echo Add other actions to build,
           echo ${$GITHUB_WORKSPACE}
 
-  push_to_branch:
-    needs: build
-    runs-on: windows-lastest
+  #push_to_branch:
+    #needs: build
+    #runs-on: windows-lastest
