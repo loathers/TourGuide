@@ -1,0 +1,26 @@
+name: compile Guide
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - '**.ash'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo ${$GITHUB_WORKSPACE}
+  #push_to_branch:
+    #needs: build
+    #runs-on: windows-lastest
