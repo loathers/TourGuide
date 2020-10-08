@@ -1,12 +1,12 @@
 name: compile Guide
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
     paths:
       - '**.ash'
-  workflow_dispatch:
 
 jobs:
   build:
