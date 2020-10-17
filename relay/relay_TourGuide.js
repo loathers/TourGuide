@@ -267,6 +267,18 @@ var __guide_colset_short_2 = "*,25%,20%";
 var __guide_colset_short_3_chatpane_slightly_visible = "*,30%,0%";
 var __guide_colset_short_3_chatpane_invisible = "*,30%";
 
+var default_settings = {};
+var informational_settings = {};
+
+const default_default_settings = {
+    "rollover_AE":"false",
+    "ascension_AE":"false",
+    "opacity":"half",
+    "image":"small",
+    "collapsing":"entries"
+};
+
+
 function timeInMilliseconds()
 {
     if (Date.now == undefined) //IE8 compatibility
@@ -533,6 +545,59 @@ function buttonRightRightClicked(event)
     installFrame(3);
 }
 
+function buttonExpandAllClicked(event)
+{
+    //hide this button (only shows if at least 1 tile is minimized)
+    document.getElementById('button_expand_all').style.visibility = "";
+    
+    //expand every currently minimized tile
+    const every_toggle_boxen = document.getElementsByClassName( "r_cl_minimize_button" );
+    for (const element of every_toggle_boxen)
+    {
+        if (element.title == "Minimize") continue;
+        
+        element.title = "Minimize";
+        element.alt = "Minimize";
+        element.textContent = "▲";
+    }
+    
+    const currently_minimized_tiles = Array.from( document.getElementsByClassName( "r_cl_collapsed" ) );
+    for (const element of currently_minimized_tiles)
+    {
+        element.classList.remove("r_cl_collapsed");
+    }
+    
+    //delete the minimized tiles cache
+    try
+    {
+        localStorage.setItem( `${document.getElementById("player_name").textContent}_TourGuide_collapsed_tiles`, "[]" );
+    }
+    catch (e) {}
+}
+
+function updateExpandAllButtonVisibility()
+{
+    var expand_all_button = document.getElementById('button_expand_all');
+    
+    var currently_minimized_tiles = document.getElementsByClassName( "r_cl_collapsed" );
+    let stored_minimized_tiles;
+    try
+    {
+        stored_minimized_tiles = JSON.parse(localStorage.getItem( `${document.getElementById("player_name").textContent}_TourGuide_collapsed_tiles` ));
+    }
+    catch (e)
+    {
+        stored_minimized_tiles = [];
+    }
+    if (stored_minimized_tiles == null)
+        stored_minimized_tiles = [];
+    
+    if (currently_minimized_tiles.length == 0 && stored_minimized_tiles.length == 0)
+        expand_all_button.style.visibility = "";
+    else
+        expand_all_button.style.visibility = "visible";
+}
+
 function installFrameDefault(event)
 {
     if (getChatIsCurrentlyActive())
@@ -656,14 +721,153 @@ function writePageExtras()
         {
         }
 	}
-    var refresh_status = document.getElementById("refresh_status");
-    refresh_status.innerHTML = ""; //clear out disabled message
+    document.getElementById("refresh_status").innerHTML = ""; //clear out disabled message
     
-    var importance_container = document.getElementById("importance_bar");
+    
+    //Load user settings from localStorage
+    const settings = loadSettings();
+    for (const [category, category_settings] of Object.entries(settings))
+    {
+        if (category == "__default")
+        {
+            default_settings = category_settings;
+            let guide_body_classes = document.getElementById("Guide_body").classList;
+            
+            for (const [setting, value] of Object.entries(default_default_settings))
+            {
+                //If they didn't set a default for some values yet, set ours
+                if (!Object.keys(default_settings).includes(setting))
+                {
+                    default_settings[setting] = value;
+                }
+                
+                //Apply the default to the page
+                guide_body_classes.add(setting + "_" + default_settings[setting]);
+            }
+        }
+        else
+        {
+            for (const tile of document.getElementsByClassName(category))
+            {
+                let tile_classes = tile.classList;
+                
+                for (const [setting, value] of Object.entries(category_settings))
+                {
+                    tile_classes.add(setting + "_" + value);
+                }
+            }
+        }
+    }
+    
+    //There's issues with adding a right-click event to SVGs on Firefox, so add it manually
+    const button_global_settings = document.getElementById("button_global_settings");
+    if (button_global_settings.oncontextmenu == null)
+        button_global_settings.addEventListener("contextmenu", function(){ callSettingsContextualMenu(event); });
+    
+    //Load minimized tiles from localStorage
+    let groups_to_minimize;
+    try
+    {
+        groups_to_minimize = JSON.parse(localStorage.getItem( `${document.getElementById("player_name").textContent}_TourGuide_collapsed_tiles` ));
+    }
+    catch (e) {}
+    
+    if (!Array.isArray(groups_to_minimize))
+        groups_to_minimize = [];
+    
+    //auto-expansion
+    informational_settings["ascension"] = document.getElementById("ascension_count").textContent;
+    informational_settings["game_day"] = document.getElementById("in_game_day").textContent;
+    if (informational_settings["ascension"] != default_settings["ascension"]) //on ascension
+    {
+        //"informational_settings" has the current ascension, and "default_settings" has the logged one. A difference means they ascended since last load.
+        for (const [category, category_settings] of Object.entries(settings))
+        {
+            if (category == "__default" && default_settings["ascension_AE"] == "true")
+            {
+                //all collapsed tiles (that don't have personal settings for that matter) need to be expanded. Parse them all.
+                let groups_to_minimize_cache = groups_to_minimize.slice(); //save the modified version here, otherwise the "for" loop has issues
+                for (const collapsed_tile of groups_to_minimize)
+                {
+                    if (Object.keys(settings).includes(collapsed_tile))
+                    {
+                        if (Object.keys(settings[collapsed_tile]).includes("ascension_AE")) //This tile has its own setting for what to do with auto-expansion on ascension, so don't even try to handle it here.
+                            continue;
+                    }
+                    groups_to_minimize_cache.splice(groups_to_minimize_cache.indexOf(collapsed_tile), 1);
+                }
+                groups_to_minimize = groups_to_minimize_cache.slice();
+            }
+            else if (category != "__default" && category_settings["ascension_AE"] == "true")
+            {
+                if (groups_to_minimize.includes(category))
+                {
+                    groups_to_minimize.splice(groups_to_minimize.indexOf(category), 1);
+                }
+            }
+        }
+        
+        default_settings["ascension"] = informational_settings["ascension"];
+        try
+        {
+            localStorage.setItem( `${document.getElementById("player_name").textContent}_TourGuide_collapsed_tiles` , JSON.stringify(groups_to_minimize) );
+        }
+        catch (e) {}
+    }
+    if (informational_settings["game_day"] != default_settings["game_day"]) //on rollover
+    {
+        //will fail if it's been exactly 95 days since last login (a KoL year), but at that point, who cares
+        for (const [category, category_settings] of Object.entries(settings))
+        {
+            if (category == "__default" && default_settings["rollover_AE"] == "true")
+            {
+                let groups_to_minimize_cache = groups_to_minimize.slice();
+                for (const collapsed_tile of groups_to_minimize)
+                {
+                    if (Object.keys(settings).includes(collapsed_tile))
+                    {
+                        if (Object.keys(settings[collapsed_tile]).includes("rollover_AE"))
+                            continue;
+                    }
+                    groups_to_minimize_cache.splice(groups_to_minimize_cache.indexOf(collapsed_tile), 1);
+                }
+                groups_to_minimize = groups_to_minimize_cache.slice();
+            }
+            else if (category != "__default" && category_settings["rollover_AE"] == "true")
+            {
+                if (groups_to_minimize.includes(category))
+                {
+                    groups_to_minimize.splice(groups_to_minimize.indexOf(category), 1);
+                }
+            }
+        }
+        
+        default_settings["game_day"] = informational_settings["game_day"];
+        try
+        {
+            localStorage.setItem( `${document.getElementById("player_name").textContent}_TourGuide_collapsed_tiles` , JSON.stringify(groups_to_minimize) );
+        }
+        catch (e) {}
+    }
+    
+    saveSettingsCategory("__default", default_settings);
+    
+    
+    //Minimize tiles based on localStorage
+    for (const group_to_minimize of groups_to_minimize)
+    {
+        const corresponding_box_id = "toggle_" + group_to_minimize;
+        const corresponding_toggle_boxen = document.getElementsByClassName( corresponding_box_id );
+        if (corresponding_toggle_boxen.length != 0) //only want to know if there's at least 1
+            toggleTileDisplay(corresponding_box_id, true);
+    }
+    updateExpandAllButtonVisibility();
+    
+    const importance_container = document.getElementById("importance_bar");
     if (importance_container != undefined)
     {
         __guide_importance_bar_visible = false;
-        var tasks_position = elementGetGlobalOffsetTop(document.getElementById("Tasks_checklist_container")) + 1;
+        const tasks_position = elementGetGlobalOffsetTop(document.getElementById("Tasks_checklist_container")) + 1;
         
         recalculateImportanceBarVisibility(tasks_position, importance_container, true)
         
@@ -939,6 +1143,347 @@ function browserProbablySupportsPointerEvents()
         __tested_pointer_events = true;
     }
     return __browser_probably_supports_pointer_events;
+}
+
+function alterSubentryMinimization(event)
+{
+    toggleTileDisplay(event.target.id, event.target.title == "Minimize");
+}
+
+function toggleTileDisplay(toggle_box_id, want_collapsed)
+{
+    //First, set the box(es) to the appropriate state
+    const toggle_boxen = document.getElementsByClassName( toggle_box_id );
+    for (const toggle_box of toggle_boxen)
+    {
+        if (want_collapsed)
+        {
+            toggle_box.title = "Expand";
+            toggle_box.alt = "Expand";
+            toggle_box.textContent = "▲"; // &#9650;
+        }
+        else
+        {
+            toggle_box.title = "Minimize";
+            toggle_box.alt = "Minimize";
+            toggle_box.textContent = "▲"; // &#9660;
+        }
+    }
+
+
+    //Second, toggle the collapsing of every matching element
+    const class_to_toggle = toggle_box_id.substring(7); //remove the "toggle_"
+    const entry_group = document.getElementsByClassName( class_to_toggle );
+    for (const element of entry_group)
+    {
+        if (want_collapsed)
+        {
+            if (!element.classList.contains("r_cl_collapsed"))
+                element.classList.add("r_cl_collapsed");
+        }
+        else
+        {
+            element.classList.remove("r_cl_collapsed");
+        }
+    }
+
+
+    //Third, update Local storage
+    const storage_name = `${document.getElementById("player_name").textContent}_TourGuide_collapsed_tiles`;
+    let current_stored_collapsed;
+    let to_write;
+    try
+    {
+        current_stored_collapsed = JSON.parse(localStorage.getItem( storage_name ));
+    }
+    catch (e)
+    {
+        current_stored_collapsed = [];
+    }
+    if (current_stored_collapsed == null || !Array.isArray(current_stored_collapsed))
+        current_stored_collapsed = [];
+    
+    if (want_collapsed)
+    {
+        if (!(current_stored_collapsed.includes( class_to_toggle )))
+        {
+            try
+            {
+                current_stored_collapsed.push( class_to_toggle );
+                to_write = JSON.stringify(current_stored_collapsed);
+                localStorage.setItem( storage_name , to_write );
+            }
+            catch (e) {}
+        }
+    }
+    else
+    {
+        if (current_stored_collapsed.includes( class_to_toggle ))
+        {
+            try
+            {
+                current_stored_collapsed.splice( current_stored_collapsed.indexOf( class_to_toggle ), 1 );
+                to_write = JSON.stringify(current_stored_collapsed);
+                localStorage.setItem( storage_name , to_write );
+            }
+            catch (e) {}
+        }
+    }
+
+
+    //Fourth, update the visibility of the expand all button
+    updateExpandAllButtonVisibility();
+}
+
+var button_currently_attached_to_menu;
+function callSettingsContextualMenu(event)
+{
+    event.preventDefault();
+
+    const sourceButton = event.currentTarget;
+    button_currently_attached_to_menu = sourceButton;
+
+    const menu = document.querySelector(".menu");
+
+    //Positioning
+    menu.style.display = "flex";
+    if (sourceButton.id == "button_global_settings")
+    {
+        menu.style.top = sourceButton.style.top;
+        menu.style.setProperty('--left-of-parent-button', `calc( ${sourceButton.style.right} + ${sourceButton.scrollWidth}px )`);
+    }
+    else
+    {
+        menu.style.top = `${sourceButton.offsetTop}px`;
+        menu.style.setProperty('--left-of-parent-button', `calc( var(--cl_container_padding) + ${sourceButton.offsetWidth}px )`);
+    }
+    menu.style.right = 'var( --left-of-parent-button )';
+    menu.style.maxWidth = 'calc( 100% - var( --left-of-parent-button ) - 30px)';
+
+    if (sourceButton.id == "button_global_settings")
+    {
+        document.getElementById("contextual_menu_header_text").textContent = "Global settings";
+        //document.getElementById("contextual_menu_trace").textContent = "";
+        //document.getElementById("contextual_menu_current_node").textContent = "Settings";
+        
+        for (const setting of document.getElementsByClassName("ct_menu_choice_setting"))
+        {
+            const setting_id = setting.id;
+
+            const default_setting = document.getElementById("default_" + setting_id);
+            default_setting.textContent = "";
+            default_setting.style.display = "none";
+            
+            setting.value = default_default_settings[setting_id];
+            
+            for (const option of setting.options)
+            {
+                if (option.value == default_settings[setting_id])
+                    setting.value = option.value;
+            }
+        }
+    }
+    else
+    {
+        const tile_id = sourceButton.id.substring(7);
+        document.getElementById("contextual_menu_header_text").textContent = tile_id;
+        //document.getElementById("contextual_menu_trace").textContent = "";
+        //document.getElementById("contextual_menu_current_node").textContent = "Settings";
+        
+        const user_settings = loadSettingsCategory(tile_id);
+        for (const setting of document.getElementsByClassName("ct_menu_choice_setting"))
+        {
+            const setting_id = setting.id;
+
+            const default_setting = document.getElementById("default_" + setting_id);
+            default_setting.style.display = "";
+            
+            setting.value = "default";
+            
+            let default_display_value;
+            
+            for (const option of setting.options)
+            {
+                if (option.value == default_settings[setting_id])
+                    default_display_value = option.textContent;
+                
+                if (option.value == user_settings[setting_id])
+                    setting.value = option.value;
+            }
+            
+            default_setting.textContent = "default (" + default_display_value + ")";
+        }
+    }
+    
+    if (document.getElementById("settings_help_button").title == "Hide help text")
+    {
+        alterSettingsHelpDisplay();
+    }
+}
+
+window.addEventListener("click", e => {
+    const menu = document.querySelector(".menu");
+    if (menu.style.display != "none" && e.target.closest(".r_cl_minimize_button") != button_currently_attached_to_menu && e.target.closest(".r_button") != button_currently_attached_to_menu && e.target.closest(".menu") != menu)
+    {
+        menu.style.display = "none";
+    }
+});
+
+function registerSettingsChange(event)
+{
+    const changed_setting = event.currentTarget; //the <select>
+    const setting_id = changed_setting.id;
+    //what it was changed to: changed_setting.value
+    //selected option (as element) : changed_setting.selectedOptions[0]
+    //all possible options (as a list of elements, in order) : changed_setting.options
+
+    const menu_header = document.getElementById("contextual_menu_header_text").textContent;
+    const default_setting_was_changed = menu_header == "Global settings";
+    
+    let category_settings;
+    if (default_setting_was_changed)
+    {
+        category_settings = loadSettingsCategory("__default");
+        default_settings[setting_id] = changed_setting.value;
+        category_settings[setting_id] = changed_setting.value;
+        saveSettingsCategory("__default", category_settings);
+    }
+    else
+    {
+        category_settings = loadSettingsCategory(menu_header);
+        if (changed_setting.value == "default")
+            delete category_settings[setting_id];
+        else
+            category_settings[setting_id] = changed_setting.value;
+        saveSettingsCategory(menu_header, category_settings);
+    }
+    
+    
+    //apply modifications to page
+    if (default_setting_was_changed)
+    {
+        let guide_body_classes = document.getElementById("Guide_body").classList;
+        for (const element of guide_body_classes.values())
+        {
+            if (element.startsWith(setting_id))
+                guide_body_classes.remove(element);
+        }
+        
+        guide_body_classes.add(setting_id + "_" + changed_setting.value);
+    }
+    else
+    {
+        for (const tile of document.getElementsByClassName(menu_header))
+        {
+            let tile_classes = tile.classList;
+            for (const element of tile_classes.values())
+            {
+                if (element.startsWith(setting_id))
+                    tile_classes.remove(element);
+            }
+            
+            if (changed_setting.value != "default")
+            {
+                tile_classes.add(setting_id + "_" + changed_setting.value);
+            }
+        }
+    }
+}
+
+function alterSettingsHelpDisplay()
+{
+    const help_button = document.getElementById("settings_help_button");
+    const show = help_button.title == "\"What is this?\"";
+    const help_text = document.getElementById("ct_menu_help");
+    const ct_menu_choice_groups = document.getElementsByClassName("ct_menu_choice_group");
+    if (show)
+    {
+        for (const choice_group of ct_menu_choice_groups)
+        {
+            choice_group.style.display = "none";
+        }
+        help_text.style.display = "block";
+        help_button.title = "Hide help text";
+        help_button.style.backgroundColor = "lightgreen";
+    }
+    else
+    {
+        for (const choice_group of ct_menu_choice_groups)
+        {
+            choice_group.style.display = "";
+        }
+        help_text.style.display = "none";
+        help_button.title = "\"What is this?\"";
+        help_button.style.backgroundColor = "lightcyan";
+    }
+}
+
+function saveSettings(user_settings)
+{
+    try
+    {
+        localStorage.setItem( `${document.getElementById("player_name").textContent}_TourGuide_settings` , JSON.stringify(user_settings) );
+    }
+    catch (e) {}
+}
+
+function saveSettingsCategory(category, category_settings)
+{
+    let user_settings = loadSettings();
+    user_settings[category] = category_settings;
+    if (Object.values(user_settings[category]).length == 0)
+        delete user_settings[category];
+    saveSettings(user_settings);
+}
+
+function loadSettings()
+{
+    let saved_settings;
+    try
+    {
+        saved_settings = JSON.parse( localStorage.getItem( `${document.getElementById("player_name").textContent}_TourGuide_settings` ) );
+    }
+    catch (e) {}
+    
+    //Make sure they are all Objects
+    if (!(saved_settings instanceof Object)) //If they are another primitive type (including null or undefined, which would trigger an error in the next check)
+    {
+        saved_settings = {};
+    }
+    if (saved_settings.constructor != Object) //If they are another kind of Object, like Array or Map
+    {
+        saved_settings = {};
+    }
+    
+    for (const [category, category_settings] of Object.entries(saved_settings))
+    {
+        if (!(category_settings instanceof Object))
+        {
+            saved_settings[category] = {};
+        }
+        if (category_settings.constructor != Object)
+        {
+            saved_settings[category] = {};
+        }
+    }
+    
+    if (!Object.keys(saved_settings).includes("__default"))
+    {
+        saved_settings["__default"] = default_settings;
+    }
+
+    return saved_settings;
+}
+
+function loadSettingsCategory(wanted_category)
+{
+    const saved_settings = loadSettings();
+
+    let loaded_category = {};
+    if (Object.keys(saved_settings).includes(wanted_category))
+        loaded_category = saved_settings[wanted_category];
+
+    return loaded_category;
 }
 
 function alterLocationPopupBarVisibility(event, visibility)
