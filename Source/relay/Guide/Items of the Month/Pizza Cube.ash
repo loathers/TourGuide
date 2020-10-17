@@ -1,6 +1,8 @@
 RegisterResourceGenerationFunction("IOTMPizzaCube");
 void IOTMPizzaCube(ChecklistEntry [int] resource_entries)
 {
+    if (!__iotms_usable[lookupItem("diabolic pizza cube")] || (fullness_limit() - my_fullness() < 3)) return;
+
     ChecklistSubentry getQuestItems() {
         // Title
         string main_title = "Make pizza";
@@ -39,11 +41,10 @@ void IOTMPizzaCube(ChecklistEntry [int] resource_entries)
         return ChecklistSubentryMake(main_title, subtitle, description);
     }
 
-    if (!__iotms_usable[lookupItem("diabolic pizza cube")] || (fullness_limit() - my_fullness() < 3)) return;
-
     ChecklistEntry entry;
     entry.image_lookup_name = "__item diabolic pizza";
     entry.url = "campground.php?action=workshed";
+    entry.tags.id = "Diabolic pizza cube resource";
 
     ChecklistSubentry questItems = getQuestItems();
     if (questItems.entries.count() > 0) {

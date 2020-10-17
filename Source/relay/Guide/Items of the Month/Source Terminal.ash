@@ -1,12 +1,14 @@
 void IOTMSourceTerminalGenerateDigitiseTargets(string [int] description)
 {
     string [int] potential_targets;
-    if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
-        potential_targets.listAppend("lobsterfrogman");
-    if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)
-        potential_targets.listAppend("modern zmobie");
-    if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
-        potential_targets.listAppend("ninja assassin");
+    if (!__misc_state["in CS aftercore"]) {
+        if (!__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 5)
+            potential_targets.listAppend("lobsterfrogman");
+        if (__quest_state["Level 7"].state_int["alcove evilness"] > 31)
+            potential_targets.listAppend("modern zmobie");
+        if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && $items[ninja rope,ninja carabiner,ninja crampons].available_amount() == 0 && !have_outfit_components("eXtreme Cold-Weather Gear"))
+            potential_targets.listAppend("ninja assassin");
+    }
     //FIXME witchess bishop or knight
     if (__iotms_usable[$item[Witchess Set]] && get_property_int("_witchessFights") < 5)
     {
@@ -98,7 +100,7 @@ void IOTMSourceTerminalGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     if (my_path_id() == PATH_NUCLEAR_AUTUMN)
         url = "place.php?whichplace=falloutshelter&action=vault_term";
     if (subentries.count() > 0)
-        optional_task_entries.listAppend(ChecklistEntryMake("__item source essence", url, subentries, 5));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item source essence", url, subentries, 5).ChecklistEntrySetIDTag("Source terminal task"));
 }
 
 RegisterResourceGenerationFunction("IOTMSourceTerminalGenerateResource");
@@ -305,5 +307,5 @@ void IOTMSourceTerminalGenerateResource(ChecklistEntry [int] resource_entries)
     if (my_path_id() == PATH_NUCLEAR_AUTUMN)
         url = "place.php?whichplace=falloutshelter&action=vault_term";
     if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake("__item source essence", url, subentries, 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item source essence", url, subentries, 5).ChecklistEntrySetIDTag("Source terminal resource"));
 }

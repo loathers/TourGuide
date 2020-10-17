@@ -4,13 +4,13 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	
 	if (__last_adventure_location == $location[The Daily Dungeon])
 	{
-		if ($item[ring of detect boring doors].equipped_amount() == 0 && $item[ring of detect boring doors].available_amount() > 0 && !get_property_boolean("dailyDungeonDone") && get_property_int("_lastDailyDungeonRoom") < 13)
+		if ($item[ring of detect boring doors].equipped_amount() == 0 && $item[ring of detect boring doors].available_amount() > 0 && !get_property_boolean("dailyDungeonDone") && get_property_int("_lastDailyDungeonRoom") < 10)
 		{
-			task_entries.listAppend(ChecklistEntryMake("__item ring of detect boring doors", "inventory.php?ftext=ring+of+detect+boring+doors", ChecklistSubentryMake("Wear ring of detect boring doors", "", "Speeds up daily dungeon"), -11));
+			task_entries.listAppend(ChecklistEntryMake("__item ring of detect boring doors", "inventory.php?ftext=ring+of+detect+boring+doors", ChecklistSubentryMake("Wear ring of detect boring doors", "", "Speeds up daily dungeon"), -11).ChecklistEntrySetIDTag("Daily dungeon detect boring door reminder"));
 		}
 		if (familiar_is_usable($familiar[gelatinous cubeling]) && ($item[pick-o-matic lockpicks].available_amount() == 0 || $item[eleven-foot pole].available_amount() == 0 || $item[Ring of Detect Boring Doors].available_amount() == 0)) //have familiar, but not the drops
 		{
-			task_entries.listAppend(ChecklistEntryMake("__familiar gelatinous cubeling", "", ChecklistSubentryMake("Use a gelatinous cubeling first", "", "You're adventuring in the daily dungeon without cubeling drops."), -11));
+			task_entries.listAppend(ChecklistEntryMake("__familiar gelatinous cubeling", "", ChecklistSubentryMake("Use a gelatinous cubeling first", "", "You're adventuring in the daily dungeon without cubeling drops."), -11).ChecklistEntrySetIDTag("Daily dungeon gelatinous cubeling drops reminder"));
 		}
 	}
 	
@@ -90,7 +90,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                     priority = 8;
                 }
 			
-				optional_task_entries.listAppend(ChecklistEntryMake("__familiar gelatinous cubeling", url, subentry, priority));
+				optional_task_entries.listAppend(ChecklistEntryMake("__familiar gelatinous cubeling", url, subentry, priority).ChecklistEntrySetIDTag("Daily dungeon gelatinous cubeling reminder"));
 			}
 		}
 		else
@@ -116,6 +116,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 				if (can_make_skeleton_key)
 				{
 					ChecklistEntry cl = ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Make a skeleton key", "", listMake("You have the ingredients.", "Speeds up the daily dungeon.")));
+					cl.tags.id = "Daily dungeon skeleton key reminder";
                     if (__last_adventure_location == $location[The Daily Dungeon])
                     {
                         cl.importance_level = -11;
@@ -132,7 +133,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     //Pop up a warning:
     if (__last_adventure_location == $location[the daily dungeon] && avoid_using_skeleton_key && $item[skeleton key].available_amount() > 0)
     {
-        task_entries.listAppend(ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Avoid using the skeleton key in the daily dungeon", "", listMake("Running low, will need one for the tower.")), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item skeleton key", "", ChecklistSubentryMake("Avoid using the skeleton key in the daily dungeon", "", listMake("Running low, will need one for the tower.")), -11).ChecklistEntrySetIDTag("Daily dungeon skeleton key avoid"));
     }
     
     if (get_property_int("_lastDailyDungeonRoom") > 0)
@@ -141,7 +142,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 	{
 		if (delay_daily_dungeon)
 		{
-			future_task_entries.listAppend(ChecklistEntryMake("daily dungeon", "da.php", ChecklistSubentryMake("Daily Dungeon", "", delay_daily_dungeon_reason), $locations[the daily dungeon]));
+			future_task_entries.listAppend(ChecklistEntryMake("daily dungeon", "da.php", ChecklistSubentryMake("Daily Dungeon", "", delay_daily_dungeon_reason), $locations[the daily dungeon]).ChecklistEntrySetIDTag("Daily dungeon later"));
 		}
 		else
 		{
@@ -215,7 +216,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             if (avoid_using_skeleton_key && $item[skeleton key].available_amount() > 0)
                 description.listAppend(HTMLGenerateSpanOfClass("Avoid using your skeleton key, you don't have many left.", "r_bold"));
 			
-			optional_task_entries.listAppend(ChecklistEntryMake("daily dungeon", url, ChecklistSubentryMake("Daily Dungeon", "", description), $locations[the daily dungeon]));
+			optional_task_entries.listAppend(ChecklistEntryMake("daily dungeon", url, ChecklistSubentryMake("Daily Dungeon", "", description), $locations[the daily dungeon]).ChecklistEntrySetIDTag("Daily dungeon today"));
 		}
 	}
 
@@ -236,20 +237,20 @@ void SDailyDungeonGenerateMissingItems(ChecklistEntry [int] items_needed_entries
         options.listAppend(from_daily_dungeon_string);
         if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
             options.listAppend("From key lime pie");
-        items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete\'s key", url, ChecklistSubentryMake("Sneaky Pete\'s key", "", options)));
+        items_needed_entries.listAppend(ChecklistEntryMake("__item Sneaky Pete\'s key", url, ChecklistSubentryMake("Sneaky Pete\'s key", "", options)).ChecklistEntrySetIDTag("Daily dungeon key sneaky_pete"));
     }
     if ($item[jarlsberg\'s key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Jarlsberg\'s key used"]) {
         string [int] options;
         options.listAppend(from_daily_dungeon_string);
         if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
             options.listAppend("From key lime pie");
-        items_needed_entries.listAppend(ChecklistEntryMake("__item jarlsberg's key", url, ChecklistSubentryMake("Jarlsberg's key", "", options)));
+        items_needed_entries.listAppend(ChecklistEntryMake("__item jarlsberg's key", url, ChecklistSubentryMake("Jarlsberg's key", "", options)).ChecklistEntrySetIDTag("Daily dungeon key jarlsberg"));
     }
     if ($item[Boris\'s key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Boris\'s key used"]) {
         string [int] options;
         options.listAppend(from_daily_dungeon_string);
         if (__misc_state_int["pulls available"] > 0 && __misc_state["can eat just about anything"])
             options.listAppend("From key lime pie");
-        items_needed_entries.listAppend(ChecklistEntryMake("__item Boris's key", url, ChecklistSubentryMake("Boris's key", "", options)));
+        items_needed_entries.listAppend(ChecklistEntryMake("__item Boris's key", url, ChecklistSubentryMake("Boris's key", "", options)).ChecklistEntrySetIDTag("Daily dungeon key boris"));
     }
 }

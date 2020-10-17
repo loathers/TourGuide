@@ -122,13 +122,16 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
     else
         subentry.entries.listAppend("There's also another unlock quest, but it's slower.");
     
+    ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=woods", subentry, $locations[the spooky forest]);
+    entry.tags.id = "Council spooky forest hidden temple"; //ich...
+    
     if (!__quest_state["Manor Unlock"].state_boolean["ballroom song effectively set"])
     {
-        subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
-        future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=woods", subentry, $locations[the spooky forest]));
+        entry.subentries[0].entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
+        future_task_entries.listAppend(entry);
     }
     else
     {
-        task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "place.php?whichplace=woods", subentry, , $locations[the spooky forest]));
+        task_entries.listAppend(entry);
     }
 }

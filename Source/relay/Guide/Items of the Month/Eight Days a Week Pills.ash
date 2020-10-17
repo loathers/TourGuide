@@ -31,6 +31,7 @@ void IOTMEightDaysAWeekPillsGenerateResource(ChecklistEntry [int] resource_entri
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Eight Days a Week Pill Keeper";
     entry.url = "main.php?eowkeeper=1";
+    entry.tags.id = "Pill keeper resource";
 
     ChecklistSubentry pills = getPills();
     if (pills.entries.count() > 0) {

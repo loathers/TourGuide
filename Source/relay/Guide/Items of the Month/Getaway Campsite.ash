@@ -13,7 +13,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Large +stat buff. Gaze at the stars.");
         if (firewood.have() || lookupItem("campfire smoke").have())
         	description.listAppend("If you don't see it, you could make and use campfire smoke first.");
-        resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake("Cloud-talk buff obtainable", "", description), 0).ChecklistEntryTagEntry("getaway campsite"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake("Cloud-talk buff obtainable", "", description), 0).ChecklistEntrySetCombinationTag("getaway campsite resources").ChecklistEntrySetIDTag("Getaway campsite cloud talk"));
     }
     if (smile_buffs_left > 0) { // && lookupEffect("That's Just Cloud-Talk, Man").have_effect() == 0)
         // Implementation of campSmile.ash by @fredg1
@@ -55,7 +55,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         
         description.listAppend("Will get: " + (my_sign() == buffCycle [todaysCycleNumber] ["name"] ? "Big " : "") + "Smile of the " + buffCycle [todaysCycleNumber] ["name"] + " (" + buffCycle [todaysCycleNumber] ["effect"] + ")");
 
-        resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake(pluralise(smile_buffs_left, "smile buff", "smile buffs") + " obtainable", "20 turns", description), 5).ChecklistEntryTagEntry("getaway campsite"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake(pluralise(smile_buffs_left, "smile buff", "smile buffs") + " obtainable", "20 turns", description), 5).ChecklistEntrySetCombinationTag("getaway campsite resources").ChecklistEntrySetIDTag("Getaway campsite sign smiles"));
     }
     if (firewood.have() && __misc_state["in run"]) {
     	string [int] description;
@@ -83,6 +83,6 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (various_options.count() > 0)
         	description.listAppend(various_options.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
-        resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "shop.php?whichshop=campfire", ChecklistSubentryMake(pluralise(firewood), "", description), 5).ChecklistEntryTagEntry("getaway campsite"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "shop.php?whichshop=campfire", ChecklistSubentryMake(pluralise(firewood), "", description), 5).ChecklistEntrySetCombinationTag("getaway campsite resources").ChecklistEntrySetIDTag("Getaway campsite firewood"));
     }
 }

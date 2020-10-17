@@ -6,7 +6,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
         return;
     if (pvp_attacks_left() > 0 && today_is_pvp_season_end())
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__effect Swordholder", "peevpee.php?place=fight", ChecklistSubentryMake("Run all of your fights", "", listMake("Season ends today.", "Make sure to get the seasonal item if you haven't, as well."))));
+        optional_task_entries.listAppend(ChecklistEntryMake("__effect Swordholder", "peevpee.php?place=fight", ChecklistSubentryMake("Run all of your fights", "", listMake("Season ends today.", "Make sure to get the seasonal item if you haven't, as well."))).ChecklistEntrySetIDTag("PVP season end"));
     }
     
     int [string] mini_names = current_pvp_stances();
@@ -535,6 +535,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     {
         entry.image_lookup_name = "__effect Swordholder";
         entry.url = "peevpee.php";
+        entry.tags.id = "PVP suggestions";
         entry.importance_level = 6;
         optional_task_entries.listAppend(entry);
     }

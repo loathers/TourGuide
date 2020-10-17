@@ -90,7 +90,7 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
                 break;
         }
         description.listAppend("Maybe " + suggestions.listJoinComponents(", ", "and") + ".");
-        optional_task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=edbase&action=edbase_book", ChecklistSubentryMake("Buy Undying skills", "", description), 11));
+        optional_task_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=edbase&action=edbase_book", ChecklistSubentryMake("Buy Undying skills", "", description), 11).ChecklistEntrySetIDTag("UNDYING path buy skills"));
     }
     
     if (my_level() >= 13 && QuestState("questL13Final").finished)
@@ -101,7 +101,7 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
             description.listAppend("Finishes the path.");
             if (availableSpleen() > 0)
                 description.listAppend("May want to fill your " + availableSpleen() + " extra spleen first.");
-            task_entries.listAppend(ChecklistEntryMake("Pyramid", "place.php?whichplace=edbase&action=edbase_altar", ChecklistSubentryMake("Put back the Holy MacGuffin", "", description), -10));
+            task_entries.listAppend(ChecklistEntryMake("Pyramid", "place.php?whichplace=edbase&action=edbase_altar", ChecklistSubentryMake("Put back the Holy MacGuffin", "", description), -10).ChecklistEntrySetIDTag("UNDYING path quest end path"));
         }
         else
         {
@@ -185,7 +185,7 @@ void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, Ch
             line += ".";
             description.listAppend(line);
             
-            task_entries.listAppend(ChecklistEntryMake("__item 2334", url, ChecklistSubentryMake("Retrieve the Holy MacGuffin", modifiers, description), $locations[The Secret Council Warehouse]));
+            task_entries.listAppend(ChecklistEntryMake("__item 2334", url, ChecklistSubentryMake("Retrieve the Holy MacGuffin", modifiers, description), $locations[The Secret Council Warehouse]).ChecklistEntrySetIDTag("UNDYING path quest final steps"));
         }
     }
 }
@@ -321,7 +321,7 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
         if (places_to_farm_ka.count() > 0)
             description.listAppend("Could farm ka in the " + places_to_farm_ka.listJoinComponents(", ", "or") + ".");
         
-        resource_entries.listAppend(ChecklistEntryMake("__item ka coin", url, ChecklistSubentryMake(ka.pluralise(), "", description), 6));
+        resource_entries.listAppend(ChecklistEntryMake("__item ka coin", url, ChecklistSubentryMake(ka.pluralise(), "", description), 6).ChecklistEntrySetIDTag("UNDYING path spend ka coin"));
     }
     
     if (true)
@@ -351,7 +351,7 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
             }
         }
         if (subentries.count() > 0)
-            resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 6));
+            resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 6).ChecklistEntrySetIDTag("UNDYING path ed special items resource"));
     }
     
     if ($skill[Lash of the cobra].have_skill() && mafiaIsPastRevision(15553))
@@ -382,7 +382,7 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
             else
                 description.listAppend("Steals a random item.");
                 
-            resource_entries.listAppend(ChecklistEntryMake("__item cool whip", "", ChecklistSubentryMake(pluralise(lashes_remaining, "lash", "lashes") + " of the cobra left", "", description), 6));
+            resource_entries.listAppend(ChecklistEntryMake("__item cool whip", "", ChecklistSubentryMake(pluralise(lashes_remaining, "lash", "lashes") + " of the cobra left", "", description), 6).ChecklistEntrySetIDTag("UNDYING path cobra lash resource"));
         }
     }
 }

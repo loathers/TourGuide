@@ -17,7 +17,7 @@ void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             description.listAppend("Choose one of:|*" + options.listJoinComponents("|*"));
         else
             description.listAppend(options.listJoinComponents("|"));
-        optional_task_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", "main.php?action=may4", ChecklistSubentryMake("Modify your lightsaber", "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", "main.php?action=may4", ChecklistSubentryMake("Modify your lightsaber", "", description), 8).ChecklistEntrySetIDTag("Fourth may saber daily upgrade"));
     }
 
 
@@ -27,7 +27,7 @@ void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         location [int] possible_appearance_locations = saber_monster.getPossibleLocationsMonsterCanAppearInNaturally().listInvert();
         
         if (fights_left > 0 && possible_appearance_locations.count() > 0)
-            optional_task_entries.listAppend(ChecklistEntryMake("__monster " + saber_monster, possible_appearance_locations[0].getClickableURLForLocation(), ChecklistSubentryMake("Fight " + pluralise(fights_left, "more " + saber_monster, "more " + saber_monster + "s"), "", "Will appear when you adventure in " + possible_appearance_locations.listJoinComponents(", ", "or") + "."), -1));
+            optional_task_entries.listAppend(ChecklistEntryMake("__monster " + saber_monster, possible_appearance_locations[0].getClickableURLForLocation(), ChecklistSubentryMake("Fight " + pluralise(fights_left, "more " + saber_monster, "more " + saber_monster + "s"), "", "Will appear when you adventure in " + possible_appearance_locations.listJoinComponents(", ", "or") + "."), -1).ChecklistEntrySetIDTag("Fourth may saber friend copies"));
     }
 }
 
@@ -54,7 +54,7 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
                 description.listAppend("Bonus! Use Meteor Shower + lightsaber skill to save a bunch of turns on weapon damage/spell damage/familiar weight tests.");
 
             //description.listAppend("Choose one of:|*" + options.listJoinComponents("|*"));
-            resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", url, ChecklistSubentryMake(uses_remaining.pluralise("force use", "forces uses"), "", description))); //"forces uses"? typo or reference/joke?
+            resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", url, ChecklistSubentryMake(uses_remaining.pluralise("force use", "forces uses"), "", description)).ChecklistEntrySetIDTag("Fourth may saber force resource")); //"forces uses"? typo or reference/joke?
         }
 
         if (true) {
@@ -65,7 +65,7 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
             else
                 description.listAppend("Rollover runaway-like/banish");
 
-            resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", "inventory.php?which=2", ChecklistSubentryMake("(up to) " + uses_remaining.pluralise("force banish", "forces banishes"), "", description)).ChecklistEntryTagEntry("banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", "inventory.php?which=2", ChecklistSubentryMake("(up to) " + uses_remaining.pluralise("force banish", "forces banishes"), "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Fourth may saber force banish"));
         }
     }
 }

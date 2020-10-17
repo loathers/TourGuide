@@ -20,7 +20,7 @@ void QMartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
 		return;
     if (!canadia_available())
         return;
-    if (__misc_state["in run"] && $location[the bugbear pen].turnsAttemptedInLocation() == 0)
+    if (__misc_state["in run"] && $location[The Edge of the Swamp].turnsAttemptedInLocation() == 0)
         return;
         
 	string url = "place.php?whichplace=marais";
@@ -115,7 +115,7 @@ void QMartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     relevant_locations[$location[Swamp Beaver Territory]] = true;
     relevant_locations[$location[The Weird Swamp Village]] = true;
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations).ChecklistEntrySetIDTag("Marty Canadia quest"));
     
     
 }

@@ -2,8 +2,7 @@
 RegisterTaskGenerationFunction("PathHeavyRainsGenerateTasks");
 void PathHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_HEAVY_RAINS)
-		return;
+    if (my_path_id() != PATH_HEAVY_RAINS) return;
     
     item thunder_item = $item[thunder thigh];
     item rain_item = $item[aquaconda brain];
@@ -161,15 +160,14 @@ void PathHeavyRainsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         }
         
         if (available_skill_types.count() > 0)
-            task_entries.listAppend(ChecklistEntryMake("__familiar personal raincloud", url, ChecklistSubentryMake("Learn " + available_skill_types.listJoinComponents(", ", "and") + " skills", "", description), -10));
+            task_entries.listAppend(ChecklistEntryMake("__familiar personal raincloud", url, ChecklistSubentryMake("Learn " + available_skill_types.listJoinComponents(", ", "and") + " skills", "", description), -10).ChecklistEntrySetIDTag("Heavy rains path new skills"));
     }
 }
 
 RegisterResourceGenerationFunction("PathHeavyRainsGenerateResource");
 void PathHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_HEAVY_RAINS)
-		return;
+    if (my_path_id() != PATH_HEAVY_RAINS) return;
     
     //resource_entries.listAppend(ChecklistEntryMake("__item gym membership card", "inventory.php?ftext=gym+membership+card", ChecklistSubentryMake(pluralise($item[gym membership card]), "", description), importance_level_item));
     
@@ -223,12 +221,12 @@ void PathHeavyRainsGenerateResource(ChecklistEntry [int] resource_entries)
             
             description.listAppend(pluralise(amount_to_make, it) + ": " + fishbone_item_descriptions[it]);
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item freshwater fishbone", "shop.php?whichshop=fishbones", ChecklistSubentryMake(pluralise($item[freshwater fishbone]), "", description), 7));
+        resource_entries.listAppend(ChecklistEntryMake("__item freshwater fishbone", "shop.php?whichshop=fishbones", ChecklistSubentryMake(pluralise($item[freshwater fishbone]), "", description), 7).ChecklistEntrySetIDTag("Heavy rains path fishbone shop"));
     }
     
     if ($item[catfish whiskers].available_amount() > 0)
     {
         //should we add in area suggestions?
-        resource_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?ftext=catfish+whiskers", ChecklistSubentryMake(pluralise($item[catfish whiskers]), "", "40 turns of -washaway"), 7));
+        resource_entries.listAppend(ChecklistEntryMake("__item catfish whiskers", "inventory.php?ftext=catfish+whiskers", ChecklistSubentryMake(pluralise($item[catfish whiskers]), "", "40 turns of -washaway"), 7).ChecklistEntrySetIDTag("Heavy rains path catfish whiskers resource"));
     }
 }

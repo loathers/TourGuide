@@ -19,7 +19,7 @@ void IOTMSpaceJellyfishGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             description.listAppend("Bring along your space jellyfish first.");
         }
         description.listAppend("Once/day.");
-        optional_task_entries.listAppend(ChecklistEntryMake("__familiar space jellyfish", url, ChecklistSubentryMake("Harvest sea jelly", "", description)));
+        optional_task_entries.listAppend(ChecklistEntryMake("__familiar space jellyfish", url, ChecklistSubentryMake("Harvest sea jelly", "", description)).ChecklistEntrySetIDTag("Space jellyfish sea jelly harvest"));
     }
 }
 
@@ -33,6 +33,7 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
     ChecklistEntry entry;
 	entry.url = "";
 	entry.image_lookup_name = "__familiar space jellyfish";
+    entry.tags.id = "Space jellyfish jelly extraction resource";
     entry.importance_level = 5;
     
     //_spaceJellyfishDrops
@@ -72,7 +73,7 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
         */
         if (get_property_int("_hotJellyUses") > 0)
         {
-            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise(get_property_int("_hotJellyUses"), "breathe out", "breathe outs"), "", "Cast Breathe Out. Free run/banish.")).ChecklistEntryTagEntry("banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise(get_property_int("_hotJellyUses"), "breathe out", "breathe outs"), "", "Cast Breathe Out. Free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Space jellyfish breathe out banish"));
         }
         
         string [item] jelly_descriptions;
@@ -88,7 +89,7 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
         }
         
         if ($item[hot jelly].available_amount() > 0 && in_ronin())
-            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise($item[hot jelly]), "", "Chew for free run/banish.")).ChecklistEntryTagEntry("banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise($item[hot jelly]), "", "Chew for free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Space jellyfish hot jelly banish"));
         
         
         

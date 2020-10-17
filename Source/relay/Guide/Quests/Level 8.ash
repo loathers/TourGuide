@@ -290,5 +290,5 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	
 	
 	
-	task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[itznotyerzitz mine,the goatlet, lair of the ninja snowmen, the extreme slope,mist-shrouded peak, itznotyerzitz mine (in disguise)]));
+	task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[itznotyerzitz mine,the goatlet, lair of the ninja snowmen, the extreme slope,mist-shrouded peak, itznotyerzitz mine (in disguise)]).ChecklistEntrySetIDTag("Council L8 trapper quest"));
 }

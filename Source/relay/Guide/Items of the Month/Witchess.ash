@@ -61,7 +61,7 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
         
         image_name = "__itemsize __monster Witchess Pawn";
         //subentries.listAppend(ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description));
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description)).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description)).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Witchess set free fights"));
     }
     if (!get_property_boolean("_witchessBuff") && mafiaIsPastRevision(16879) && !__misc_state["familiars temporarily blocked"] && $effect[puzzle champ].effect_is_usable())
     {
@@ -72,5 +72,5 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
         //resource_entries.listAppend(ChecklistEntryMake("__effect Puzzle Champ", "campground.php?action=witchess", ChecklistSubentryMake("Witchess buff", "", "+" + familiar_weight_modifier + " familiar weight. (25 turns)"), 4));
     }
     if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", subentries, 4));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", subentries, 4).ChecklistEntrySetIDTag("Witchess set resource"));
 }

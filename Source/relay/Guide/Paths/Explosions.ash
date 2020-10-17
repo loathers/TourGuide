@@ -7,11 +7,11 @@ void PathExplosionsGenerateResource(ChecklistEntry [int] resource_entries)
     item isotopes = lookupItem("rare Meat isotope");
     if (isotopes.have())
     {
-    	string [int] description;
+        string [int] description;
         int isotope_amount = isotopes.available_amount();
         if (isotope_amount >= 5)
         {
-        	description.listAppend("<strong>Space chowder</strong> - for eating or hippy-fighting war.");
+            description.listAppend("<strong>Space chowder</strong> - for eating or hippy-fighting war.");
             description.listAppend("<strong>Space wine</strong> - for drinking or frat-fighting war.");
         }
         if (isotope_amount >= 10 && !$item[antique accordion].have() && my_class() != $class[accordion thief])
@@ -27,6 +27,6 @@ void PathExplosionsGenerateResource(ChecklistEntry [int] resource_entries)
         //if (isotope_amount >= 10 && !lookupItem("low-pressure oxygen tank").have())
             //description.listAppend("<strong>low-pressure oxygen tank</strong> - prevents HP damage at end of fight, but you probably want to ignore this.");
             
-        resource_entries.listAppend(ChecklistEntryMake("__item rare Meat isotope", "shop.php?whichshop=exploathing", ChecklistSubentryMake(pluralise(isotopes), "", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item rare Meat isotope", "shop.php?whichshop=exploathing", ChecklistSubentryMake(pluralise(isotopes), "", description), 5).ChecklistEntrySetIDTag("Exploathing path rare meat isotope shop"));
     }
 }

@@ -77,6 +77,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	ChecklistEntry entry;
 	entry.url = "crypt.php";
 	entry.image_lookup_name = base_quest_state.image_name;
+	entry.tags.id = "Council L7 crypt cyrpt quest";
 	entry.should_indent_after_first_subentry = true;
 	entry.subentries.listAppend(ChecklistSubentryMake(base_quest_state.quest_name));
     entry.should_highlight = $locations[the defiled nook, the defiled cranny, the defiled alcove, the defiled niche, haert of the cyrpt] contains __last_adventure_location;

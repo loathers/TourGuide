@@ -3,13 +3,11 @@
 RegisterResourceGenerationFunction("PathSneakyPeteGenerateResource");
 void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785))
-		return;
+    if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785)) return;
     
     
-	ChecklistEntry entry;
-	entry.url = "";
-	entry.image_lookup_name = "";
+    ChecklistEntry entry;
+    entry.tags.id = "Sneaky Pete path skills resource";
     entry.importance_level = 1;
     
     if (true)
@@ -22,25 +20,24 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
         
         if ($skill[Peel Out].skill_is_usable() && free_peel_outs_available > 0)
         {
-            string [int] description;
-            
-            boolean is_banish = false;
-            if (get_property("peteMotorbikeMuffler") == "Extra-Smelly Muffler")
-            {
-                description.listAppend("Free runaway/banish in-combat.");
-                is_banish = true;
-            }
-            else
-                description.listAppend("Free runaway in-combat.");
-            
             if (entry.image_lookup_name.length() == 0)
                 entry.image_lookup_name = "__skill Easy Riding";
-        
-        	ChecklistSubentry subentry = ChecklistSubentryMake(pluralise(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", description);
-            if (is_banish)
-            	resource_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "", subentry).ChecklistEntryTagEntry("banish"));
+            
+            ChecklistSubentry subentry = ChecklistSubentryMake(pluralise(free_peel_outs_available, "peel out", "peel outs"), "10 MP/cast", listMakeBlankString());
+            
+            if (get_property("peteMotorbikeMuffler") == "Extra-Smelly Muffler")
+            {
+                subentry.entries.listAppend("Free runaway/banish in-combat.");
+                TagGroup tags;
+                tags.id = "Sneaky Pete path peel out banish";
+                tags.combination = "banish";
+                resource_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "", subentry, tags));
+            }
             else
-	            entry.subentries.listAppend(subentry);
+            {
+                subentry.entries.listAppend("Free runaway in-combat.");
+                entry.subentries.listAppend(subentry);
+            }
         }
     }
     
@@ -65,12 +62,12 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
         if (!have_outfit_components("Knob Goblin Elite Guard Uniform") && !have_outfit_components("Knob Goblin Harem Girl Disguise") && !__quest_state["Level 5"].finished)
             targets.listAppend("Harem Girl - disguise for quest. (20% drop)");
         
-		if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0 && $item[s.o.c.k.].available_amount() == 0)
-			targets.listAppend("Burly Sidekick (Mohawk wig) - speed up top floor of castle.");
+        if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0 && $item[s.o.c.k.].available_amount() == 0)
+            targets.listAppend("Burly Sidekick (Mohawk wig) - speed up top floor of castle.");
         if ($item[amulet of extreme plot significance].available_amount() == 0 && !__quest_state["Level 10"].finished && !$location[The Castle in the Clouds in the Sky (Ground floor)].locationAvailable() && $item[s.o.c.k.].available_amount() == 0)
-			targets.listAppend("Quiet Healer (amulet of extreme plot significance) - speed up castle basement.");
-		if (!__quest_state["Level 12"].state_boolean["Orchard Finished"])
-			targets.listAppend("Filthworms.");
+            targets.listAppend("Quiet Healer (amulet of extreme plot significance) - speed up castle basement.");
+        if (!__quest_state["Level 12"].state_boolean["Orchard Finished"])
+            targets.listAppend("Filthworms.");
             
         if (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 && $item[a-boo clue].available_amount() < 3)
             targets.listAppend("A-Boo Peak - a-boo clues. (15% drop)");
@@ -102,8 +99,7 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("PathSneakyPeteGenerateTasks");
 void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785))
-		return;
+    if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785)) return;
     
     
     if (true)
@@ -222,8 +218,7 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             description.listAppendList(upgrades);
 
 
-            optional_task_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "main.php?action=motorcycle", ChecklistSubentryMake("Upgrade your bike", "", description), 11));
-            
+            optional_task_entries.listAppend(ChecklistEntryMake("__skill Easy Riding", "main.php?action=motorcycle", ChecklistSubentryMake("Upgrade your bike", "", description), 11).ChecklistEntrySetIDTag("Sneaky Pete path upgrade motorcycle"));
         }
     }
     
@@ -260,7 +255,7 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
                 
             //description.listAppend("Potential options:|*|*|*+|*");
             description.listAppend("Potential options:|*" + options.listJoinComponents("|*"));
-            optional_task_entries.listAppend(ChecklistEntryMake("__skill Check Mirror", "skills.php", ChecklistSubentryMake("Check mirror", "", description), 11));
+            optional_task_entries.listAppend(ChecklistEntryMake("__skill Check Mirror", "skills.php", ChecklistSubentryMake("Check mirror", "", description), 11).ChecklistEntrySetIDTag("Sneaky Pete path mirror"));
         }
     }
     int audience_max = 30;
@@ -269,9 +264,9 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         audience_max = 50;
     }
     if ($skill[Throw Party].skill_is_usable() && my_audience() == audience_max && !get_property_boolean("_petePartyThrown"))
-        task_entries.listAppend(ChecklistEntryMake("__item party hat", "skills.php", ChecklistSubentryMake("Throw a party!", "", "Drinks."), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item party hat", "skills.php", ChecklistSubentryMake("Throw a party!", "", "Drinks."), -11).ChecklistEntrySetIDTag("Sneaky Pete path party andience"));
     if ($skill[Incite Riot].skill_is_usable() && my_audience() == -audience_max && !get_property_boolean("_peteRiotIncited"))
-        task_entries.listAppend(ChecklistEntryMake("__item fire", "skills.php", ChecklistSubentryMake("Incite a riot", "", "Breaking the law, breaking the law."), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item fire", "skills.php", ChecklistSubentryMake("Incite a riot", "", "Breaking the law, breaking the law."), -11).ChecklistEntrySetIDTag("Sneaky Pete path riot audience"));
     
     //sneakyPetePoints first
     int skills_available = MIN(30, MIN(15, my_level()) + get_property_int("sneakyPetePoints"));
@@ -288,6 +283,6 @@ void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     {
         string [int] description;
         description.listAppend("At least " + pluraliseWordy(skills_available - skills_have, "skill", "skills") + " available.");
-        optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11));
+        optional_task_entries.listAppend(ChecklistEntryMake("__skill Natural Dancer", "da.php?place=gate3", ChecklistSubentryMake("Buy Sneaky Pete skills", "", description), 11).ChecklistEntrySetIDTag("Sneaky Pete path new skills"));
     }
 }

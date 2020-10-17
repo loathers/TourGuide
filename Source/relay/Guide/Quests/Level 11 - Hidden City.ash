@@ -33,7 +33,16 @@ void QLevel11HiddenCityInit() {
         }
     }
     
+    int lianas_left;
+    foreach shrine in $locations[a massive ziggurat,an overgrown shrine (northwest),an overgrown shrine (southwest),an overgrown shrine (northeast),an overgrown shrine (southeast)] {
+        lianas_left += 3 - shrine.numberOfDenseLianaFoughtInShrine();
+    }
+    state.state_int["lianas left"] = lianas_left;
+    
     if (get_property_int("hiddenBowlingAlleyProgress") >= 1 && get_property_int("hiddenHospitalProgress") >= 1 && get_property_int("hiddenApartmentProgress") >= 1 && get_property_int("hiddenOfficeProgress") >= 1 && $location[a massive Ziggurat].numberOfDenseLianaFoughtInShrine() >= 3 && state.mafia_internal_step >= 4)
+        state.state_int["lianas left"] = 0;
+
+    if (state.state_int["lianas left"] == 0)
         state.state_boolean["need machete for liana"] = false;
     
     if (!__misc_state["can equip just about any weapon"]) {
@@ -94,6 +103,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     ChecklistEntry entry;
     entry.url = "place.php?whichplace=hiddencity";
     entry.image_lookup_name = base_quest_state.image_name;
+    entry.tags.id = "Council L11 quest hidden city";
     entry.should_indent_after_first_subentry = true;
     entry.should_highlight = $locations[the hidden temple, the hidden apartment building, the hidden hospital, the hidden office building, the hidden bowling alley, the hidden park, a massive ziggurat,an overgrown shrine (northwest),an overgrown shrine (southwest),an overgrown shrine (northeast),an overgrown shrine (southeast)] contains __last_adventure_location;
     

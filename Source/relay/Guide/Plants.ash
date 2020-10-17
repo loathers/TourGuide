@@ -279,15 +279,12 @@ void generateFloristFriar(Checklist [int] checklists)
         string image_name = plant.image_lookup_name;
 		if (subentry.entries.count() > 0)
         {
-            if (false)
-                florist_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=forestvillage&amp;action=fv_friar", subentry));
-            else
-                subentries.listAppend(subentry);
+            subentries.listAppend(subentry);
         }
 	}
     if (subentries.count() > 0)
     {
-        florist_entries.listAppend(ChecklistEntryMake("plant up sea daisy", "place.php?whichplace=forestvillage&amp;action=fv_friar", subentries));
+        florist_entries.listAppend(ChecklistEntryMake("plant up sea daisy", "place.php?whichplace=forestvillage&amp;action=fv_friar", subentries).ChecklistEntrySetIDTag("Florist friar plant reminder"));
     }
 	
 	checklists.listAppend(ChecklistMake("Florist Friar", florist_entries));

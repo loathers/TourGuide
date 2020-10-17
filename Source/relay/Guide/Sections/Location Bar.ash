@@ -121,22 +121,22 @@ buffer generateLocationBar(boolean displaying_navbar)
     if (l == $location[domed city of ronaldus])
     {
         int ronald_phase = moon_phase() % 8;
-        if (ronald_phase == 4)
-            custom_location_information = "30% aliens";
-        else if (ronald_phase < 2 || ronald_phase > 6)
+        int ronald_darkness = abs(ronald_phase - 4);
+        int ronald_light = 4 - ronald_darkness;
+        if (ronald_light < 2)
             custom_location_information = "No aliens";
         else
-            custom_location_information = "15% aliens";
+            custom_location_information = (ronald_light * 8) + "% aliens";
     }
     else if (l == $location[domed city of grimacia])
     {
         int grimace_phase = moon_phase() / 2;
-        if (grimace_phase == 4)
-            custom_location_information = "30% aliens";
-        else if (grimace_phase < 2 || grimace_phase > 6)
+        int grimace_darkness = abs(grimace_phase - 4);
+        int grimace_light = 4 - grimace_darkness;
+        if (grimace_light < 2)
             custom_location_information = "No aliens";
         else
-            custom_location_information = "15% aliens";
+            custom_location_information = (grimace_light * 8) + "% aliens";
     }
     else if (l == $location[a-boo peak])
     {
@@ -224,7 +224,7 @@ buffer generateLocationBar(boolean displaying_navbar)
         custom_location_information = pluralise(__quest_state["Level 12"].state_int["frat boys left on battlefield"], "frat boy", "frat boys");
     else if (l == $location[the battlefield (frat uniform)])
         custom_location_information = pluralise(__quest_state["Level 12"].state_int["hippies left on battlefield"], "hippy", "hippies");
-    else if ($locations[The Briny Deeps,The Brinier Deepers,The Briniest Deepests,An Octopus's Garden,The Wreck of the Edgar Fitzsimmons,Madness Reef,The Mer-Kin Outpost,The Skate Park,The Coral Corral,Mer-kin Colosseum,Mer-kin Library,Mer-kin Gymnasium,Mer-kin Elementary School,The Marinara Trench,Anemone Mine,The Dive Bar,The Caliginous Abyss] contains l || (l == $location[The Ice Hole] && l != $location[none]))
+    else if (l.environment == "underwater")
     {
         Error error;
         float pressure_penalty = l.pressurePenaltyForLocation(error);
@@ -358,10 +358,12 @@ buffer generateLocationBar(boolean displaying_navbar)
             location_data.listAppend(pluralise(turns_spent, "turn", "turns"));
     }
     
-    //easy list:
-    //FIXME just use that test instead?
+    //easy list: $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents,fernswarthy's basement]
     //ashq foreach l in $locations[] if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0) print(l);
-    boolean [location] nc_blacklist = $locations[Pump Up Muscle,Pump Up Mysticality,Pump Up Moxie,The Shore\, Inc. Travel Agency,Goat Party,Pirate Party,Lemon Party,The Roulette Tables,The Poker Room,Anemone Mine (Mining),The Knob Shaft (Mining),Friar Ceremony Location,Itznotyerzitz Mine (in Disguise),The Prince's Restroom,The Prince's Dance Floor,The Prince's Kitchen,The Prince's Balcony,The Prince's Lounge,The Prince's Canapes table,Portal to Terrible Parents,fernswarthy's basement];
+    boolean [location] nc_blacklist = {$location[fernswarthy's basement]:true};
+    foreach l in $locations[]
+        if (l.appearance_rates().count() == 1 && l.appearance_rates()[$monster[none]] == 100.0)
+            nc_blacklist[l] = true;
     
     if ((my_buffedstat($stat[moxie]) < average_ml || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) && sample_count > 0 && __misc_state["in run"] && monster_level_adjustment() < 100)
     {

@@ -70,5 +70,5 @@ void QOldLandfillGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     }
 	
     
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the old landfill]));
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[the old landfill]).ChecklistEntrySetIDTag("Old landfill hippy quest"));
 }

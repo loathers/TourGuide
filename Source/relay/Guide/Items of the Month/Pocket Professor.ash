@@ -55,7 +55,7 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
         int ml = numeric_modifier('monster level');
         int muscle = my_buffedstat($stat[muscle]);
         int defense = clampi(muscle + add, 0, cap) + ml;
-        int hp = floor(0.75 * defense);
+        int hp = max(floor(0.75 * defense), 1);
         int adventures = thesisAdventures(hp);
         string description = name + " (" + adventures + " advs";
         if (adventures < 11 && cap + ml >= 1296 / .75) {
@@ -108,6 +108,7 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__familiar pocket professor";
+    entry.tags.id = "Pocket professor familiar resource";
 
     ChecklistSubentry lectures = getLecture();
     if (lectures.entries.count() > 0) {

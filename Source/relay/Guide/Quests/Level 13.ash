@@ -1284,7 +1284,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             //trophies_are_possible = true; //Gourdcore, Golden Meat Stack
         
         if (trophies_are_possible)
-            task_entries.listAppend(ChecklistEntryMake("__item puzzling trophy", "trophy.php", ChecklistSubentryMake("Check for trophies", "10k meat, trophy requirements", "Certain trophies are missable after freeing the king")));
+            task_entries.listAppend(ChecklistEntryMake("__item puzzling trophy", "trophy.php", ChecklistSubentryMake("Check for trophies", "10k meat, trophy requirements", "Certain trophies are missable after freeing the king")).ChecklistEntrySetIDTag("Path end trophies"));
 		should_output_main_entry = false;
         
         
@@ -1292,7 +1292,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             if (availableDrunkenness() > 0)
             {
-                task_entries.listAppend(ChecklistEntryMake("__item gibson", "inventory.php?which=1", ChecklistSubentryMake("Drink " + availableDrunkenness() + " drunkenness", "", "Freeing the king reduces your liver capacity.")));
+                task_entries.listAppend(ChecklistEntryMake("__item gibson", "inventory.php?which=1", ChecklistSubentryMake("Drink " + availableDrunkenness() + " drunkenness", "", "Freeing the king reduces your liver capacity.")).ChecklistEntrySetIDTag("Path end max liver usage"));
             }
         }
         
@@ -1301,13 +1301,13 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($skill[rain dance].skill_is_usable() && my_rain() >= 10)
             {
                 int times = floor(my_rain().to_float() / 10.0);
-                task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluraliseWordy(times, "time", "times"), "", "+20% item buff for aftercore.")));
+                task_entries.listAppend(ChecklistEntryMake("__effect Rain Dancin'", "skills.php", ChecklistSubentryMake("Cast Rain Dance " + pluraliseWordy(times, "time", "times"), "", "+20% item buff for aftercore.")).ChecklistEntrySetIDTag("Path end rain dance"));
             }
         }
         
         if ($item[Yearbook Club Camera].available_amount() > 0 && $item[Yearbook Club Camera].equipped_amount() == 0)
         {
-            task_entries.listAppend(ChecklistEntryMake("__item yearbook club camera", "inventory.php?ftext=yearbook+club+camera", ChecklistSubentryMake("Equip the yearbook club camera", "", "Before prism break. Otherwise, it'll disappear.")));
+            task_entries.listAppend(ChecklistEntryMake("__item yearbook club camera", "inventory.php?ftext=yearbook+club+camera", ChecklistSubentryMake("Equip the yearbook club camera", "", "Before prism break. Otherwise, it'll disappear.")).ChecklistEntrySetIDTag("Path end yearbook camera"));
         }
 		
 	}
@@ -1572,5 +1572,5 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	}*/
 
 	if (should_output_main_entry)
-		task_entries.listAppend(ChecklistEntryMake(image_name, url, subentries));
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, subentries).ChecklistEntrySetIDTag("Council L13 quest"));
 }

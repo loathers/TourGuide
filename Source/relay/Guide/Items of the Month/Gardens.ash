@@ -12,6 +12,8 @@ void generateGardenEntry(ChecklistEntry [int] resource_entries, boolean [item] g
     if (subentries.count() > 0)
     {
         ChecklistSubentry subentry = subentries[subentries.count() - 1]; //hacky
+        TagGroup tags;
+        tags.id = "Campground garden possible creations"; //differenciate by "kind of garden" ?
         
         
         int [item] creatable_items = garden_creatable_items.creatable_items();

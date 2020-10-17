@@ -172,8 +172,6 @@ void SSweetSynthesisGenerateResource(ChecklistEntry [int] resource_entries)
     int setting_maximum_display_limit = 2;
     
     
-    string [int] description;
-    
     string [int][int] table;
     //table.listAppend(listMake(HTMLGenerateSpanOfClass("Effect", "r_bold"), HTMLGenerateSpanOfClass("Candies", "r_bold")));
     
@@ -294,6 +292,10 @@ void SSweetSynthesisGenerateResource(ChecklistEntry [int] resource_entries)
             //table.listAppend(listMake(__sweet_synthesis_buff_descriptions[e], line));
         }
     }
+    
+    if (table_lines.count() == 0)
+        return;
+    
     string [int] building_line;
     foreach key in table_lines
     {
@@ -307,10 +309,12 @@ void SSweetSynthesisGenerateResource(ChecklistEntry [int] resource_entries)
     if (building_line.count() > 0)
         table.listAppend(building_line);
     int estimated_margin = approximate_line_count * 1.2;
-    //description.listAppend("Costs one spleen and two candies.");
-    description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateTagWrap("span",HTMLGenerateSimpleTableLines(table, false), mapMake("class", "r_tooltip_inner_class r_tooltip_inner_class_margin", "style", "margin-top:-" + estimated_margin + "em;margin-left:-5em;")) + "Costs one spleen and two candies.", "r_tooltip_outer_class"));
     
+    ChecklistSubentry subentry = ChecklistSubentryMake("Sweet Synthesis Buff", "30 turns", "Costs one spleen and two candies.");
+    //ChecklistSubentry subentry = ChecklistSubentryMake("Sweet Synthesis Buff", "30 turns", HTMLGenerateSpanOfClass(HTMLGenerateTagWrap("span", table.HTMLGenerateSimpleTableLines(false), mapMake("class", "r_tooltip_inner_class r_tooltip_inner_class_margin", "style", "margin-top:-" + estimated_margin + "em;margin-left:-5em;")) + "Costs one spleen and two candies.", "r_tooltip_outer_class"));
+    ChecklistEntry entry = ChecklistEntryMake("__skill Sweet Synthesis", "runskillz.php?action=Skillz&whichskill=166&targetplayer=" + my_id() + "&pwd=" + my_hash() + "&quantity=1", subentry, 10);
+    entry.tags.id = "Sweet synthesis skill";
+    entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Sweet Synthesis Buff", "30 turns", table.HTMLGenerateSimpleTableLines(false)));
     
-    if (table.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake("__skill Sweet Synthesis", "runskillz.php?action=Skillz&whichskill=166&targetplayer=" + my_id() + "&pwd=" + my_hash() + "&quantity=1", ChecklistSubentryMake("Sweet Synthesis Buff", "30 turns", description), 10));
+    resource_entries.listAppend(entry);
 }

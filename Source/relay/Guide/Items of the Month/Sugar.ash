@@ -20,6 +20,8 @@ void IOTMSugarGenerateResource(ChecklistEntry [int] resource_entries)
         sugar_crafted_items.listAppend(i.to_item());
     }
     ChecklistSubentry [int] subentries;
+    TagGroup tags;
+    tags.id = "Sugar sheet folding resource";
     
     string image_name = "";
     

@@ -44,7 +44,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (potential_targets.count() > 0)
             description.listAppend("Possibly a " + potential_targets.listJoinComponents(", ", "or") + ".");
         
-		optional_task_entries.listAppend(ChecklistEntryMake(familiar_image, url, ChecklistSubentryMake(title, "", description), 6));
+		optional_task_entries.listAppend(ChecklistEntryMake(familiar_image, url, ChecklistSubentryMake(title, "", description), 6).ChecklistEntrySetIDTag("Romantic-like familiar copy make"));
 	}
     
     
@@ -76,7 +76,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
                 else
                     description = "Switch to Crimbo Shrub first.|" + description;
             }
-            optional_task_entries.listAppend(ChecklistEntryMake("__item dense meat stack", url, ChecklistSubentryMake(title, "", description), 6));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item dense meat stack", url, ChecklistSubentryMake(title, "", description), 6).ChecklistEntrySetIDTag("Crimbo shrub familiar big red present"));
         }
     }
 }
@@ -91,19 +91,6 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
     familiar relevant_familiar = $familiar[Ms. Puck Man];
     if (!relevant_familiar.familiar_is_usable() && $familiar[Puck Man].familiar_is_usable())
         relevant_familiar = $familiar[Puck Man];
-    if ($item[power pill].available_amount() > 0)
-    {
-        string header = $item[power pill].pluralise().capitaliseFirstLetter();
-        int power_pill_uses_left = clampi(20 - get_property_int("_powerPillUses"), 0, 20);
-        if (power_pill_uses_left < $item[power pill].available_amount())
-        {
-            if (power_pill_uses_left == 0)
-                header += " (not usable today)";
-            else
-                header += " (" + power_pill_uses_left + " usable today)";
-        }
-        resource_entries.listAppend(ChecklistEntryMake("__item power pill", "", ChecklistSubentryMake(header, "", "Use in combat to instakill without costing a turn.")).ChecklistEntryTagEntry("free instakill"));
-    }
     if ($familiar[Ms. Puck Man].familiar_is_usable() || $familiar[Puck Man].familiar_is_usable())
     {
         int power_pills_remaining = MAX(0, MIN(11, my_daycount() + 1) - get_property_int("_powerPillDrops"));
@@ -120,6 +107,20 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(line);
             
             puck_subentries.listAppend(ChecklistSubentryMake(pluralise(power_pills_remaining, "power pill", "power pills") + " obtainable", "", description));
+        }
+        
+        if ($item[power pill].available_amount() > 0)
+        {
+            string header = $item[power pill].pluralise().capitaliseFirstLetter();
+            int power_pill_uses_left = clampi(20 - get_property_int("_powerPillUses"), 0, 20);
+            if (power_pill_uses_left < $item[power pill].available_amount())
+            {
+                if (power_pill_uses_left == 0)
+                    header += " (not usable today)";
+                else
+                    header += " (" + power_pill_uses_left + " usable today)";
+            }
+            resource_entries.listAppend(ChecklistEntryMake("__item power pill", "", ChecklistSubentryMake(header, "", "Use in combat to instakill without costing a turn.")).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Puck man familiar power pill free kill"));
         }
     }
     if (yellow_pixel != $item[none] && yellow_pixel.available_amount() > 0 && in_ronin())
@@ -198,7 +199,7 @@ void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
     }
     if (puck_subentries.count() > 0)
     {
-        resource_entries.listAppend(ChecklistEntryMake("__familiar " + relevant_familiar, url, puck_subentries, 9));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar " + relevant_familiar, url, puck_subentries, 9).ChecklistEntrySetIDTag("Puck man familiar resource"));
     }
 
 }
@@ -239,7 +240,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
                 description.listAppend("Sugar shield available (+2 runs)");
         }
 			
-		resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(name, "", description)));
+		resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(name, "", description)).ChecklistEntrySetIDTag("Bander-like familiar free run"));
 	}
 	
 	if (true)
@@ -278,7 +279,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 			int importance = 0;
             if (!__misc_state["in run"])
                 importance = 6;
-			resource_entries.listAppend(ChecklistEntryMake(hipster_image, url, ChecklistSubentryMake(name, "", description), importance));
+			resource_entries.listAppend(ChecklistEntryMake(hipster_image, url, ChecklistSubentryMake(name, "", description), importance).ChecklistEntrySetIDTag("Hipster-like familiar hipster fights"));
 		}
 	}
 	
@@ -303,7 +304,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 		if (__misc_state["have muscle class combat skill"])
         {
         	if (tag_with_banish_tag)
-            	resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", "", ChecklistSubentryMake("Nanorhino Banish", "", description_banish)).ChecklistEntryTagEntry("banish"));
+            	resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", "", ChecklistSubentryMake("Nanorhino Banish", "", description_banish)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Nanorhino familiar banish"));
             else
 				subentries.listAppend(ChecklistSubentryMake("Nanorhino Banish", "", description_banish));
         }
@@ -317,11 +318,11 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
                 subentries.listAppend(ChecklistSubentryMake("Nanorhino Yellow Ray", "", "Cast moxie combat skill."));
         }
 		if (subentries.count() > 0)
-			resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", url, subentries, 5));
+			resource_entries.listAppend(ChecklistEntryMake("__familiar nanorhino", url, subentries, 5).ChecklistEntrySetIDTag("Nanorhino familiar use charge"));
 	}
-	if (__misc_state["yellow ray available"] && !__misc_state["in run"])
+	if (__misc_state["yellow ray available"] && !__misc_state["in run"]) //in-run version in Misc Tasks.ash
     {
-        resource_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Yellow ray available", "", "From " + __misc_state_string["yellow ray source"] + "."), 6));
+        resource_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Yellow ray available", "", "From " + __misc_state_string["yellow ray source"] + "."), 6).ChecklistEntrySetIDTag("Yellow-ray resource"));
     }
     
     if (my_familiar() == $familiar[happy medium] || $familiar[happy medium].charges > 0 && $familiar[happy medium].familiar_is_usable()) //|| stuff
@@ -364,7 +365,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
         int importance = 6;
         if (my_familiar() == $familiar[happy medium] || charges > 0)
             importance = 0;
-        resource_entries.listAppend(ChecklistEntryMake("__familiar happy medium", url, ChecklistSubentryMake(title, "", description), importance));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar happy medium", url, ChecklistSubentryMake(title, "", description), importance).ChecklistEntrySetIDTag("Happy medium familiar siphon"));
     }
     if (my_familiar() == $familiar[steam-powered cheerleader] || $familiar[steam-powered cheerleader].familiar_is_usable() && get_property_int("_cheerleaderSteam") < 200)
     {
@@ -426,7 +427,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
             url = "familiar.php";
         
         
-        resource_entries.listAppend(ChecklistEntryMake("__familiar steam-powered cheerleader", url, ChecklistSubentryMake(title, "", description), importance));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar steam-powered cheerleader", url, ChecklistSubentryMake(title, "", description), importance).ChecklistEntrySetIDTag("Steam-powered cheerleader familiar steam"));
     }
     
     if ($familiar[grim brother].familiar_is_usable() && !get_property_boolean("_grimBuff") && __misc_state["in run"]) //in aftercore, let the maximizer handle it?
@@ -439,7 +440,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
         
         description.listAppend("30 turns of +20% init or +HP/MP or +damage.");
         int importance = 9;
-        resource_entries.listAppend(ChecklistEntryMake("__familiar grim brother", url, ChecklistSubentryMake(title, "", description), importance));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar grim brother", url, ChecklistSubentryMake(title, "", description), importance).ChecklistEntrySetIDTag("Grim brother familiar buff"));
     }
     
     
@@ -451,10 +452,10 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 
 void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_familiar() == $familiar[none] && !__misc_state["single familiar run"] && !__misc_state["familiars temporarily blocked"])
+	if (my_familiar() == $familiar[none] && !__misc_state["single familiar run"] && !__misc_state["familiars temporarily blocked"] && !($locations[The Bandit Crossroads,The Towering Mountains,The Mystic Wood,The Putrid Swamp,The Cursed Village,The Sprawling Cemetery,The Old Rubee Mine,The Foreboding Cave,The Faerie Cyrkle,The Druidic Campsite,Near the Witch's House,The Evil Cathedral,The Barrow Mounds,The Cursed Village Thieves' Guild,The Troll Fortress,The Labyrinthine Crypt,The Lair of the Phoenix,The Dragon's Moor,Duke Vampire's Chateau,The Master Thief's Chalet,The Spider Queen's Lair,The Archwizard's Tower,The Ley Nexus,The Ghoul King's Catacomb,The Ogre Chieftain's Keep] contains __last_adventure_location))
 	{
 		string image_name = "black cat";
-		optional_task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "")));
+		optional_task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "")).ChecklistEntrySetIDTag("Bring familiar reminder"));
 	}
     
     if ($familiar[Crimbo Shrub].familiar_is_usable())
@@ -493,7 +494,7 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             if ($item[box of old Crimbo decorations].available_amount() > 0)
                 url = "inv_use.php?pwd=" + my_hash() + "&whichitem=7958";
             
-            optional_task_entries.listAppend(ChecklistEntryMake("__item box of old Crimbo decorations", url, ChecklistSubentryMake("Configure your Crimbo Shrub", "", description), 6));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item box of old Crimbo decorations", url, ChecklistSubentryMake("Configure your Crimbo Shrub", "", description), 6).ChecklistEntrySetIDTag("Crimbo shrub familiar decorate"));
         }
         /*
         shrubGarland(user, now 'PvP', default )

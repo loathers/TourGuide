@@ -106,6 +106,7 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
             output_buffer.append(" ");
         }
         output_buffer.append(info.item_name);
+        output_buffer.append("</span>");
         
         string [int] secondary_line;
         if (info.should_display_drop_base)
@@ -137,7 +138,6 @@ buffer createItemInformationTableMethod2(int columns, LBPItemInformation [int] i
             output_buffer.append(HTMLGenerateTagSuffix(wrap_type));
         }
         
-        output_buffer.append("</span>");
         output_buffer.append("</div>");
     }
     output_buffer.append("</div>"); //row
@@ -219,6 +219,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
 
             float effective_drop_rate = adjusted_base_drop_rate;
             float item_modifier = l.item_drop_modifier_for_location();
+            Error error;
             if (it.fullness > 0 || (__items_that_craft_food contains it))
             {
                 item_modifier += numeric_modifier("Food Drop");
@@ -272,6 +273,10 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             if (it == $item[black picnic basket] && $skill[Bear Essence].have_skill())
             {
                 item_modifier += 20.0 * MAX(1, get_property_int("skillLevel134"));
+            }
+            if (l.environment == "underwater") //FIXME underwater drops are complicated and I'd have to look deeply into this to verify
+            {
+                //item_modifier -= l.pressurePenaltyForLocation(error); //pressure is actually already included in item_drop_modifier_for_location()
             }
             if (item_is_pickpockable_only)
             {
@@ -336,7 +341,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             effective_drop_rate = clampf(floor(effective_drop_rate), 0.0, 100.0);
             adjusted_base_drop_rate = effective_drop_rate;
             
-            if (l.environment == "underwater") //FIXME underwater drops are complicated and I'd have to look deeply into this to verify, so we just list a ? for now
+            if (error.was_error)
                 adjusted_base_drop_rate = -1;
         }
 
@@ -359,7 +364,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             else if (adjusted_base_drop_rate < 100 || base_drop_rate < 100)
             {
                 info.should_display_drop_current = true;
-                if (drop_rate_is_guess)
+                if (drop_rate_is_guess || l.environment == "underwater")
                     info.item_drop_current_information = adjusted_base_drop_rate + "?%";
                 else
                     info.item_drop_current_information = adjusted_base_drop_rate + "%";
@@ -422,7 +427,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
         int maximum_columns = 2;
         if (items_presenting.count() >= 7 || monsters_to_display_items_minimally.count() >= 5) //hippy camp
             maximum_columns = 3;
-        output_buffer.append(createItemInformationTableMethod2(MIN(columns, maximum_columns), items_presenting, want_item_minimal_display, "r_only_display_if_not_large r_only_display_if_not_medium r_do_not_display_if_media_queries_unsupported", "")); //font-size:0.95em;
+        output_buffer.append(createItemInformationTableMethod2(MIN(columns, maximum_columns), items_presenting, want_item_minimal_display, "r_only_display_if_not_large r_only_display_if_not_medium", "")); //font-size:0.95em;
     }
     output_buffer.append("</div>"); //container
     
@@ -653,21 +658,21 @@ static
 buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_location_name_is_centre_aligned)
 {
     buffer buf;
+    if (!__setting_enable_location_popup_box)
+        return buf;
     location l = __last_adventure_location;
     if (!__setting_location_bar_uses_last_location && !get_property_boolean("_relay_guide_setting_ignore_next_adventure_for_location_bar") && get_property_location("nextAdventure") != $location[none])
         l = get_property_location("nextAdventure");
-    if (!__setting_enable_location_popup_box)
-        return buf;
     
     string transition_time = "0.5s";
-    buf.append(HTMLGenerateTagWrap("div", "", mapMake("id", "r_location_popup_blackout", "style", "position:fixed;z-index:5;width:100%;height:100%;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;visibility:hidden;")));
+    buf.append(HTMLGenerateTagWrap("div", "", mapMake("id", "r_location_popup_blackout", "style", "position:fixed;z-index:6;width:100%;height:100%;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;visibility:hidden;")));
     
     
-    buf.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_location_popup_box", "style", "height:auto;transition:bottom " + transition_time + ";z-index:5;opacity:0;pointer-events:none;bottom:-10000px", "class", "r_bottom_outer_container")));
+    buf.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_location_popup_box", "style", "height:auto;transition:bottom " + transition_time + ";z-index:6;opacity:0;pointer-events:none;bottom:-10000px", "class", "r_bottom_outer_container")));
     buf.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_bottom_inner_container", "style", "background:white;height:auto;")));
     
-    float [monster] appearance_rates_adjusted = l.appearance_rates_adjusted();
-    float [monster] appearance_rates_next_turn = l.appearance_rates(true);
+    float [monster] appearance_rates_adjusted = l.appearance_rates_adjusted(false).appearance_rates_cancel_nc();
+    float [monster] appearance_rates_next_turn = l.appearance_rates_adjusted(true).appearance_rates_cancel_nc();
     
     string [monster] monsters_that_we_cannot_encounter;
     if ($effect[Ancient Annoying Serpent Poison].have_effect() == 0)
@@ -720,7 +725,20 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         }
         else if (evilness > 0)
         {
-            foreach m in $monsters[spiny skelelton,toothy sklelton]
+            foreach m in $monsters[spiny skelelton,toothy sklelton,party skelteon]
+                monsters_that_we_cannot_encounter[m] = "boss up";
+        }
+    }
+    else if (l == $location[the defiled alcove])
+    {
+        int evilness = __quest_state["Level 7"].state_int["alcove evilness"];
+        if (evilness > 25)
+        {
+            monsters_that_we_cannot_encounter[$monster[conjoined zmombie]] = "evilness too high";
+        }
+        else if (evilness > 0)
+        {
+            foreach m in $monsters[grave rober zmobie,corpulent zobmie,modern zmobie]
                 monsters_that_we_cannot_encounter[m] = "boss up";
         }
     }
@@ -742,7 +760,6 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 monsters_that_we_cannot_encounter[m] = "ML based";
         }
     }
-    //FIXME other defileds
     
     boolean banishes_are_possible = true;
     if ($locations[the secret government laboratory,sloppy seconds diner] contains l)
@@ -752,28 +769,8 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     
     foreach m in appearance_rates_next_turn
     {
-        if (monsters_that_we_cannot_encounter contains m)// || m.is_banished())
+        if (monsters_that_we_cannot_encounter contains m)
             remove appearance_rates_next_turn[m];
-    }
-    //l.appearance_rates(true) doesn't seem to take into account banished monsters, so correct:
-    appearance_rates_next_turn[$monster[none]] = 0.0; //ignore
-    float arnt_sum = 0.0;
-    foreach m, rate in appearance_rates_next_turn
-    {
-        if (m.is_banished() && banishes_are_possible)
-            appearance_rates_next_turn[m] = MIN(appearance_rates_next_turn[m], 0.0);
-        else if (rate > 0.0)
-            arnt_sum += appearance_rates_next_turn[m];
-    }
-    if (arnt_sum != 100.0 && arnt_sum != 0.0)
-    {
-        float inverse = 1.0 / (arnt_sum / 100.0);
-        
-        foreach m, rate in appearance_rates_next_turn
-        {
-            if (rate > 0.0)
-                appearance_rates_next_turn[m] *= inverse;
-        }
     }
     
     monster [int] monster_display_order;
@@ -790,7 +787,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         if (rate <= 0.0 && l == $location[Investigating a Plaintive Telegram])
             continue;
         monster_display_order.listAppend(m);
-        if (rate > 0.0 && m != $monster[none])
+        if (rate > 0.0)
         {
             if (last_rate == -1.0)
                 last_rate = rate;
@@ -800,7 +797,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             }
         }
         
-        if (next_rate > 0.0 && m != $monster[none])
+        if (next_rate > 0.0)
         {
             if (last_next_rate == -1.0)
                 last_next_rate = next_rate;
@@ -856,14 +853,6 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         }
     }*/
     
-    float rate_nc_cancel_multiplier = 1.0;
-    if (appearance_rates_adjusted[$monster[none]] > 0.0)
-    {
-        float divisor = (1.0 - appearance_rates_adjusted[$monster[none]] / 100.0);
-        if (divisor != 0.0)
-            rate_nc_cancel_multiplier = 1.0 / divisor;
-    }
-    
     boolean [monster] monsters_to_display_items_minimally;
     int item_minimal_display_limit = 6;
     foreach key, m in monster_display_order
@@ -894,8 +883,8 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         if (m.image.length() == 0)
             monster_image_url = "";
         ServerImageStats monster_image_stats = ServerImageStatsOfImageURL(monster_image_url);
-        float rate = appearance_rates_adjusted[m] * rate_nc_cancel_multiplier;
-        float next_rate = appearance_rates_next_turn[m]; //already normalised for monsters
+        float rate = appearance_rates_adjusted[m];
+        float next_rate = appearance_rates_next_turn[m];
         if (entries_displayed > 0)
             buf.append(HTMLGenerateTagPrefix("hr", mapMake("style", "margin:0px;")));
         entries_displayed += 1;
@@ -904,9 +893,9 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         boolean avoid_outputting_conditional = false;
         boolean monster_cannot_be_encountered = false;
         string reason_monster_cannot_be_encountered = "";
-        if (m.is_banished() && banishes_are_possible)
+        if (rate == -3.0 && banishes_are_possible) //-3.0 => is (properly) banished
         {
-            monster_cannot_be_encountered = m.is_banished();
+            monster_cannot_be_encountered = true;
             reason_monster_cannot_be_encountered = "banished";
         }
         else if (monsters_that_we_cannot_encounter contains m)
@@ -922,8 +911,8 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         }
         if (true)
         {
-            //string style = "width:100%;display:table;padding:0.25em;z-index:7;position:relative;overflow:hidden;";
-            string style = "width:100%;padding-bottom:0.1em;z-index:7;position:relative;overflow:hidden;";
+            //string style = "width:100%;display:table;padding:0.25em;z-index:8;position:relative;overflow:hidden;";
+            string style = "width:100%;padding-bottom:0.1em;z-index:8;position:relative;overflow:hidden;";
             if (try_for_minimal_display)
                 style += "padding-top:0.1em;";
             if (monster_cannot_be_encountered)
@@ -1014,47 +1003,13 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         
         //FIXME handle canceling NC
         buffer rate_buffer;
-        if (m.is_banished() && banishes_are_possible)
-        {
-            rate_buffer.append("banished");
-            Banish banish_information = m.BanishForMonster();
-            if (banish_information.banish_source != "")
-            {
-                rate_buffer.append(" by ");
-                rate_buffer.append(banish_information.banish_source);
-            }
-            if (banish_information.custom_reset_conditions != "")
-            {
-                rate_buffer.append(" until ");
-                rate_buffer.append(banish_information.custom_reset_conditions);
-            }
-            else if (banish_information.banish_turn_length == -1)
-                rate_buffer.append(" forever");
-            else if (banish_information.banish_turn_length > 0)
-            {
-                int turns_left = banish_information.BanishTurnsLeft();
-                rate_buffer.append(" for ");
-                rate_buffer.append(pluralise(turns_left, "more turn", "more turns"));
-            }
-            rate_buffer.append(" ");
-            avoid_outputting_conditional = true;
-        }
-        else if (m.attributes.contains_text("SEMIRARE"))
-        {
+        if (m.attributes.contains_text("SEMIRARE"))
             rate_buffer.append("semi-rare ");
-            avoid_outputting_conditional = true;
-        }
         else if (m.attributes.contains_text("ULTRARARE"))
-        {
             rate_buffer.append("ultra rare ");
-            avoid_outputting_conditional = true;
-        }
         else if (m.boss)
-        {
             rate_buffer.append("boss ");
-            avoid_outputting_conditional = true;
-        }
-        if (rate > 0 && !(m.is_banished() && banishes_are_possible) && !monster_cannot_be_encountered)
+        else if (rate > 0 && !monster_cannot_be_encountered)
         {
             if (!rates_are_equal)
             {
@@ -1071,7 +1026,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 rate_buffer.append("%");
             }
         }
-        else if (rate <= 0)
+        else if (rate <= 0 && !(m.is_banished() && banishes_are_possible))
         {
             if (possible_alien_monsters contains m)
                 rate_buffer.append("elsewhere");
@@ -1081,6 +1036,50 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         //seen values for rate:
         //0.0 for bosses
         //-1.0 for ultra-rares
+        //-3.0 for (properly) banished
+        if (m.is_banished() && banishes_are_possible)
+        {
+            Banish banish_information = m.BanishForMonster();
+            if (rate == -3.0)
+            {
+                rate_buffer.append("banished");
+                if (banish_information.banish_source != "")
+                {
+                    rate_buffer.append(" by ");
+                    rate_buffer.append(banish_information.banish_source);
+                }
+                if (banish_information.custom_reset_conditions != "")
+                {
+                    rate_buffer.append(" until ");
+                    rate_buffer.append(banish_information.custom_reset_conditions);
+                }
+                else if (banish_information.banish_turn_length == -1)
+                    rate_buffer.append(" forever");
+                else if (banish_information.banish_turn_length > 0)
+                {
+                    int turns_left = banish_information.BanishTurnsLeft();
+                    rate_buffer.append(" for ");
+                    rate_buffer.append(pluralise(turns_left, "more turn", "more turns"));
+                }
+            }
+            else if (rate > 0.0)
+            {
+                //monster was banished, but they are olfacting it (only base copies of the monsters are removed by banishes)
+                if (!rates_are_equal || !next_rates_are_equal)
+                    rate_buffer.append("<br>");
+                rate_buffer.append("banished");
+                if (banish_information.banish_source != "")
+                {
+                    rate_buffer.append(" by ");
+                    rate_buffer.append(banish_information.banish_source);
+                }
+                //want to avoid cluttering, so don't show until when
+                rate_buffer.append("<br>");
+                rate_buffer.append("brought back by copies".HTMLGenerateSpanOfClass("r_element_important"));
+                
+            }
+            rate_buffer.append(" ");
+        }
         
         if (rate_buffer.length() > 0)
         {
@@ -1126,10 +1125,12 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             if (m.max_meat > 0)
             {
                 float average_meat = (m.min_meat + m.max_meat) * 0.5;
-                average_meat *= (1.0 + meat_drop_modifier() / 100.0);
+                Error error;
+                // float pressure_penalty = l.environment == "underwater" ? -l.pressurePenaltyForLocation(error) : 0.0; //already accounted for in meat_drop_modifier()
+                average_meat *= 1.0 + meat_drop_modifier() / 100.0;
                 if (average_meat >= 25) //ignore really low amounts
                 {
-                    if (l.environment == "underwater") //FIXME calculate this properly
+                    if (error.was_error)
                         stats_l1.listAppend("? meat");
                     else
                         stats_l1.listAppend(average_meat.round() + " meat");

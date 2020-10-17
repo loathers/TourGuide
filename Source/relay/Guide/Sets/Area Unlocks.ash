@@ -67,6 +67,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 		}
 		
         ChecklistEntry entry = ChecklistEntryMake("__item bitchin' meatcar", url, subentry, relevant_locations);
+        entry.tags.id = "Area unlock desert beach";
         if (optional)
             optional_task_entries.listAppend(entry);
         else
@@ -155,7 +156,9 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             else if (url == "")
                 url = "place.php?whichplace=woods";
             line_string += ".";
-            if (my_path_id() != PATH_NUCLEAR_AUTUMN)
+            if (my_path_id() == PATH_LOW_KEY_SUMMER)
+                line_string += " (need to go there anyway)";
+            else if (my_path_id() != PATH_NUCLEAR_AUTUMN)
                 line_string += " (probably slower?)";
             subentry.entries.listAppend(line_string);
         }
@@ -173,6 +176,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         
         
 		ChecklistEntry entry = ChecklistEntryMake("__item dingy dinghy", url, subentry, $locations[the shore\, inc. travel agency]);
+        entry.tags.id = "Area unlock mysterious island";
         if (my_path_id() == PATH_COMMUNITY_SERVICE)
         	optional_task_entries.listAppend(entry);
         else

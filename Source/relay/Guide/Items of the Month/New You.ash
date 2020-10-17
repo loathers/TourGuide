@@ -42,11 +42,11 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
             ChecklistSubentry subentry = ChecklistSubentryMake(pluralise(it), "100 turns, " + affirmation_effects[it], combat_text);
             if (it == lookupItem("Daily Affirmation: Think Win-Lose"))
             {
-            	resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry).ChecklistEntryTagEntry("free instakill"));
+            	resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("New you affirmation win-lose free kill"));
             }
             else if (it == lookupItem("Daily Affirmation: Be a Mind Master"))
             {
-                resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry).ChecklistEntryTagEntry("banish"));
+                resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("New you affirmation mind master banish"));
             }
             else
 	            entry.subentries.listAppend(subentry);
@@ -54,6 +54,7 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
         if (entry.subentries.count() > 0)
         {
             entry.url = "inventory.php?ftext=daily+affirmation";
+            entry.tags.id = "New you affirmation resource";
             entry.importance_level = 6;
             resource_entries.listAppend(entry);
         }

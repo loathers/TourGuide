@@ -14,7 +14,7 @@ void IOTMVotingBootGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             description.listAppend("Gives special modifiers, and unlocks three free fights to burn delay.");
         else
             description.listAppend("Gives special modifiers.");
-        optional_task_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", "place.php?whichplace=town_right&action=townright_vote", ChecklistSubentryMake("Vote!", "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", "place.php?whichplace=town_right&action=townright_vote", ChecklistSubentryMake("Vote!", "", description), 8).ChecklistEntrySetIDTag("Voting booth daily ballot"));
         return;
     }
     
@@ -41,9 +41,9 @@ void IOTMVotingBootGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             string title = "Fight voting monster";
             if (fighting_monster != $monster[none])
                 title += " " + fighting_monster;
-            task_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", url, ChecklistSubentryMake(title, "", description), -11));
+            task_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", url, ChecklistSubentryMake(title, "", description), -11).ChecklistEntrySetIDTag("Voting booth voting monster now"));
         } else {
-            optional_task_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", "", ChecklistSubentryMake("Voting monster after " + pluralise(turns_before_vote_fight, "More Turn", "more turns") + "", "", "Free fight to burn delay with (" + vote_free_fights_left + " left)."), 10));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", "", ChecklistSubentryMake("Voting monster after " + pluralise(turns_before_vote_fight, "More Turn", "more turns") + "", "", "Free fight to burn delay with (" + vote_free_fights_left + " left)."), 10).ChecklistEntrySetIDTag("Voting booth voting monster reminder")); //merge those two? or give the player the choice, at least?
         }
     }
 
@@ -57,7 +57,7 @@ void IOTMVotingBootGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             url = "inventory.php?ftext=i+voted!";
         }
         description.listAppend("Adventure in the sonofa beach, macrometeorite the " + (fighting_monster == $monster[none] ? "voting monster" : fighting_monster.to_string()) + ", and you'll get a lobsterfrogman.");
-        task_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", url, ChecklistSubentryMake(title, "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", url, ChecklistSubentryMake(title, "", description), -11).ChecklistEntrySetIDTag("Voting booth LFM wanderer-switch-copy trick"));
         
     }
 }
@@ -69,6 +69,6 @@ void IOTMVotingBootGenerateResource(ChecklistEntry [int] resource_entries)
     
     int vote_free_fights_left = 3 - get_property_int("_voteFreeFights");
     if (get_property_int("_voteFreeFights") < 3) {
-        resource_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", "", ChecklistSubentryMake(pluralise(vote_free_fights_left, "voting monster", "voting monsters"), "", "Free fight."), 8).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", "", ChecklistSubentryMake(pluralise(vote_free_fights_left, "voting monster", "voting monsters"), "", "Free fight."), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Voting booth voting monster free fight"));
     }
 }

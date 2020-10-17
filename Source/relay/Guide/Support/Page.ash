@@ -57,7 +57,9 @@ buffer CSSBlockGenerate(CSSBlock block)
             if (entry.class_name == "")
                 result.append(entry.tag + " { " + entry.definition + " }");
             else
-                result.append(entry.tag + "." + entry.class_name + " { " + entry.definition + " }");
+            {
+                result.append(entry.tag + ( entry.class_name.char_at(0) != "#" && entry.class_name.char_at(0) != "." ? "." : "") + entry.class_name + " { " + entry.definition + " }");
+            }
             result.append("\n");
         }
         if (output_identifier)
@@ -329,10 +331,7 @@ void PageInit()
 
 string HTMLGenerateIndentedText(string text, string width)
 {
-	if (__use_table_based_layouts) //table-based layout
-		return "<table cellpadding=0 cellspacing=0 width=100%><tr>" + HTMLGenerateTagWrap("td", "", mapMake("style", "width:" + width + ";")) + "<td>" + text + "</td></tr></table>";
-	else //div-based layout:
-		return HTMLGenerateDivOfClass(text, "r_indention");
+	return HTMLGenerateDivOfClass(text, "r_indention");
 }
 
 string HTMLGenerateIndentedText(string [int] text)
@@ -364,92 +363,47 @@ string HTMLGenerateSimpleTableLines(string [int][int] lines, boolean dividers_ar
 		max_columns = max(max_columns, lines[i].count());
 	}
 	
-	if (__use_table_based_layouts)
-	{
-		//table-based layout:
-		result.append("<table style=\"margin-right: 10px; width:100%;\" cellpadding=0 cellspacing=0>");
-	
-	
-        int intra_i = 0;
-		foreach i in lines
-		{
-            if (intra_i > 0)
-            {
-                result.append("<tr><td colspan=1000><hr></td></tr>");
-            }
-			result.append("<tr>");
-			int intra_j = 0;
-			foreach j in lines[i]
-			{
-				string entry = lines[i][j];
-				result.append("<td align=");
-				if (false && max_columns == 1)
-					result.append("center");
-				else if (intra_j == 0)
-					result.append("left");
-				else
-					result.append("right");
-				if (lines[i].count() < max_columns && intra_j == lines[i].count() - 1)
-				{
-					int calculated_colspan = max_columns - lines[i].count() + 1;
-					result.append(" colspan=" + calculated_colspan);
-				}
-				result.append(">");
-				result.append(entry);
-				result.append("</td>");
-				intra_j += 1;
-			}
-			result.append("</tr>");
-            intra_i += 1;
-		}
-	
-	
-		result.append("</table>");
-	}
-	else
-	{
-		//div-based layout:
-        int intra_i = 0;
-        int last_cell_count = 0;
-        result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container")));
-		foreach i in lines
-		{
-            if (intra_i > 0)
-            {
-                result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
-                for i from 1 to last_cell_count //no colspan with display:table, generate extra (zero-padding, zero-margin) cells:
-                {
-                    string separator = "";
-                    if (dividers_are_visible)
-                        separator = "<hr>";
-                    else
-                        separator = "<hr style=\"opacity:0\">"; //laziness - generate an invisible HR, so there's still spacing
-                    result.append(HTMLGenerateDivOfClass(separator, "r_stl_entry"));
-                }
-                result.append("</div>");
-                last_cell_count = 0;
-            }
+    //div-based layout:
+    int intra_i = 0;
+    int last_cell_count = 0;
+    result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container")));
+    foreach i in lines
+    {
+        if (intra_i > 0)
+        {
             result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
-            int intra_j = 0;
-			foreach j in lines[i]
-			{
-				string entry = lines[i][j];
-                if (intra_j > 0)
-                {
-                    result.append(HTMLGenerateDivOfClass("", "r_stl_entry r_stl_spacer"));
-                    last_cell_count += 1;
-                }
-				result.append(HTMLGenerateDivOfClass(entry, "r_stl_entry"));
-                last_cell_count += 1;
-                
-                intra_j += 1;
-			}
-			
+            for i from 1 to last_cell_count //no colspan with display:table, generate extra (zero-padding, zero-margin) cells:
+            {
+                string separator = "";
+                if (dividers_are_visible)
+                    separator = "<hr>";
+                else
+                    separator = "<hr style=\"opacity:0\">"; //laziness - generate an invisible HR, so there's still spacing
+                result.append(HTMLGenerateDivOfClass(separator, "r_stl_entry"));
+            }
             result.append("</div>");
-            intra_i += 1;
-		}
+            last_cell_count = 0;
+        }
+        result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_stl_container_row")));
+        int intra_j = 0;
+        foreach j in lines[i]
+        {
+            string entry = lines[i][j];
+            if (intra_j > 0)
+            {
+                result.append(HTMLGenerateDivOfClass("", "r_stl_entry r_stl_spacer"));
+                last_cell_count += 1;
+            }
+            result.append(HTMLGenerateDivOfClass(entry, "r_stl_entry"));
+            last_cell_count += 1;
+            
+            intra_j += 1;
+        }
+        
         result.append("</div>");
-	}
+        intra_i += 1;
+    }
+    result.append("</div>");
 	return result.to_string();
 }
 

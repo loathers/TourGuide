@@ -37,7 +37,7 @@ void IOTMBarrelGodGenerateResource(ChecklistEntry [int] resource_entries)
         if (buff_description != "")
             description.listAppend(buff_description.capitaliseFirstLetter() + " buff for 50 turns." + ($item[map to the Biggest Barrel].available_amount() == 0 && (my_daycount() >= 7 || !in_ronin()) ? "|Might give the map to the Biggest Barrel." : ""));
         
-        resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake("barrel god", "da.php?barrelshrine=1", ChecklistSubentryMake("Barrel worship", "", description), 8).ChecklistEntrySetIDTag("Barrel God resource"));
     }
     
     item [int] barrels_around;
@@ -79,6 +79,6 @@ void IOTMBarrelGodGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             description.listAppend(line);
         }
         description.listAppend("Can only be fought once a day, until defeated.");
-        optional_task_entries.listAppend(ChecklistEntryMake("barrel god", "inventory.php?ftext=map+to+the+Biggest+Barrel", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake("barrel god", "inventory.php?ftext=map+to+the+Biggest+Barrel", ChecklistSubentryMake("Defeat the Barrelmech", "", description), 8).ChecklistEntrySetIDTag("Barrel god biggest fight"));
     }
 }

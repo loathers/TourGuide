@@ -201,7 +201,7 @@ void PathCommunityServiceGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         
         
         description.listAppend(pluralise(turns, "turn", "turns") + ".");
-        task_entries.listAppend(ChecklistEntryMake(image_name, "council.php", ChecklistSubentryMake(service_name, modifiers, description)));
+        task_entries.listAppend(ChecklistEntryMake(image_name, "council.php", ChecklistSubentryMake(service_name, modifiers, description)).ChecklistEntrySetIDTag("Community service path " + service_lookup_name));
     }
     //equaliser potions
     /*if (true)

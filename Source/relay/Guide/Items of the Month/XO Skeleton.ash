@@ -10,6 +10,7 @@ void IOTMXOSkeletonGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	ChecklistEntry entry;
 	entry.image_lookup_name = "__familiar xo skeleton";
+	entry.tags.id = "XO skeleton familiar resource";
 	entry.importance_level = 3;
 	if (my_familiar() != lookupFamiliar("XO Skeleton"))
 		entry.url = "familiar.php";

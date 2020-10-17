@@ -1,7 +1,7 @@
 
 void QManorInit()
 {
-	QuestState state;
+    QuestState state;
     
     
     state.state_boolean["need ballroom song set"] = false;
@@ -50,49 +50,49 @@ void QManorInit()
     
     
     
-	if (locationAvailable($location[the haunted ballroom]) && !(state.state_boolean["need ballroom song set"] || state.state_boolean["ballroom needs delay burned"]))
-		QuestStateParseMafiaQuestPropertyValue(state, "finished");
-	else
+    if (locationAvailable($location[the haunted ballroom]) && !(state.state_boolean["need ballroom song set"] || state.state_boolean["ballroom needs delay burned"]))
+        QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    else
     {
-		QuestStateParseMafiaQuestPropertyValue(state, "started");
+        QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
     if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-	state.quest_name = "Spookyraven Manor Unlock";
-	state.image_name = "Spookyraven Manor";
+    state.quest_name = "Spookyraven Manor Unlock";
+    state.image_name = "Spookyraven Manor";
     
-	
-	/*location zone_to_work_on = $location[none];
-	if (!locationAvailable($location[the haunted billiards room]))
-	{
-		zone_to_work_on = $location[the haunted billiards room];
-	}
-	else if (!locationAvailable($location[the haunted library]))
-	{
-		zone_to_work_on = $location[the haunted library];
-	}
-	else if (!locationAvailable($location[the haunted bedroom]))
-	{
-		zone_to_work_on = $location[the haunted bedroom];
-	}
-	else if (!locationAvailable($location[the haunted ballroom]))
-	{
-		zone_to_work_on = $location[the haunted ballroom];
-	}
-	state.state_string["zone to work on"] = zone_to_work_on;*/
-	
-	__quest_state["Manor Unlock"] = state;
+    
+    /*location zone_to_work_on = $location[none];
+    if (!locationAvailable($location[the haunted billiards room]))
+    {
+        zone_to_work_on = $location[the haunted billiards room];
+    }
+    else if (!locationAvailable($location[the haunted library]))
+    {
+        zone_to_work_on = $location[the haunted library];
+    }
+    else if (!locationAvailable($location[the haunted bedroom]))
+    {
+        zone_to_work_on = $location[the haunted bedroom];
+    }
+    else if (!locationAvailable($location[the haunted ballroom]))
+    {
+        zone_to_work_on = $location[the haunted ballroom];
+    }
+    state.state_string["zone to work on"] = zone_to_work_on;*/
+    
+    __quest_state["Manor Unlock"] = state;
 }
 
 
 void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__quest_state["Manor Unlock"].in_progress && __misc_state["in run"])
-		return;
+    if (!__quest_state["Manor Unlock"].in_progress && __misc_state["in run"])
+        return;
     if (my_level() < 5 && my_ascensions() == 0 && !QuestState("questM21Dance").in_progress) return; //not yet possible
     
     boolean should_output_optionally = false;
     boolean should_output_futurally = false;
-	QuestState base_quest_state = __quest_state["Manor Unlock"];
+    QuestState base_quest_state = __quest_state["Manor Unlock"];
     
     boolean [location] relevant_locations = $locations[the haunted kitchen, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom, the haunted gallery, the haunted bathroom];
     //$locations[the haunted kitchen, the haunted library, the haunted billiards room, the haunted bedroom, the haunted ballroom];
@@ -100,14 +100,14 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     
     if (!__misc_state["in run"] && !(relevant_locations contains __last_adventure_location))
         return;
-	ChecklistSubentry subentry;
-	//subentry.header = "Unlock Spookyraven Manor";
+    ChecklistSubentry subentry;
+    //subentry.header = "Unlock Spookyraven Manor";
     
     //This is currently very incomplete, sorry.
-	
-	string url = "";
-	
-	string image_name;
+    
+    string url = "";
+    
+    string image_name;
     
     boolean ballroom_probably_open = false;
     if ($location[the haunted ballroom].turnsAttemptedInLocation() > 0)
@@ -307,6 +307,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                         
                     subentries2.listAppend(ChecklistSubentryMake("Burn " + pluralise($location[the haunted ballroom].delayRemainingInLocation(), "turn", "turns") + " delay in haunted ballroom", modifiers2, ""));
                     ChecklistEntry entry2 = ChecklistEntryMake("__half Haunted Ballroom", $location[the haunted ballroom].getClickableURLForLocation(), subentries2, $locations[the haunted ballroom]);
+                    entry2.tags.id = "Manor spookyraven ballroom delay";
                     entry2.importance_level = 5;
                     optional_task_entries.listAppend(entry2);
                     //subentry.header = ;
@@ -354,12 +355,11 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
             should_output_futurally = true;
         }*/
         
-        float drawers_per_turn = 0.0;
-        float hot_resistance = numeric_modifier("hot resistance");
-        float stench_resistance = numeric_modifier("stench resistance");
+        float hot_resistance = MIN(numeric_modifier("hot resistance"), 9.0);
+        float stench_resistance = MIN(numeric_modifier("stench resistance"), 9.0);
         
-        int more_hot_needed = MAX(0, 9 - hot_resistance.to_int());
-        int more_stench_needed = MAX(0, 9 - stench_resistance.to_int());
+        int more_hot_needed = 9 - hot_resistance.to_int();
+        int more_stench_needed = 9 - stench_resistance.to_int();
         
         
         string [int] needed_resists;
@@ -370,29 +370,40 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         
         //subentry.entries.listAppend("Run 9 " + HTMLGenerateSpanOfClass("hot", "r_element_hot") + " resistance and " + HTMLGenerateSpanOfClass("stench", "r_element_stench") + " resistance to search faster.");
         
-        drawers_per_turn = 0.5 * MIN(4.0, MAX(1.0, 1.0 + hot_resistance / 3.0)) + 0.5 * MIN(4.0, MAX(1.0, 1.0 + stench_resistance / 3.0));
-        drawers_per_turn = MAX(1.0, drawers_per_turn); //zero-divide safety backup
+        float drawers_per_turn = 1.0 + MAX(hot_resistance / 6.0, 0.0) + MAX(stench_resistance / 6.0, 0.0);
         
         float drawers_needed = MAX(0, 21 - get_property_int("manorDrawerCount"));
         
         int total_turns = ceil(drawers_needed / drawers_per_turn) + 1;
         
-        if (needed_resists.count() > 0 && total_turns > 1)
-            subentry.entries.listAppend("Run " + needed_resists.listJoinComponents(", ", "and") + " to search faster.");
-        subentry.entries.listAppend(drawers_per_turn.roundForOutput(1) + " drawers searched per turn.|~" + pluralise(total_turns, "turn", "turns") + " remaining.");
-        
-		if (__misc_state["have hipster"])
-			subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
-        if (total_turns > 1)
-        {
-            subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("hot res", "r_element_hot_desaturated"));
-            subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("stench res", "r_element_stench_desaturated"));
+        if (drawers_needed == 0.0)
+            subentry.entries.listAppend("Find the key next turn.");
+        else {
+            string line;
+            if (hot_resistance <= 0 && stench_resistance <= 0)
+                line = "1 drawer"; //roundForOutput returns a string, incompatible with pluralise()
+            else
+                line = drawers_per_turn.roundForOutput(1) + " drawers";
+            line += " searched per turn.|";
+            
+            if (drawers_needed > drawers_per_turn.floor()) {
+                subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("hot res", "r_element_hot_desaturated"));
+                subentry.modifiers.listAppend(HTMLGenerateSpanOfClass("stench res", "r_element_stench_desaturated"));
+                
+                line += "~";
+                if (needed_resists.count() > 0) {
+                    subentry.entries.listAppend("Run " + needed_resists.listJoinComponents(", ", "and") + " to search faster.");
+                    if (!__misc_state["familiars temporarily blocked"] && $familiar[exotic parrot].familiar_is_usable() && my_familiar() != $familiar[exotic parrot])
+                        subentry.entries.listAppend("Possibly bring along your exotic parrot.");
+                }
+            }
+            
+            line += total_turns + " turns remaining.";
+            subentry.entries.listAppend(line);
         }
         
-        if (!__misc_state["familiars temporarily blocked"] && $familiar[exotic parrot].familiar_is_usable() && my_familiar() != $familiar[exotic parrot] && (hot_resistance < 9.0 || stench_resistance < 9.0) && total_turns > 1)
-        {
-            subentry.entries.listAppend("Possibly bring along your exotic parrot.");
-        }
+        if (__misc_state["have hipster"])
+            subentry.modifiers.listAppend(__misc_state_string["hipster name"]);
         
         if (inebriety_limit() > 10 && my_inebriety() < 10)
             subentry.entries.listAppend("Try not to drink past ten, the billiards room is next.");
@@ -523,11 +534,12 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         }
         
     }
-	if (subentry.header != "")
+    if (subentry.header != "")
     {
         if (image_name.length() == 0)
             image_name = base_quest_state.image_name;
         ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, relevant_locations);
+        entry.tags.id = "Manor spookyraven quest";
         if (should_output_futurally)
             future_task_entries.listAppend(entry);
         else if (should_output_optionally)

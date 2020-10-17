@@ -78,5 +78,5 @@ void QMeatsmithGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     relevant_locations[$location[the skeleton store]] = true;
     
     if (have_reason_to_add)
-        optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, relevant_locations));
+        optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, relevant_locations).ChecklistEntrySetIDTag("Meatsmith skeleton store quest"));
 }

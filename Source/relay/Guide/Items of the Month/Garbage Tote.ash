@@ -24,7 +24,7 @@ void IOTMGarbageToteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         	description.listAppend("Broken champagne bottle (double +item for " + pluralise(get_property_int("garbageChampagneCharge"), "more turn", "more turns") + ".)");
         
         
-        optional_task_entries.listAppend(ChecklistEntryMake("__item January's Garbage Tote", "inv_use.php?pwd=" + my_hash() + "&whichitem=9690", ChecklistSubentryMake("Collect a garbage tote item", "", description), 1));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item January's Garbage Tote", "inv_use.php?pwd=" + my_hash() + "&whichitem=9690", ChecklistSubentryMake("Collect a garbage tote item", "", description), 1).ChecklistEntrySetIDTag("Garbage tote should switch item"));
 	}
 }
 
@@ -58,6 +58,7 @@ void IOTMGarbageToteGenerateResource(ChecklistEntry [int] resource_entries)
 	ChecklistEntry entry;
 	entry.url = "inv_use.php?pwd=" + my_hash() + "&whichitem=9690";
 	entry.importance_level = 8;
+    entry.tags.id = "Garbage tote items resource";
 	
     boolean outdatedGarbage = !get_property_boolean("_garbageItemChanged");
 
@@ -85,7 +86,7 @@ void IOTMGarbageToteGenerateResource(ChecklistEntry [int] resource_entries)
         if (entry.image_lookup_name == "")
 	        entry.image_lookup_name = "__item " + it;
 		entry.subentries.listAppend(ChecklistSubentryMake(title, "", description));   
-        //resource_entries.listAppend(ChecklistEntryMake("__item " + it, url, ChecklistSubentryMake(title, "", description), 8));
+        //resource_entries.listAppend(ChecklistEntryMake("__item " + it, url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntrySetIDTag("Garbage tote items resource"));
 	}
 	if (entry.subentries.count() > 0)
 		resource_entries.listAppend(entry);

@@ -65,28 +65,14 @@ buffer generateNavbar(Checklist [int] ordered_output_checklists)
                 navbar.append(HTMLGenerateDivOfClass("", "r_navbar_line_separator"));
             
             string text_div = HTMLGenerateDivOfClass(title, "r_navbar_text");
-            if (__use_table_based_layouts)
-            {
-                //Vertical centring with tables:
-                navbar.append("<table style=\"border-spacing:0px;margin-left:auto;margin-right:auto;height:100%;\"><tr><td style=\"vertical-align:middle;\">");
-                navbar.append(text_div);
-                navbar.append("</td></tr></table>");
-            }
-            else if (true)
+            if (true)
             {
                 //Vertical centring with divs:
                 //Which is to... tell the browser to act like a table.
                 //Sorry.
                 navbar.append(HTMLGenerateTagPrefix("div", mapMake("style", "padding-left:1px;padding-right:1px;margin-left:auto;margin-right:auto;display:table;height:100%;")));
-                navbar.append(HTMLGenerateTagPrefix("div", mapMake("style", "display:table-cell;vertical-align:middle;")));
-                navbar.append(text_div);
+                navbar.append(HTMLGenerateTagWrap("div", text_div, mapMake("style", "display:table-cell;vertical-align:middle;")));
                 navbar.append("</div>");
-                navbar.append("</div>");
-            }
-            else
-            {
-                //No vertical centring.
-                navbar.append(text_div);
             }
             navbar.append("</div>");
             navbar.append("</a>");

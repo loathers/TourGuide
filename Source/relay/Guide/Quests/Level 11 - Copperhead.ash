@@ -239,6 +239,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     
     
     ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[A Mob of Zeppelin Protesters,The Red Zeppelin]);
+    entry.tags.id = "Council L11 quest copperhead Ron";
     
     if (!__misc_state["in run"] || $item[talisman o' namsilat].available_amount() > 0)
         optional_task_entries.listAppend(entry);
@@ -277,6 +278,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     ChecklistEntry entry;
     entry.url = $location[the copperhead club].getClickableURLForLocation();
     entry.image_lookup_name = base_quest_state.image_name;
+    entry.tags.id = "Council L11 quest copperhead Shen";
     entry.should_highlight = $locations[the copperhead club] contains __last_adventure_location;
     
     ChecklistSubentry subentry;

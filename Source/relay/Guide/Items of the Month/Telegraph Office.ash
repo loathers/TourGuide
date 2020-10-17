@@ -9,7 +9,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     
     if ($item[your cowboy boots].available_amount() == 0)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__item your cowboy boots", "place.php?whichplace=town_right", ChecklistSubentryMake("Acquire your cowboy boots", "", "Visit the LT&T office."), 0));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item your cowboy boots", "place.php?whichplace=town_right", ChecklistSubentryMake("Acquire your cowboy boots", "", "Visit the LT&T office."), 0).ChecklistEntrySetIDTag("Telegraph office LT&T cowboy boots"));
         
     }
     
@@ -169,6 +169,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     }
     
     ChecklistEntry entry = ChecklistEntryMake("__item sea cowboy hat", "inventory.php?ftext=plaintive+telegram", ChecklistSubentryMake(quest_name, modifiers, description), $locations[Investigating a Plaintive Telegram]);
+    entry.tags.id = "Telegraph office LT&T quest";
     if (__misc_state["in run"])
         future_task_entries.listAppend(entry);
     else
@@ -215,7 +216,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         }
         
         
-        resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?ftext=clara's+bell", ChecklistSubentryMake("Clara's Bell", "", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?ftext=clara's+bell", ChecklistSubentryMake("Clara's Bell", "", description), 5).ChecklistEntrySetIDTag("LT&T claras bell resource"));
     }
     
     //skills:
@@ -252,6 +253,6 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
             subentries.listAppend(ChecklistSubentryMake(s + " castable", "", telegraph_skill_descriptions[s]));
         }
         if (subentries.count() > 0)
-            resource_entries.listAppend(ChecklistEntryMake(image_name, "skillz.php", subentries, 9));
+            resource_entries.listAppend(ChecklistEntryMake(image_name, "skillz.php", subentries, 9).ChecklistEntrySetIDTag("LT&T daily cowboy skills resource"));
     }
 }

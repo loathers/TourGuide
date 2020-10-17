@@ -4,7 +4,7 @@ RegisterTaskGenerationFunction("SMiscTasksGenerateTasks");
 void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     //From tasks.ash. May be able to split off some of these into their own files:
-	if (__misc_state["yellow ray available"] && __misc_state["in run"])
+	if (__misc_state["yellow ray available"] && __misc_state["in run"]) //not-in-run version in Familiars.ash (???)
 	{
 		string [int] potential_targets;
 		
@@ -46,14 +46,14 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             potential_targets.listAppend(HTMLGenerateSpanFont("Acquire cowrruption first.", "red"));
         }
 		
-		optional_task_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Fire yellow ray", "", potential_targets), 5));
+		optional_task_entries.listAppend(ChecklistEntryMake(__misc_state_string["yellow ray image name"], "", ChecklistSubentryMake("Fire yellow ray", "", potential_targets), 5).ChecklistEntrySetIDTag("Yellow ray suggestions"));
 	}
     
     if (__misc_state["in run"] && !have_mushroom_plot() && knoll_available() && __misc_state["can eat just about anything"] && fullness_limit() >= 4 && $item[spooky mushroom].available_amount() == 0 && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && my_meat() >= 5000 && my_path_id() != PATH_SLOW_AND_STEADY && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         string [int] description;
         description.listAppend("For spooky mushrooms, to cook a grue egg omelette. (epic food)|Will " + ((my_meat() < 5000) ? "need" : "cost") + " 5k meat. Plant a spooky spore.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item spooky mushroom", "knoll_mushrooms.php", ChecklistSubentryMake("Possibly plant a mushroom plot", "", description), 5));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item spooky mushroom", "knoll_mushrooms.php", ChecklistSubentryMake("Possibly plant a mushroom plot", "", description), 5).ChecklistEntrySetIDTag("Mushroom plot plant"));
     
     }
 	
@@ -88,6 +88,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             modifiers.listAppend("slimeling?");
             
         ChecklistEntry entry = ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]);
+        entry.tags.id = "Filthy hippy disguise acquire";
         if (should_be_future_task)
             future_task_entries.listAppend(entry);
         else
@@ -108,7 +109,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             description.listAppend("Try using it to explore the typical tavern.");
             url = "cellar.php";
         }
-		optional_task_entries.listAppend(ChecklistEntryMake("__item dead guy's watch", url, ChecklistSubentryMake("Use rollover runaway", modifiers, description), 8));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item dead guy's watch", url, ChecklistSubentryMake("Use rollover runaway", modifiers, description), 8).ChecklistEntrySetIDTag("Rollover runaway suggestions"));
     }
     
     //I'm not sure if you ever need a frat boy ensemble in-run, even if you're doing the hippy side on the war? If you need war hippy fatigues, the faster (?) way is acquire hippy outfit -> frat warrior fatigues -> start the war / use desert adventure for hippy fatigues. But if they're sure...
@@ -128,10 +129,10 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         else
             description.listAppend("Possibly wait until level 9, to unlock NCs in the area.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item orcish frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[frat house]));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item orcish frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[frat house]).ChecklistEntrySetIDTag("Frat boy ensemble acquire"));
     }
 		
-	if ($item[strange leaflet].available_amount() > 0 && __misc_state["in run"])
+	if ($item[strange leaflet].available_amount() > 0 && __misc_state["in run"] && !get_property_boolean("leafletCompleted"))
 	{
         boolean leaflet_quest_probably_finished = false;
         
@@ -179,6 +180,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             }
             
             ChecklistEntry entry = ChecklistEntryMake("__item strange leaflet", "", ChecklistSubentryMake("Strange leaflet quest", "", description));
+            entry.tags.id = "Strange leaflet";
             if (future_task)
                 future_task_entries.listAppend(entry);
             else
@@ -220,7 +222,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             description.listAppend("Obtained by casting spaghetti breakfast.");
             url = "skills.php";
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8).ChecklistEntrySetIDTag("Spaghetti breakfast resource"));
     }
     
     if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && my_path_id() != PATH_NUCLEAR_AUTUMN)
@@ -243,7 +245,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
                 reasons.listAppend("free rests");
             
             string description = "Better HP/MP restoration via " + reasons.listJoinComponents(", ", "and") + ".";
-            optional_task_entries.listAppend(ChecklistEntryMake("__item " + upgraded_dwelling, "inventory.php?which=3", ChecklistSubentryMake("Use " + upgraded_dwelling, "", description), 8));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item " + upgraded_dwelling, upgraded_dwelling.invSearch(), ChecklistSubentryMake("Use " + upgraded_dwelling, "", description), 8).ChecklistEntrySetIDTag("Campground dwelling uprgade"));
             
         }
     }
@@ -259,7 +261,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             receipt_item = $item[moustache sock];
         if (receipt_item != $item[none] && receipt_item.available_amount() == 0)
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__item " + $item[dry cleaning receipt], "inventory.php?ftext=dry+cleaning+receipt", ChecklistSubentryMake("Use " + $item[dry cleaning receipt], "", "For " + receipt_item + " accessory."), 8));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item " + $item[dry cleaning receipt], "inventory.php?ftext=dry+cleaning+receipt", ChecklistSubentryMake("Use " + $item[dry cleaning receipt], "", "For " + receipt_item + " accessory."), 8).ChecklistEntrySetIDTag("Dry cleaning receipt resource"));
         }
     }
 }

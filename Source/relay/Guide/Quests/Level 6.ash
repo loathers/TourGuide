@@ -160,9 +160,12 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		subentry.entries.listAppend(HTMLGenerateSpanOfClass("Wait until -combat ballroom song set.", "r_bold"));
 		should_delay = true;
 	}
-	
-	if (should_delay)
-		future_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "friars.php", subentry, $locations[the dark neck of the woods, the dark heart of the woods, the dark elbow of the woods]));
-	else
-		task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "friars.php", subentry, $locations[the dark neck of the woods, the dark heart of the woods, the dark elbow of the woods]));
+
+    ChecklistEntry entry = ChecklistEntryMake(base_quest_state.image_name, "friars.php", subentry, $locations[the dark neck of the woods, the dark heart of the woods, the dark elbow of the woods]);
+    entry.tags.id = "Council L6 friars quest";
+    
+    if (should_delay)
+        future_task_entries.listAppend(entry);
+    else
+        task_entries.listAppend(entry);
 }

@@ -113,7 +113,7 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
         if (!hasPants)
             description.listAppend(HTMLGenerateSpanFont("Could buy Guzzlr pants for more Guzzlrbucks.", "grey"));
 
-        optional_task_entries.listAppend(ChecklistEntryMake("__item Guzzlrbuck", questLocation.getClickableURLForLocation(), ChecklistSubentryMake("Deliver booze", subtitle, description)));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item Guzzlrbuck", questLocation.getClickableURLForLocation(), ChecklistSubentryMake("Deliver booze", subtitle, description), boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("Guzzlr quest task"));
     }
 
 
@@ -163,7 +163,7 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
         }
 
         if (description.count() > 0)
-            optional_task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", "inventory.php?tap=guzzlr", ChecklistSubentryMake(main_title, subtitle, description)));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", "inventory.php?tap=guzzlr", ChecklistSubentryMake(main_title, subtitle, description)).ChecklistEntrySetIDTag("Guzzlr tablet tap"));
     }
 }
 //FIXME todo: a separate tile to suggest how to use a spare cocktail set, when in run?

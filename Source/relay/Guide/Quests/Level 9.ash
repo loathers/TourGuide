@@ -210,6 +210,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             should_delay = false;
         
         ChecklistEntry checklist_entry = ChecklistEntryMake("a-boo peak", "place.php?whichplace=highlands", ChecklistSubentryMake("A-Boo Peak", modifiers, details), $locations[a-boo peak]);
+        checklist_entry.tags.id = "Council L9 quest a-boo peak progress";
 		if (should_delay)
         {
             checklist_entry.importance_level = 11;
@@ -226,6 +227,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         details.listAppend("Light the fire!");
         
         ChecklistEntry checklist_entry = ChecklistEntryMake("a-boo peak", "place.php?whichplace=highlands", ChecklistSubentryMake("A-Boo Peak", modifiers, details), $locations[a-boo peak]);
+        checklist_entry.tags.id = "Council L9 quest a-boo peak done";
         task_entries.listAppend(checklist_entry);
     }
 	if (base_quest_state.state_int["twin peak progress"] < 15)
@@ -383,7 +385,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
 		{
 			details.listAppend("Spend 50 total turns in the twin peak.");
 		}
-		task_entries.listAppend(ChecklistEntryMake("twin peak", url, ChecklistSubentryMake("Twin Peak", modifiers, details), $locations[twin peak]));
+		task_entries.listAppend(ChecklistEntryMake("twin peak", url, ChecklistSubentryMake("Twin Peak", modifiers, details), $locations[twin peak]).ChecklistEntrySetIDTag("Council L9 quest twin peak"));
 	}
     boolean need_jar_of_oil = false;
     if ($item[jar of oil].available_amount() == 0 && $item[bubblin\' crude].available_amount() < 12 && !base_quest_state.state_boolean["Peak Jar Completed"] && base_quest_state.state_boolean["can complete twin peaks quest quickly"])
@@ -499,7 +501,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
             }
 		}
 		
-		task_entries.listAppend(ChecklistEntryMake("oil peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Oil Peak", modifiers, details), $locations[oil peak]));
+		task_entries.listAppend(ChecklistEntryMake("oil peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Oil Peak", modifiers, details), $locations[oil peak]).ChecklistEntrySetIDTag("Council L9 quest oil peak progress"));
 	}
     else if (!$location[oil peak].noncombat_queue.contains_text("Unimpressed with Pressure"))
     {
@@ -508,7 +510,7 @@ void QLevel9GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklist
         
         details.listAppend("Light the fire!");
         
-		task_entries.listAppend(ChecklistEntryMake("oil peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Oil Peak", modifiers, details), $locations[oil peak]));
+		task_entries.listAppend(ChecklistEntryMake("oil peak", "place.php?whichplace=highlands", ChecklistSubentryMake("Oil Peak", modifiers, details), $locations[oil peak]).ChecklistEntrySetIDTag("Council L9 quest oil peak done"));
     }
 }
 
@@ -682,5 +684,5 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	}
 	int tasks_after = task_entries.count() + optional_task_entries.count() + future_task_entries.count();
 	if (tasks_before == tasks_after) //if our sidequests didn't add anything, show something:
-		task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the smut orc logging camp,a-boo peak,oil peak,twin peak]));
+		task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the smut orc logging camp,a-boo peak,oil peak,twin peak]).ChecklistEntrySetIDTag("Council L9 quest highlands"));
 }

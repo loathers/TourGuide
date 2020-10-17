@@ -167,9 +167,5 @@ void QFeloniaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         }
     }
     
-    boolean [location] relevant_locations;
-    relevant_locations[$location[the bugbear pen]] = true;
-    relevant_locations[$location[the spooky gravy burrow]] = true;
-	
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, relevant_locations));
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the bugbear pen,the spooky gravy burrow]).ChecklistEntrySetIDTag("Felonia knoll quest"));
 }

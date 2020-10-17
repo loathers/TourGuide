@@ -205,10 +205,14 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             subentry.entries.listAppend("Speak to the council.");
         }
     }
+    
+    ChecklistEntry entry = ChecklistEntryMake(image_name, url, subentry, $locations[the black forest]);
+    entry.tags.id = "Council L11 quest diary";
+    
     if (make_entry_future)
-        future_task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the black forest]));
+        future_task_entries.listAppend(entry);
     else
-        task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, $locations[the black forest]));
+        task_entries.listAppend(entry);
 }
 
 void QLevel11GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

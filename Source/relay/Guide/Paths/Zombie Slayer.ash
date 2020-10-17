@@ -19,7 +19,7 @@ void PathZombieSlayerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
         if (zombie_skills_have < 30)
         {
             //probably should suggest eat X hunter brains but
-            optional_task_entries.listAppend(ChecklistEntryMake("__item hunter brain", "inventory.php?ftext=hunter+brain", ChecklistSubentryMake("Eat a hunter brain", "", "Gain a skill point."), -1));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item hunter brain", "inventory.php?ftext=hunter+brain", ChecklistSubentryMake("Eat a hunter brain", "", "Gain a skill point."), -1).ChecklistEntrySetIDTag("Zombie slayer path skill points"));
         }
     }
     
@@ -28,8 +28,7 @@ void PathZombieSlayerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
 RegisterResourceGenerationFunction("PathZombieSlayerGenerateResource");
 void PathZombieSlayerGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_ZOMBIE_SLAYER)
-		return;
+    if (my_path_id() != PATH_ZOMBIE_SLAYER) return;
     
     if ($item[right bear arm].available_amount() > 0 && $item[left bear arm].available_amount() > 0)
     {
@@ -51,7 +50,7 @@ void PathZombieSlayerGenerateResource(ChecklistEntry [int] resource_entries)
                 url = "inventory.php?which=2";
                 description.listAppend("Equip " + items_to_equip.listJoinComponents(", ", "and") + ".");
             }
-            resource_entries.listAppend(ChecklistEntryMake("__item right bear arm", url, ChecklistSubentryMake(pluralise(bear_hugs_remaining, "bear hug", "bear hugs"), "", description), 8));
+            resource_entries.listAppend(ChecklistEntryMake("__item right bear arm", url, ChecklistSubentryMake(pluralise(bear_hugs_remaining, "bear hug", "bear hugs"), "", description), 8).ChecklistEntrySetIDTag("Zombie slayer path bear arms hugs"));
             
         }
     }

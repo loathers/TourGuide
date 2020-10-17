@@ -147,7 +147,7 @@ void IOTMNeverendingPartyGenerateTasks(ChecklistEntry [int] task_entries, Checkl
         if (finished) {
             description.listAppend("Visit the party one last time to finish the quest.");
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item party hat", url, ChecklistSubentryMake("Neverending Party Quest", modifiers, description), 8, lookupLocations("The Neverending Party")));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item party hat", url, ChecklistSubentryMake("Neverending Party Quest", modifiers, description), 8, lookupLocations("The Neverending Party")).ChecklistEntrySetIDTag("Neverending party quest"));
     }
 }
 
@@ -189,6 +189,6 @@ void IOTMNeverendingPartyGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("ML buff: " + listMake("Backyard", "Candle wax").listJoinComponents(__html_right_arrow_character));
     }
     if (free_fights_left > 0)
-        resource_entries.listAppend(ChecklistEntryMake("__item party hat", "place.php?whichplace=town_wrong", ChecklistSubentryMake(pluralise(free_fights_left, "free party fight", "free party fights"), modifiers, description), lookupLocations("The Neverending Party")).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item party hat", "place.php?whichplace=town_wrong", ChecklistSubentryMake(pluralise(free_fights_left, "free party fight", "free party fights"), modifiers, description), lookupLocations("The Neverending Party")).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Neverending party free fights"));
     
 }

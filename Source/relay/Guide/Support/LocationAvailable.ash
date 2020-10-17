@@ -9,23 +9,6 @@ import "relay/Guide/Settings.ash"
 import "relay/Guide/QuestState.ash"
 
 
-//Version compatibility locations:
-
-boolean __location_compatibility_inited = false;
-//Should probably be called manually, as a backup:
-void locationCompatibilityInit()
-{
-    //Different versions refer to locations by different names.
-    //For instance, pre-13878 versions refer to the palindome as "The Palindome". Versions after that refer it to "Inside the Palindome".
-    //This method provides correct lookups for both versions, without warnings.
-    if (__location_compatibility_inited)
-        return;
-    __location_compatibility_inited = true;
-    
-}
-
-locationCompatibilityInit(); //not sure if calling functions like this is intended. may break in the future?
-
 boolean [location] __la_location_is_available;
 boolean [string] __la_zone_is_unlocked;
 
@@ -33,73 +16,29 @@ boolean __la_commons_were_inited = false;
 int __la_turncount_initialised_on = -1;
 
 
-//Takes into account banishes and olfactions.
-//Probably will be inaccurate in many corner cases, sorry.
-//There's an appearance_rates() function that takes into account queue effects, which we may consider using in the future?
-float [monster] appearance_rates_adjusted(location l)
+float [monster] appearance_rates_adjusted(location l, boolean account_for_queue)
 {
-    boolean appearance_rates_has_changed = mafiaIsPastRevision(14740); //not sure on the revision, but after a certain revision, appearance_rates() takes into account olfaction
-    //FIXME domed city of ronald/grimacia doesn't take into account alien appearance rate
-    float [monster] source = l.appearance_rates();
+    float [monster] source = l.appearance_rates(account_for_queue);
     
-    if (l == $location[the sleazy back alley]) //FIXME is mafia's data files incorrect, or the wiki's?
-        source[$monster[none]] = MIN(MAX(0, 20 - combat_rate_modifier()), 100);
-    
-    float minimum_monster_appearance = 1000000000.0;
-    foreach m in source
-    {
-        if (m == $monster[none])
-            continue;
-        float v = source[m];
-        if (v > 0.0)
-        {
-            if (v < minimum_monster_appearance)
-                minimum_monster_appearance = v;
-        }
-    }
-    
-    float [monster] source_altered;
-    foreach m in source
-    {
-        float v = source[m];
-        if (m == $monster[none])
-        {
-            if (v < 0.0)
-                source_altered[m] = 0.0;
-            else
-                source_altered[m] = v;
-        }
-        else
-            source_altered[m] = v / minimum_monster_appearance;
-    }
-    
-    // @todo Update this once mafia is fixed.
-    if (($locations[The Dark Elbow of the Woods,The Dark Heart of the Woods,The Dark Neck of the Woods] contains l)) {
-        source_altered[$monster[none]] = 0.05;
-    }
-
     boolean lawyers_relocated = get_property_ascension("relocatePygmyLawyer");
     boolean janitors_relocated = get_property_ascension("relocatePygmyJanitor");
     if (l == $location[the hidden park])
     {
-        if (janitors_relocated)
-            source_altered[$monster[pygmy janitor]] = 1.0;
-        else if (source_altered contains $monster[pygmy janitor])
-            remove source_altered[$monster[pygmy janitor]];
-        if (lawyers_relocated)
-            source_altered[$monster[pygmy witch lawyer]] = 1.0;
-        else if (source_altered contains $monster[pygmy witch lawyer])
-            remove source_altered[$monster[pygmy witch lawyer]];
+        if (!janitors_relocated && source contains $monster[pygmy janitor])
+            remove source[$monster[pygmy janitor]];
+        if (!lawyers_relocated && source contains $monster[pygmy witch lawyer])
+            remove source[$monster[pygmy witch lawyer]];
     }
     if (($locations[The Hidden Apartment Building,The Hidden Bowling Alley,The Hidden Hospital,The Hidden Office Building] contains l))
     {
-        if (janitors_relocated && (source_altered contains $monster[pygmy janitor]))
-            remove source_altered[$monster[pygmy janitor]];
-        if (lawyers_relocated && (source_altered contains $monster[pygmy witch lawyer]))
-            remove source_altered[$monster[pygmy witch lawyer]];
+        if (janitors_relocated && (source contains $monster[pygmy janitor]))
+            remove source[$monster[pygmy janitor]];
+        if (lawyers_relocated && (source contains $monster[pygmy witch lawyer]))
+            remove source[$monster[pygmy witch lawyer]];
     }
     if ($locations[domed city of grimacia,domed city of ronaldus] contains l)
     {
+        //appearance_rates() currently doesn't handle the relation between aliens and moonlight
         boolean [monster] aliens;
         boolean [monster] survivors;
         float actual_percent_aliens = 0.0;
@@ -110,63 +49,52 @@ float [monster] appearance_rates_adjusted(location l)
             aliens = $monsters[cat-alien,dog-alien,alielf];
             survivors = $monsters[unhinged survivor,grizzled survivor,whiny survivor];
             int grimace_phase = moon_phase() / 2;
-            if (grimace_phase == 4)
-                actual_percent_aliens = 0.3;
-            else if (grimace_phase < 2 || grimace_phase > 6)
+            int grimace_darkness = abs(grimace_phase - 4);
+            int grimace_light = 4 - grimace_darkness;
+            if (grimace_light < 2)
                 actual_percent_aliens = 0.0;
             else
-                actual_percent_aliens = 0.15;
+                actual_percent_aliens = 8.0 * grimace_light;
         }
         else
         {
             aliens = $monsters[dogcat,hamsterpus,ferrelf];
             survivors = $monsters[unlikely survivor,overarmed survivor,primitive survivor];
             int ronald_phase = moon_phase() % 8;
-            if (ronald_phase == 4)
-                actual_percent_aliens = 0.3;
-            else if (ronald_phase < 2 || ronald_phase > 6)
+            int ronald_darkness = abs(ronald_phase - 4);
+            int ronald_light = 4 - ronald_darkness;
+            if (ronald_light < 2)
                 actual_percent_aliens = 0.0;
             else
-                actual_percent_aliens = 0.15;
+                actual_percent_aliens = 8.0 * ronald_light;
         }
         //Readjust:
-        float source_percent_aliens = 0.0;
-        float source_percent_survivors = 0.0;
-        foreach m, rate in source_altered
+        if (actual_percent_aliens == 0.0)
         {
-            if (aliens contains m)
+            foreach m, rate in source
             {
-                if (actual_percent_aliens == 0.0)
-                    remove source_altered[m];
-                source_percent_aliens += rate;
+                if (aliens contains m)
+                    remove source[m];
             }
-            if (survivors contains m)
-                source_percent_survivors += rate;
         }
-        //Readjust:
-        
-        foreach m, rate in source_altered
+        else
         {
-            float adjusted_rate = rate;
-            if (aliens contains m)
+            float source_percent_aliens = 0.0;
+            float source_percent_survivors = 0.0;
+            foreach m, rate in source
             {
-                if (actual_percent_aliens == 0.0 || source_percent_aliens == 0.0)
-                {
-                    adjusted_rate = 0.0;
-                }
-                else
-                {
-                    adjusted_rate = rate / source_percent_aliens * actual_percent_aliens;
-                }
+                if (aliens contains m)
+                    source_percent_aliens += rate;
+                if (survivors contains m)
+                    source_percent_survivors += rate;
             }
-            if (survivors contains m)
+            foreach m, rate in source
             {
-                if (source_percent_survivors == 0.0)
-                    adjusted_rate = rate; //bugged, but don't change anything
-                else
-                    adjusted_rate = rate / source_percent_survivors * (1.0 - actual_percent_aliens);
+                if (aliens contains m && source_percent_aliens != 0.0)
+                    source[m] = rate / source_percent_aliens * actual_percent_aliens;
+                if (survivors contains m && source_percent_survivors != 0.0)
+                    source[m] = rate / source_percent_survivors * (100.0 - actual_percent_aliens);
             }
-            source_altered[m] = adjusted_rate;
         }
         
     }
@@ -191,119 +119,127 @@ float [monster] appearance_rates_adjusted(location l)
         {
             if (monsters_not_to_remove contains m)
                 continue;
-            remove source_altered[m];
-        }
-    }
-    
-    boolean banishes_are_possible = true;
-    if ($locations[the secret government laboratory,sloppy seconds diner] contains l)
-        banishes_are_possible = false;
-    if (banishes_are_possible)
-    {
-        foreach m in source_altered
-        {
-            if (m.is_banished())
-                source_altered[m] = 0.0;
-        }
-    }
-    
-    //umm... I'm not sure if appearance_rates() takes into account olfact all the time or not
-    //in the palindome, it didn't for some reason? but in another area I think it did. can't remember
-    /*
-    > get olfactedMonster
-    bob racecar
-    > ash $effect[on the trail].have_effect()
-    Returned: 35
-    > ash $location[inside the palindome].appearance_rates()
-    Returned: aggregate float [monster]
-    Bob Racecar => 9.0
-    Dr. Awkward => 0.0
-    Drab Bard => 9.0
-    Evil Olive => -3.0
-    Flock of Stab-Bats => 9.0
-    none => 55.0
-    Racecar Bob => 9.0
-    Taco Cat => 9.0
-    Tan Gnat => -3.0
-    */
-    //so, if appearance_rate() doesn't seem to be taking into account olfaction, force it?
-    if ($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster").to_monster() != $monster[none])
-    {
-        monster olfacted_monster = get_property("olfactedMonster").to_monster();
-        if (source_altered contains olfacted_monster)
-        {
-            if (fabs(source_altered[olfacted_monster] - 1.0) < 0.01)
-                appearance_rates_has_changed = false;
-        }
-    }
-    
-    if ($effect[on the trail].have_effect() > 0 && !appearance_rates_has_changed)
-    {
-        monster olfacted_monster = get_property("olfactedMonster").to_monster();
-        if (olfacted_monster != $monster[none])
-        {
-            if (source_altered contains olfacted_monster)
-                source_altered[olfacted_monster] += 3.0; //FIXME is this correct?
+            remove source[m];
         }
     }
     
     
-    //Convert source_altered to source.
+    //change the NC rate manually when we suspect mafia got it wrong
+    float original_combat_rate = 100.0 - source[$monster[none]];
+    float new_combat_rate = -1.0;
+    
+    if (l == $location[the sleazy back alley]) //FIXME is mafia's data files incorrect, or the wiki's?
+        new_combat_rate = clampf(80.0 + combat_rate_modifier(), 0, 100);
+    
+    // @todo Update this once mafia is fixed.
+    if ($locations[The Dark Elbow of the Woods,The Dark Heart of the Woods,The Dark Neck of the Woods] contains l)
+        new_combat_rate = clampf(95.0 + combat_rate_modifier(), 0, 100);
+    
     if (l == $location[Inside the Palindome])
-    {
         if (!questPropertyPastInternalStepNumber("questL11Palindome", 3))
-            source_altered[$monster[none]] = 0.0;
-    }
+            new_combat_rate = 100.0;
     
-    float total = 0.0;
-    float nc_rate = clampf(source_altered[$monster[none]], 0.0, 100.0);
-    float combat_rate = clampf(100.0 - nc_rate, 0.0, 100.0);
-    foreach m in source_altered
+    //Readjust:
+    if (new_combat_rate == 0.0)
     {
-        float v = source_altered[m];
-        if (m == $monster[none])
-            continue;
-        if (v > 0)
-            total += v;
+        foreach m, rate in source
+            if (rate > 0.0)
+                source[m] = 0.0;
+        source[$monster[none]] = 100.0;
     }
-    if ($locations[Guano Junction,the Batrat and Ratbat Burrow,the Beanbat Chamber] contains l)
+    else if (original_combat_rate != new_combat_rate && new_combat_rate > 0.0 && original_combat_rate > 0.0)
     {
-        //hacky, probably wrong:
-        float v = total / 8.0;
-        source_altered[$monster[screambat]] = v;
-        total += v;
-    }
-    //oil peak goes here?
-    if (total > 0.0)
-    {
-        foreach m in source_altered
+        source[$monster[none]] = 100.0 - new_combat_rate;
+        
+        float ratio = new_combat_rate / original_combat_rate;
+        foreach m, rate in source
         {
             if (m == $monster[none])
                 continue;
-            float v = source_altered[m];
-            source_altered[m] = v / total * combat_rate;
+            if (rate > 0.0)
+                source[m] = rate * ratio;
         }
     }
     
-    return source_altered;
+    //for monsters which always appear every X adventures, which mafia returns as 0 when not about to get them.
+    //Currently doesn't support cases when mafia is not aware that the encounter is periodically scheduled. Currently "peanut" from the calaginous abyss
+    void averagePediodicSuperlikely(monster superlikely_monster, int frequency)
+    {
+        float combat_rate = clampf(100.0 - source[$monster[none]], 0.0, 100.0);
+        if (combat_rate == 0.0) return;
+        if (source[superlikely_monster] != 0) return;
+        
+        float superlikely_average_occurence = 1.0 / frequency;
+        source[superlikely_monster] = superlikely_average_occurence * combat_rate;
+        //If, let's say, we have 4 monsters (25% occurence), with a superlikely occuring every 2 turns (1 / 2 = 50%)
+        //the 4 monsters' 25% (obviously giving 100%) + the SL's 50% give 150% combat chance: 3/2 the combat rate.
+        //if we divide the 4 monsters' rate by 3/2, we get 16.6. Not quite.
+        //To get them to 12.5% (which, when *4, gives 50%, which, when added the SL's rate, equals the combat rate),
+        //we say that the ratio is 1 + (1 / (x-1))
+        //here this gives 1 + (1 / (2-1)) = 200% = 2/1 the combat rate
+        //25% (the 4 monsters' appearance rate) / (2/1) = 12.5%
+        float excess_ratio = 1.0 + 1.0 / (frequency - 1);
+        
+        foreach m, v in source
+        {
+            if (m == $monster[none] || m == superlikely_monster)
+                continue;
+            if (v > 0.0)
+                source[m] = v / excess_ratio * combat_rate / 100.0;
+        }
+    }
+
+    if ($locations[Guano Junction,the Batrat and Ratbat Burrow,the Beanbat Chamber] contains l)
+        $monster[screambat].averagePediodicSuperlikely(8);
+    
+    if (l == $location[kokomo resort])
+        $monster[Brick Mulligan, the Bartender].averagePediodicSuperlikely(25);
+    
+    if (l == $location[The Post-Mall])
+        $monster[sentient ATM].averagePediodicSuperlikely(11);
+    
+    
+    return source;
 }
 
+float [monster] appearance_rates_adjusted(location l)
+{
+    return appearance_rates_adjusted(l, false);
+}
+
+
+float [monster] appearance_rates_cancel_nc(float [monster] base_rates)
+{
+    if (base_rates[$monster[none]] == 100.0) return base_rates;
+    
+    float combat_rate_sum = 0.0;
+    foreach m, rate in base_rates
+    {
+        if (m == $monster[none])
+            continue;
+        if (rate > 0.0)
+            combat_rate_sum += rate;
+    }
+    if (combat_rate_sum != 100.0 && combat_rate_sum != 0.0)
+    {
+        float divisor = combat_rate_sum / 100.0;
+        
+        foreach m, rate in base_rates
+        {
+            if (m == $monster[none])
+                continue;
+            if (rate > 0.0)
+                base_rates[m] /= divisor;
+        }
+    }
+    
+    return base_rates;
+}
 
 float [monster] appearance_rates_adjusted_cancel_nc(location l)
 {
     float [monster] base_rates = appearance_rates_adjusted(l);
-    float nc_rate = base_rates[$monster[none]] / 100.0;
-    float nc_inverse_multiplier = 1.0;
-    if (nc_rate != 1.0)
-        nc_inverse_multiplier = 1.0 / (1.0 - nc_rate);
-    foreach m in base_rates
-    {
-        if (m == $monster[none])
-            base_rates[m] = 0.0;
-        else
-            base_rates[m] *= nc_inverse_multiplier;
-    }
-    return base_rates;
+    return base_rates.appearance_rates_cancel_nc();
 }
 
 //Do not call - internal implementation detail.

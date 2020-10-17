@@ -43,7 +43,7 @@ void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entri
             description.listAppend("Visit Isabella's" + separator + "Redirect Your Desire" + separator + "Go to the Bar.");
         
         
-        resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire stats", "", description), 5));
+        resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire stats", "", description), 5).ChecklistEntrySetIDTag("Plastic vampire fangs Isabella interview"));
         
     }
 
@@ -117,7 +117,7 @@ void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entri
         
         if (vamp_outs_remaining > 0) {
             //resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake(pluralise(vamp_outs_remaining, "vamp out", "vamp outs"), "", description), 8));
-            resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire masquerade", "", description), 8));
+            resource_entries.listAppend(ChecklistEntryMake("__item " + fang_source, url, ChecklistSubentryMake("Vampire masquerade", "", description), 8).ChecklistEntrySetIDTag("Plastic vampire fangs vamp out resource"));
         }
     }
 }

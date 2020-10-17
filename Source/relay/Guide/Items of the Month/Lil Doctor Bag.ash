@@ -34,7 +34,7 @@ void IOTMLilDoctorBagGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
         description.listAppend(pluralise(35 - doctor_bag_lights - doctor_bag_upgrades * 5, "quest", "quests") + " until bag is fully upgraded.");
     }
     
-    optional_task_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(title, "", description), 9));
+    optional_task_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(title, "", description), 9).ChecklistEntrySetIDTag("Lil doctor bag upgrade quest"));
 }
 
 RegisterResourceGenerationFunction("IOTMLilDoctorBagGenerateResource");
@@ -56,7 +56,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         }
         //if (snojo_skill_entry.image_lookup_name == "")
             //snojo_skill_entry.image_lookup_name = "__skill shattering punch";
-        resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(otoscopes_left, "otoscope", "otoscopes"), "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(otoscopes_left, "otoscope", "otoscopes"), "", description), 8).ChecklistEntrySetIDTag("Lil doctor bag otoscope"));
     }
 	//Chest X-Ray: instakill
     int instakills_left = clampi(3 - get_property_int("_chestXRayUsed"), 0, 3);
@@ -73,7 +73,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         }
         //if (snojo_skill_entry.image_lookup_name == "")
             //snojo_skill_entry.image_lookup_name = "__skill shattering punch";
-        resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(instakills_left, "chest x-ray", "chest x-rays"), "", description), 0).ChecklistEntryTagEntry("free instakill"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(instakills_left, "chest x-ray", "chest x-rays"), "", description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Lil doctor bag x-ray free kill"));
         
     }
 	//Reflex Hammer: Banish
@@ -88,6 +88,6 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         } else {
             description.listAppend("Free run/banish");
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntryTagEntry("banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Lil doctor bag reflex hammer banish"));
     }
 }

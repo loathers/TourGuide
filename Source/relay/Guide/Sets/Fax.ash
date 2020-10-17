@@ -305,12 +305,8 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
     return SFaxGeneratePotentialFaxes(suggest_less_powerful_faxes, blank);
 }
 
-void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task)
+void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries)
 {
-    if (!__misc_state["in aftercore"] && !from_task)
-        return;
-    if (__misc_state["in aftercore"] && from_task)
-        return;
     string url = "clan_viplounge.php?action=faxmachine";
     
     if (get_auto_attack() != 0)
@@ -319,10 +315,11 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     }
     
 	if (__misc_state["fax available"] && $item[photocopied monster].available_amount() == 0)
-        optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(true), "|<hr>"))));
+        optional_task_entries.listAppend(ChecklistEntryMake("fax machine", url, ChecklistSubentryMake("Fax", "", listJoinComponents(SFaxGeneratePotentialFaxes(true), "|<hr>"))).ChecklistEntrySetIDTag("VIP fax machine suggestions"));
     if ($skill[Rain Man].skill_is_usable() && my_rain() >= 50)
     {
         ChecklistEntry entry = ChecklistEntryMake("__skill rain man", "skills.php", ChecklistSubentryMake("Rain man copy", "50 rain drops", listJoinComponents(SFaxGeneratePotentialFaxes(true), "<hr>")));
+        entry.tags.id = "Heavy rains path rain man skill";
         
         if (my_rain() > 93)
         {
@@ -336,12 +333,13 @@ void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 
 void SFaxGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	SFaxGenerateEntry(resource_entries, resource_entries, false);
+    if (__misc_state["in aftercore"])
+        SFaxGenerateEntry(resource_entries, resource_entries);
 }
 
 
 void SFaxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	SFaxGenerateEntry(task_entries, optional_task_entries, true);
-
+    if (!__misc_state["in aftercore"])
+        SFaxGenerateEntry(task_entries, optional_task_entries);
 }

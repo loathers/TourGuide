@@ -40,12 +40,10 @@ boolean PathJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string prop
 RegisterResourceGenerationFunction("PathJarlsbergGenerateResource");
 void PathJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_JARLSBERG)
-		return;
+    if (my_path_id() != PATH_AVATAR_OF_JARLSBERG) return;
     
-	ChecklistEntry entry;
-	entry.url = "";
-	entry.image_lookup_name = "";
+    ChecklistEntry entry;
+    entry.tags.id = "Jarlsberg path staff resource";
     
     
     //wizard staff:
@@ -78,11 +76,12 @@ void PathJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
             always_output = true;
         }
         
-    	ChecklistEntry entry2;
+        ChecklistEntry entry2;
         boolean should_add = PathJarlsbergGenerateStaff(entry2, $item[Staff of the Standalone Cheese], "_jiggleCheese", cheese_line, always_output);
-        entry2.ChecklistEntryTagEntry("banish");
+        entry2.tags.id = "Jarlsberg path staff banish";
+        entry2.tags.combination = "banish";
         if (should_add)
-	        resource_entries.listAppend(entry2);
+            resource_entries.listAppend(entry2);
     }
     PathJarlsbergGenerateStaff(entry, $item[Staff of the Staff of Life], "_jiggleLife", "Restores all HP.", false);
     

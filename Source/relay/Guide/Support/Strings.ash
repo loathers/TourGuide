@@ -308,6 +308,18 @@ string pluraliseWordy(item i) //whatever we have around
 	return pluraliseWordy(i.available_amount(), i);
 }
 
+string invSearch(string it)
+{
+    string url = "inventory.php?ftext=";
+    url += it.replace_string(" ", "+");
+    return url;
+}
+
+string invSearch(item it)
+{
+    return invSearch(it.name);
+}
+
 
 //Additions to standard API:
 //Auto-conversion property functions:

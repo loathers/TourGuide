@@ -99,6 +99,20 @@ void setUpState()
         __misc_state["in run"] = true;
     __misc_state["In valhalla"] = (my_class().to_string() == "Astral Spirit");
     
+    __misc_state["in CS aftercore"] = __misc_state["in aftercore"] && get_property("csServicesPerformed").split_string(",").count() == 11;
+    
+    
+    int adventures_after_rollover = my_adventures() + 40;
+    if (my_path_id() != PATH_SLOW_AND_STEADY) {
+        adventures_after_rollover += numeric_modifier("adventures");
+        adventures_after_rollover += get_property_int("extraRolloverAdventures");
+        if (getHolidaysTomorrow()["Labór Day"])
+            adventures_after_rollover += 10;
+    }
+    adventures_after_rollover = MAX(adventures_after_rollover, 0); //Who knows?
+    int adventures_after_rollover_post_cap = MIN(adventures_after_rollover, 200);
+    __misc_state_int["adventures after rollover"] = adventures_after_rollover_post_cap;
+    __misc_state_int["adventures lost to rollover"] = adventures_after_rollover - adventures_after_rollover_post_cap;
     
 	if (my_turncount() >= 30 && get_property_int("singleFamiliarRun") != -1)
 		__misc_state["single familiar run"] = true;
@@ -195,6 +209,12 @@ void setUpState()
 		yellow_ray_available = true;
 		yellow_ray_source = source.to_string();
 		yellow_ray_image_name = "__item " + source.to_string();
+    }
+    if ($item[micronova].available_amount() > 0)
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "micronova";
+        yellow_ray_image_name = "__item micronova";
     }
     if ($item[viral video].available_amount() > 0)
     {

@@ -1,14 +1,14 @@
 RegisterResourceGenerationFunction("IOTMPowerfulGloveGenerateResource");
 void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!lookupItem("Powerful Glove").have()) return;
+    if (!$item[Powerful Glove].have()) return;
 
     int chargeLeft = 100 - get_property_int("_powerfulGloveBatteryPowerUsed");
 
     if (chargeLeft < 5) return;
 
     string url = "skillz.php";
-    if (!lookupItem("Powerful Glove").equipped())
+    if (!$item[Powerful Glove].equipped())
         url = "inventory.php?ftext=powerful+glove";
 
     string [int] description;
@@ -18,13 +18,13 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend(HTMLGenerateSpanOfClass("Replace Enemy (10% charge):", "r_bold") + " Swap monster.");
     description.listAppend(HTMLGenerateSpanOfClass("Shrink Enemy (5% charge):", "r_bold") + " Delevel.");
 
-    resource_entries.listAppend(ChecklistEntryMake("__item Powerful Glove", url, ChecklistSubentryMake(chargeLeft + "% battery charge", "", description)));
+    resource_entries.listAppend(ChecklistEntryMake("__item Powerful Glove", url, ChecklistSubentryMake(chargeLeft + "% battery charge", "", description)).ChecklistEntrySetIDTag("Powerful glove skills resource"));
 }
 
 RegisterTaskGenerationFunction("IOTMPowerfulGloveTask");
 void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!__misc_state["in run"] || !lookupItem("Powerful Glove").have() || lookupItem("Powerful Glove").have_equipped()) return;
+    if (!__misc_state["in run"] || !$item[Powerful Glove].have() || $item[Powerful Glove].have_equipped()) return;
 
     boolean is_plumber = my_path_id() == PATH_OF_THE_PLUMBER;
 
@@ -37,9 +37,5 @@ void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     if (glove_drops.count() == 0) return;
 
-    int importance_level;
-    if (is_plumber)
-        importance_level = -10;
-
-    optional_task_entries.listAppend(ChecklistEntryMake("__item white pixel", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake("Equip Powerful Glove", "", "Get extra " + glove_drops.listJoinComponents(" and ") + "."), importance_level));
+    optional_task_entries.listAppend(ChecklistEntryMake("__item white pixel", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake("Equip Powerful Glove", "", "Get extra " + glove_drops.listJoinComponents(" and ") + "."), is_plumber ? -10 : 0).ChecklistEntrySetIDTag("Powerful glove equip reminder"));
 }

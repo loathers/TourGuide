@@ -2,8 +2,7 @@
 RegisterResourceGenerationFunction("PathAvatarOfWestOfLoathingGenerateResource");
 void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING && !($classes[snake oiler,beanslinger,cow puncher] contains my_class()))
-		return;
+    if (my_path_id() != PATH_AVATAR_OF_WEST_OF_LOATHING && !($classes[snake oiler,beanslinger,cow puncher] contains my_class())) return;
     
     //Oils:
     string image_name = "";
@@ -80,7 +79,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
     }
     sort subentries by subentries_sort_value[index];
     if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 2));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "", subentries, 2).ChecklistEntrySetIDTag("West Loathing path oils resource"));
     
     
     //Should we display beancannon in aftercore? I guess we could suggest a cheap source of it...? Maybe another time.
@@ -114,7 +113,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
             string title = pluralise(banish_count, "beancannon banish", "beancannon banishes");
             if (!in_ronin())
                 title = "Beancannon banishes";
-            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntryTagEntry("banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("West Loathing path beancannon banish"));
         }
     }
     
@@ -124,7 +123,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
         string [int] description;
         string line = "Olfaction.";
         description.listAppend(line);
-        resource_entries.listAppend(ChecklistEntryMake("__effect Greaser Lightnin'", "", ChecklistSubentryMake(pluralise(uses_remaining, "long con", "long cons") + " remaining", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake("__effect Greaser Lightnin'", "", ChecklistSubentryMake(pluralise(uses_remaining, "long con", "long cons") + " remaining", "", description), 8).ChecklistEntrySetIDTag("West Loathing path long con resource"));
     }
 }
 
@@ -194,11 +193,11 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     
     if (skill_subentries.count() > 0)
     {
-        task_entries.listAppend(ChecklistEntryMake("__item tales of the west: beanslinging", skill_url, skill_subentries, priority));
+        task_entries.listAppend(ChecklistEntryMake("__item tales of the west: beanslinging", skill_url, skill_subentries, priority).ChecklistEntrySetIDTag("West Loathing path new skills"));
     }
     
     if (my_class() == $class[Cow Puncher] && $item[corrupted marrow].available_amount() > 0 && $item[corrupted marrow].to_effect().have_effect() < 100 && in_ronin())
     {
-        task_entries.listAppend(ChecklistEntryMake("__effect Cowrruption", "inventory.php?ftext=corrupted+marrow", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11));
+        task_entries.listAppend(ChecklistEntryMake("__effect Cowrruption", "inventory.php?ftext=corrupted+marrow", ChecklistSubentryMake("Use corrupted marrow", "", "+200% weapon damage/spell damage"), -11).ChecklistEntrySetIDTag("West Loathing path cow puncher corrupted marrow"));
     }
 }

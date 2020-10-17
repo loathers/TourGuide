@@ -398,7 +398,7 @@ boolean have_outfit_components(string outfit_name)
 
 boolean playerIsLoggedIn()
 {
-    return !(my_hash().length() == 0 || my_id() == 0);
+    return !(my_hash().length() == 0 || my_id() == 0) || __setting_debug_mode;
 }
 
 int substatsForLevel(int level)

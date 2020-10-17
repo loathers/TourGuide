@@ -96,7 +96,7 @@ void QLevel12Init()
 void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	QuestState base_quest_state = __quest_state["Level 12"];
-	if (!base_quest_state.state_boolean["Orchard Finished"])
+	if (!base_quest_state.state_boolean["Orchard Finished"] && my_path_id() != PATH_2CRS)
 	{
 		string [int] details;
 		string [int] modifiers;
@@ -177,7 +177,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             details.listAppend("~" + roundForOutput(turns_per_gland, 1) + " turns per gland.");
         }
 	
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Orchard", url, ChecklistSubentryMake("Island War Orchard Quest", modifiers, details), $locations[the hatching chamber, the feeding chamber, the royal guard chamber, the filthworm queen's chamber]));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Orchard", url, ChecklistSubentryMake("Island War Orchard Quest", modifiers, details), $locations[the hatching chamber, the feeding chamber, the royal guard chamber, the filthworm queen's chamber]).ChecklistEntrySetIDTag("Council L12 quest side orchard filthworms"));
 	}
 	if (!base_quest_state.state_boolean["Farm Finished"])
 	{
@@ -200,9 +200,9 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             if (__misc_state["free runs available"])
                 modifiers.listAppend("free runs in barn");
         }
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Farm", "bigisland.php?place=farm", ChecklistSubentryMake("Island War Farm Quest", modifiers, details), $locations[mcmillicancuddy's farm,mcmillicancuddy's barn,mcmillicancuddy's pond,mcmillicancuddy's back 40,mcmillicancuddy's other back 40,mcmillicancuddy's granary,mcmillicancuddy's bog,mcmillicancuddy's family plot,mcmillicancuddy's shady thicket]));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Farm", "bigisland.php?place=farm", ChecklistSubentryMake("Island War Farm Quest", modifiers, details), $locations[mcmillicancuddy's farm,mcmillicancuddy's barn,mcmillicancuddy's pond,mcmillicancuddy's back 40,mcmillicancuddy's other back 40,mcmillicancuddy's granary,mcmillicancuddy's bog,mcmillicancuddy's family plot,mcmillicancuddy's shady thicket]).ChecklistEntrySetIDTag("Council L12 quest side farm"));
 	}
-	if (!base_quest_state.state_boolean["Nuns Finished"])
+	if (!base_quest_state.state_boolean["Nuns Finished"] && my_path_id() != PATH_2CRS)
 	{
 		string [int] details;
 		int meat_gotten = get_property_int("currentNunneryMeat");
@@ -300,7 +300,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 details.listAppend("Could try pulling " + relevant_potions_output.listJoinComponents(", ", "or") + ".");
         }
         details.listAppendList(extra_details);
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Nuns", "bigisland.php?place=nunnery", ChecklistSubentryMake("Island War Nuns Quest", "+meat", details), $locations[the themthar hills]).ChecklistEntrySetIDTag("Council L12 quest side nuns"));
 	}
 	if (!base_quest_state.state_boolean["Junkyard Finished"])
 	{
@@ -413,7 +413,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                     details.listAppend("Potentially banish A.M.C. Gremlin.");
             }
 		}
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Junkyard", "bigisland.php?place=junkyard", ChecklistSubentryMake("Island War Junkyard Quest", listMake("+DR", "+DA", "+HP", "+moxie"), details), $locations[next to that barrel with something burning in it,near an abandoned refrigerator,over where the old tires are,out by that rusted-out car]));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Junkyard", "bigisland.php?place=junkyard", ChecklistSubentryMake("Island War Junkyard Quest", listMake("+DR", "+DA", "+HP", "+moxie"), details), $locations[next to that barrel with something burning in it,near an abandoned refrigerator,over where the old tires are,out by that rusted-out car]).ChecklistEntrySetIDTag("Council 12 quest side junkyard Yossarian"));
 	}
 	if (!base_quest_state.state_boolean["Lighthouse Finished"])
 	{
@@ -501,7 +501,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
             details.listAppend("Talk to the lighthouse keeper to finish quest.");
         
 	
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Lighthouse", "bigisland.php?place=lighthouse", ChecklistSubentryMake("Island War Lighthouse Quest", modifiers, details), $locations[sonofa beach]));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Lighthouse", "bigisland.php?place=lighthouse", ChecklistSubentryMake("Island War Lighthouse Quest", modifiers, details), $locations[sonofa beach]).ChecklistEntrySetIDTag("Council L12 quest side lighthouse gunpowder LFM"));
 	}
 	if (!base_quest_state.state_boolean["Arena Finished"] && my_path_id() != PATH_G_LOVER && my_path_id() != PATH_POCKET_FAMILIARS)
 	{
@@ -524,14 +524,14 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
 	
         //Normally, this would be bigisland.php?place=concert
         //But that could theoretically complete the quest for the wrong side, if they're wearing the wrong uniform and misclick.
-		optional_task_entries.listAppend(ChecklistEntryMake("Island War Arena", "bigisland.php", ChecklistSubentryMake("Island War Arena Quest", modifiers, details)));
+		optional_task_entries.listAppend(ChecklistEntryMake("Island War Arena", "bigisland.php", ChecklistSubentryMake("Island War Arena Quest", modifiers, details)).ChecklistEntrySetIDTag("Council L12 quest side arena"));
 		
 		if (ml_remaining > 0 && ($item[jam band flyers].available_amount() > 0 || $item[rock band flyers].available_amount() > 0))
 		{
 			item it = $item[jam band flyers];
 			if ($item[rock band flyers].available_amount() > 0 && $item[jam band flyers].available_amount() == 0)
 				it = $item[rock band flyers];
-			task_entries.listAppend(ChecklistEntryMake(it, "", ChecklistSubentryMake("Flyer with " + it + " every combat", "+ML", details), -11));
+			task_entries.listAppend(ChecklistEntryMake(it, "", ChecklistSubentryMake("Flyer with " + it + " every combat", "+ML", details), -11).ChecklistEntrySetIDTag("Council L12 quest side advertise reminder"));
 		}
 	}
 }
@@ -755,7 +755,7 @@ void QLevel12ExplosionsGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             description.listAppend("Buy some space chowder for the non-combat.");
     }
 	
-	task_entries.listAppend(ChecklistEntryMake("island war", url, ChecklistSubentryMake("War!", "", description), 0));
+	task_entries.listAppend(ChecklistEntryMake("island war", url, ChecklistSubentryMake("War!", "", description), 0).ChecklistEntrySetIDTag("Council L12 quest exploathing path"));
 }
 
 void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -769,7 +769,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
 	
-	task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "island.php", subentry, $locations[the battlefield (frat uniform), the battlefield (hippy uniform), frat house, hippy camp, wartime frat house, wartime frat house (hippy disguise), wartime hippy camp, wartime hippy camp (frat disguise)]));
+	task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "island.php", subentry, $locations[the battlefield (frat uniform), the battlefield (hippy uniform), frat house, hippy camp, wartime frat house, wartime frat house (hippy disguise), wartime hippy camp, wartime hippy camp (frat disguise)]).ChecklistEntrySetIDTag("Council L12 quest battlefield"));
 	if (base_quest_state.mafia_internal_step < 2)
 	{
 		subentry.modifiers.listAppend("-combat");

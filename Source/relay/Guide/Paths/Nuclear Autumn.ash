@@ -34,19 +34,17 @@ void PathNuclearAutumnGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     }
     
     if (subentries.count() > 0)
-        task_entries.listAppend(ChecklistEntryMake("__item rad", url, subentries, 0));
+        task_entries.listAppend(ChecklistEntryMake("__item rad", url, subentries, 0).ChecklistEntrySetIDTag("Nuclear autumn path shelter action suggestion"));
 }
 
 RegisterResourceGenerationFunction("PathNuclearAutumnGenerateResource");
 void PathNuclearAutumnGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path_id() != PATH_NUCLEAR_AUTUMN)
-		return;
+    if (my_path_id() != PATH_NUCLEAR_AUTUMN) return;
     
     item rad = $item[rad];
     if (rad.available_amount() > 0)
     {
-        
         int [skill] skill_rad_cost;
         
         foreach s in $skills[Boiling Tear Ducts,Projectile Salivary Glands,Translucent Skin,Skunk Glands,Throat Refrigerant,Internal Soda Machine]
@@ -151,7 +149,7 @@ void PathNuclearAutumnGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(line);
         }
         
-		resource_entries.listAppend(ChecklistEntryMake("__item rad", "shop.php?whichshop=mutate", ChecklistSubentryMake(pluralise(rad) + " available", "", description), 8));
+		resource_entries.listAppend(ChecklistEntryMake("__item rad", "shop.php?whichshop=mutate", ChecklistSubentryMake(pluralise(rad) + " available", "", description), 8).ChecklistEntrySetIDTag("Nuclear autumn path rad shop"));
     }
     if (get_property_int("falloutShelterLevel") >= 3 && !get_property_boolean("_falloutShelterSpaUsed"))
     {

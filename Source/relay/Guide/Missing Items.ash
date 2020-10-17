@@ -95,6 +95,7 @@ void generateMissingItems(Checklist [int] checklists)
             subentries[0].entries.listAppend("Either meatpaste together, or find after losing to the naughty sorceress. (" + (in_bad_moon() ? "probably faster" : "usually slower") + ")");
             
         ChecklistEntry entry = ChecklistEntryMake("__item wand of nagamar", $location[the castle in the clouds in the sky (basement)].getClickableURLForLocation(), subentries);
+        entry.tags.id = "Wand of Nagamar reminder";
         entry.should_indent_after_first_subentry = true;
         
         items_needed_entries.listAppend(entry);
@@ -104,10 +105,10 @@ void generateMissingItems(Checklist [int] checklists)
         SLevel13DoorGenerateMissingItems(items_needed_entries);
     
     if ($item[lord spookyraven\'s spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"] && !__quest_state["Level 11 Manor"].finished)
-        items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Lord Spookyraven's spectacles", "", "Found in Haunted Bedroom")));
+        items_needed_entries.listAppend(ChecklistEntryMake("__item lord spookyraven's spectacles", $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Lord Spookyraven's spectacles", "", "Found in Haunted Bedroom")).ChecklistEntrySetIDTag("Lord spookyraven spectacles reminder"));
     
     if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["beanstalk grown"]) {
-        items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", $location[The Beanbat Chamber].getClickableURLForLocation(), ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")));
+        items_needed_entries.listAppend(ChecklistEntryMake("__item enchanted bean", $location[The Beanbat Chamber].getClickableURLForLocation(), ChecklistSubentryMake("Enchanted bean", "", "Found in the beanbat chamber.")).ChecklistEntrySetIDTag("Enchanted bean reminder"));
     }
     
     if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"]) {
@@ -122,7 +123,7 @@ void generateMissingItems(Checklist [int] checklists)
     if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"]) {
         item camera = 7266.to_item();
         if (camera != $item[none]) {
-            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")));
+            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")).ChecklistEntrySetIDTag("Instant camera reminder"));
         }
     }
     
@@ -137,7 +138,7 @@ void generateMissingItems(Checklist [int] checklists)
             description.listAppend("Or towerkill.");
         if (!can_towerkill && !__quest_state["Level 13"].state_boolean["past tower level 2"] && $location[the castle in the clouds in the sky (top floor)].locationAvailable())
             description.listAppend("Don't collect this right now; wait until you're at the wall of bones.|(probability of appearing increases)");
-        items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)));
+        items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)).ChecklistEntrySetIDTag("Electric boning knife reminder"));
     }
     if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"] && my_path_id() != PATH_POCKET_FAMILIARS) {
         string [int] description;
@@ -151,7 +152,7 @@ void generateMissingItems(Checklist [int] checklists)
         if (!in_bad_moon())
             description.listAppend("Or towerkill.");
         
-        items_needed_entries.listAppend(ChecklistEntryMake("__item beehive", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Beehive", "-combat", description)));
+        items_needed_entries.listAppend(ChecklistEntryMake("__item beehive", $location[the black forest].getClickableURLForLocation(), ChecklistSubentryMake("Beehive", "-combat", description)).ChecklistEntrySetIDTag("Beehive reminder"));
     }
     
     if (!__quest_state["Level 13"].state_boolean["past races"]) {
@@ -191,7 +192,7 @@ void generateMissingItems(Checklist [int] checklists)
         
         subentry.header = sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + " sources";
         if (subentry.modifiers.count() > 0)
-            items_needed_entries.listAppend(ChecklistEntryMake("__item vial of patchouli oil", "", subentry));
+            items_needed_entries.listAppend(ChecklistEntryMake("__item vial of patchouli oil", "", subentry).ChecklistEntrySetIDTag("NS lair pre-door challenges reminder"));
     }
     
     checklists.listAppend(ChecklistMake("Required Items", items_needed_entries));

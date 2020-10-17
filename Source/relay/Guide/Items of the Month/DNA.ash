@@ -365,6 +365,8 @@ void IOTMDNAGenerateResource(ChecklistEntry [int] resource_entries)
     
     
     ChecklistSubentry [int] subentries;
+    TagGroup tags;
+    tags.id = "DNA lab various resources"; //seems to include a lot, but IDK enough about the lab
     
     string syringe_description = "";
     boolean syringe_description_output = false;
@@ -476,9 +478,7 @@ void IOTMDNAGenerateResource(ChecklistEntry [int] resource_entries)
     }
     
     if (subentries.count() > 0)
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=workshed", subentries, importance));
-    
-    
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=workshed", subentries, tags, importance));
 }
 
 RegisterTaskGenerationFunction("IOTMDNAGenerateTasks");
@@ -521,7 +521,7 @@ void IOTMDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if (suggestion_reason != "")
             {
                 string description = suggestion_reason.capitaliseFirstLetter() + ".";
-                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Make gene tonic for " + syringe_phylum, "", description), -11));
+                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Make gene tonic for " + syringe_phylum, "", description), -11).ChecklistEntrySetIDTag("DNA lab make DNA potion"));
             }
         }
         
@@ -557,7 +557,7 @@ void IOTMDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                     relevant_effect_description = __dna_phylum_to_description[p];
                 string description = suggestion_reason.capitaliseFirstLetter() + ".";
                 description += "|" + monster_phylum().to_string().capitaliseFirstLetter() + " (" + relevant_effect_description + ")";
-                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "", ChecklistSubentryMake("Extract DNA from " + last_monster().to_string().HTMLEscapeString(), "", description), -11));
+                task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "", ChecklistSubentryMake("Extract DNA from " + last_monster().to_string().HTMLEscapeString(), "", description), -11).ChecklistEntrySetIDTag("DNA lab use syringe"));
             }
         }
     }
@@ -567,6 +567,6 @@ void IOTMDNAGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         string [int] description;
         if (__dna_intrinsic_ideas.count() > 0)
             description.listAppend("Could try " + __dna_intrinsic_ideas.listJoinComponents(", ", "or") + ".");
-        optional_task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Hybridize yourself", "", description), 5));
+        optional_task_entries.listAppend(ChecklistEntryMake("__effect Human-Human Hybrid", "campground.php?action=workshed", ChecklistSubentryMake("Hybridize yourself", "", description), 5).ChecklistEntrySetIDTag("DNA lab become hybrid"));
     }
 }

@@ -93,7 +93,7 @@ void generatePullList(Checklist [int] checklists)
 	if (pulls_available <= 0)
 		return;
 	if (pulls_available > 0)
-		pulls_entries.listAppend(ChecklistEntryMake("special subheader", "", ChecklistSubentryMake(pluralise(pulls_available, "pull", "pulls") + " remaining")));
+		pulls_entries.listAppend(ChecklistEntryMake("special subheader", "", ChecklistSubentryMake(pluralise(pulls_available, "pull", "pulls") + " remaining")).ChecklistEntrySetIDTag("Pulls special subheader"));
 	
 	item [int] pullable_list_item;
 	int [int] pullable_list_max_wanted;
@@ -600,7 +600,7 @@ void generatePullList(Checklist [int] checklists)
 		
 		if (gp_item.alternate_name != "")
 		{
-			pulls_entries.listAppend(ChecklistEntryMake(gp_item.alternate_image_name, "storage.php", ChecklistSubentryMake(gp_item.alternate_name, "", reason_list)));
+			pulls_entries.listAppend(ChecklistEntryMake(gp_item.alternate_image_name, "storage.php", ChecklistSubentryMake(gp_item.alternate_name, "", reason_list)).ChecklistEntrySetIDTag("Pull suggestions " + gp_item.alternate_name));
 			continue;
 		}
 		
@@ -651,7 +651,6 @@ void generatePullList(Checklist [int] checklists)
 				continue;
             if (!is_unrestricted(it))
                 continue;
-            //if (!it.is_unrestricted()) continue; //FIXME uncomment next point release
 			int actual_amount = pullable_amount(it, max_wanted);
 			if (actual_amount > 0)
 			{
@@ -663,14 +662,15 @@ void generatePullList(Checklist [int] checklists)
                     if (it.to_slot() != $slot[none])
                         url = "storage.php?which=2";
                 }
-              
+                
                 if (it.storage_amount() == 0 && (__pulls_reasonable_to_buy_in_run contains it) && it != $item[ten-leaf clover] && it != $item[none])
                     url = "mall.php";
-              
+                
+                string title = pluralise(actual_amount, it);
 				if (max_wanted == 1)
-					pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(it, "", reason_list)));
-				else
-					pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(pluralise(actual_amount, it), "", reason_list)));
+					title = it;
+                
+                pulls_entries.listAppend(ChecklistEntryMake(it, url, ChecklistSubentryMake(title, "", reason_list)).ChecklistEntrySetIDTag("Pull suggestions " + it.name));
 				break;
 			}
 		}

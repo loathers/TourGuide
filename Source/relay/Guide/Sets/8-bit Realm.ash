@@ -24,7 +24,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
             subentry.entries.listAppend("Or wait for pixellated monsters.");
     
-        optional_task_entries.listAppend(ChecklistEntryMake("__familiar angry jung man", url, subentry));
+        optional_task_entries.listAppend(ChecklistEntryMake("__familiar angry jung man", url, subentry).ChecklistEntrySetIDTag("Angry jung man familiar digital key psycho jar drop"));
         need_route_output = false;
     }
     if ($item[psychoanalytic jar].available_amount() > 0 || $item[jar of psychoses (The Crackpot Mystic)].available_amount() > 0 || get_property_boolean("_psychoJarUsed")) //FIXME check which jar used
@@ -63,7 +63,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
                 description.listAppend("Or wait for pixellated monsters.");
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake(title, modifiers, description), $locations[fear man's level]));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake(title, modifiers, description), $locations[fear man's level]).ChecklistEntrySetIDTag("Angry jung man familiar digital key psycho jar use"));
         need_route_output = false;
     }
     if (my_path_id() == PATH_EXPLOSIONS) need_route_output = false;
@@ -91,9 +91,9 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             //No other choice. 8-bit realm.
             //Well, I suppose they could fax and arrow a ghost.
             if ($item[continuum transfunctioner].available_amount() > 0)
-                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", url, ChecklistSubentryMake("Adventure in the 8-bit realm", modifiers, description), $locations[8-bit realm]));
+                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", url, ChecklistSubentryMake("Adventure in the 8-bit realm", modifiers, description), $locations[8-bit realm]).ChecklistEntrySetIDTag("Crackpot mystic digital key 8-bit"));
             else if (my_level() >= 2)
-                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake("Acquire a continuum transfunctioner", "", "From the crackpot mystic.")));
+                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake("Acquire a continuum transfunctioner", "", "From the crackpot mystic.")).ChecklistEntrySetIDTag("Crackpot mystic get transfunctioner"));
         }
         else
         {
@@ -102,7 +102,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             description.listAppend("To make digital key.");
             if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER)
                 description.listAppend("Or wait for pixellated monsters.");
-            optional_task_entries.listAppend(ChecklistEntryMake("__item psychoanalytic jar", "", ChecklistSubentryMake("Pull a jar of psychoses (The Crackpot Mystic)", "", description)));
+            optional_task_entries.listAppend(ChecklistEntryMake("__item psychoanalytic jar", "", ChecklistSubentryMake("Pull a jar of psychoses (The Crackpot Mystic)", "", description)).ChecklistEntrySetIDTag("Crackpot mystic digital key psycho"));
         }
     }
 }
@@ -161,7 +161,7 @@ void S8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] crafting_list = crafting_list_have;
         crafting_list.listAppendList(crafting_list_cannot);
         string pixels_have = "Pixel crafting";
-        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10));
+        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10).ChecklistEntrySetIDTag("Crackpot mystic pixel crafting resource"));
     }
 }
 
@@ -197,6 +197,6 @@ void S8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
             if (total_white_pixels > 0)
                 options.listAppend(total_white_pixels + "/30 white pixels found.");
         }
-        items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", url, ChecklistSubentryMake("Digital key", "", options)));
+        items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", url, ChecklistSubentryMake("Digital key", "", options)).ChecklistEntrySetIDTag("Council L13 quest tower door digital key"));
     }
 }

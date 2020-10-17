@@ -153,8 +153,10 @@ void SSealClubberInfernalSealsGenerateResource(ChecklistEntry [int] resource_ent
         options.listAppend(option);
     }
     description.listPrepend(HTMLGenerateSimpleTableLines(options));
-        
-    resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", description), 10));
+    
+    resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", description), 10).ChecklistEntrySetIDTag("Seal clubber summon resource"));
+    
+    resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", "See dedicated tile."), 10).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Seal clubber summon free fight")); //add an anchor to the dedicated tile??
 }
 
 void SSealClubberGenerateResource(ChecklistEntry [int] resource_entries)
@@ -172,7 +174,7 @@ void STurtleTamerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     
     if (__misc_state["in run"] && guild_store_available() && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST && $effect[Eau de Tortue].have_effect() == 0 && my_meat() >= 200)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__item helmet turtle", "shop.php?whichshop=guildstore3", ChecklistSubentryMake("Buy and use turtle pheromones", "", "Lets you encounter more turtles.")));
+        optional_task_entries.listAppend(ChecklistEntryMake("__item helmet turtle", "shop.php?whichshop=guildstore3", ChecklistSubentryMake("Buy and use turtle pheromones", "", "Lets you encounter more turtles.")).ChecklistEntrySetIDTag("Turtle tamer pheromones"));
     }
 }
 
@@ -196,7 +198,7 @@ void SDiscoBanditGenerateResource(ChecklistEntry [int] resource_entries)
                 string [int] skill_order = rave_combo_number_5.split_string(",");
                 description.listAppend(skill_order.listJoinComponents(__html_right_arrow_character).capitaliseFirstLetter() + ".");
             }
-            resource_entries.listAppend(ChecklistEntryMake("__skill Disco Dance 3: Back in the Habit", "", ChecklistSubentryMake(pluralise(steals_remaining, "Rave Steal", "Rave Steals"), "", description), 8));
+            resource_entries.listAppend(ChecklistEntryMake("__skill Disco Dance 3: Back in the Habit", "", ChecklistSubentryMake(pluralise(steals_remaining, "Rave Steal", "Rave Steals"), "", description), 8).ChecklistEntrySetIDTag("Disco bandit rave steal"));
         }
     }
 }
@@ -209,11 +211,11 @@ void SPastamancerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     {
         if ($item[black hymnal].available_amount() == 0)
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__skill Canticle of Carboloading", "volcanoisland.php", ChecklistSubentryMake("Collect the black hymnal from the Nemesis Temple", "", "Unlocks Carboloading.")));
+            optional_task_entries.listAppend(ChecklistEntryMake("__skill Canticle of Carboloading", "volcanoisland.php", ChecklistSubentryMake("Collect the black hymnal from the Nemesis Temple", "", "Unlocks Carboloading.")).ChecklistEntrySetIDTag("Nemesis quest pastamancer black hymnal get"));
         }
         else
         {
-            optional_task_entries.listAppend(ChecklistEntryMake("__skill Canticle of Carboloading", "inventory.php?ftext=black+hymnal", ChecklistSubentryMake("Use the black hymnal", "", "Unlocks Carboloading.")));
+            optional_task_entries.listAppend(ChecklistEntryMake("__skill Canticle of Carboloading", "inventory.php?ftext=black+hymnal", ChecklistSubentryMake("Use the black hymnal", "", "Unlocks Carboloading.")).ChecklistEntrySetIDTag("Nemesis quest pastamancer black hymnal use"));
         }
     }
 }

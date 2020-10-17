@@ -12,6 +12,7 @@ void IOTMMeteorLoreGenerateResource(ChecklistEntry [int] resource_entries)
     
     ChecklistEntry entry;
     entry.image_lookup_name = "__skill Meteor Lore";
+    entry.tags.id = "Meteor lore resource";
     entry.importance_level = 3;
     if (get_property_int("_macrometeoriteUses") < 10)
     {

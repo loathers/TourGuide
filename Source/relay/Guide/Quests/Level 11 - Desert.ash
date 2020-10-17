@@ -81,7 +81,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             description.listAppend("Adventure in the Oasis.");
             if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
                 description.listAppend("Potentially clover for 20 turns, versus 5.");
-            task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "place.php?whichplace=desertbeach", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11));
+            task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "place.php?whichplace=desertbeach", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11).ChecklistEntrySetIDTag("Council L11 quest desert ultrahydrated"));
         }
         //if (exploration > 0)
             //subentry.entries.listAppend("Need ultra-hydrated from The Oasis. (potential clover for 20 turns)");
@@ -212,5 +212,5 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         }
     } else
         subentry.entries.listAppend("Could bring along Melodramedary.");
-    task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the arid\, extra-dry desert,the oasis]));
+    task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the arid\, extra-dry desert,the oasis]).ChecklistEntrySetIDTag("Council L11 quest desert exploration"));
 }

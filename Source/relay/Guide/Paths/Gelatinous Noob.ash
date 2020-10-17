@@ -48,8 +48,7 @@ void initialiseGelatinousStatics()
 RegisterTaskGenerationFunction("PathGelatinousNoobGenerateTasks");
 void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path_id() != PATH_GELATINOUS_NOOB)
-		return;
+    if (my_path_id() != PATH_GELATINOUS_NOOB) return;
     
     int total_absorptions = 2 + MIN(13, my_level());
     int absorptions_used = get_property_int("_noobSkillCount");
@@ -276,7 +275,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 description.listAppend(line);
             }*/
         }
-        optional_task_entries.listAppend(ChecklistEntryMake("__familiar Gelatinous Cubeling", "inventory.php", ChecklistSubentryMake("Absorb " + pluralise(absorptions_left, "item", "items"), "", description), -1));
+        optional_task_entries.listAppend(ChecklistEntryMake("__familiar Gelatinous Cubeling", "inventory.php", ChecklistSubentryMake("Absorb " + pluralise(absorptions_left, "item", "items"), "", description), -1).ChecklistEntrySetIDTag("Gelatinous noob path absorption suggestions"));
     }
     
     if (lookupFamiliar("Robortender").have_familiar())
@@ -359,7 +358,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             {
                 phylums_out.listAppend(p + " (" + matchup_type[key] + ")");
             }
-            optional_task_entries.listAppend(ChecklistEntryMake("__familiar Robortender", url, ChecklistSubentryMake("Run robortender against " + phylums_out.listJoinComponents(", ", "and"), "", description), 5));
+            optional_task_entries.listAppend(ChecklistEntryMake("__familiar Robortender", url, ChecklistSubentryMake("Run robortender against " + phylums_out.listJoinComponents(", ", "and"), "", description), 5).ChecklistEntrySetIDTag("Gelatinous noob path robortender familiar"));
         }
     }
 }

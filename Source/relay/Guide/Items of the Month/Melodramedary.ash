@@ -4,7 +4,7 @@ void IOTMMelodramedaryGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     if (my_familiar() != lookupFamiliar("Melodramedary")) return;
 
     if (get_property_int("camelSpit") == 100)
-        task_entries.listAppend(ChecklistEntryMake("__familiar Melodramedary", "familiar.php", ChecklistSubentryMake("Melodramedary: Locked and Loaded!", "", HTMLGenerateSpanFont("Spit!", "blue")), -11));
+        task_entries.listAppend(ChecklistEntryMake("__familiar Melodramedary", "familiar.php", ChecklistSubentryMake("Melodramedary: Locked and Loaded!", "", HTMLGenerateSpanFont("Spit!", "blue")), -11).ChecklistEntrySetIDTag("Melodramedary familiar spit ready"));
 }
 
 RegisterResourceGenerationFunction("IOTMMelodramedaryResource");
@@ -61,5 +61,5 @@ void IOTMMelodramedaryResource(ChecklistEntry [int] resource_entries)
     if (options.count() > 0)
         description.listAppend("Possible targets:" + options.listJoinComponents("<hr>").HTMLGenerateIndentedText());
     
-    resource_entries.listAppend(ChecklistEntryMake("__familiar Melodramedary", "familiar.php", ChecklistSubentryMake(title, description), 1));
+    resource_entries.listAppend(ChecklistEntryMake("__familiar Melodramedary", "familiar.php", ChecklistSubentryMake(title, description), 1).ChecklistEntrySetIDTag("Melodramedary familiar resource"));
 }

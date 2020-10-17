@@ -109,5 +109,5 @@ step8	You've done a good turn, and helped Subject 37 make his escape from the Co
         }
     }
 		
-	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[]));
+	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, active_url, subentry, $locations[]).ChecklistEntrySetIDTag("Subject 37 quest"));
 }

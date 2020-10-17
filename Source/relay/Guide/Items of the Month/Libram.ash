@@ -36,7 +36,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
                 subentry.entries.listAppend("Could try to summon a yellow taffy. (" + (chance * 100.0).roundForOutput(1) + "% chance)");
             }
             
-            resource_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7));
+            resource_entries.listAppend(ChecklistEntryMake("__item libram of divine favors", "campground.php?action=bookshelf", subentry, 7).ChecklistEntrySetIDTag("Bookshelf librams resource"));
         }
         
         
@@ -45,7 +45,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
                 ChecklistSubentry subentry;
                 subentry.header =  (3 - get_property_int("_brickoEyeSummons")) + " BRICKO&trade; eye bricks obtainable";
                 subentry.entries.listAppend("Cast Summon BRICKOs libram. (" + libram_mp_cost + " mp)");
-                resource_entries.listAppend(ChecklistEntryMake("__item bricko eye brick", "campground.php?action=bookshelf", subentry, 9));
+                resource_entries.listAppend(ChecklistEntryMake("__item bricko eye brick", "campground.php?action=bookshelf", subentry, 9).ChecklistEntrySetIDTag("Bookshelf BRICKO libram resource"));
                 
             }
         }
@@ -63,6 +63,8 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
             bricko_potential_fights_available = clampi(10 - get_property_int("_brickoFights"), 0, 10);
         if (bricko_potential_fights_available > 0) {
             ChecklistSubentry subentry;
+            TagGroup tags;
+            tags.id = "BRICKO free fight";
             subentry.header = pluralise(bricko_potential_fights_available, "BRICKO&trade; fight", "BRICKO&trade; fights") + " ready";
             
             
@@ -95,7 +97,7 @@ void IOTMLibramGenerateResource(ChecklistEntry [int] resource_entries)
             if (creatable.count() > 0)
                 subentry.entries.listAppend("Creatable: (" + $item[bricko brick].available_amount() + " bricks available)" + HTMLGenerateIndentedText(creatable));
                 
-            resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?ftext=bricko", subentry, 7));
+            resource_entries.listAppend(ChecklistEntryMake("__item bricko brick", "inventory.php?ftext=bricko", subentry, tags, 7));
         }
     }
 }

@@ -9,7 +9,7 @@ void IOTMBirdADayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         if (have_effect($effect[Blessing of the Bird]) > 0)
             description.listAppend(HTMLGenerateSpanFont("Still have an old blessing", "red") + "|Using the calendar will replace the old buff's modifiers with the new ones.");
 
-        optional_task_entries.listAppend(ChecklistEntryMake("__effect Blessing of the Bird", "inventory.php?ftext=bird-a-day+calendar", ChecklistSubentryMake("Discover your daily Bird", "", description), 8));
+        optional_task_entries.listAppend(ChecklistEntryMake("__effect Blessing of the Bird", "inventory.php?ftext=bird-a-day+calendar", ChecklistSubentryMake("Discover your daily Bird", "", description), 8).ChecklistEntrySetIDTag("Bird-a-day calendar"));
     }
 }
 
@@ -119,6 +119,7 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
     ChecklistEntry entry;
     entry.image_lookup_name = "__effect Blessing of the Bird";
     entry.url = "skillz.php";
+    entry.tags.id = "Bird-a-day cast";
 
     ChecklistSubentry birdMods = getBirdMods();
     if (birdMods.entries.count() > 0) {

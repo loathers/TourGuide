@@ -52,5 +52,5 @@ void QGalaktikGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
         //image_name = "__familiar o.a.f.";
     }
 	
-	optional_task_entries.listAppend(ChecklistEntryMake(image_name, active_url, subentry, $locations[the overgrown lot]));
+	optional_task_entries.listAppend(ChecklistEntryMake(image_name, active_url, subentry, $locations[the overgrown lot]).ChecklistEntrySetIDTag("Doc Galaktik flower quest"));
 }

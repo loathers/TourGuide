@@ -239,6 +239,7 @@ void QWhiteCitadelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         
         
     ChecklistEntry entry = ChecklistEntryMake(image_name, active_url, subentry, relevant_locations);
+    entry.tags.id = "White citadel guild quest";
     if (add_as_future_task)
         future_task_entries.listAppend(entry);
     else

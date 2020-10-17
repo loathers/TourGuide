@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "1.7.7";
+string __version = "1.8.0";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -18,7 +18,6 @@ boolean __show_importance_bar = true;
 boolean __setting_show_navbar = true;
 boolean __setting_navbar_has_proportional_widths = false; //doesn't look very good, remove?
 boolean __setting_gray_navbar = true;
-boolean __use_table_based_layouts = false; //backup implementation. not compatible with media queries. consider removing?
 boolean __setting_use_kol_css = false; //images/styles.css
 boolean __setting_show_location_bar = true;
 boolean __setting_enable_location_popup_box = true;
@@ -26,7 +25,6 @@ boolean __setting_location_bar_uses_last_location = false; //nextAdventure other
 boolean __setting_location_bar_fixed_layout = true;
 boolean __setting_location_bar_limit_max_width = true;
 float __setting_location_bar_max_width_per_entry = 0.35;
-boolean __setting_small_size_uses_full_width = false; //implemented, but disabled - doesn't look amazing. reduced indention width instead to compensate
 boolean __setting_enable_outputting_all_numberology_options = true;
 
 string __setting_unavailable_colour = "#7F7F7F";

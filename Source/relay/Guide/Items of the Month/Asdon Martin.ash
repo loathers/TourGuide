@@ -8,7 +8,6 @@ void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     if (!__iotms_usable[lookupItem("Asdon martin keyfob")])
         return;
     //BanishIsActive
-    //FIXME test get_fuel() in point release
     if (!BanishIsActive("Spring-Loaded Front Bumper") && __misc_state["in run"] && (my_path_id() != PATH_POCKET_FAMILIARS || (__iotms_usable[$item[source terminal]] && __iotms_usable[lookupItem("FantasyRealm membership packet")])))
     {
     	string description = "Banish" + (__misc_state["free runs usable"] ? "/free run" : "") + ", ";
@@ -23,7 +22,7 @@ void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             description += fuel;
 		if (my_path_id() == PATH_POCKET_FAMILIARS)
 			description += "|In FantasyRealm, where you can extract for consumables.";
-        task_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=fuelconvertor", ChecklistSubentryMake("Cast Spring-Loaded Front Bumper", "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=fuelconvertor", ChecklistSubentryMake("Cast Spring-Loaded Front Bumper", "", description), -11).ChecklistEntrySetIDTag("Asdon front bumper reminder"));
     }
 }
 
@@ -34,6 +33,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     ChecklistEntry entry;
     entry.importance_level = 0;
+    entry.tags.id = "Asdon Martin resource";
     if (__misc_state["in run"] && in_ronin())
     {
         item [int] fuelables = asdonMartinGenerateListOfFuelables();
@@ -122,7 +122,7 @@ void IOTMAsdonMartinGenerateResource(ChecklistEntry [int] resource_entries)
         string fuel_costs = "Costs 100 fuel";
         if (get_fuel() < 100)
         	fuel_costs = HTMLGenerateSpanFont(fuel_costs, "red");
-		resource_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=workshed", ChecklistSubentryMake("Asdon Missile", "", fuel_costs + ", instakill + YR-equivalent.")).ChecklistEntryTagEntry("free instakill"));
+		resource_entries.listAppend(ChecklistEntryMake("__item Asdon Martin keyfob", "campground.php?action=workshed", ChecklistSubentryMake("Asdon Missile", "", fuel_costs + ", instakill + YR-equivalent.")).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Asdon Martin missile launcher"));
         //entry.subentries.listAppend(ChecklistSubentryMake("Asdon Missile", "", fuel_costs + ", instakill + YR-equivalent."));
     }
     if (BanishIsActive("Spring-Loaded Front Bumper"))

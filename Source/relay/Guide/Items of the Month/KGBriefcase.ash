@@ -6,6 +6,7 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
     entry.image_lookup_name = "__item Kremlin's Greatest Briefcase";
     entry.importance_level = 5;
     entry.url = "place.php?whichplace=kgb";
+    entry.tags.id = "Kremlin Briefcase resource";
     if (get_property_int("_kgbTranquilizerDartUses") < 3 && my_path_id() != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
@@ -15,7 +16,7 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Equip the briefcase first.");
             //entry.url = "inventory.php?which=2";
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item Kremlin's Greatest Briefcase", entry.url, ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "briefcase dart", "briefcase darts"), "", description)).ChecklistEntryTagEntry("banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Kremlin's Greatest Briefcase", entry.url, ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "briefcase dart", "briefcase darts"), "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Kremlin Briefcase tranq dart banish"));
     }
     int clicks_remaining = clampi(22 - get_property_int("_kgbClicksUsed"), 0, 22);
     if (!mafiaIsPastRevision(18110))

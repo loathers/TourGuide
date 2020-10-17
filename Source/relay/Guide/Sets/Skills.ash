@@ -1,7 +1,7 @@
 string [int] SSkillsPotentialCraftingOptions()
 {
     string [int] potential_options;
-    if ($item[knob cake].available_amount() == 0 && !__quest_state["Level 6"].finished)
+    if ($item[knob cake].available_amount() == 0 && !__quest_state["Level 6"].finished && my_path_id() != PATH_COMMUNITY_SERVICE)
         potential_options.listAppend("knob cake");
     if (__misc_state["can eat just about anything"])
         potential_options.listAppend("food");
@@ -14,29 +14,73 @@ string [int] SSkillsPotentialCraftingOptions()
 
 void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    string url;
     if (skill_is_usable($skill[inigo's incantation of inspiration])) {
         int inigos_casts_remaining = 5 - get_property_int("_inigosCasts");
         string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
         if (inigos_casts_remaining > 0)
-            resource_entries.listAppend(ChecklistEntryMake("__effect Inigo's Incantation of Inspiration", "skills.php", ChecklistSubentryMake(pluralise(inigos_casts_remaining, "Inigo's cast", "Inigo's casts") + " remaining", "", description), 4));
+            resource_entries.listAppend(ChecklistEntryMake("__effect Inigo's Incantation of Inspiration", "skills.php", ChecklistSubentryMake(pluralise(inigos_casts_remaining, "Inigo's cast", "Inigo's casts") + " remaining", "", description), 4).ChecklistEntrySetIDTag("Inigo inspiration skill reminder"));
     }
-    int free_crafts_left = 0;
-    if ($effect[Inigo's Incantation of Inspiration].have_effect() >= 5) {
-        free_crafts_left += $effect[Inigo's Incantation of Inspiration].have_effect() / 5;
+    if (true) {
+        ChecklistEntry craft_entry;
+        craft_entry.image_lookup_name = "__item tenderizing hammer";
+        craft_entry.url = "craft.php?mode=discoveries";
+        craft_entry.tags.id = "Free crafts resource";
+        craft_entry.importance_level = 4;
+
+        int free_crafts_left = 0;
+        if ($effect[Inigo's Incantation of Inspiration].have_effect() >= 5) {
+            free_crafts_left += $effect[Inigo's Incantation of Inspiration].have_effect() / 5;
+        }
+        if ($effect[craft tea].have_effect() >= 5) {
+            free_crafts_left += $effect[craft tea].have_effect() / 5;
+        }
+        if ($skill[rapid prototyping].skill_is_usable()) {
+            free_crafts_left += clampi(5 - get_property_int("_rapidPrototypingUsed"), 0, 5);
+        }
+        if (lookupSkill("Expert Corner-Cutter").skill_is_usable()) {
+            free_crafts_left += clampi(5 - get_property_int("_expertCornerCutterUsed"), 0, 5);
+        }
+
+        int free_smiths_left = 0;
+        if (__campground[$item[warbear auto-anvil]] > 0) {
+            free_smiths_left += clampi(5 - get_property_int("_warbearAutoAnvilCrafting"), 0, 5);
+        }
+        int jackhammer_crafts_later = 0;
+        if ($items[Loathing Legion abacus,Loathing Legion can opener,Loathing Legion chainsaw,Loathing Legion corkscrew,Loathing Legion defibrillator,Loathing Legion double prism,Loathing Legion electric knife,Loathing Legion flamethrower,Loathing Legion hammer,Loathing Legion helicopter,Loathing Legion jackhammer,Loathing Legion kitchen sink,Loathing Legion knife,Loathing Legion many-purpose hook,Loathing Legion moondial,Loathing Legion necktie,Loathing Legion pizza stone,Loathing Legion rollerblades,Loathing Legion tape measure,Loathing Legion tattoo needle,Loathing Legion universal screwdriver,Loathing Legion Knife].available_amount() > 0) {
+            int jackhammer_crafts = clampi(3 - get_property_int("_legionJackhammerCrafting"), 0, 3);
+            if ($item[Loathing Legion jackhammer].available_amount() == 0)
+                jackhammer_crafts_later = jackhammer_crafts;
+            else
+                free_smiths_left += jackhammer_crafts;
+        }
+        if ($item[Thor's Pliers].available_amount() > 0) {
+            free_smiths_left += clampi(10 - get_property_int("_thorsPliersCrafting"), 0, 10);
+        }
+        if (free_smiths_left > 0 || jackhammer_crafts_later > 0) {
+            craft_entry.url = "craft.php?mode=discoveries&what=smith";
+            //free_smiths_left += free_crafts_left; //naaaah
+            //FIXME remind them to buy a hammer (if no loathing jackhammer)
+            string [int] description;
+            if (jackhammer_crafts_later > 0)
+                description.listAppend("Get " + jackhammer_crafts_later + " more by folding your loathing legion knife into jackhammer.");
+            string title = "free smithing";
+            if (knoll_available()) //innabox makes normal smithing free
+                title = "free advanced smithing";
+            craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_smiths_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "SMITHING only" : "", description));
+        }
+
+        if (free_crafts_left > 0) {
+            string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
+            craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_crafts_left, "free craft", "free crafts") + " remaining", free_smiths_left > 0 || jackhammer_crafts_later > 0 ? "Any crafting mode, including smithing" : "", description));
+        }
+
+        if (craft_entry.subentries.count() > 0)
+            resource_entries.listAppend(craft_entry);
     }
-    if ($skill[rapid prototyping].skill_is_usable()) {
-        free_crafts_left += clampi(5 - get_property_int("_rapidPrototypingUsed"), 0, 5);
-    }
-    if (lookupSkill("Expert Corner-Cutter").skill_is_usable()) {
-        free_crafts_left += clampi(5 - get_property_int("_expertCornerCutterUsed"), 0, 5);
-    }
-    if (free_crafts_left > 0) {
-        string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
-        resource_entries.listAppend(ChecklistEntryMake("__item tenderizing hammer", "", ChecklistSubentryMake(pluralise(free_crafts_left, "free craft", "free crafts") + " remaining", "", description), 4));
-    }
+
     ChecklistSubentry [int] subentries;
     int importance = 11;
+    string url;
 
     string [skill] skills_to_details;
     string [skill] skills_to_urls;
@@ -193,16 +237,17 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     if (subentries.count() > 0) {
         subentries.listPrepend(ChecklistSubentryMake("Skill summons:"));
         ChecklistEntry entry = ChecklistEntryMake("__item Knob Goblin love potion", url, subentries, importance);
+        entry.tags.id = "Daily summon skills resource";
         entry.should_indent_after_first_subentry = true;
         resource_entries.listAppend(entry);
     }
     
     
     if (lookupSkill("Evoke Eldritch Horror").skill_is_usable() && !get_property_boolean("_eldritchHorrorEvoked")) {
-        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Evoke eldritch horror skill free fight"));
     }
     if (!get_property_boolean("_eldritchTentacleFought") && my_path_id() != PATH_EXPLOSIONS) {
-        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 5).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Daily forest tentacle free fight"));
     }
     
 }

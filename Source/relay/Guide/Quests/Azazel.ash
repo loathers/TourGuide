@@ -58,7 +58,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             line += " once you have enough space";
         line += ".";
         subentry.entries.listAppend(line);
-        optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "", subentry));
+        optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "", subentry).ChecklistEntrySetIDTag("Azazel steel organ consume"));
         return;
     }
     
@@ -81,6 +81,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	ChecklistEntry entry;
 	entry.url = "pandamonium.php";
 	entry.image_lookup_name = base_quest_state.image_name;
+    entry.tags.id = "Azazel steel organ quest";
 	entry.should_indent_after_first_subentry = true;
     entry.should_highlight = $locations[the laugh floor, infernal rackets backstage] contains __last_adventure_location;
     
@@ -244,7 +245,7 @@ void QAzazelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         entry.subentries.listAppend(subentry);
     }
     
-    if ((my_path_id() == PATH_TEETOTALER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_ZOMBIE_SLAYER) && availableFullness() < 5)
+    if ((my_path_id() == PATH_TEETOTALER || my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_OF_THE_PLUMBER) && availableFullness() < 5)
         entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("Won't work, need five fullness to eat lasagna.", "red"), "", ""));
         
     if (my_path_id() == PATH_OXYGENARIAN && availableSpleen() < 5)

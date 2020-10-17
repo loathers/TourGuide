@@ -22,7 +22,7 @@ void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, Che
             if (url == "")
                 url = possible_locations[0].getClickableURLForLocation();
         }
-        task_entries.listAppend(ChecklistEntryMake("__item Kramco Sausage-o-Matic&trade;", url, ChecklistSubentryMake(title, "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item Kramco Sausage-o-Matic&trade;", url, ChecklistSubentryMake(title, "", description), -11).ChecklistEntrySetIDTag("Kramco sausage grinder goblin fight reminder"));
     }
 }
 
@@ -34,6 +34,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Kramco Sausage-o-Matic&trade;";
     entry.url = "inventory.php?action=grind";
+    entry.tags.id = "Kramco sausage grinder resource";
     entry.importance_level = -2;
     
     string [int] main_description;

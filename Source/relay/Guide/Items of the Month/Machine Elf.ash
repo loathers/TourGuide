@@ -30,6 +30,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
     ChecklistEntry entry;
     entry.image_lookup_name = "__familiar machine elf";
     entry.url = url;
+    entry.tags.id = "Machine elf tunnels resource";
     entry.importance_level = importance;
     if (__last_adventure_location == $location[the deep machine tunnels])
         entry.should_highlight = true;
@@ -139,7 +140,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
                 description.listAppend("Possibly run the machine elf elsewhere first, for transmutable potions.");
         }
         //entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));
-        resource_entries.listAppend(ChecklistEntryMake(entry.image_lookup_name, entry.url, ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description)).ChecklistEntryTagEntry("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake(entry.image_lookup_name, entry.url, ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description)).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Machine elf free fights"));
     }
     if (entry.subentries.count() > 0)
     {
@@ -180,6 +181,6 @@ void IOTMMachineElfGenerateResource(ChecklistEntry [int] resource_entries)
 			abstraction_lines.listAppend(ChecklistSubentryMake(pluralise(it), "",  description));
 		}
 		if (abstraction_lines.count() > 0)
-			resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=1", abstraction_lines, 7));
+			resource_entries.listAppend(ChecklistEntryMake(image_name, "inventory.php?which=1", abstraction_lines, 7).ChecklistEntrySetIDTag("Machine elf abstraction resource"));
     }
 }

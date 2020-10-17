@@ -187,6 +187,7 @@ void IOTMTomesGenerateResource(ChecklistEntry [int] resource_entries)
 		
         
         ChecklistEntry entry = ChecklistEntryMake("__item tome of clip art", "campground.php?action=bookshelf", subentries);
+		entry.tags.id = "Tomes summons resource";
         if (in_ronin())
             entry.should_indent_after_first_subentry = true;
         resource_entries.listAppend(entry);

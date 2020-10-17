@@ -300,5 +300,5 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         relevant_locations[l] = true;
     
 
-    task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, relevant_locations));
+    task_entries.listAppend(ChecklistEntryMake(image_name, url, subentry, relevant_locations).ChecklistEntrySetIDTag("Council L11 quest spookyraven manor"));
 }

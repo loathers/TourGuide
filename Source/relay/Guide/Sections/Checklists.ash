@@ -9,7 +9,7 @@ void generateMisc(Checklist [int] checklists)
 		string [int] king_messages;
 		king_messages.listAppend("You know, whenever.");
 		king_messages.listAppend("Or become the new naughty sorceress?");
-		unimportant_task_entries.listAppend(ChecklistEntryMake("king imprismed", "place.php?whichplace=nstower", ChecklistSubentryMake("Free the King", "", king_messages)));
+		unimportant_task_entries.listAppend(ChecklistEntryMake("king imprismed", "place.php?whichplace=nstower", ChecklistSubentryMake("Free the King", "", king_messages)).ChecklistEntrySetIDTag("He's still trapped, just saying"));
 		
 		checklists.listAppend(ChecklistMake("Unimportant Tasks", unimportant_task_entries));
 	}
@@ -21,7 +21,7 @@ void generateMisc(Checklist [int] checklists)
         
         //Give them something to mindlessly click on:
         //url = "bet.php";
-       if ($coinmaster[Game Shoppe].is_accessible())
+        if ($coinmaster[Game Shoppe].is_accessible())
             url = "aagame.php";
         
         
@@ -62,37 +62,22 @@ void generateMisc(Checklist [int] checklists)
         int pvp_fights_after_rollover = MIN(pvp_fights_after_rollover_before_caps, 100);
         if (today_is_pvp_season_end())
             pvp_fights_after_rollover = 0;
-        if (true)
-        {
-            int adventures_after_rollover = my_adventures() + 40;
-            if (my_path_id() != PATH_SLOW_AND_STEADY)
-                adventures_after_rollover += numeric_modifier("adventures");
-            //if (get_property_boolean("_borrowedTimeUsed"))
-                //adventures_after_rollover -= 20;
-            adventures_after_rollover += get_property_int("extraRolloverAdventures");
-            
-            if (getHolidaysTomorrow()["Labór Day"] && my_path_id() != PATH_SLOW_AND_STEADY)
-                adventures_after_rollover += 10;
-            
-            adventures_after_rollover = clampi(adventures_after_rollover, 0, 200);
-            
-            string [int] all_tomorrows_parties;
-            all_tomorrows_parties.listAppend(pluralise(adventures_after_rollover, "adventure", "adventures")); //it should be impossible to have under twenty adventures after rollover, but why should that stop us from checking the singular case?
-            if (hippy_stone_broken() && pvp_fights_after_rollover > 0)
-                all_tomorrows_parties.listAppend(pluralise(pvp_fights_after_rollover, "fight", "fights"));
-            
-            description.listAppend("Will start with " + all_tomorrows_parties.listJoinComponents(", ", "and") + " tomorrow.");
-        }
+        
+        int adventures_after_rollover = __misc_state_int["adventures after rollover"];
+        
+        string [int] all_tomorrows_parties;
+        all_tomorrows_parties.listAppend(pluralise(adventures_after_rollover, "adventure", "adventures")); //it should be impossible to have under twenty adventures after rollover, but why should that stop us from checking the singular case?
+        if (hippy_stone_broken() && pvp_fights_after_rollover > 0)
+            all_tomorrows_parties.listAppend(pluralise(pvp_fights_after_rollover, "fight", "fights"));
+        
+        description.listAppend("Will start with " + all_tomorrows_parties.listJoinComponents(", ", "and") + " tomorrow.");
         
         int rollover_adventures_from_equipment = 0;
         foreach s in $slots[hat,weapon,off-hand,back,shirt,pants,acc1,acc2,acc3,familiar]
             rollover_adventures_from_equipment += s.equipped_item().numeric_modifier("adventures").to_int_silent();
         
         //detect if they're going to lose some turns, be nice:
-        int rollover_adventures_gained = numeric_modifier("adventures").to_int_silent() + 40;
-        if (get_property_boolean("_borrowedTimeUsed"))
-            rollover_adventures_gained -= 20;
-        int adventures_lost = (my_adventures() + rollover_adventures_gained) - 200;
+        int adventures_lost = __misc_state_int["adventures lost to rollover"];
         if (rollover_adventures_from_equipment == 0.0 && adventures_lost == 0 && my_path_id() != PATH_SLOW_AND_STEADY)
         {
             description.listAppend("Possibly wear +adventures gear.");
@@ -134,13 +119,13 @@ void generateMisc(Checklist [int] checklists)
         }
         //FIXME resolution be more adventurous goes here
         
-		task_entries.entries.listAppend(ChecklistEntryMake("__item counterclockwise watch", url, ChecklistSubentryMake("Wait for rollover", "", description), -11));
+		task_entries.entries.listAppend(ChecklistEntryMake("__item counterclockwise watch", url, ChecklistSubentryMake("Wait for rollover", "", description), -11).ChecklistEntrySetIDTag("Game unplayable"));
         if (stills_available() > 0 && __misc_state["in run"])
         {
             string url = "shop.php?whichshop=still";
             if ($item[soda water].available_amount() == 0)
                 url = "shop.php?whichshop=generalstore";
-            task_entries.entries.listAppend(ChecklistEntryMake("__item tonic water", url, ChecklistSubentryMake("Make " + pluralise(stills_available(), $item[tonic water]), "", listMake("Tonic water is a ~40MP restore, improved from soda water.", "Or improve drinks.")), -11));
+            task_entries.entries.listAppend(ChecklistEntryMake("__item tonic water", url, ChecklistSubentryMake("Make " + pluralise(stills_available(), $item[tonic water]), "", listMake("Tonic water is a ~40MP restore, improved from soda water.", "Or improve drinks.")), -11).ChecklistEntrySetIDTag("End of day nash crosby still"));
         }
 	}
 }
@@ -168,19 +153,19 @@ void generateChecklists(Checklist [int] ordered_output_checklists)
     {
         LimitModeBatfellowGenerateChecklists(checklists);
     }
-    else if (!playerIsLoggedIn())
+    else if (!playerIsLoggedIn() && !__misc_state["Example mode"])
     {
 		Checklist task_entries = lookupChecklist(checklists, "Tasks");
         
         string image_name;
         image_name = "disco bandit";
-		task_entries.entries.listAppend(ChecklistEntryMake(image_name, "", ChecklistSubentryMake("Log in", "+internet", "An Adventurer is You!"), -11));
+		task_entries.entries.listAppend(ChecklistEntryMake(image_name, "", ChecklistSubentryMake("Log in", "+internet", "An Adventurer is You!"), -11).ChecklistEntrySetIDTag("Not logged in"));
     }
-    else if (__misc_state["In valhalla"])
+    else if (__misc_state["In valhalla"] && !__misc_state["Example mode"])
     {
         //Valhalla:
 		Checklist task_entries = lookupChecklist(checklists, "Tasks");
-        task_entries.entries.listAppend(ChecklistEntryMake("astral spirit", "", ChecklistSubentryMake("Start a new life", "", listMake("Perm skills.", "Buy consumables.", "Bring along a pet."))));
+        task_entries.entries.listAppend(ChecklistEntryMake("astral spirit", "", ChecklistSubentryMake("Start a new life", "", listMake("Perm skills.", "Buy consumables.", "Bring along a pet."))).ChecklistEntrySetIDTag("Astral spirit"));
     }
     else
     {
@@ -280,37 +265,13 @@ Adds the checklists to the DOM.
 @param ordered_output_checklists Checklists to output.
 */
 void outputChecklists(Checklist [int] ordered_output_checklists) {
-    // Turn Count
-    if (__misc_state["in run"] && playerIsLoggedIn()) {
-        PageWrite(HTMLGenerateDivOfClass("Day " + my_daycount() + ". " + pluralise(my_turncount(), "turn", "turns") + " played.", "r_bold"));
-    }
-
-    // Path
-	if (my_path() != "" && my_path() != "None" && playerIsLoggedIn()) {
-		PageWrite(HTMLGenerateDivOfClass(my_path(), "r_bold"));
-	}
-    
-    // Random Message
-    PageWrite(HTMLGenerateDivOfStyle(generateRandomMessage(), "padding-left:20px;padding-right:20px;"));
-
-    PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "extra_words_at_top")));
-	
-    // Example mode
-	if (__misc_state["Example mode"]) {
-		PageWrite("<br>");
-		PageWrite(HTMLGenerateDivOfStyle("Example ascension", "text-align:center; font-weight:bold;"));
-	}
-    
     Checklist extra_important_tasks;
     
 	// Checklists:
-	foreach i in ordered_output_checklists {
-		Checklist cl = ordered_output_checklists[i];
-        
+	foreach i, cl in ordered_output_checklists {
         // Check for Pin
         if (__show_importance_bar && cl.title == "Tasks") {
-            foreach key in cl.entries {
-                ChecklistEntry entry = cl.entries[key];
+            foreach key, entry in cl.entries {
                 if (entry.importance_level <= -11) {
                     extra_important_tasks.entries.listAppend(entry);
                     if (entry.only_show_as_extra_important_pop_up) {

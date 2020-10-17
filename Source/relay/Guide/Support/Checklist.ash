@@ -92,6 +92,12 @@ ChecklistSubentry [int] listMake(ChecklistSubentry e1)
 }
 
 
+record TagGroup
+{
+    string id; //For the "minimize" feature to keep track of the entries. Uses 'combination' instead if present. Uses the first entry's header if empty.
+    string combination; //Entries with identical combination tags will be combined into one, with the "first" taking precedence.
+};
+
 int CHECKLIST_DEFAULT_IMPORTANCE = 0;
 record ChecklistEntry
 {
@@ -99,6 +105,7 @@ record ChecklistEntry
 	string url;
     string [string] container_div_attributes;
 	ChecklistSubentry [int] subentries;
+    TagGroup tags; //meta-informations about the entry
 	boolean should_indent_after_first_subentry;
     
     boolean should_highlight;
@@ -106,20 +113,79 @@ record ChecklistEntry
 	int importance_level; //Entries will be resorted by importance level before output, ascending order. Default importance is 0. Convention is to vary it from [-11, 11] for reasons that are clear and well supported in the narrative.
     boolean only_show_as_extra_important_pop_up; //only valid if -11 importance or lower - only shows up as a pop-up, meant to inform the user they can scroll up to see something else (semi-rares)
     ChecklistSubentry [int] subentries_on_mouse_over; //replaces subentries
-    
-    string combination_tag; //Entries with identical combination tags will be combined into one, with the "first" taking precedence.
 };
 
 
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry [int] subentries, TagGroup tags, int importance, boolean should_highlight)
+{
+    ChecklistEntry result;
+    result.image_lookup_name = image_lookup_name;
+    result.url = url;
+    result.subentries = subentries;
+    result.tags = tags;
+    result.importance_level = importance;
+    result.should_highlight = should_highlight;
+    return result;
+}
+
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry [int] subentries, TagGroup tags, int importance)
+{
+    return ChecklistEntryMake(image_lookup_name, target_location, subentries, tags, importance, false);
+}
+
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry [int] subentries, TagGroup tags, int importance, boolean [location] highlight_if_last_adventured)
+{
+    boolean should_highlight = false;
+    
+    if (highlight_if_last_adventured contains __last_adventure_location)
+        should_highlight = true;
+    return ChecklistEntryMake(image_lookup_name, target_location, subentries, tags, importance, should_highlight);
+}
+
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry [int] subentries, TagGroup tags)
+{
+    return ChecklistEntryMake(image_lookup_name, target_location, subentries, tags, CHECKLIST_DEFAULT_IMPORTANCE);
+}
+
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry [int] subentries, TagGroup tags, boolean [location] highlight_if_last_adventured)
+{
+    return ChecklistEntryMake(image_lookup_name, target_location, subentries, tags, CHECKLIST_DEFAULT_IMPORTANCE, highlight_if_last_adventured);
+}
+
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry subentry, TagGroup tags, int importance)
+{
+    ChecklistSubentry [int] subentries;
+    subentries[subentries.count()] = subentry;
+    return ChecklistEntryMake(image_lookup_name, target_location, subentries, tags, importance);
+}
+
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry subentry, TagGroup tags, int importance, boolean [location] highlight_if_last_adventured)
+{
+    ChecklistSubentry [int] subentries;
+    subentries[subentries.count()] = subentry;
+    return ChecklistEntryMake(image_lookup_name, target_location, subentries, tags, importance, highlight_if_last_adventured);
+}
+
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry subentry, TagGroup tags)
+{
+    return ChecklistEntryMake(image_lookup_name, target_location, subentry, tags, CHECKLIST_DEFAULT_IMPORTANCE);
+}
+
+ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry subentry, TagGroup tags, boolean [location] highlight_if_last_adventured)
+{
+    ChecklistSubentry [int] subentries;
+    subentries[subentries.count()] = subentry;
+    return ChecklistEntryMake(image_lookup_name, target_location, subentries, tags, CHECKLIST_DEFAULT_IMPORTANCE, highlight_if_last_adventured);
+}
+
+
+//should we remove these? Players may have build their own ChecklistEntries, so if we do, we'd put a warning here during a release, and officially remove them on the next.
+// Considering YOUR speed (yes, you, you know who you are), they'll have, what... a year..? <_<
+// ... to change their custom ChecklistEntry / make the right edit(s)
 ChecklistEntry ChecklistEntryMake(string image_lookup_name, string url, ChecklistSubentry [int] subentries, int importance, boolean should_highlight)
 {
-	ChecklistEntry result;
-	result.image_lookup_name = image_lookup_name;
-	result.url = url;
-	result.subentries = subentries;
-	result.importance_level = importance;
-    result.should_highlight = should_highlight;
-	return result;
+    TagGroup tags;
+    return ChecklistEntryMake(image_lookup_name, url, subentries, tags, importance, should_highlight);
 }
 
 ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_location, ChecklistSubentry [int] subentries, int importance)
@@ -173,9 +239,15 @@ ChecklistEntry ChecklistEntryMake(string image_lookup_name, string target_locati
 }
 
 //Secondary level of making checklist entries; setting properties and returning them.
-ChecklistEntry ChecklistEntryTagEntry(ChecklistEntry e, string tag)
+ChecklistEntry ChecklistEntrySetIDTag(ChecklistEntry e, string id)
 {
-    e.combination_tag = tag;
+    e.tags.id = id;
+    return e;
+}
+
+ChecklistEntry ChecklistEntrySetCombinationTag(ChecklistEntry e, string tag)
+{
+    e.tags.combination = tag;
     return e;
 }
 
@@ -253,9 +325,9 @@ string ChecklistGenerateModifierSpan(string [int] modifiers)
 	return HTMLGenerateSpanOfClass(modifiers.listJoinComponents(", "), "r_cl_modifier");
 }
 
-string ChecklistGenerateModifierSpan(string modifier)
+string ChecklistGenerateModifierSpan(string modifier) //no longer span, but I'm sure as hell not gonna change every instance of it :V
 {
-	return HTMLGenerateSpanOfClass(modifier, "r_cl_modifier");
+	return HTMLGenerateDivOfClass(modifier, "r_cl_modifier");
 }
 
 
@@ -267,62 +339,107 @@ void ChecklistInit()
 	
 	PageAddCSSClass("", "r_cl_header", "text-align:center; font-size:1.15em; font-weight:bold;");
 	PageAddCSSClass("", "r_cl_subheader", "font-size:1.07em; font-weight:bold;");
-	PageAddCSSClass("div", "r_cl_inter_spacing_divider", "width:100%; height:12px;");
-	PageAddCSSClass("div", "r_cl_l_container", "padding-top:5px;padding-bottom:5px;");
+    PageAddCSSClass("", "r_cl_entry_id", "font-size:1.07em; font-weight:bold; display:none;");
+    PageAddCSSClass("div", "r_cl_entry_first_subheader", "display:flex;flex-direction:row;align-items:flex-start;width:100%;");
+    PageAddCSSClass("div", "r_cl_entry_container", "display:flex; flex-direction:row; align-items:flex-start; padding-top: var(--cl_entry_container_padding); padding-bottom: var(--cl_entry_container_padding);");
     
     string gradient = "background: #ffffff;background: -moz-linear-gradient(left, #ffffff 50%, #F0F0F0 75%, #F0F0F0 100%);background: -webkit-gradient(linear, left top, right top, color-stop(50%,#ffffff), color-stop(75%,#F0F0F0), color-stop(100%,#F0F0F0));background: -webkit-linear-gradient(left, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);background: -o-linear-gradient(left, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);background: -ms-linear-gradient(left, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);background: linear-gradient(to right, #ffffff 50%,#F0F0F0 75%,#F0F0F0 100%);filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#F0F0F0',GradientType=1 );"; //help
-	PageAddCSSClass("div", "r_cl_l_container_highlighted", gradient + "padding-top:5px;padding-bottom:5px;");
+    PageAddCSSClass("", "container_highlighted", gradient + "margin-right: calc(0px - var(--cl_container_padding)); padding-right: var(--cl_container_padding);"); //counter the checklist_container's padding, so that the gradient won't stop mid-way
+    PageAddCSSClass("", "close_highlight", "margin-right: calc(0px - var(--cl_container_padding)); padding-right: var(--cl_container_padding);");
     
-	PageAddCSSClass("div", "r_cl_l_left", "float:left;width:" + __setting_image_width_large + "px;margin-left:20px;overflow:hidden;");
-	PageAddCSSClass("div", "r_cl_l_right_container", "width:100%;margin-left:" + (-__setting_image_width_large - 20) + "px;float:right;text-align:left;vertical-align:top;");
-	PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + (__setting_image_width_large + 20 + 2) + "px;display:inline-block;margin-right:20px;");
+    PageAddCSSClass("div", "r_cl_entry_image", "width: var(--image-width); flex:none;");
+    PageAddCSSClass("div", "r_cl_entry_content_container", "flex-grow:1;display:flex;flex-direction:column;text-align:left;align-items:flex-start;");
+    PageAddCSSClass("", "hr_like", "border: 0px; border-top: 1px; border-style:solid; border-color: " + __setting_line_colour + ";");
     
-    PageAddCSSClass("hr", "r_cl_hr", "padding:0px;margin-top:0px;margin-bottom:0px;width:auto; margin-left:" + __setting_indention_width + ";margin-right:" + __setting_indention_width +";");
-    PageAddCSSClass("hr", "r_cl_hr_extended", "padding:0px;margin-top:0px;margin-bottom:0px;width:auto; margin-left:" + __setting_indention_width + ";margin-right:0px;");
-	PageAddCSSClass("div", "r_cl_holding_container", "display:inline-block;");
+    //subentries-on-mouseover
+    PageAddCSSClass("", "r_cl_entry_content_container.entry_hoverable", "");
+    PageAddCSSClass("", "r_cl_entry_content_container.entry_hovered", "display:none;");
+    PageAddCSSClass("", "r_cl_entry_container:hover .r_cl_entry_content_container.entry_hoverable", "display:none;");
+    PageAddCSSClass("", "r_cl_entry_container:hover .r_cl_entry_content_container.entry_hovered", "display:flex;");
+    
+    //collapsing feature
+    PageAddCSSClass("button", "r_cl_minimize_button", "background-color:antiquewhite;padding:0px;font-size:11px;height:18px;width:18px;flex-shrink:0;position:relative;z-index:2;color:#7F7F7F;cursor:pointer;");
+    PageAddCSSClass("button", "r_cl_minimize_button:hover", "background-color:black;");
+    
+    if (true)
+    {
+        PageAddCSSClass("", "#Guide_body.opacity_full .r_cl_entry_container.r_cl_collapsed .r_cl_entry_image"
+                        + ", #Guide_body.opacity_full .r_cl_entry_container.r_cl_collapsed .r_cl_subheader"
+                        + ", #Guide_body.opacity_full .r_cl_entry_container.r_cl_collapsed .r_cl_modifier", "opacity:1;");
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.opacity_full .r_cl_entry_image"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.opacity_full .r_cl_subheader"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.opacity_full .r_cl_modifier", "opacity:1;", 1);
+        
+        PageAddCSSClass("", "#Guide_body.opacity_half .r_cl_entry_container.r_cl_collapsed .r_cl_entry_image"
+                        + ", #Guide_body.opacity_half .r_cl_entry_container.r_cl_collapsed .r_cl_subheader"
+                        + ", #Guide_body.opacity_half .r_cl_entry_container.r_cl_collapsed .r_cl_modifier", "opacity:0.5;");
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.opacity_half .r_cl_entry_image"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.opacity_half .r_cl_subheader"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.opacity_half .r_cl_modifier", "opacity:0.5;", 1);
+        
+        
+        //.image_auto on #Guide_body is already the normal behaviour, so don't do anything here (THANKFULLY).
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_auto .r_cl_image_container_large", "display:block;", 1, __setting_media_query_large_size);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_auto .r_cl_image_container_medium"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.image_auto .r_cl_image_container_small", "display:none;", 1, __setting_media_query_large_size);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_auto .r_cl_image_container_medium", "display:block;", 1, __setting_media_query_medium_size);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_auto .r_cl_image_container_large"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.image_auto .r_cl_image_container_small", "display:none;", 1, __setting_media_query_medium_size);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_auto .r_cl_image_container_small", "display:block;", 1, __setting_media_query_small_size);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_auto .r_cl_image_container_large"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.image_auto .r_cl_image_container_medium", "display:none;" , 1, __setting_media_query_small_size);
+        
+        PageAddCSSClass("", "#Guide_body.image_none .r_cl_entry_container.r_cl_collapsed .r_cl_image_container_large"
+                        + ", #Guide_body.image_none .r_cl_entry_container.r_cl_collapsed .r_cl_image_container_medium"
+                        + ", #Guide_body.image_none .r_cl_entry_container.r_cl_collapsed .r_cl_image_container_small", "display:none;");
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_none .r_cl_image_container_large"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.image_none .r_cl_image_container_medium"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.image_none .r_cl_image_container_small", "display:none;", 1);
+        
+        PageAddCSSClass("", "#Guide_body.image_small .r_cl_entry_container.r_cl_collapsed .r_cl_image_container_large"
+                        + ", #Guide_body.image_small .r_cl_entry_container.r_cl_collapsed .r_cl_image_container_medium", "display:none;");
+        PageAddCSSClass("", "#Guide_body.image_small .r_cl_entry_container.r_cl_collapsed .r_cl_image_container_small", "display:block;");
+        PageAddCSSClass("", "#Guide_body.image_small .r_cl_entry_container.r_cl_collapsed .r_cl_image_container_small", "display:none;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_small .r_cl_image_container_large"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.image_small .r_cl_image_container_medium", "display:none;", 1);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_small .r_cl_image_container_small", "display:block;", 1);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.image_small .r_cl_image_container_small", "display:none;", 1, __setting_media_query_tiny_size);
+        
+        
+        PageAddCSSClass("", "#Guide_body.collapsing_entries .r_cl_entry_container.r_cl_collapsed .r_cl_subheader"
+                        + ", #Guide_body.collapsing_entries .r_cl_entry_container.r_cl_collapsed .r_cl_modifier", "display:block;");
+        PageAddCSSClass("", "#Guide_body.collapsing_entries .r_cl_entry_container.r_cl_collapsed .r_cl_entry_id", "display:none;");
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.collapsing_entries .r_cl_subheader"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.collapsing_entries .r_cl_modifier", "display:block;", 1);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.collapsing_entries .r_cl_entry_id", "display:none;", 1);
+        
+        PageAddCSSClass("", "#Guide_body.collapsing_modifiers .r_cl_entry_container.r_cl_collapsed .r_cl_subheader", "display:block;");
+        PageAddCSSClass("", "#Guide_body.collapsing_modifiers .r_cl_entry_container.r_cl_collapsed .r_cl_modifier"
+                        + ", #Guide_body.collapsing_modifiers .r_cl_entry_container.r_cl_collapsed .r_cl_entry_id", "display:none;");
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.collapsing_modifiers .r_cl_subheader", "display:block;", 1);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.collapsing_modifiers .r_cl_modifier"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.collapsing_modifiers .r_cl_entry_id", "display:none;", 1);
+        
+        PageAddCSSClass("", "#Guide_body.collapsing_replace .r_cl_entry_container.r_cl_collapsed .r_cl_subheader"
+                        + ", #Guide_body.collapsing_replace .r_cl_entry_container.r_cl_collapsed .r_cl_modifier", "display:none;");
+        PageAddCSSClass("", "#Guide_body.collapsing_replace .r_cl_entry_container.r_cl_collapsed .r_cl_entry_id", "display:block;");
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.collapsing_replace .r_cl_subheader"
+                        + ", #Guide_body .r_cl_entry_container.r_cl_collapsed.collapsing_replace .r_cl_modifier", "display:none;", 1);
+        PageAddCSSClass("", "#Guide_body .r_cl_entry_container.r_cl_collapsed.collapsing_replace .r_cl_entry_id", "display:block;", 1);
+
+        PageAddCSSClass("", "r_cl_entry_container.r_cl_collapsed .r_cl_collapsable", "display:none;");
+    }
 	
     
     PageAddCSSClass("", "r_cl_image_container_large", "display:block;");
     PageAddCSSClass("", "r_cl_image_container_medium", "display:none;");
     PageAddCSSClass("", "r_cl_image_container_small", "display:none;");
     
-	if (true)
-	{
-		string div_style = "";
-		div_style = "margin:0px; border:1px; border-style: solid; border-color:" + __setting_line_colour + ";";
-        div_style += "border-left:0px; border-right:0px;";
-        div_style += "background-color:#FFFFFF; width:100%; padding-top:5px;";
-		PageAddCSSClass("div", "r_cl_checklist_container", div_style);
-	}
+	PageAddCSSClass("div", "r_cl_checklist_container", "margin:0px; padding-left: var(--cl_container_padding); padding-right: var(--cl_container_padding); border:1px; border-style: solid; border-color:" + __setting_line_colour + ";border-left:0px; border-right:0px;background-color:#FFFFFF; padding-top:5px;");
     
     //media queries:
-    if (!__use_table_based_layouts)
+    if (true)
     {
-        PageAddCSSClass("div", "r_cl_l_left", "width:" + __setting_image_width_medium + "px;margin-left:5px;", 0, __setting_media_query_medium_size);
-        PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-__setting_image_width_medium - 5) + "px;", 0, __setting_media_query_medium_size);
-        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + (__setting_image_width_medium + 5 + 2) + "px;margin-right:10px;", 0, __setting_media_query_medium_size);
-        PageAddCSSClass("div", "r_cl_l_container", "padding-top:4px;padding-bottom:4px;", 0, __setting_media_query_medium_size);
-        PageAddCSSClass("hr", "r_cl_hr", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;margin-right:" + (__setting_indention_width_in_em / 2.0) +"em;", 0, __setting_media_query_medium_size);
-        PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;", 0, __setting_media_query_medium_size);
-        
-        
-        PageAddCSSClass("div", "r_cl_l_left", "width:" + (__setting_image_width_small) + "px;margin-left:5px;", 0, __setting_media_query_small_size);
-        PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-(__setting_image_width_small) - 10) + "px;", 0, __setting_media_query_small_size);
-        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + ((__setting_image_width_small) + 10) + "px;margin-right:3px;", 0, __setting_media_query_small_size);
-        PageAddCSSClass("hr", "r_cl_hr", "margin-left:0px;margin-right:0px;", 0, __setting_media_query_small_size);
-        PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:0px;", 0, __setting_media_query_small_size);
-        PageAddCSSClass("div", "r_cl_l_container", "padding-top:3px;padding-bottom:3px;", 0, __setting_media_query_small_size);
-        
-        
-        PageAddCSSClass("div", "r_cl_l_left", "width:" + (0) + "px;margin-left:3px;", 0, __setting_media_query_tiny_size);
-        PageAddCSSClass("div", "r_cl_l_right_container", "margin-left:" + (-(0) - 3) + "px;", 0, __setting_media_query_tiny_size);
-        PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:" + ((0) + 3 + 2) + "px;margin-right:3px;", 0, __setting_media_query_tiny_size);
-        PageAddCSSClass("hr", "r_cl_hr", "margin-left:0px;margin-right:0px;", 0, __setting_media_query_tiny_size);
-        PageAddCSSClass("hr", "r_cl_hr_extended", "margin-left:0px;", 0, __setting_media_query_tiny_size);
-        PageAddCSSClass("div", "r_cl_l_container", "padding-top:3px;padding-bottom:3px;", 0, __setting_media_query_tiny_size);
-        
-        
-        
         PageAddCSSClass("", "r_cl_image_container_large", "display:none", 0, __setting_media_query_medium_size);
         PageAddCSSClass("", "r_cl_image_container_medium", "display:block;", 0, __setting_media_query_medium_size);
         PageAddCSSClass("", "r_cl_image_container_small", "display:none;", 0, __setting_media_query_medium_size);
@@ -335,21 +452,9 @@ void ChecklistInit()
         PageAddCSSClass("", "r_cl_image_container_medium", "display:none;", 0, __setting_media_query_tiny_size);
         PageAddCSSClass("", "r_cl_image_container_small", "display:none;", 0, __setting_media_query_tiny_size);
         
-        PageAddCSSClass("", "r_small_float_indention", "display:none");
         
-        PageAddCSSClass("", "r_indention_not_small", "margin-left:" + __setting_indention_width + ";");
-        if (__setting_small_size_uses_full_width)
-        {
-            PageAddCSSClass("div", "r_cl_l_right_content", "margin-left:10px;margin-right:3px;min-width:80%;", 0, __setting_media_query_small_size);
-            PageAddCSSClass("", "r_cl_image_container_small", "display:block;float:left;", 0, __setting_media_query_small_size);
-            PageAddCSSClass("", "r_small_float_indention", "display:inline;width:0.5em;float:left;", 0, __setting_media_query_small_size);
-            PageAddCSSClass("", "r_indention_not_small", "margin-left:0.75em;", 0, __setting_media_query_small_size);
-            PageAddCSSClass("", "r_indention_not_small", "margin-left:0.75em;", 0, __setting_media_query_tiny_size);
-        }
-        
-        
-        PageAddCSSClass("", "r_indention", "margin-left:0.75em;", 0, __setting_media_query_small_size);
-        PageAddCSSClass("", "r_indention", "margin-left:0.75em;", 0, __setting_media_query_tiny_size);
+        PageAddCSSClass("", "r_indention", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;", 0, __setting_media_query_small_size);
+        PageAddCSSClass("", "r_indention", "margin-left:" + (__setting_indention_width_in_em / 2.0) + "em;", 0, __setting_media_query_tiny_size);
     }
 }
 
@@ -396,104 +501,91 @@ void ChecklistFormatSubentry(ChecklistSubentry subentry) {
     }
 }
 
-buffer ChecklistGenerateEntryHTML(ChecklistEntry entry, ChecklistSubentry [int] subentries, boolean outputting_anchor, buffer anchor_prefix_html, buffer anchor_suffix_html, boolean setting_use_holding_containers_per_subentry) {
-    Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large, 75);
-    Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium, 50);
-    Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small, 50);
-    if (__setting_small_size_uses_full_width) {
-        max_image_dimensions_small = Vec2iMake(__setting_image_width_small,__setting_image_width_small);
-    }
-
-    buffer result;
-    buffer image_container;
+buffer ChecklistEntryGenerateContentHTML(ChecklistEntry entry, ChecklistSubentry [int] subentries, string [string] anchor_attributes) {
+    buffer entry_content;
     
-    if (outputting_anchor && !__setting_entire_area_clickable) {
-        image_container.append(anchor_prefix_html);
-    }
-    
-    image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large, "r_cl_image_container_large"));
-    image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_medium, "r_cl_image_container_medium"));
-
-    if (!__setting_small_size_uses_full_width) {
-        image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
-    }
-    
-    if (outputting_anchor && !__setting_entire_area_clickable) {
-        image_container.append(anchor_suffix_html);
-    }
-    
-    result.append(HTMLGenerateDivOfClass(image_container, "r_cl_l_left"));
-    result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_container")));
-    
-    if (outputting_anchor && !__setting_entire_area_clickable) {
-        result.append(anchor_prefix_html);
-    }
-
-    result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_l_right_content")));
-    
-    if (__setting_small_size_uses_full_width) {
-        result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_small, "r_cl_image_container_small"));
-        result.append(HTMLGenerateTagWrap("div", "", mapMake("class", "r_small_float_indention", "style", "height: " + __kol_image_generate_image_html_return_final_size.y + "px;")));
-    }
+    string entry_id = entry.tags.id;
     
     boolean first = true;
-    foreach j in subentries {
-        ChecklistSubentry subentry = subentries[j];
+    boolean indented_after_first_subentry = false;
+    boolean entry_is_just_a_title = true;
+    foreach j, subentry in subentries {
         if (subentry.header == "")
             continue;
-        string subheader = subentry.header;
         
-        boolean indent_this_entry = false;
         if (first)
         {
-            first = false;
+            string subheader = HTMLGenerateSpanOfClass(subentry.header, "r_cl_subheader");
+            subheader += HTMLGenerateSpanOfClass(entry_id, "r_cl_entry_id");
+            
+            buffer first_subheader;
+            if (anchor_attributes.count() > 0 && !__setting_entire_area_clickable)
+                subheader = HTMLGenerateTagWrap("a", subheader, anchor_attributes);
+            first_subheader.append(subheader);
+            
+            //minimize button
+            boolean entry_has_content_to_minimize = false;
+            int indented_entries;
+            foreach j, subentry in subentries {
+                if (subentry.header == "")
+                    continue;
+                
+                if (entry.should_indent_after_first_subentry)
+                    indented_entries++;
+                if (subentry.entries.count() > 0 || indented_entries >= 2) {
+                    entry_has_content_to_minimize = true;
+                    break;
+                }
+            }
+
+            first_subheader.append(HTMLGenerateTagWrap("div", "", string [string] {"style":"flex-grow:1;"})); //fill empty space to ensure the button(s) are on the right end
+
+            if (entry_has_content_to_minimize) {
+                first_subheader.append(HTMLGenerateTagWrap("button", "&#9660;", string [string] {"class":"r_cl_minimize_button toggle_" + entry_id,"alt":"Minimize","title":"Minimize","id":"toggle_" + entry_id,"onclick":"alterSubentryMinimization(event)", "oncontextmenu":"callSettingsContextualMenu(event)"}));
+            }
+
+            entry_content.append(HTMLGenerateTagWrap("div", first_subheader, string [string] {"class":"r_cl_entry_first_subheader"}));
         }
-        else if (entry.should_indent_after_first_subentry)
+        else if (entry.should_indent_after_first_subentry && !indented_after_first_subentry)
         {
-            indent_this_entry = true;
+            entry_content.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention r_cl_collapsable"))); // + entry_id
+            indented_after_first_subentry = true;
         }
         
-        if (indent_this_entry)
-            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
+        if (anchor_attributes.count() > 0 && !__setting_entire_area_clickable) {
+            if (subentry.modifiers.count() + subentry.entries.count() > 0 && entry_is_just_a_title) {
+                entry_is_just_a_title = false;
+                entry_content.append(HTMLGenerateTagPrefix("a", anchor_attributes));
+            }
+        }
         
-        result.append(HTMLGenerateSpanOfClass(subheader, "r_cl_subheader"));
-        if (__setting_small_size_uses_full_width)
-            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention_not_small")));
-        else
-            result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
+        if (!first)
+            entry_content.append(HTMLGenerateDivOfClass(subentry.header, "r_cl_subheader"));
+        
         if (subentry.modifiers.count() > 0)
-            result.append(ChecklistGenerateModifierSpan(listJoinComponents(subentry.modifiers, ", ")));
+            entry_content.append(subentry.modifiers.listJoinComponents(", ").HTMLGenerateDivOfClass("r_indention r_cl_modifier"));
+
         if (subentry.entries.count() > 0)
         {
-            int intra_k = 0;
-            if (setting_use_holding_containers_per_subentry)
-                result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_cl_holding_container"))); //HRs
-            while (intra_k < subentry.entries.count())
+            buffer subentry_text;
+            for intra_k from 0 to subentry.entries.count() - 1
             { 
                 if (intra_k > 0)
-                    result.append("<hr>");
+                    subentry_text.append("<hr>");
                 string line = subentry.entries[listKeyForIndex(subentry.entries, intra_k)];
                 
-                //if (line.contains_text("<hr"))
-                line = HTMLGenerateDivOfClass(line, "r_cl_holding_container"); //For nested HRs, sizes them down a bit
-                
-                result.append(line);
-                
-                intra_k += 1;
+                subentry_text.append(line);
             }
-            if (setting_use_holding_containers_per_subentry)
-                result.append("</div>");
+            entry_content.append(HTMLGenerateTagWrap("div", subentry_text, mapMake("class", "r_indention" + (indented_after_first_subentry ? "" : " r_cl_collapsable") ))); // + entry_id
         }
-        result.append("</div>");
-        if (indent_this_entry)
-            result.append("</div>");
+        
+        first = false;
     }
-    result.append("</div>");
-    if (outputting_anchor && !__setting_entire_area_clickable)
-        result.append(anchor_suffix_html);
-    result.append("</div>");
-    result.append(HTMLGenerateDivOfClass("", "r_end_floating_elements")); //stop floating
-    return result;
+    if (indented_after_first_subentry)
+        entry_content.append("</div>");
+    if (anchor_attributes.count() > 0 && !__setting_entire_area_clickable && !entry_is_just_a_title)
+        entry_content.append("</a>");
+    return entry_content;
 }
 
 /**
@@ -507,35 +599,53 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders) {
 	//Combine entries with identical combination tags:
 	ChecklistEntry [string] combination_tag_entries;
 	foreach key, entry in entries {
-		if (entry.combination_tag == "") continue;
+		if (entry.tags.combination == "") continue;
         if (entry.only_show_as_extra_important_pop_up) continue; //do not support this feature with this
+        if (entry.should_indent_after_first_subentry) continue;
         if (entry.subentries_on_mouse_over.count() > 0) continue;
         if (entry.container_div_attributes.count() > 0) continue;
         
-        if (!(combination_tag_entries contains entry.combination_tag)) {
-        	entry.importance_level -= 1; //combined entries gain a hack; a level above everything else
-        	combination_tag_entries[entry.combination_tag] = entry;
+        entry.importance_level -= 1; //combined entries gain a hack; a level above everything else
+
+        if (!(combination_tag_entries contains entry.tags.combination)) {
+            entry.tags.id = cl.title + "_" + entry.tags.combination;
+            combination_tag_entries[entry.tags.combination] = entry;
             continue;
         }
 
-        ChecklistEntry master_entry = combination_tag_entries[entry.combination_tag];
+        ChecklistEntry master_entry = combination_tag_entries[entry.tags.combination];
         
         if (entry.should_highlight) {
         	master_entry.should_highlight = true;
         }
 
         if (master_entry.url == "" && entry.url != "") {
-        	master_entry.url = entry.url;
+            master_entry.url = entry.url;
         }
 
-        master_entry.importance_level = min(master_entry.importance_level, entry.importance_level - 1);
-        
-        foreach key, subentry in entry.subentries { 
-        	master_entry.subentries.listAppend(subentry);
+        if (entry.importance_level < master_entry.importance_level)
+        {
+            master_entry.importance_level = entry.importance_level;
+            master_entry.image_lookup_name = entry.image_lookup_name;
+            if (entry.url != "")
+                master_entry.url = entry.url;
+
+            //Put that entry's subentries at the start
+            ChecklistSubentry [int] new_master_subentries = entry.subentries;
+            foreach key, subentry in master_entry.subentries {
+                new_master_subentries.listAppend(subentry);
+            }
+            master_entry.subentries = new_master_subentries;
+        }
+        else
+        {
+            foreach key, subentry in entry.subentries { 
+                master_entry.subentries.listAppend(subentry);
+            }
         }
 
         remove entries[key];
-	}
+    }
 	
 	//Sort by importance:
 	sort entries by value.importance_level;
@@ -563,191 +673,117 @@ buffer ChecklistGenerate(Checklist cl, boolean output_borders) {
 	}
 	
 	buffer result;
-    if (output_borders)
-        result.append(HTMLGenerateDivOfClass("", "r_cl_inter_spacing_divider")); //spacing
-	
-    if (!cl.disable_generating_id)
-        result.append(HTMLGenerateTagWrap("a", "", mapMake("id", HTMLConvertStringToAnchorID(cl.title), "class", "r_cl_internal_anchor")));
-	
     string [string] main_container_map;
     main_container_map["class"] = "r_cl_checklist_container";
     if (!cl.disable_generating_id)
         main_container_map["id"] = HTMLConvertStringToAnchorID(cl.title + " checklist container");
-    if (!output_borders)
+    if (output_borders)
+        main_container_map["style"] = "margin-top:12px;margin-bottom:24px;"; //spacing
+    else
         main_container_map["style"] = "border:0px;";
     result.append(HTMLGenerateTagPrefix("div", main_container_map));
 	
 	
-	result.append(HTMLGenerateDivOfClass(cl.title, "r_cl_header"));
+    string anchor = cl.title;
+    if (!cl.disable_generating_id)
+        anchor = HTMLGenerateTagWrap("a", "", mapMake("id", HTMLConvertStringToAnchorID(cl.title), "class", "r_cl_internal_anchor")) + cl.title;
+    
+	result.append(HTMLGenerateDivOfClass(anchor, "r_cl_header"));
 	
 	if (special_subheader != "")
 		result.append(ChecklistGenerateModifierSpan(special_subheader));
 	
-	int starting_intra_i = 0;
+	int starting_intra_i = 1;
 	if (skip_first_entry)
-		starting_intra_i = 1;
+		starting_intra_i++;
 	int intra_i = 0;
 	int entries_output = 0;
     boolean last_was_highlighted = false;
-    int current_mouse_over_id = 1;
-	foreach i in entries
-	{
-		if (intra_i < starting_intra_i)
-		{
-			intra_i += 1;
-			continue;
-		}
-		ChecklistEntry entry = entries[i];
-		if (intra_i > starting_intra_i)
-		{
-            boolean next_is_highlighted = false;
-            if (entry.should_highlight)
-                next_is_highlighted = true;
-            string class_name = "r_cl_hr";
-            if (last_was_highlighted || next_is_highlighted)
-                class_name = "r_cl_hr_extended";
-			result.append(HTMLGenerateTagPrefix("hr", mapMake("class", class_name)));
-		}
-        if (__use_table_based_layouts)
-            __setting_entire_area_clickable = true;
-		boolean outputting_anchor = false;
-        buffer anchor_prefix_html;
-        buffer anchor_suffix_html;
-		if (entry.url != "")
-		{
-            anchor_prefix_html = HTMLGenerateTagPrefix("a", mapMake("target", "mainpane", "href", entry.url, "class", "r_a_undecorated"));
-			anchor_suffix_html.append("</a>");
-			outputting_anchor = true;
-		}
-        if (outputting_anchor && __setting_entire_area_clickable)
-			result.append(anchor_prefix_html);
-		
-		boolean setting_use_holding_containers_per_subentry = true;
-			
-		Vec2i max_image_dimensions_large = Vec2iMake(__setting_image_width_large, 75);
-		Vec2i max_image_dimensions_medium = Vec2iMake(__setting_image_width_medium, 50);
-		Vec2i max_image_dimensions_small = Vec2iMake(__setting_image_width_small, 50);
-        if (__setting_small_size_uses_full_width)
-            max_image_dimensions_small = Vec2iMake(__setting_image_width_small,__setting_image_width_small);
+    foreach i, entry in entries
+    {
+        if (++intra_i < starting_intra_i)
+            continue;
+        entries_output++;
+        string [string] anchor_attributes;
+        if (entry.url != "")
+            anchor_attributes = {"target":"mainpane", "href":entry.url, "class":"r_a_undecorated"};
         
-        string container_class = "r_cl_l_container";
+        buffer entry_content;
+        string container_class = "r_cl_entry_container";
         if (entry.should_highlight)
-            container_class = "r_cl_l_container_highlighted";
+            container_class += " container_highlighted";
+        if (intra_i > starting_intra_i)
+        {
+            container_class += " hr_like";
+            if (last_was_highlighted && !entry.should_highlight)
+                container_class += " close_highlight";
+        }
         last_was_highlighted = entry.should_highlight;
         
-        buffer generated_subentry_html = ChecklistGenerateEntryHTML(entry, entry.subentries, outputting_anchor, anchor_prefix_html, anchor_suffix_html, setting_use_holding_containers_per_subentry);
-        if (entry.subentries_on_mouse_over.count() > 0)
+        if (true) //"Correct" the entry ID
         {
-            buffer generated_mouseover_subentry_html = ChecklistGenerateEntryHTML(entry, entry.subentries_on_mouse_over, outputting_anchor, anchor_prefix_html, anchor_suffix_html, setting_use_holding_containers_per_subentry);
-            
-            //Can't properly escape, so generate two no-show divs and replace them as needed:
-            //We could just have a div that shows up when we mouse over...
-            //This is currently very buggy.
-            entry.container_div_attributes["onmouseenter"] = "event.currentTarget.innerHTML = document.getElementById('r_temp_o" + current_mouse_over_id + "').innerHTML";
-            entry.container_div_attributes["onmouseleave"] = "event.currentTarget.innerHTML = document.getElementById('r_temp_l" + current_mouse_over_id + "').innerHTML";
-            
-            result.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_temp_o" + current_mouse_over_id, "style", "display:none")));
-            result.append(generated_mouseover_subentry_html);
-            result.append(HTMLGenerateTagSuffix("div"));
-            result.append(HTMLGenerateTagPrefix("div", mapMake("id", "r_temp_l" + current_mouse_over_id, "style", "display:none")));
-            result.append(generated_subentry_html);
-            result.append(HTMLGenerateTagSuffix("div"));
-            
-            current_mouse_over_id += 1;
+            string entry_id;
+            if (entry.tags.combination != "") //not supposed to happen, but still can
+                entry_id = entry.tags.combination;
+            else if (entry.tags.id != "")
+                entry_id = entry.tags.id;
+            else
+                entry_id = "unIDed_" + entry.subentries[0].header;
+            entry_id = create_matcher("[ \\-.,#]", entry_id).replace_all("_");
+            entry.tags.id = entity_encode(entry_id);
         }
         
-        entry.container_div_attributes["class"] += (entry.container_div_attributes contains "class" ? " " : "") + container_class;
-        result.append(HTMLGenerateTagPrefix("div", entry.container_div_attributes));
+        buffer image_container;
         
-		if (__use_table_based_layouts)
-		{
-			//table-based layout:
-			result.append("<table cellpadding=0 cellspacing=0><tr>");
-			
-			result.append(HTMLGenerateTagWrap("td", "", mapMake("style", "width:" + __setting_indention_width + ";")));
-			result.append("<td>");
-			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "min-width:" + __setting_image_width_large + "px; max-width:" + __setting_image_width_large + "px; width:" + __setting_image_width_large + "px;vertical-align:top; text-align: center;")));
-			
-			result.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, max_image_dimensions_large));
-			
-			result.append("</td>");
-			result.append(HTMLGenerateTagPrefix("td", mapMake("style", "text-align:left; vertical-align:top")));
-			
-				
-			boolean first = true;
-			foreach j in entry.subentries
-			{
-				ChecklistSubentry subentry = entry.subentries[j];
-				if (subentry.header == "")
-					continue;
-				string subheader = subentry.header;
-				
-				boolean indent_this_entry = false;
-				if (first)
-				{
-					first = false;
-				}
-				else if (entry.should_indent_after_first_subentry)
-				{
-					indent_this_entry = true;
-				}
-				if (indent_this_entry)
-					result.append(HTMLGenerateTagPrefix("div", mapMake("class", "r_indention")));
-				
-				result.append("<table cellpadding=0 cellspacing=0><tr><td colspan=2>");
-			
-				result.append(HTMLGenerateSpanOfClass(subheader, "r_cl_subheader"));
-				
-				result.append("</td></tr>");
-				
-				
-				result.append("<tr>");
-				result.append(HTMLGenerateTagWrap("td", "", mapMake("style", "width:" + __setting_indention_width + ";")));
-				result.append("<td>");
-				if (subentry.modifiers.count() > 0)
-					result.append(ChecklistGenerateModifierSpan(listJoinComponents(subentry.modifiers, ", ") + "<br>"));
-				if (subentry.entries.count() > 0)
-				{
-					int intra_k = 0;
-					while (intra_k < subentry.entries.count())
-					{ 
-						if (intra_k > 0)
-							result.append("<hr>");
-						string line = subentry.entries[listKeyForIndex(subentry.entries, intra_k)];
-						line = HTMLGenerateDivOfClass(line, "r_cl_holding_container"); //For nested HRs
-						
-						
-						result.append(line);
-						
-						intra_k += 1;
-					}
-				}
-				result.append("</td></tr>");
-				
-				result.append("</table>");
-				if (indent_this_entry)
-					result.append("</div>");
-			}		
-			result.append("</td>");
-			result.append("</tr></table>");
-		}
-		else
-		{
-            result.append(generated_subentry_html);
-		}
-        result.append("</div>");
+        if (true) //image
+        {
+            image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, Vec2iMake(__setting_image_width_large, 75), "r_cl_image_container_large"));
+            image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, Vec2iMake(__setting_image_width_medium, 50), "r_cl_image_container_medium"));
+            image_container.append(KOLImageGenerateImageHTML(entry.image_lookup_name, true, Vec2iMake(__setting_image_width_small, 50), "r_cl_image_container_small"));
+            if (anchor_attributes.count() > 0 && !__setting_entire_area_clickable)
+                image_container = HTMLGenerateTagWrap("a", image_container, anchor_attributes);
+            image_container = HTMLGenerateTagWrap("div", image_container, mapMake("class", "r_cl_entry_image"));
+        }
+        
+        buffer content;
+        
+        if (true) //content (text)
+        {
+            string base_content = entry.ChecklistEntryGenerateContentHTML(entry.subentries, anchor_attributes);
+            if (entry.subentries_on_mouse_over.count() == 0)
+                base_content = HTMLGenerateTagWrap("div", base_content, mapMake("class", "r_cl_entry_content_container"));
+            else
+            {
+                base_content = HTMLGenerateTagWrap("div", base_content, mapMake("class", "r_cl_entry_content_container entry_hoverable"));
+                
+                string hover_content = entry.ChecklistEntryGenerateContentHTML(entry.subentries_on_mouse_over, anchor_attributes);
+                hover_content = HTMLGenerateTagWrap("div", hover_content, mapMake("class", "r_cl_entry_content_container entry_hovered"));
+                content.append(hover_content);
+            }
+            content.append(base_content);
+        }
+        
+        buffer generated_subentry_html;
+        generated_subentry_html.append(image_container);
+        generated_subentry_html.append(content);
+        
+        if (entry.container_div_attributes contains "class")
+        {
+            if (!entry.container_div_attributes["class"].contains_text(container_class)) //can happen with entries being pinned in the importance bar, passing here twice
+                entry.container_div_attributes["class"] += " " + container_class;
+        }
+        else
+            entry.container_div_attributes["class"] = container_class;
+        entry.container_div_attributes["class"] += " " + entry.tags.id;
+        entry_content.append(HTMLGenerateTagWrap("div", generated_subentry_html, entry.container_div_attributes));
 
 		
-		if (outputting_anchor && __setting_entire_area_clickable)
-            result.append(anchor_suffix_html);
+		if (anchor_attributes.count() > 0 && __setting_entire_area_clickable)
+            entry_content = HTMLGenerateTagWrap("a", entry_content, anchor_attributes);
 		
-		intra_i += 1;
-		entries_output += 1;
+        result.append(entry_content);
 	}
 	result.append("</div>");
-	
-    if (output_borders)
-        result.append(HTMLGenerateDivOfClass("", "r_cl_inter_spacing_divider"));
 	
 	return result;
 }

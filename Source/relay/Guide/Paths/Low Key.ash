@@ -28,7 +28,7 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
             url = key.zone.getClickableURLForLocation();
         }
 
-        low_key_entries.listAppend(ChecklistEntryMake("__item " + key.it.name, url, ChecklistSubentryMake(key.it.name.capitaliseFirstLetter(), key.enchantment, description), boolean [location] {key.zone:true}));
+        low_key_entries.listAppend(ChecklistEntryMake("__item " + key.it.name, url, ChecklistSubentryMake(key.it.name.capitaliseFirstLetter(), key.enchantment, description), boolean [location] {key.zone:true}).ChecklistEntrySetIDTag("Low key summer path " + key.it.name));
     }
 
     //base keys
