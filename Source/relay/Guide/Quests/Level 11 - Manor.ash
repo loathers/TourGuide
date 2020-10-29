@@ -94,10 +94,10 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             {
                 //FIXME also make sure that is relevant when in the haunted bedroom/missing items
                 //FIXME detect the chamber being opened
-                boolean output_final_fight_info = false;
-                if (use_fast_route)
+                boolean output_final_fight_info = base_quest_state.mafia_internal_step >= 4;
+                if (use_fast_route && !output_final_fight_info)
                 {
-                    if ($item[wine bomb].available_amount() > 0 || base_quest_state.mafia_internal_step >= 4)
+                    if ($item[wine bomb].available_amount() > 0)
                     {
                         output_final_fight_info = true;
                     }
