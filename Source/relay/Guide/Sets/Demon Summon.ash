@@ -22,7 +22,7 @@ void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if ($item[scroll of ancient forbidden unspeakable evil].available_amount() == 0 && $item[scroll of ancient forbidden unspeakable evil].creatable_amount() > 0)
         {
-            description.listAppend("Create a scroll of scroll of ancient forbidden unspeakable evil.");
+            description.listAppend("Create a scroll of ancient forbidden unspeakable evil.");
             url = "";
         }
         
