@@ -118,7 +118,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         ChecklistSubentry subentry;
         subentry.header = base_quest_state.quest_name;
         subentry.entries.listAppend("Unlock the hidden city via the hidden temple.");
-        if ($item[the Nostril of the Serpent].available_amount() == 0)
+        if ($item[the Nostril of the Serpent].available_amount() == 0 && !get_property_ascension("lastTempleButtonsUnlock"))
             subentry.entries.listAppend("Need nostril of the serpent.");
         if ($item[stone wool].available_amount() > 0 && my_path_id() != PATH_G_LOVER)
         {

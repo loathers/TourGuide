@@ -197,7 +197,7 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         if (!$location[the hidden park].locationAvailable())
         {
             wool_needed += 1;
-            if ($item[the nostril of the serpent].available_amount() == 0)
+            if ($item[the nostril of the serpent].available_amount() == 0 && !get_property_ascension("lastTempleButtonsUnlock"))
                 wool_needed += 1;
         }
 		if ($item[stone wool].available_amount() < wool_needed)
