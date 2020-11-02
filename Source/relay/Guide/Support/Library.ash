@@ -1234,7 +1234,10 @@ boolean haveSeenBadMoonEncounter(int encounter_id)
 {
     if (!get_property_ascension("lastBadMoonReset")) //badMoonEncounter values are not reset when you ascend
         return false;
-    return get_property_boolean("badMoonEncounter" + encounter_id);
+    string zero = ""; //Encounters under 10 are listed as "01", "02", "03"...
+    if (encounter_id < 10)
+        zero = "0";
+    return get_property_boolean("badMoonEncounter" + zero + encounter_id);
 }
 
 //FIXME make this use static etc. Probably extend Item Filter.ash to support equipment.

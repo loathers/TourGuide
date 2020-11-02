@@ -4,7 +4,7 @@ RegisterResourceGenerationFunction("IOTMRuneSpoonGenerateResource");
 void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	item spoon = lookupItem("hewn moon-rune spoon");
-	if (!spoon.have() && spoon.closet_amount() == 0) return;
+	if (!spoon.have() && spoon.closet_amount() == 0 || my_sign().to_lower_case() == "bad moon") return;
 	
 	if (!get_property_boolean("moonTuned"))
 	{

@@ -3,7 +3,7 @@
 RegisterTaskGenerationFunction("IOTMBastilleBattalionGenerateTasks");
 void IOTMBastilleBattalionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (lookupItem("Bastille Battalion control rig").available_amount() == 0) return;
+	if (lookupItem("Bastille Battalion control rig").available_amount() == 0 || my_sign().to_lower_case() == "bad moon") return;
 	
 	if (lookupItem("Draftsman's driving gloves").available_amount() > 0 || lookupItem("Nouveau nosering").available_amount() > 0 || lookupItem("Brutal brogues").available_amount() > 0) return;
 	
