@@ -458,7 +458,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         string url = "inventory.php?ftext=stone+wool";
         int quest_needed = 2;
-        if ($item[the nostril of the serpent].available_amount() > 0)
+        if ($item[the nostril of the serpent].available_amount() > 0 || get_property_ascension("lastTempleButtonsUnlock"))
             quest_needed -= 1;
         if (locationAvailable($location[the hidden park]) || !in_run)
             quest_needed = 0;

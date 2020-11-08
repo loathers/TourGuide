@@ -68,7 +68,7 @@ void SemirareGenerateDescription(string [int] description)
 				semirares.listAppend(LocationChoiceMake($location[Itznotyerzitz Mine], "|*Acquire mining gear for trapper quest.|*Run +234% item to get drop.", 0));
 		}
         int wool_needed = 1;
-        if ($item[the nostril of the serpent].available_amount() == 0)
+        if ($item[the nostril of the serpent].available_amount() == 0 && !get_property_ascension("lastTempleButtonsUnlock"))
             wool_needed += 1;
 		if ($item[stone wool].available_amount() < wool_needed && !locationAvailable($location[the hidden park]))
 		{

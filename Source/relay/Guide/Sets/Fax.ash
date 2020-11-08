@@ -127,7 +127,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
             }
             if (!__quest_state["Level 8"].state_boolean["Past mine"] && !have_outfit_components("Mining Gear") && __misc_state["can equip just about any weapon"])
                 potential_faxes.listAppend("7-Foot Dwarf Foreman - Mining gear for level 8 quest. Need YR or +234% items.");
-            if (!locationAvailable($location[the hidden park]) && ($item[stone wool].available_amount()) < (2 - MIN(1, $item[the nostril of the serpent].available_amount())))
+            if (!locationAvailable($location[the hidden park]) && $item[stone wool].available_amount() < ($item[the nostril of the serpent].available_amount() == 0 && !get_property_ascension("lastTempleButtonsUnlock") ? 2 : 1))
                 potential_faxes.listAppend("Baa'baa'bu'ran - Stone wool for hidden city unlock. Need +100% items (or as much as you can get for extra wool)");
         }
         
