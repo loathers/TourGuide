@@ -30,7 +30,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Level 5"].in_progress)
 		return;
-    if (my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"])
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO || __misc_state["in aftercore"])
         return;
     string url = "place.php?whichplace=plains";
 	//if the quest isn't started and we have unlocked the barracks, wait until it's started:
