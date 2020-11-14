@@ -12,7 +12,7 @@ location [int] generatePossibleLocationsToBurnDelay()
         if (l == $location[the oasis] && $effect[ultrahydrated].have_effect() == 0) continue;
         if (l == $location[the hidden apartment building] && get_property_int("hiddenApartmentProgress") >= 7) continue;
         if (l == $location[the hidden office building] && get_property_int("hiddenOfficeProgress") >= 7) continue;
-        if (__misc_state["in CS aftercore"] && $locations[the spooky forest,the outskirts of cobb's knob] contains l) continue;
+        if ($locations[the spooky forest,the outskirts of cobb's knob] contains l && (my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in CS aftercore"] || my_path_id() == PATH_GREY_GOO)) continue;
 
         if (l.delayRemainingInLocation() > 0 && l.locationAvailable())
             possible_locations.listAppend(l);
