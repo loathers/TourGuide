@@ -76,3 +76,5 @@ import "relay/Guide/Items of the Month/Guzzlr.ash";
 import "relay/Guide/Items of the Month/Melodramedary.ash";
 // Missing: SpinMaster lathe
 // Missing: Cargo cultist shorts
+import "relay/Guide/Items of the Month/Comprehensive Cartography.ash";
+// Missing: unwrapped knock-off retro superhero cape
