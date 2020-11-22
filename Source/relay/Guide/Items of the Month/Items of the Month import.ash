@@ -73,6 +73,6 @@ import "relay/Guide/Items of the Month/Better Shrooms and Gardens.ash";
 // Missing: Left-Hand Man
 import "relay/Guide/Items of the Month/Guzzlr.ash";
 // Missing: Iunion
-// Missing: Melodramedary
+import "relay/Guide/Items of the Month/Melodramedary.ash";
 // Missing: SpinMaster lathe
 // Missing: Cargo cultist shorts
