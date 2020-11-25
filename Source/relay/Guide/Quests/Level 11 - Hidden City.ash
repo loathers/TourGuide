@@ -315,18 +315,10 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 
                 int totalTurnsSpent = $location[the hidden office building].turns_spent;
                 
-                int delayForNextNoncombat;
+                int delayForNextNoncombat = 4 - (totalTurnsSpent - 1) % 5;
 
-                if (totalTurnsSpent < 6) {
-                    delayForNextNoncombat = 5 - totalTurnsSpent;
-                } else {
-                    delayForNextNoncombat = 4 - (totalTurnsSpent - 5) % 5;
-                }
-
-                if (!hasMcCluskyFile) {
-                    if (numberOfFilesLeft > 0) {
-                        subentry.entries.listAppend("Kill " + pluralise(numberOfFilesLeft, "more pygmy witch accountant", "more pygmy witch accountants") + " for their files.");
-                    }
+                if (!hasMcCluskyFile && numberOfFilesLeft > 0) {
+                    subentry.entries.listAppend("Kill " + pluralise(numberOfFilesLeft, "more pygmy witch accountant", "more pygmy witch accountants") + " for their files.");
                 }
 
                 if (delayForNextNoncombat == 0) {
