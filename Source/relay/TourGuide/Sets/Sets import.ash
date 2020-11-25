@@ -17,7 +17,7 @@ import "relay/TourGuide/Sets/Old Level 9 quest.ash";
 import "relay/TourGuide/Sets/Fax.ash";
 import "relay/TourGuide/Sets/Dungeons of Doom.ash";
 import "relay/TourGuide/Sets/Olfaction.ash";
-import "relay/TourGuide/Sets/Holiday.ash";
+import "relay/TourGuide/Sets/Holidays.ash";
 import "relay/TourGuide/Sets/Reminders.ash";
 import "relay/TourGuide/Sets/Events.ash";
 import "relay/TourGuide/Sets/Classes.ash";
