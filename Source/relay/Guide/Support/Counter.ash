@@ -1,7 +1,7 @@
-import "relay/Guide/Support/List.ash"
-import "relay/Guide/Support/Math.ash"
-import "relay/Guide/Support/Library.ash"
-import "relay/Guide/Support/AdventurePHP Locations.ash"
+import "relay/TourGuide/Support/List.ash"
+import "relay/TourGuide/Support/Math.ash"
+import "relay/TourGuide/Support/Library.ash"
+import "relay/TourGuide/Support/AdventurePHP Locations.ash"
 
 Record Counter
 {

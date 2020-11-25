@@ -1,6 +1,6 @@
-import "relay/Guide/Support/Checklist.ash"
-import "relay/Guide/Support/LocationAvailable.ash"
-import "relay/Guide/Quests/Quest import.ash"
+import "relay/TourGuide/Support/Checklist.ash"
+import "relay/TourGuide/Support/LocationAvailable.ash"
+import "relay/TourGuide/Quests/Quest import.ash"
 
 
 void QuestsInit()

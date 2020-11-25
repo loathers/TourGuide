@@ -1,5 +1,5 @@
-import "relay/Guide/Support/List.ash";
-import "relay/Guide/Support/Ingredients.ash"
+import "relay/TourGuide/Support/List.ash";
+import "relay/TourGuide/Support/Ingredients.ash"
 
 static {
     int PATH_UNKNOWN = -1;

@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Item Filter.ash"
+import "relay/TourGuide/Support/Item Filter.ash"
 
 void QLevel12Init()
 {

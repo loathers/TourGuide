@@ -1,5 +1,5 @@
-import "relay/Guide/Support/Banishers.ash";
-import "relay/Guide/Paths/Bad Moon.ash";
+import "relay/TourGuide/Support/Banishers.ash";
+import "relay/TourGuide/Paths/Bad Moon.ash";
 
 Record LBPItemInformation
 {

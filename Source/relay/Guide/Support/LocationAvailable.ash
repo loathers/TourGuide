@@ -1,12 +1,12 @@
 //Library for checking if any given location is unlocked.
 //Similar to canadv.ash, except there's no code for using items and no URLs are (currently) visited. This limits our accuracy.
 //Currently, most locations are missing, sorry.
-import "relay/Guide/Support/Error.ash"
-import "relay/Guide/Support/List.ash"
-import "relay/Guide/Support/Library.ash"
-import "relay/Guide/Support/Campground.ash"
-import "relay/Guide/Settings.ash"
-import "relay/Guide/QuestState.ash"
+import "relay/TourGuide/Support/Error.ash"
+import "relay/TourGuide/Support/List.ash"
+import "relay/TourGuide/Support/Library.ash"
+import "relay/TourGuide/Support/Campground.ash"
+import "relay/TourGuide/Settings.ash"
+import "relay/TourGuide/QuestState.ash"
 
 
 boolean [location] __la_location_is_available;

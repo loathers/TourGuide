@@ -1,6 +1,6 @@
 
-import "relay/Guide/Support/Library 2.ash"
-import "relay/Guide/Support/Ingredients.ash"
+import "relay/TourGuide/Support/Library 2.ash"
+import "relay/TourGuide/Support/Ingredients.ash"
 
 RegisterTaskGenerationFunction("IOTMAsdonMartinGenerateTasks");
 void IOTMAsdonMartinGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

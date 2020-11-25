@@ -1,4 +1,4 @@
-import "relay/Guide/Support/HTML.ash"
+import "relay/TourGuide/Support/HTML.ash"
 
 record RestingBonus
 {

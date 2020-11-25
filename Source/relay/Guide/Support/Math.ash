@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Error.ash"
+import "relay/TourGuide/Support/Error.ash"
 
 //Coordinate system is upper-left origin.
 

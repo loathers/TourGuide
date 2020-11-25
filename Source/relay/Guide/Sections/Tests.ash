@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Banishers.ash";
+import "relay/TourGuide/Support/Banishers.ash";
 
 void generateImageTest(Checklist [int] checklists)
 {

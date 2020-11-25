@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Location Choice.ash";
+import "relay/TourGuide/Support/Location Choice.ash";
 
 RegisterTaskGenerationFunction("IOTMTelegraphOfficeGenerateTasks");
 void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

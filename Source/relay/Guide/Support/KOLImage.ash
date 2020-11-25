@@ -1,7 +1,7 @@
-import "relay/Guide/Support/Math.ash"
-import "relay/Guide/Support/HTML.ash"
-import "relay/Guide/Support/Library.ash"
-import "relay/Guide/Support/Page.ash"
+import "relay/TourGuide/Support/Math.ash"
+import "relay/TourGuide/Support/HTML.ash"
+import "relay/TourGuide/Support/Library.ash"
+import "relay/TourGuide/Support/Page.ash"
 
 boolean __setting_show_alignment_guides = false;
 //Library for displaying KOL images

@@ -1,9 +1,9 @@
-import "relay/Guide/Support/Campground.ash"
-import "relay/Guide/QuestState.ash"
-import "relay/Guide/Quests.ash"
-import "relay/Guide/Sets.ash"
-import "relay/Guide/Pulls.ash"
-import "relay/Guide/Plants.ash"
+import "relay/TourGuide/Support/Campground.ash"
+import "relay/TourGuide/QuestState.ash"
+import "relay/TourGuide/Quests.ash"
+import "relay/TourGuide/Sets.ash"
+import "relay/TourGuide/Pulls.ash"
+import "relay/TourGuide/Plants.ash"
 
 void setUpExampleState()
 {

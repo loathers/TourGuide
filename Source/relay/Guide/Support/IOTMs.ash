@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Campground.ash"
+import "relay/TourGuide/Support/Campground.ash"
 
 boolean [item] __iotms_usable;
 

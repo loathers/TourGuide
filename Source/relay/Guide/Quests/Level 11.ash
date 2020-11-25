@@ -1,10 +1,10 @@
-import "relay/Guide/Quests/Level 11 - Copperhead.ash";
-import "relay/Guide/Quests/Level 11 - Pyramid.ash";
-import "relay/Guide/Quests/Level 11 - Desert.ash";
-import "relay/Guide/Quests/Level 11 - Palindome.ash";
-import "relay/Guide/Quests/Level 11 - Manor.ash";
-import "relay/Guide/Quests/Level 11 - Hidden City.ash";
-import "relay/Guide/Quests/Level 11 - Hidden Temple.ash";
+import "relay/TourGuide/Quests/Level 11 - Copperhead.ash";
+import "relay/TourGuide/Quests/Level 11 - Pyramid.ash";
+import "relay/TourGuide/Quests/Level 11 - Desert.ash";
+import "relay/TourGuide/Quests/Level 11 - Palindome.ash";
+import "relay/TourGuide/Quests/Level 11 - Manor.ash";
+import "relay/TourGuide/Quests/Level 11 - Hidden City.ash";
+import "relay/TourGuide/Quests/Level 11 - Hidden Temple.ash";
 
 void QLevel11Init()
 {

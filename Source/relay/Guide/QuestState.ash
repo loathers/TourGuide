@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Library.ash"
+import "relay/TourGuide/Support/Library.ash"
 
 //Quest status stores all/most of our quest information in an internal format that's easier to understand.
 record QuestState

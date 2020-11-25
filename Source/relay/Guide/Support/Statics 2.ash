@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Library.ash";
+import "relay/TourGuide/Support/Library.ash";
 
 static
 {

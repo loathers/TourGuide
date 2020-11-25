@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Numberology.ash"
+import "relay/TourGuide/Support/Numberology.ash"
 void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!$skill[Calculate the Universe].skill_is_usable())

@@ -1,9 +1,9 @@
-import "relay/Guide/Support/LocationAvailable.ash"
-import "relay/Guide/Support/Equipment Requirement.ash"
-import "relay/Guide/Support/HTML.ash"
-import "relay/Guide/Support/Statics 2.ash"
-import "relay/Guide/Support/Ingredients.ash"
-import "relay/Guide/Support/Counter.ash"
+import "relay/TourGuide/Support/LocationAvailable.ash"
+import "relay/TourGuide/Support/Equipment Requirement.ash"
+import "relay/TourGuide/Support/HTML.ash"
+import "relay/TourGuide/Support/Statics 2.ash"
+import "relay/TourGuide/Support/Ingredients.ash"
+import "relay/TourGuide/Support/Counter.ash"
 
 
 

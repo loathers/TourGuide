@@ -1,7 +1,7 @@
-import "relay/Guide/QuestState.ash"
-import "relay/Guide/Support/Checklist.ash"
-import "relay/Guide/Support/LocationAvailable.ash"
-import "relay/Guide/Sets/Sets import.ash"
+import "relay/TourGuide/QuestState.ash"
+import "relay/TourGuide/Support/Checklist.ash"
+import "relay/TourGuide/Support/LocationAvailable.ash"
+import "relay/TourGuide/Sets/Sets import.ash"
 
 
 

@@ -1,5 +1,5 @@
-import "relay/Guide/Support/HTML.ash"
-import "relay/Guide/Settings.ash"
+import "relay/TourGuide/Support/HTML.ash"
+import "relay/TourGuide/Settings.ash"
 
 record CSSEntry
 {

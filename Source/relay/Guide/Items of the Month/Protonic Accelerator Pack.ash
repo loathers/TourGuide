@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Monster Data.ash";
+import "relay/TourGuide/Support/Monster Data.ash";
 
 RegisterTaskGenerationFunction("IOTMProtonicAcceleratorPackGenerateTasks");
 void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

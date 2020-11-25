@@ -1,8 +1,8 @@
-import "relay/Guide/Support/Checklist.ash"
-import "relay/Guide/Support/Library.ash"
-import "relay/Guide/Plants.ash"
-import "relay/Guide/Support/HTML.ash"
-import "relay/Guide/Sets.ash"
+import "relay/TourGuide/Support/Checklist.ash"
+import "relay/TourGuide/Support/Library.ash"
+import "relay/TourGuide/Plants.ash"
+import "relay/TourGuide/Support/HTML.ash"
+import "relay/TourGuide/Sets.ash"
 
 void generateTasks(Checklist [int] checklists)
 {

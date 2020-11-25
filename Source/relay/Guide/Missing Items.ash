@@ -1,5 +1,5 @@
-import "relay/Guide/Support/Checklist.ash";
-import "relay/Guide/QuestState.ash";
+import "relay/TourGuide/Support/Checklist.ash";
+import "relay/TourGuide/QuestState.ash";
 
 void generateMissingItems(Checklist [int] checklists)
 {

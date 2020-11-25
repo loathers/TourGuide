@@ -1,9 +1,9 @@
-import "relay/Guide/Support/HTML.ash"
-import "relay/Guide/Support/KOLImage.ash"
-import "relay/Guide/Support/List.ash"
-import "relay/Guide/Support/Page.ash"
-import "relay/Guide/Support/Library.ash"
-import "relay/Guide/Settings.ash"
+import "relay/TourGuide/Support/HTML.ash"
+import "relay/TourGuide/Support/KOLImage.ash"
+import "relay/TourGuide/Support/List.ash"
+import "relay/TourGuide/Support/Page.ash"
+import "relay/TourGuide/Support/Library.ash"
+import "relay/TourGuide/Settings.ash"
 
 
 record ChecklistSubentry

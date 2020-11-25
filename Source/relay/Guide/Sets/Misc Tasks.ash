@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Campground.ash"
+import "relay/TourGuide/Support/Campground.ash"
 
 RegisterTaskGenerationFunction("SMiscTasksGenerateTasks");
 void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

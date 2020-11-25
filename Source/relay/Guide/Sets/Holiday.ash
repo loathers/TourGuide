@@ -1,4 +1,4 @@
-import "relay/Guide/Support/Holiday.ash";
+import "relay/TourGuide/Support/Holiday.ash";
 
 void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
