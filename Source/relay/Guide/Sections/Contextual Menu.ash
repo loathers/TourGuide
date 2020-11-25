@@ -58,7 +58,7 @@ buffer generateContextualMenu()
         choice_group.append(HTMLGenerateTagWrap("div", "When minimized", string [string] {"class":"ct_menu_choice_subheader"}));
         choice_group.append(generateContextualMenuChoice("Opacity", "opacity", string [string] {"half":"halve opacity","full":"keep full opacity"}));
         choice_group.append(generateContextualMenuChoice("Tile image", "image", string [string] {"none":"don't display", "small":"display smallest", "auto":"don't change image size"}));
-        choice_group.append(generateContextualMenuChoice("Content to show", "collapsing", string [string] {"entries":"title", "modifiers":"title + subtitle", "replace":"replace all with tile ID"}));
+        choice_group.append(generateContextualMenuChoice("Content to show", "collapsing", string [string] {"modifiers":"title", "entries":"title + subtitle", "replace":"replace all with tile ID"}));
         guide_contextual_menu.append(HTMLGenerateTagWrap("div", choice_group, string [string] {"class":"ct_menu_choice_group", "id":"auto_expansion_choice_group"}));
     }
 
