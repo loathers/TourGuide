@@ -1,6 +1,9 @@
 //These settings are for development. Don't worry about editing them.
 string __version = "1.8.0";
 
+//Path and name of the .js file. In case you change either.
+string __javascript = "relay_TourGuide.js";
+
 //Debugging:
 boolean __setting_debug_mode = false;
 boolean __setting_debug_enable_example_mode_in_aftercore = false; //for testing. Will give false information, so don't enable
