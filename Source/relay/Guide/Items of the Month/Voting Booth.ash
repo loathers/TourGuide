@@ -5,7 +5,7 @@ void IOTMVotingBootGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 {
     if (!mafiaIsPastRevision(18965))
         return;
-    if (!__iotms_usable[lookupItem("voter registration form")]) return;
+    if (!__iotms_usable[lookupItem("voter registration form")] && lookupItem("&quot;I Voted!&quot; sticker").available_amount() == 0) return;
     
     if (lookupItem("&quot;I Voted!&quot; sticker").available_amount() == 0 || false) {
         //Vote!
