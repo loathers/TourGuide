@@ -2,7 +2,7 @@
 string __version = "1.8.0";
 
 //Path and name of the .js file. In case you change either.
-string __javascript = "relay_TourGuide.js";
+string __javascript = "TourGuide.js";
 
 //Debugging:
 boolean __setting_debug_mode = false;
