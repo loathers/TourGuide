@@ -381,10 +381,6 @@ void setUpState()
     {
         some_olfact_available = true;
     }
-    if ($skill[Map the Monsters].have_skill() && $skill[Map the Monsters].timescast < 3)
-    {
-        some_olfact_available = true;
-    }
     if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevant
     {
         some_olfact_available = true;
