@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("SDemonSummonGenerateResource");
 void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!QuestState("questL11Manor").finished)
+    if (!QuestState("questL11Manor").finished || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO)
         return;
     if (get_property_boolean("demonSummoned"))
         return;

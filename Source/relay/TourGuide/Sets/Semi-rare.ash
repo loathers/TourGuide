@@ -52,7 +52,7 @@ void SemirareGenerateDescription(string [int] description)
 			if (!have_outfit_components("Knob Goblin Elite Guard Uniform"))
 			{
 				string [int] reasons;
-				if (!__quest_state["Level 8"].finished)
+				if (!__quest_state["Level 5"].finished)
 					reasons.listAppend("Cobb's Knob quest");
                 if (!dispensary_available() && false)
                 {

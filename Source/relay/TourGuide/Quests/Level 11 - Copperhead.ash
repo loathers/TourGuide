@@ -5,7 +5,7 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Ron");
-        if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
         state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
         state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
         
@@ -24,7 +24,7 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Shen");
-        if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
         state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
         state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
         

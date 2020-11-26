@@ -10,6 +10,7 @@ void QNemesisInit()
     
 	
 	QuestStateParseMafiaQuestProperty(state, "questG04Nemesis");
+    if (my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	
 	state.quest_name = "Nemesis Quest";
 	state.image_name = "__half Nemesis";

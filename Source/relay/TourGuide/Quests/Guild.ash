@@ -39,7 +39,7 @@ void QGuildInit()
         QuestStateParseMafiaQuestPropertyValue(state, "step1");
 	}
 	
-	state.startable = true;
+    state.startable = !(my_path_id() == PATH_GREY_GOO && $classes[seal clubber,turtle tamer] contains my_class());
 	
 	__quest_state["Guild"] = state;
 }
@@ -54,7 +54,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     if (my_path_id() == PATH_NUCLEAR_AUTUMN)
         return;
 	QuestState base_quest_state = __quest_state["Guild"];
-	if (base_quest_state.finished)
+	if (base_quest_state.finished || !base_quest_state.startable)
 		return;
 		
 	ChecklistSubentry subentry;
