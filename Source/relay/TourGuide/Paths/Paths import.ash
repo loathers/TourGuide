@@ -17,4 +17,4 @@ import "relay/TourGuide/Paths/G-Lover.ash";
 import "relay/TourGuide/Paths/Explosions.ash";
 //missing plumber
 import "relay/TourGuide/Paths/Low Key.ash";
-//missing grey goo
+import "relay/TourGuide/Paths/Grey Goo.ash";
