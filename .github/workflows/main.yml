@@ -1,0 +1,186 @@
+name: bundle Guide
+# By https://github.com/fredg1
+
+# Current restrictions (also kind of a TODO list...):
+#            Bundle_ASH_script.py must (for now) be accessible from the root.
+#            ASH script must (for now) be 'Source/relay/relay_TourGuide.ash'
+#            Destination path will (for now) be 'relay/relay_TourGuide.ash'
+
+on: # customize at will
+  workflow_dispatch:
+  # see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags for more info about this if you want to modify it
+  # (for example, if you wish to make it so that any branch can trigger this workflow)
+  push:
+    branches:
+      - 'master'
+    paths:
+      - 'Source/relay/**.ash'
+      - 'Source/relay/**.js'
+    # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
+    paths-ignore:
+      - '.github/**'
+
+env:
+  # To have the target branch name use DYNAMIC_TARGET_NAME, set USE_DYNAMIC_TARGET_NAME to 'true'. Will otherwise use STATIC_TARGET_NAME.
+  USE_DYNAMIC_TARGET_NAME: false
+  STATIC_TARGET_NAME: 'Pre-Release'
+  # in DYNAMIC_TARGET_NAME, {0} will be replaced by the current branch/tag's actual name
+  DYNAMIC_TARGET_NAME: 'Bundled-{0}'
+
+
+
+# Anything past this point shouldn't need to be modified.
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+        
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1.0.1
+        
+      - name: checkout current branch
+        uses: actions/checkout@v2
+      
+      # checkout target branch
+      - name: checkout target branch static
+        id: static_get
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME != 'true' }}
+        uses: actions/checkout@v2
+        continue-on-error: true
+        with:
+          ref: ${{ env.STATIC_TARGET_NAME }}
+          path: target_branch
+          persist-credentials: false
+          fetch-depth: 0
+      - name: checkout target branch dynamic
+        id: dynamic_get
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME == 'true' }}
+        uses: actions/checkout@v2
+        continue-on-error: true
+        with:
+          ref: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
+          path: target_branch
+          persist-credentials: false
+          fetch-depth: 0
+      
+      # target branch doesn't exist; create it
+      - name: create target branch static
+        id: static_create
+        if: ${{ steps.static_get.outcome == 'failure' }}
+        uses: peterjgrainger/action-create-branch@v2.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: ${{ env.STATIC_TARGET_NAME }}
+      - name: create target branch dynamic
+        id: dynamic_create
+        if: ${{ steps.dynamic_get.outcome == 'failure' }}
+        uses: peterjgrainger/action-create-branch@v2.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
+      
+      # NOW checkout the newly-made target branch
+      - name: checkout created target branch static
+        id: static_get_created
+        if: ${{ steps.static_create.outcome == 'success' }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.STATIC_TARGET_NAME }}
+          path: target_branch
+          persist-credentials: false
+          fetch-depth: 0
+      - name: checkout created target branch dynamic
+        id: dynamic_get_created
+        if: ${{ steps.dynamic_create.outcome == 'success' }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
+          path: target_branch
+          persist-credentials: false
+          fetch-depth: 0
+      
+      # if it's a newly created branch (which was based on the current one), then nothing in it can be assumed to be important. Wipe it all (well... not .git).
+      - name: clean created branch
+        id: clean_created
+        if: ${{ steps.static_get_created.outcome == 'success' || steps.dynamic_get_created.outcome == 'success' }}
+        working-directory: ./target_branch
+        shell: python
+        run: |
+          import os
+          import shutil
+          
+          with os.scandir() as cur_dir:
+            for dir_entry in cur_dir:
+              if dir_entry.name != '.git':
+                if dir_entry.is_dir(follow_symlinks=False):
+                  shutil.rmtree(path=dir_entry.name)
+                else:
+                  os.remove(path=dir_entry.name)
+        
+        
+      - name: Forward bundle output to target branch
+        shell: python
+        run: |
+          import os
+          import sys
+          
+          sys.path.append(os.getcwd())
+          import Bundle_ASH_script
+          
+          # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
+          Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'target_branch/relay/relay_TourGuide.ash', 'Source')
+      
+      # copy any non-ASH file in target_branch
+      - name: Add non-ash in Source
+        shell: python
+        run: |
+          import os
+          
+          def parse_folder(cur_dir, current_path = ''):
+            for dir_entry in cur_dir:
+              if dir_entry.is_symlink():
+                continue
+              if dir_entry.is_dir():
+                next_path = current_path
+                if next_path != '':
+                  next_path += '/'
+                next_path += dir_entry.name
+                with os.scandir('Source/' + next_path) as next_dir:
+                  parse_folder(next_dir, next_path)
+              elif dir_entry.is_file() and not dir_entry.name.endswith('.ash'):
+                this_path = current_path + '/' + dir_entry.name
+                print('Grabbing ' + this_path + ' ...')
+                if os.path.exists( 'target_branch/' + this_path ):
+                  os.remove( 'target_branch/' + this_path )
+                os.renames('Source/' + this_path, 'target_branch/' + this_path)
+          
+          with os.scandir('Source') as source_dir:
+            parse_folder(cur_dir = source_dir)
+            
+      - name: commit changes to static target
+        working-directory: ./target_branch
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME != 'true' }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add --all -v *
+          git commit -m "Import changes from master" -a
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ env.STATIC_TARGET_NAME }} --follow-tags --tags
+        
+      - name: commit changes to dynamic target
+        working-directory: ./target_branch
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME == 'true' }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add --all -v *
+          git commit -m "Add changes" -a
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }} --follow-tags --tags
