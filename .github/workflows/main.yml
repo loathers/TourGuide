@@ -12,7 +12,7 @@ on: # customize at will
   # (for example, if you wish to make it so that any branch can trigger this workflow)
   push:
     branches:
-      - 'master'
+      - '**'
     paths:
       - 'Source/relay/**.ash'
       - 'Source/relay/**.js'
@@ -22,7 +22,7 @@ on: # customize at will
 
 env:
   # To have the target branch name use DYNAMIC_TARGET_NAME, set USE_DYNAMIC_TARGET_NAME to 'true'. Will otherwise use STATIC_TARGET_NAME.
-  USE_DYNAMIC_TARGET_NAME: false
+  USE_DYNAMIC_TARGET_NAME: true
   STATIC_TARGET_NAME: 'Pre-Release'
   # in DYNAMIC_TARGET_NAME, {0} will be replaced by the current branch/tag's actual name
   DYNAMIC_TARGET_NAME: 'Bundled-{0}'
