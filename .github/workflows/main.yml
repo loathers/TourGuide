@@ -1,30 +1,61 @@
-name: bundle Guide
+name: bundle ASH script(s), and push to new branch
 # By https://github.com/fredg1
 
-# Current restrictions (also kind of a TODO list...):
-#            Bundle_ASH_script.py must (for now) be accessible from the root.
-#            ASH script must (for now) be 'Source/relay/relay_TourGuide.ash'
-#            Destination path will (for now) be 'relay/relay_TourGuide.ash'
-
-on: # customize at will
-  workflow_dispatch:
-  # see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags for more info about this if you want to modify it
-  # (for example, if you wish to make it so that any branch can trigger this workflow)
-  push:
-    #branches:
-      #- 'master'
-    paths:
-      - 'Source/relay/**.ash'
-      - 'Source/relay/**.js'
-    # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
-      - '!.github/**'
-
 env:
+  # Branch names.
+  
   # To have the target branch name use DYNAMIC_TARGET_NAME, set USE_DYNAMIC_TARGET_NAME to 'true'. Will otherwise use STATIC_TARGET_NAME.
-  USE_DYNAMIC_TARGET_NAME: true
+  # (doesn't need to be the name of an existing branch. Will create one if needed)
+  USE_DYNAMIC_TARGET_NAME: 'false'
   STATIC_TARGET_NAME: 'Pre-Release'
   # in DYNAMIC_TARGET_NAME, {0} will be replaced by the current branch/tag's actual name
   DYNAMIC_TARGET_NAME: 'Bundled-{0}'
+  
+  
+  
+  # The path to take (folders to go through) to reach the "mafia folder" in both branches.
+  # RELATIVE paths only (relative to the root of the repository).
+  # Empty string if it is reachable from the root.
+  
+  # Only its content will be transferred to <target_branch>
+  SOURCE_PATH_TO_MAFIA: 'Source'
+  
+  # If this folder already exists on the target branch, IT'S CONTENT WILL BE ERASED.
+  # Stuff outside of it won't.
+  TARGET_PATH_TO_MAFIA: ''
+  
+  
+  
+  # Relative path to reach the FOLDER CONTAINING the "bundler" (Bundle_ASH_script.py)
+  PATH_TO_BUNDLER_FOLDER: ''
+  
+  
+  
+  # comma-separated list of (relative) path and name of the ASH scripts you want to bundle, and their new names and (relative) destinations.
+  # Paths need to be relative to the "mafia folder".
+  # Any .ash script not in this list won't be transferred, so if you have scripts that don't have imports, but want them in the result, include them here anyway
+  
+  # The scripts to bundle
+  ASH_SCRIPT_SOURCES: 'relay/relay_TourGuide.ash'
+  # Their (RESPECTIVE; order matters) destinations
+  ASH_SCRIPT_DESTINATIONS: 'relay/relay_TourGuide.ash'
+
+
+
+on: # customize at will
+  workflow_dispatch:
+  # for more info about this if you want to modify it, see
+  # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags
+  # (for example, if you wish to make it so that any branch can trigger this workflow)
+  push:
+    branches:
+      - 'master'
+    paths:
+      # MAKE SURE THIS IS UP-TO-DATE/CORRECT (it's impossible to query env. variables at this point).
+      - 'Source/**.ash'
+      - 'Source/**.js'
+    # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
+      - '!.github/**'
 
 
 
@@ -57,10 +88,12 @@ jobs:
         with:
           python-version: 3.8
         
+      # checkout source and target branches
       - name: checkout current branch
         uses: actions/checkout@v2
+        with:
+          path: source_branch
       
-      # checkout target branch
       - name: checkout target branch
         id: target_get
         uses: actions/checkout@v2
@@ -92,23 +125,26 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       
-      # if it's a newly created branch (which was based on the current one), then nothing in it can be assumed to be important. Wipe it all (well... not .git).
-      - name: clean created branch
-        id: clean_created
-        if: ${{ steps.target_get_created.outcome == 'success' }}
+      # Clean mafia folder in target branch
+      - name: clean target branch
         working-directory: ./target_branch
         shell: python
         run: |
           import os
           import shutil
           
-          with os.scandir() as cur_dir:
+          target_base = '${{ env.TARGET_PATH_TO_MAFIA }}'
+          if not os.path.exists( target_base ):
+            os.makedirs( target_base )
+          
+          with os.scandir(target_base) as cur_dir:
             for dir_entry in cur_dir:
               if dir_entry.name != '.git':
+                path_to_entry = os.path.join(target_base, dir_entry.name)
                 if dir_entry.is_dir(follow_symlinks=False):
-                  shutil.rmtree(path=dir_entry.name)
+                  shutil.rmtree(path=path_to_entry)
                 else:
-                  os.remove(path=dir_entry.name)
+                  os.remove(path=path_to_entry)
         
         
       - name: Forward bundle output to target branch
@@ -117,11 +153,28 @@ jobs:
           import os
           import sys
           
-          sys.path.append(os.getcwd())
+          sys.path.append( os.path.join( os.getcwd(), 'source_branch', '${{ env.PATH_TO_BUNDLER_FOLDER }}') )
           import Bundle_ASH_script
           
-          # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
-          Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'target_branch/relay/relay_TourGuide.ash', 'Source')
+          
+          source_scripts = tuple( map(str, '${{ env.ASH_SCRIPT_SOURCES }}'.split(',') ) )
+          destinations = tuple( map(str, '${{ env.ASH_SCRIPT_DESTINATIONS }}'.split(',') ) )
+          
+          if len(source_scripts) != len(destinations):
+            raise Exception("ASH_SCRIPT_SOURCES and ASH_SCRIPT_DESTINATIONS aren't properly paired")
+          
+          for i in range( len( source_scripts ) ):
+            # The script that bundles the target script.
+            # First argument is the source script.
+            source_script = source_scripts[i]
+            
+            # Second argument is the path to reach the file to create/put the result in.
+            destination = os.path.join( 'target_branch', '${{ env.TARGET_PATH_TO_MAFIA }}', destinations[i] )
+            
+            # Third argument (optional) is the path to reach the "mafia folder".
+            path_to_source_script = os.path.join( 'source_branch', '${{ env.SOURCE_PATH_TO_MAFIA }}' )
+            
+            Bundle_ASH_script.bundle_and_write( source_script, destination, path_to_source_script )
       
       # copy any non-ASH file in target_branch
       - name: Add non-ash in Source
@@ -129,27 +182,30 @@ jobs:
         run: |
           import os
           
+          source_base = os.path.join('source_branch', '${{ env.SOURCE_PATH_TO_MAFIA }}')
+          target_base = os.path.join('target_branch', '${{ env.TARGET_PATH_TO_MAFIA }}')
+          
           def parse_folder(cur_dir, current_path = ''):
             for dir_entry in cur_dir:
               if dir_entry.is_symlink():
                 continue
               if dir_entry.is_dir():
-                next_path = current_path
-                if next_path != '':
-                  next_path += '/'
-                next_path += dir_entry.name
-                with os.scandir('Source/' + next_path) as next_dir:
+                next_path = os.path.join(current_path, dir_entry.name)
+                with os.scandir( os.path.join(source_base, next_path) ) as next_dir:
                   parse_folder(next_dir, next_path)
               elif dir_entry.is_file() and not dir_entry.name.endswith('.ash'):
-                this_path = current_path + '/' + dir_entry.name
+                this_path = os.path.join(current_path, dir_entry.name)
                 print('Grabbing ' + this_path + ' ...')
-                if os.path.exists( 'target_branch/' + this_path ):
-                  os.remove( 'target_branch/' + this_path )
-                os.renames('Source/' + this_path, 'target_branch/' + this_path)
+                
+                this_path_source = os.path.join(source_base, this_path)
+                this_path_target = os.path.join(target_base, this_path)
+                if os.path.exists( this_path_target ):
+                  os.remove( this_path_target )
+                os.renames(this_path_source, this_path_target)
           
-          with os.scandir('Source') as source_dir:
+          with os.scandir(source_base) as source_dir:
             parse_folder(cur_dir = source_dir)
-            
+      
       - name: commit changes to target
         working-directory: ./target_branch
         run: |
