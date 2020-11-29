@@ -212,5 +212,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add --all -v *
-          git commit -m "Import changes from master" -a
+          git commit -m "Import changes from ${{ github.ref }}" -a
           git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ needs.set-target-branch.outputs.target-branch }} --follow-tags --tags
