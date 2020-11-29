@@ -11,12 +11,12 @@ on: # customize at will
   # see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags for more info about this if you want to modify it
   # (for example, if you wish to make it so that any branch can trigger this workflow)
   push:
-    branches:
-      - '**'
+    #branches:
+      #- 'master'
     paths:
       - 'Source/relay/**.ash'
       - 'Source/relay/**.js'
-      # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
+    # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
       - '!.github/**'
 
 env:
@@ -31,8 +31,25 @@ env:
 # Anything past this point shouldn't need to be modified.
 
 jobs:
+  set-target-branch:
+    runs-on: windows-latest
+    outputs:
+      target-branch: ${{ steps.set-target.outputs.target }}
+    steps:
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1.0.1
+      
+      - id: set-target
+        run: |
+          if ( "${{ env.USE_DYNAMIC_TARGET_NAME }}" -eq "true" ) {
+            echo "::set-output name=target::${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}"
+          } else {
+            echo "::set-output name=target::${{ env.STATIC_TARGET_NAME }}"
+          }
+  
   build:
     runs-on: windows-latest
+    needs: [set-target-branch]
 
     steps:
       - name: setup Python
@@ -40,68 +57,37 @@ jobs:
         with:
           python-version: 3.8
         
-      - name: Get branch name
-        uses: nelonoel/branch-name@v1.0.1
-        
       - name: checkout current branch
         uses: actions/checkout@v2
       
       # checkout target branch
-      - name: checkout target branch static
-        id: static_get
-        if: ${{ env.USE_DYNAMIC_TARGET_NAME != 'true' }}
+      - name: checkout target branch
+        id: target_get
         uses: actions/checkout@v2
         continue-on-error: true
         with:
-          ref: ${{ env.STATIC_TARGET_NAME }}
-          path: target_branch
-          persist-credentials: false
-          fetch-depth: 0
-      - name: checkout target branch dynamic
-        id: dynamic_get
-        if: ${{ env.USE_DYNAMIC_TARGET_NAME == 'true' }}
-        uses: actions/checkout@v2
-        continue-on-error: true
-        with:
-          ref: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
+          ref: ${{ needs.set-target-branch.outputs.target-branch }}
           path: target_branch
           persist-credentials: false
           fetch-depth: 0
       
       # target branch doesn't exist; create it
-      - name: create target branch static
-        id: static_create
-        if: ${{ steps.static_get.outcome == 'failure' }}
+      - name: create target branch
+        id: target_create
+        if: ${{ steps.target_get.outcome == 'failure' }}
         uses: peterjgrainger/action-create-branch@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          branch: ${{ env.STATIC_TARGET_NAME }}
-      - name: create target branch dynamic
-        id: dynamic_create
-        if: ${{ steps.dynamic_get.outcome == 'failure' }}
-        uses: peterjgrainger/action-create-branch@v2.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          branch: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
+          branch: ${{ needs.set-target-branch.outputs.target-branch }}
       
       # NOW checkout the newly-made target branch
-      - name: checkout created target branch static
-        id: static_get_created
-        if: ${{ steps.static_create.outcome == 'success' }}
+      - name: checkout created target branch
+        id: target_get_created
+        if: ${{ steps.target_create.outcome == 'success' }}
         uses: actions/checkout@v2
         with:
-          ref: ${{ env.STATIC_TARGET_NAME }}
-          path: target_branch
-          persist-credentials: false
-          fetch-depth: 0
-      - name: checkout created target branch dynamic
-        id: dynamic_get_created
-        if: ${{ steps.dynamic_create.outcome == 'success' }}
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
+          ref: ${{ needs.set-target-branch.outputs.target-branch }}
           path: target_branch
           persist-credentials: false
           fetch-depth: 0
@@ -109,7 +95,7 @@ jobs:
       # if it's a newly created branch (which was based on the current one), then nothing in it can be assumed to be important. Wipe it all (well... not .git).
       - name: clean created branch
         id: clean_created
-        if: ${{ steps.static_get_created.outcome == 'success' || steps.dynamic_get_created.outcome == 'success' }}
+        if: ${{ steps.target_get_created.outcome == 'success' }}
         working-directory: ./target_branch
         shell: python
         run: |
@@ -164,22 +150,11 @@ jobs:
           with os.scandir('Source') as source_dir:
             parse_folder(cur_dir = source_dir)
             
-      - name: commit changes to static target
+      - name: commit changes to target
         working-directory: ./target_branch
-        if: ${{ env.USE_DYNAMIC_TARGET_NAME != 'true' }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add --all -v *
           git commit -m "Import changes from master" -a
-          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ env.STATIC_TARGET_NAME }} --follow-tags --tags
-        
-      - name: commit changes to dynamic target
-        working-directory: ./target_branch
-        if: ${{ env.USE_DYNAMIC_TARGET_NAME == 'true' }}
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add --all -v *
-          git commit -m "Add changes" -a
-          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }} --follow-tags --tags
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ needs.set-target-branch.outputs.target-branch }} --follow-tags --tags
