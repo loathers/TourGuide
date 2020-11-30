@@ -116,6 +116,13 @@ void SemirareGenerateDescription(string [int] description)
 	}
 		
 	//aftercore? sea quest, sand dollars, giant pearl
+
+    // Train up pool skill if not maxed and have Spookyraven billiards room key
+    int permanent_pool_skill = floor(2.0 * sqrt(max(0, get_property_int("poolSharkCount"))));
+    if (permanent_pool_skill < 10 && to_item("7301").available_amount() > 0) {
+        int visits_for_next_level = ceil(pow2f((permanent_pool_skill + 1.0) / 2)) - get_property_int("poolSharkCount");
+        semirares.listAppend(LocationChoiceMake($location[The Haunted Billiards Room], "|*Train permanent pool skill (need " + visits_for_next_level.pluralise(" more visit", " more visits") + " for level " + (permanent_pool_skill + 1) + ")", 0));
+    }
 	
     LocationChoiceSort(semirares);
     

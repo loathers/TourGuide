@@ -73,6 +73,8 @@ import "relay/TourGuide/Items of the Month/Better Shrooms and Gardens.ash";
 // Missing: Left-Hand Man
 import "relay/TourGuide/Items of the Month/Guzzlr.ash";
 // Missing: Iunion
-// Missing: Melodramedary
+import "relay/TourGuide/Items of the Month/Melodramedary.ash";
 // Missing: SpinMaster lathe
 // Missing: Cargo cultist shorts
+import "relay/TourGuide/Items of the Month/Comprehensive Cartography.ash";
+// Missing: unwrapped knock-off retro superhero cape
