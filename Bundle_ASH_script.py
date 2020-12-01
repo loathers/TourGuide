@@ -154,7 +154,7 @@ def bundle(path_to_file,path_to_folder,resulting_file = """""",imported_files = 
           #try anyway
           end_index = len(import_command)
 
-        import_command = import_command[start_index:end_index]
+        import_command = os.path.normpath( import_command[start_index:end_index] )
         #now import
         if import_command not in imported_files:
           imported_files.append(import_command)
@@ -179,7 +179,7 @@ def bundle_and_write(path_to_file,path_to_result,path_to_folder = '',allow_overw
     open_mode = 'w'
 
   path_to_target_dir = os.path.dirname(path_to_result)
-  if not os.path.exists( path_to_target_dir ):
+  if not path_to_target_dir == '' and not os.path.exists( path_to_target_dir ):
     os.makedirs( path_to_target_dir )
 
   imported_files = []
