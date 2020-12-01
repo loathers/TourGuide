@@ -228,7 +228,7 @@ jobs:
           
           if len( unused_ASH_files ) > 0:
             print()
-            print( len( unused_ASH_files ) + ' unused ASH file(s) found:' )
+            print( str( len( unused_ASH_files ) ) + ' unused ASH file(s) found:' )
             for unused_file in unused_ASH_file:
               print( '    ' + unused_file )
       
