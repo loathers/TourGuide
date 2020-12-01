@@ -198,7 +198,8 @@ jobs:
           
           imported_files = ${{ steps.bundle-ASH.outputs.imported_files }}
           bundled_files = ${{ steps.bundle-ASH.outputs.bundled_files }}
-          used_ASH_files = imported_files + bundled_files
+          for file in (imported_files + bundled_files):
+            used_ASH_files.append( os.path.normpath( file ) )
           unused_ASH_files = []
           
           def parse_folder(cur_dir, current_path = ''):
@@ -212,7 +213,7 @@ jobs:
               elif dir_entry.is_file():
                 this_path = os.path.join(current_path, dir_entry.name)
                 if this_path.endswith('.ash'):
-                  if used_ASH_files.count( this_path ) == 0:
+                  if used_ASH_files.count( os.path.normpath( this_path ) ) == 0:
                     unused_ASH_files.append( this_path )
                 else:
                   print('Grabbing ' + this_path + ' ...')
