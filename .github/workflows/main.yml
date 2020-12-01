@@ -198,6 +198,7 @@ jobs:
           
           imported_files = ${{ steps.bundle-ASH.outputs.imported_files }}
           bundled_files = ${{ steps.bundle-ASH.outputs.bundled_files }}
+          used_ASH_files = []
           for file in (imported_files + bundled_files):
             used_ASH_files.append( os.path.normpath( file ) )
           unused_ASH_files = []
