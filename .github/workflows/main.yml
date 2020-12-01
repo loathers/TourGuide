@@ -122,13 +122,12 @@ jobs:
       
       # Clean mafia folder in target branch
       - name: clean target branch
-        working-directory: ./target_branch
         shell: python
         run: |
           import os
           import shutil
           
-          target_base = '${{ env.TARGET_PATH_TO_MAFIA }}'
+          target_base = os.path.join( 'target_branch', '${{ env.TARGET_PATH_TO_MAFIA }}' )
           if not os.path.exists( target_base ):
             os.makedirs( target_base )
           
