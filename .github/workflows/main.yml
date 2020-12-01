@@ -229,7 +229,7 @@ jobs:
           if len( unused_ASH_files ) > 0:
             print()
             print( str( len( unused_ASH_files ) ) + ' unused ASH file(s) found:' )
-            for unused_file in unused_ASH_file:
+            for unused_file in unused_ASH_files:
               print( '    ' + unused_file )
       
       - name: commit changes to target
