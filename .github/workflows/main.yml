@@ -174,7 +174,7 @@ jobs:
             # Third argument (optional) is the path to reach the "mafia folder".
             path_to_source_script = os.path.join( 'source_branch', '${{ env.SOURCE_PATH_TO_MAFIA }}' )
             
-            Bundle_ASH_script.bundle_and_write( source_script, destination, path_to_source_script )
+            Bundle_ASH_script.bundle_and_write( source_script, destination, path_to_source_script, allow_overwrite=True )
       
       # copy any non-ASH file in target_branch
       - name: Add non-ash in Source
