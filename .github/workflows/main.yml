@@ -210,11 +210,11 @@ jobs:
                 with os.scandir( os.path.join(source_base, next_path) ) as next_dir:
                   parse_folder(next_dir, next_path)
               elif dir_entry.is_file():
-                if dir_entry.name.endswith('.ash'):
-                  if used_ASH_files.count( dir_entry.name ) == 0:
-                    unused_ASH_files.append( dir_entry.name )
+                this_path = os.path.join(current_path, dir_entry.name)
+                if this_path.endswith('.ash'):
+                  if used_ASH_files.count( this_path ) == 0:
+                    unused_ASH_files.append( this_path )
                 else:
-                  this_path = os.path.join(current_path, dir_entry.name)
                   print('Grabbing ' + this_path + ' ...')
                   
                   this_path_source = os.path.join(source_base, this_path)
