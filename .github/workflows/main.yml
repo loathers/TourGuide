@@ -26,11 +26,6 @@ env:
   
   
   
-  # Relative path to reach the FOLDER CONTAINING the "bundler" (Bundle_ASH_script.py)
-  PATH_TO_BUNDLER_FOLDER: ''
-  
-  
-  
   # comma-separated list of (relative) path and name of the ASH scripts you want to bundle, and their new names and (relative) destinations.
   # Paths need to be relative to the "mafia folder".
   # Any .ash script not in this list won't be transferred, so if you have scripts that don't have imports, but want them in the result, include them here anyway
@@ -147,13 +142,21 @@ jobs:
                   os.remove(path=path_to_entry)
         
         
+        
+      - name: checkout bundler
+        uses: actions/checkout@v2
+        with:
+          repository: fredg1/ASH-bundler
+          path: bundler_branch
+        
       - name: Forward bundle output to target branch
+        id: bundle-ASH
         shell: python
         run: |
           import os
           import sys
           
-          sys.path.append( os.path.join( os.getcwd(), 'source_branch', '${{ env.PATH_TO_BUNDLER_FOLDER }}') )
+          sys.path.append( os.path.join( os.getcwd(), 'bundler_branch' ) )
           import Bundle_ASH_script
           
           
@@ -162,6 +165,9 @@ jobs:
           
           if len(source_scripts) != len(destinations):
             raise Exception("ASH_SCRIPT_SOURCES and ASH_SCRIPT_DESTINATIONS aren't properly paired")
+          
+          imported_files = []
+          bundled_files = []
           
           for i in range( len( source_scripts ) ):
             # The script that bundles the target script.
@@ -174,7 +180,13 @@ jobs:
             # Third argument (optional) is the path to reach the "mafia folder".
             path_to_source_script = os.path.join( 'source_branch', '${{ env.SOURCE_PATH_TO_MAFIA }}' )
             
-            Bundle_ASH_script.bundle_and_write( source_script, destination, path_to_source_script, allow_overwrite=True )
+            imports = Bundle_ASH_script.bundle_and_write( source_script, destination, path_to_source_script, allow_overwrite=True, return_imported_files=True )
+            
+            imported_files.extend( imports )
+            bundled_files.append( source_script )
+          
+          print(f'::set-output name=imported_files::{imported_files}')
+          print(f'::set-output name=bundled_files::{bundled_files}')
       
       # copy any non-ASH file in target_branch
       - name: Add non-ash in Source
@@ -185,6 +197,11 @@ jobs:
           source_base = os.path.join('source_branch', '${{ env.SOURCE_PATH_TO_MAFIA }}')
           target_base = os.path.join('target_branch', '${{ env.TARGET_PATH_TO_MAFIA }}')
           
+          imported_files = ${{ steps.bundle-ASH.outputs.imported_files }}
+          bundled_files = ${{ steps.bundle-ASH.outputs.bundled_files }}
+          used_ASH_files = imported_files + bundled_files
+          unused_ASH_files = []
+          
           def parse_folder(cur_dir, current_path = ''):
             for dir_entry in cur_dir:
               if dir_entry.is_symlink():
@@ -193,18 +210,28 @@ jobs:
                 next_path = os.path.join(current_path, dir_entry.name)
                 with os.scandir( os.path.join(source_base, next_path) ) as next_dir:
                   parse_folder(next_dir, next_path)
-              elif dir_entry.is_file() and not dir_entry.name.endswith('.ash'):
-                this_path = os.path.join(current_path, dir_entry.name)
-                print('Grabbing ' + this_path + ' ...')
-                
-                this_path_source = os.path.join(source_base, this_path)
-                this_path_target = os.path.join(target_base, this_path)
-                if os.path.exists( this_path_target ):
-                  os.remove( this_path_target )
-                os.renames(this_path_source, this_path_target)
+              elif dir_entry.is_file():
+                if dir_entry.name.endswith('.ash'):
+                  if used_ASH_files.count( dir_entry.name ) == 0:
+                    unused_ASH_files.append( dir_entry.name )
+                else:
+                  this_path = os.path.join(current_path, dir_entry.name)
+                  print('Grabbing ' + this_path + ' ...')
+                  
+                  this_path_source = os.path.join(source_base, this_path)
+                  this_path_target = os.path.join(target_base, this_path)
+                  if os.path.exists( this_path_target ):
+                    os.remove( this_path_target )
+                  os.renames(this_path_source, this_path_target)
           
           with os.scandir(source_base) as source_dir:
             parse_folder(cur_dir = source_dir)
+          
+          if len( unused_ASH_files ) > 0:
+            print()
+            print( len( unused_ASH_files ) + ' unused ASH file(s) found:' )
+            for unused_file in unused_ASH_file:
+              print( '    ' + unused_file )
       
       - name: commit changes to target
         working-directory: ./target_branch
