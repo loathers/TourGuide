@@ -2,23 +2,29 @@ import os
 
 # USER MANUAL
 #
-# to use, call "bundle_and_write()" with 2 or 3 arguments.
-# argument 1: path to the script you want to bundle.
+# to use, call "bundle_and_write()" with 2, 3 or 4 arguments.
+# argument 1, path_to_file: path to the script you want to bundle.
 #   WARNING: this path needs to be RELATIVE TO THE MAFIA FOLDER. 
 #   This means this value will always be either "relay/[...].ash" or "scripts/[...].ash"
 #    example: "relay/relay_TourGuide.ash"
 #
-# argument 2: path to the soon-to-be-created bundled file.
+# argument 2, path_to_result: path to the soon-to-be-created bundled file.
 #   Can either be absolute or relative.
 #    if relative, the reference is the folder in which THIS SCRIPT was ran.
 #        examples: "C:/Users/Keith/Documents/my_precious/my_script.ash"
 #          or      "my_script.ash"
 #
-# argument 3 (optional): the path to REACH YOUR MAFIA FOLDER
+# argument 3, path_to_folder (optional): the path to REACH YOUR MAFIA FOLDER
 #   Can be either absolute or relative
 #   if you run this script from within your mafia folder, don't submit anything here.
 #   Otherwise, this is the folders that this script has to go through to reach your mafia folder
 #    (or whatever folder contains the "scripts" or "relay" folder(s) containing your scripts to import)
+#
+# argument 4, allow_overwrite (optional): True
+#   The capital T matters.
+#   A safety measure; whether or not you allow the script to act
+#   if path_to_result already exists.
+#   Not including it makes it default to False.
 #
 #
 #
@@ -28,10 +34,10 @@ import os
 #   - your script is at C:/Users/Me/Desktop/Games/Actually_entertaining_games/KoLMafia/scripts/my_script.ash
 #
 #   In the command line, you would do:
-#       C:\Users\Me\Desktop>  py Bundle_ASH_script.bundle_and_write( 'scripts/my_script.ash' , 'Sekrits/my_bundled_script.ash' , 'Games/Actually_entertaining_games/KoLMafia/' )
+#       C:\Users\Me\Desktop>  py Bundle_ASH_script.bundle_and_write( path_to_file='scripts/my_script.ash' , path_to_result='Sekrits/my_bundled_script.ash' , path_to_folder='Games/Actually_entertaining_games/KoLMafia/' )
 #
 #   Another way to do it would be to put, at the end of this file:
-#       bundle_and_write( 'scripts/my_script.ash' , 'Sekrits/my_bundled_script.ash' , 'Games/Actually_entertaining_games/KoLMafia/' )
+#       bundle_and_write( path_to_file='scripts/my_script.ash' , path_to_result='Sekrits/my_bundled_script.ash' , path_to_folder='Games/Actually_entertaining_games/KoLMafia/' )
 #   and then run, in the command line:
 #       C:\Users\Me\Desktop>  py Bundle_ASH_script
 #
@@ -40,11 +46,8 @@ import os
 
 debug = False
 
-#Safety measure. Will not do anything if path_to_result already exists. Change to False to allow overwriting
-create_new_file_only = False
-
 def bundle(path_to_file,path_to_folder,resulting_file = """""",imported_files = []):
-  with open(path_to_folder + path_to_file, mode='r', encoding='UTF-8') as ash_file:
+  with open( os.path.join( path_to_folder, path_to_file ), mode='r', encoding='UTF-8') as ash_file:
     if debug:
       print('Importing ' + path_to_file)
     saw_presumed_start_of_code = False
@@ -170,17 +173,19 @@ def bundle(path_to_file,path_to_folder,resulting_file = """""",imported_files = 
     return resulting_file
 
 
-def bundle_and_write(path_to_file,path_to_result,path_to_folder = ''):
-  open_mode = 'w'
-  if create_new_file_only:
-    open_mode = 'x'
+def bundle_and_write(path_to_file,path_to_result,path_to_folder = '',allow_overwrite=False,return_imported_files=False):
+  open_mode = 'x'
+  if allow_overwrite:
+    open_mode = 'w'
 
   path_to_target_dir = os.path.dirname(path_to_result)
   if not os.path.exists( path_to_target_dir ):
     os.makedirs( path_to_target_dir )
 
-  with open(path_to_result, mode=open_mode, encoding='UTF-8') as bundled_file:
-    if path_to_folder != '' and not path_to_folder.endswith('/') and not path_to_folder.endswith('\\'):
-      path_to_folder += '/'
+  imported_files = []
 
-    bundled_file.write( bundle(path_to_file,path_to_folder) )
+  with open(path_to_result, mode=open_mode, encoding='UTF-8') as bundled_file:
+    bundled_file.write( bundle(path_to_file,path_to_folder,imported_files=imported_files) )
+
+  if return_imported_files:
+    return imported_files
