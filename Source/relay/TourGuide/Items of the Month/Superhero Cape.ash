@@ -63,7 +63,7 @@ void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
         
         // Subtitle
         string subtitle = current_cape.main_modifiers;
-
+        
         // Entries
         string [int] description;
         if (cape_configurations contains current_hero)
@@ -88,11 +88,8 @@ void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
                 cape_stats = "Robot";
                 break;
         }
-        if ( cape_stats != "" )
-            cape_stats = HTMLGenerateSpanOfClass("Mainstat exp: ", "r_bold" ) + cape_stats;
-            cape_stats += " + Thrill";
         if ( cape_stats != "" && current_wash != "thrill" )
-            description.listAppend( cape_stats );
+            description.listAppend( HTMLGenerateSpanOfClass("Mainstat exp: ", "r_bold" ) + cape_stats + " + Thrill" );
         
         if ( current_hero != "heck" || current_wash != "kiss" )
             description.listAppend( HTMLGenerateSpanOfClass("Yellow ray: ", "r_bold" ) + "Heck + Kiss" );
@@ -100,9 +97,7 @@ void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend( HTMLGenerateSpanOfClass("+3 Res: ", "r_bold" ) + "Vampire + Hold" );
         if ( current_hero != "vampire" || current_wash != "kill" )
             description.listAppend( HTMLGenerateSpanOfClass("Instakill / Cyrpt Evil: ", "r_bold" ) + "Vampire + Kill" );
-
-
-
+        
         return ChecklistSubentryMake(main_title, "", description);
     }
     
@@ -116,12 +111,12 @@ void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
     if ( ccc.entries.count() > 0 ) {
         entry.subentries.listAppend(ccc);
     }
-
+    
     ChecklistSubentry ucc = usefulCapeConfigs();
     if ( ucc.entries.count() > 0 ) {
         entry.subentries.listAppend(ucc);
     }
-
+    
     if ( entry.subentries.count() > 0 ) {
         resource_entries.listAppend(entry);
     }
