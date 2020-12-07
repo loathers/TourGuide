@@ -21,3 +21,4 @@ void PathDarkGiftGenerateResource(ChecklistEntry [int] resource_entries)
         }
         resource_entries.listAppend(ChecklistEntryMake("__skill Baleful Howl", url, ChecklistSubentryMake(pluralise(banishes_left, "baleful howl", "baleful howls"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Dark gyffte path baleful howl banish"));
     }
+}
