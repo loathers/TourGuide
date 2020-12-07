@@ -8,7 +8,8 @@ RegisterResourceGenerationFunction("IOTMSuperheroCapeGenerateResource");
 void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!mafiaIsPastRevision(20494)) return;
-    if (!lookupItem("unwrapped knock-off retro superhero cape").have()) return;
+    item cape = lookupItem("unwrapped knock-off retro superhero cape");
+    if (!cape.have()) return;
     
     string current_hero = get_property("retroCapeSuperhero");
     string current_wash = get_property("retroCapeWashingInstructions");
@@ -104,7 +105,7 @@ void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
     
     ChecklistEntry entry;
     entry.image_lookup_name = "__item unwrapped knock-off retro superhero cape";
-    entry.url = "inventory.php?action=hmtmkmkm";
+    entry.url = cape.equipped() ? "inventory.php?action=hmtmkmkm" : cape.invSearch(); // we don't even need to change/adapt the name, kol recognizes it anyway!
     entry.tags.id = "Superhero cape resource";
 
     ChecklistSubentry ccc = getCurrentCapeConfig();
