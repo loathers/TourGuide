@@ -241,13 +241,20 @@ void setUpState()
         yellow_ray_source = "Crimbo Shrub";
         yellow_ray_image_name = "__item DNOTC Box"; //uncertain
     }
-	if (familiar_is_usable($familiar[nanorhino]) && __misc_state["have moxie class combat skill"] && get_property_int("_nanorhinoCharge") == 100)
-	{
-		yellow_ray_available = true;
-		yellow_ray_source = "Nanorhino";
-		yellow_ray_image_name = "nanorhino";
-		
-	}
+    if (familiar_is_usable($familiar[nanorhino]) && __misc_state["have moxie class combat skill"] && get_property_int("_nanorhinoCharge") == 100)
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "Nanorhino";
+        yellow_ray_image_name = "nanorhino";
+    }
+    if (lookupItem("unwrapped knock-off retro superhero cape").have())
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "Superhero cape skill Unleash the Devil's Kiss";
+        yellow_ray_source += get_property("retroCapeSuperhero") != "heck" || get_property("retroCapeWashingInstructions") != "kiss" ? " (Heck General + Kiss me)" : "";
+        yellow_ray_source += !lookupItem("unwrapped knock-off retro superhero cape").equipped() ? " (equip first)" : "";
+        yellow_ray_image_name = "__item unwrapped knock-off retro superhero cape";
+    }
     if ($skill[Ball Lightning].skill_is_usable() && my_path_id() == PATH_HEAVY_RAINS && my_lightning() >= 5)
     {
         yellow_ray_available = true;
