@@ -34,7 +34,7 @@ void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
                 "hold":"+3 all resistances",
                 "thrill":"+3 muscle stats/fight",
                 "kiss":"Skill: Smooch of the Daywalker|Drain 20% of your foe's HP",
-                "kill":"Skill: Slay the Dead|Undead insta-bone (NOT free kill, <font color='red'>requires sword</font>).|+1% Cyrpt elivness recdution."
+                "kill":"Skill: Slay the Dead|Undead insta-bone (NOT free kill, <font color='red'>requires sword</font>).|+1% Cyrpt evilness reduction."
             }
         ),
         "heck":new CapeConfiguration(
