@@ -11,7 +11,7 @@ void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
     item cape = lookupItem("unwrapped knock-off retro superhero cape");
     if (!cape.have()) return;
     
-    //if (!__misc_state["in run"]) return; //Only relevant information in aftercore is YR, but the YR tile will already mention the cape if needed anyway, in aftercore.
+    if (!__misc_state["in run"]) return; //Only relevant information in aftercore is YR, but the YR tile will already mention the cape if needed anyway, in aftercore.
     
     // Not too sure if this should even be kept? There's no real precedent of Guide showing a resource that "never ends"...
     // We could make a new section that lists a player's possessions and everything special related to them, and this would go there, but currently... not too sure...
