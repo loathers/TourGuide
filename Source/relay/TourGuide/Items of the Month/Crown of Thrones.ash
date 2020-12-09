@@ -227,46 +227,12 @@ void IOTMCOTGenerateSuggestions(string [int] description)
 RegisterResourceGenerationFunction("IOTMCOTGenerateResource");
 void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
 {
-     if ($item[crown of thrones].available_amount() == 0 && $item[Buddy Bjorn].available_amount() == 0)
+    if ($item[crown of thrones].available_amount() == 0 && $item[Buddy Bjorn].available_amount() == 0)
         return;
     if (__misc_state["familiars temporarily blocked"]) //avatar paths
         return;
     string [int] description;
     
-	void addFamiliarDropsLine(string fam, string prop, int limit, string dropdesc) {
-		int currentDrops = get_property_int(prop);
-		familiar thisFam = fam.to_familiar();
-		if	( !thisFam.have_familiar() ) { return; }
-		string txtclr = "";
-		if	( fam.index_of("Stomping") > -1 ) {
-			txtclr = (get_property_boolean("bootsCharged"))?"green":"red";
-		}
-		if	( currentDrops == limit ) { txtclr = "gray"; }
-		
-		description.listAppend(HTMLGenerateSpanFont(fam+": "+currentDrops + "/"+limit+" "+dropdesc+".", txtclr));
-		return;
-	}
-	
-	description.listAppend(HTMLGenerateSpanFont("Crown/Bjorn-specific drops", "lightgray"));
-	addFamiliarDropsLine("Machine Elf", "_abstractionDropsCrown", 25, "abstractions");
-	addFamiliarDropsLine("Trick-or-Treating Tot", "_hoardedCandyDropsCrown", 3, "hoarded candy wads");
-	addFamiliarDropsLine("Grimstone Golem", "_grimstoneMaskDropsCrown", 1, "grimstone mask");
-	addFamiliarDropsLine("Garbage Fire", "_garbageFireDropsCrown", 3, "burning newspapers");
-	addFamiliarDropsLine("Optimistic Candle", "_optimisticCandleDropsCrown", 3, "globs of melted wax");
-	
-	description.listAppend(HTMLGenerateSpanFont("General familiar drops", "lightgray"));
-	addFamiliarDropsLine("Rogue Program", "_tokenDrops", 5, "GG tokens");
-	addFamiliarDropsLine("Galloping Grill", "_hotAshesDrops", 5, "hot ashes");
-	addFamiliarDropsLine("Fist Turkey", "_turkeyBooze", 5, "Turkey booze");
-	addFamiliarDropsLine("Golden Monkey", "_powderedGoldDrops", 5, "powdered gold");
-	//these drop yellow pixels, not pills?
-	//addFamiliarDropsLine("Puck Man", "_powerPillDrops", 11, "power pills");
-	//addFamiliarDropsLine("Ms. Puck Man", "_powerPillDrops", 11, "power pills");
-	addFamiliarDropsLine("Stomping Boots", "_pasteDrops", 7, "spleen pastes");
-	addFamiliarDropsLine("Li'l Xenomorph", "_transponderDrops", 5, "transponders");
-	
-	
-
     item crown_item = $item[crown of thrones];
     if (crown_item.equipped_amount() == 0 && $item[Buddy Bjorn].available_amount() > 0)
         crown_item = $item[Buddy Bjorn];
