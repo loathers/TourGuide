@@ -10,7 +10,7 @@ name: bundle ASH script(s), and push to new branch
 
 env:
   # Branch to checkout under ./target_branch/ . If contains {0}, {0} will be replaced by the source branch's name.
-  # (doesn't need to be the name of an existing branch. Will create one if needed)
+  # (doesn't need to be the name of an existing branch. Will create one if needed (will be a copy of the source branch))
   # examples: 'Pre-Release', 'Bundled-{0}', 'my_{0}_2.0' or just '{0}' (not the best idea, though...)
   TARGET_NAME: 'Bundled-{0}'
   
