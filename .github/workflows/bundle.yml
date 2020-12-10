@@ -338,6 +338,7 @@ jobs:
       
       # copy any non-ASH file in target_branch
       - name: Add non-ash in Source
+        id: parse-rest
         shell: python
         run: |
           import os
@@ -379,9 +380,22 @@ jobs:
           
           if len( unused_ASH_files ) > 0:
             print()
-            print( str( len( unused_ASH_files ) ) + ' unused ASH file(s) found:' )
-            for unused_file in unused_ASH_files:
-              print( '    ' + unused_file )
+            with open('artifact.txt', mode='x', encoding='UTF-8') as f:
+              message = str( len( unused_ASH_files ) ) + ' unused ASH file(s) (not imported by any of the scripts) found:'
+              print( message )
+              f.write( message + '\n' )
+              
+              for unused_file in unused_ASH_files:
+                message = '    ' + unused_file
+                print( message )
+                f.write( message + '\n' )
+      
+      - name: upload unused files message as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: unused files found
+          path: ./artifact.txt
+          if-no-files-found: ignore
       
       - name: commit changes to target
         working-directory: ./target_branch
