@@ -132,7 +132,7 @@ jobs:
         run: |
           import os
           
-          workflow_file = '.github/workflows/bundle.yml' # there's a way to get this, but it's sooooo much work :(
+          workflow_file = '.github/workflows/main.yml' # there's a way to get this, but it's sooooo much work :(
           new_branch_to_exclude = '${{ steps.set-target.outputs.target-branch }}'
           
           
