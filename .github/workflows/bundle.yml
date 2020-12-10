@@ -2,14 +2,10 @@ name: bundle ASH script(s), and push to new branch
 # By https://github.com/fredg1
 
 env:
-  # Branch names.
-  
-  # To have the target branch name use DYNAMIC_TARGET_NAME, set USE_DYNAMIC_TARGET_NAME to 'true'. Will otherwise use STATIC_TARGET_NAME.
+  # Branch to checkout under ./target_branch/ . If contains {0}, {0} will be replaced by the source branch's name.
   # (doesn't need to be the name of an existing branch. Will create one if needed)
-  USE_DYNAMIC_TARGET_NAME: 'false'
-  STATIC_TARGET_NAME: 'Pre-Release'
-  # in DYNAMIC_TARGET_NAME, {0} will be replaced by the current branch/tag's actual name
-  DYNAMIC_TARGET_NAME: 'Bundled-{0}'
+  # examples: 'Pre-Release', 'Bundled-{0}', 'my_{0}_2.0' or just '{0}' (not the best idea, though...)
+  TARGET_NAME: 'Bundled-{0}'
   
   
   
@@ -20,7 +16,7 @@ env:
   # Only its content will be transferred to <target_branch>
   SOURCE_PATH_TO_MAFIA: 'Source'
   
-  # If this folder already exists on the target branch, IT'S CONTENT WILL BE ERASED.
+  # If this folder already exists on the target branch, IT'S PREVIOUS CONTENT WILL BE ERASED.
   # Stuff outside of it won't.
   TARGET_PATH_TO_MAFIA: ''
   
@@ -37,7 +33,7 @@ env:
 
 
 
-on: # customize at will
+on:
   workflow_dispatch:
   # for more info about this if you want to modify it, see
   # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags
@@ -46,9 +42,8 @@ on: # customize at will
     branches:
       - 'master'
     paths:
-      # MAKE SURE THIS IS UP-TO-DATE/CORRECT (it's impossible to query env. variables at this point).
-      - 'Source/**.ash'
-      - 'Source/**.js'
+      # MAKE SURE THIS MATCHES SOURCE_PATH_TO_MAFIA (it's impossible to query env. variables at this point).
+      - 'Source/**'
     # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
       - '!.github/**'
 
@@ -57,45 +52,49 @@ on: # customize at will
 # Anything past this point shouldn't need to be modified.
 
 jobs:
-  set-target-branch:
-    runs-on: windows-latest
-    outputs:
-      target-branch: ${{ steps.set-target.outputs.target }}
-    steps:
-      - name: Get branch name
-        uses: nelonoel/branch-name@v1.0.1
-      
-      - id: set-target
-        run: |
-          if ( "${{ env.USE_DYNAMIC_TARGET_NAME }}" -eq "true" ) {
-            echo "::set-output name=target::${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}"
-          } else {
-            echo "::set-output name=target::${{ env.STATIC_TARGET_NAME }}"
-          }
-  
   build:
     runs-on: windows-latest
-    needs: [set-target-branch]
 
     steps:
       - name: setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-        
-      # checkout source and target branches
+      
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1.0.1
+      
+      # Checkout referrer (source) under ./source_branch/
       - name: checkout current branch
         uses: actions/checkout@v2
         with:
-          path: source_branch
+          path: ./source_branch
+      
+      
+      # Parse wanted target name, then checkout under ./target_branch/
+      - name: set desired target branch
+        id: set-target
+        shell: python
+        run: |
+          source = '${{ env.BRANCH_NAME }}'
+          target = '${{ env.TARGET_NAME }}'
+          
+          if target == source:
+            pass
+          elif target == '':
+            target = 'Bundled-' + source
+          elif '{0}' in target:
+            target = target.format( source )
+          
+          print(f'::set-output name=target-branch::{target}')
       
       - name: checkout target branch
         id: target_get
         uses: actions/checkout@v2
         continue-on-error: true
         with:
-          ref: ${{ needs.set-target-branch.outputs.target-branch }}
-          path: target_branch
+          ref: ${{ steps.set-target.outputs.target-branch }}
+          path: ./target_branch
           persist-credentials: false
           fetch-depth: 0
       
@@ -107,7 +106,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          branch: ${{ needs.set-target-branch.outputs.target-branch }}
+          branch: ${{ steps.set-target.outputs.target-branch }}
       
       # NOW checkout the newly-made target branch
       - name: checkout created target branch
@@ -115,8 +114,8 @@ jobs:
         if: ${{ steps.target_create.outcome == 'success' }}
         uses: actions/checkout@v2
         with:
-          ref: ${{ needs.set-target-branch.outputs.target-branch }}
-          path: target_branch
+          ref: ${{ steps.set-target.outputs.target-branch }}
+          path: ./target_branch
           persist-credentials: false
           fetch-depth: 0
       
@@ -241,4 +240,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add --all -v *
           git commit -m "Import changes from ${{ github.ref }}" -a
-          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ needs.set-target-branch.outputs.target-branch }} --follow-tags --tags
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ steps.set-target.outputs.target-branch }} --follow-tags --tags
