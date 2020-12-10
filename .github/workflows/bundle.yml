@@ -1,6 +1,13 @@
 name: bundle ASH script(s), and push to new branch
 # By https://github.com/fredg1
 
+# USER MANUAL
+#  This workflow should run by itself without the need for any change.
+#  It's, however, currently tailored to TourGuide.
+#  If you wish to change its behavior (change the name of the target branch, where it places the result in it, or if you wish to use it on a folder + script other than Source + relay/TourGuide.ash), all you need to modify should be in the "env" section down below.
+# I'm working on making this its own action that can be called as many times as needed, on any script, with as much customization as possible, but github is still not done on the feature I'd need for that :/
+# P.S. please don't change the filename of this workflow. A step depends on that. (if you do, please modify line 135 accordingly)
+
 env:
   # Branch to checkout under ./target_branch/ . If contains {0}, {0} will be replaced by the source branch's name.
   # (doesn't need to be the name of an existing branch. Will create one if needed)
@@ -37,15 +44,12 @@ on:
   workflow_dispatch:
   # for more info about this if you want to modify it, see
   # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags
-  # (for example, if you wish to make it so that any branch can trigger this workflow)
+  # and
+  # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestpaths
   push:
-    branches:
-      - 'master'
     paths:
-      # MAKE SURE THIS MATCHES SOURCE_PATH_TO_MAFIA (it's impossible to query env. variables at this point).
-      - 'Source/**'
-    # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
-      - '!.github/**'
+      #- '${{ SOURCE_PATH_TO_MAFIA }}/**' # it's impossible to query env. variables at this point, sorry :(
+      - '!.github/**' # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
 
 
 
@@ -118,6 +122,152 @@ jobs:
           path: ./target_branch
           persist-credentials: false
           fetch-depth: 0
+      
+      # If this branch needed to be created, assume the user doesn't want to have this workflow trigger in it
+      # this was way too much work for something so situational...
+      - name: don't carry workflow
+        if: ${{ steps.target_get_created.outcome == 'success' }}
+        working-directory: ./target_branch
+        shell: python
+        run: |
+          import os
+          
+          workflow_file = '.github/workflows/bundle.yml' # there's a way to get this, but it's sooooo much work :(
+          new_branch_to_exclude = '${{ steps.set-target.outputs.target-branch }}'
+          
+          
+          def removeComment(line: str, start = 0):
+            comment_start = line.find('#', start)
+            if comment_start == -1:
+              return line
+            else:
+              if line[comment_start - 1] == '\\':
+                removeComment( line, comment_start + 1 )
+              else:
+                return line[:comment_start]
+          
+          
+          extra_line_separator_characters = len( os.linesep ) - 1 # may mess us up when we manually move the pointer on Windows (which is \r\n , 2 characters)
+          if os.path.exists( workflow_file ):
+            with open(workflow_file, mode='r+', encoding='UTF-8') as f:
+              in_event_trigger_section = False # whether we reached "on:". Never set back to False; we exit the loop instead
+              in_push_event_trigger = False # whether we reached "push:", and if we're still in it
+              push_event_trigger_indentation = 0 # the indentation of the "push:" block. Used to check when to set in_push_event_trigger back to False, and in case the push: block ends up being empty, as a backup of indentation_after_push
+              push_event_trigger_location = 0 # pointer location after the "push:" block. Used in case the push: block ends up being empty
+              indentation_after_push = 0 # the indentation of the "branches:"/"branches-ignore:" block (or, if we don't see it, the first block inside of "push:" that we see). Used to tell when we left the branches:/branches-ignore: block, and, if that block didn't end up being here, the indentation we'll use to MAKE said block
+              found_branches = False # which, of branches or branches-ignore, we found
+              found_branches_ignore = False # which, of branches or branches-ignore, we found
+              branches_start_location = 0 # pointer location after the "branches:" or "branches-ignore:" block (currently unused)
+              branches_end_location = None # furthest we got the pointer while in_branches was True. We want to add something right after that
+              branches_indentation = 0 # by how much the user indented what's IN their branches:/branches-ignore: scope. They all need the same indentation
+              in_branches = False # whether we reached "branches:" or "branches-ignore:", and if we're still in it
+              branches_lines = [] # list of lines interpreted as being under the "branches:" or "branches-ignore:" scope
+              while True:
+                line = f.readline()
+                # we're looking for:
+                #on: (event_trigger_section)
+                #  [...]
+                #  push: (push_event_trigger)
+                #    [...]
+                #    branches:
+                if line == '':
+                  if in_branches:
+                    branches_end_location = f.tell()
+                  break # end of file
+                elif in_event_trigger_section:
+                  # remove comments from the line
+                  no_commented_line = removeComment( line )
+                  stripped_line = no_commented_line.lstrip()
+                  current_indentation = len( no_commented_line ) - len( stripped_line )
+                  
+                  if stripped_line == '':
+                    if in_branches:
+                      branches_lines.append( line )
+                    continue
+                  
+                  if in_push_event_trigger and current_indentation <= push_event_trigger_indentation:
+                    in_push_event_trigger = False # we left that block
+                  if in_branches and current_indentation <= indentation_after_push and (current_indentation < indentation_after_push or not stripped_line.startswith('-')):
+                    in_branches = False
+                    branches_end_location = f.tell() - ( len( line ) + extra_line_separator_characters )
+                  
+                  if current_indentation == 0:
+                    break # we left the event trigger section
+                  
+                  if stripped_line.startswith('push:') and ( push_event_trigger_indentation == 0 or current_indentation < push_event_trigger_indentation ):
+                    in_push_event_trigger = True
+                    push_event_trigger_indentation = current_indentation
+                    push_event_trigger_location = f.tell()
+                    # also reset all the other variables in case we previously set them in the wrong(???) "push:" block
+                    indentation_after_push = 0
+                    found_branches = False
+                    found_branches_ignore = False
+                    branches_start_location = 0
+                    branches_end_location = None
+                    branches_indentation = 0
+                    in_branches = False
+                    branches_lines = []
+                  elif in_push_event_trigger:
+                    if indentation_after_push == 0:
+                      indentation_after_push = current_indentation # save this for later in case there's no "branches:" tag, and we need to add it ourselves
+                    
+                    if in_branches:
+                      if stripped_line.startswith('-') and branches_indentation == 0:
+                        branches_indentation = current_indentation
+                      branches_lines.append( line )
+                    elif stripped_line.startswith('branches:'):
+                      found_branches = True
+                      branches_start_location = f.tell()
+                      in_branches = True
+                      indentation_after_push = current_indentation
+                    elif stripped_line.startswith('branches-ignore:'):
+                      found_branches_ignore = True
+                      branches_start_location = f.tell()
+                      in_branches = True
+                      indentation_after_push = current_indentation
+                
+                elif line.startswith('on:'):
+                  in_event_trigger_section = True
+              
+              
+              
+              if push_event_trigger_location > 0: # if it's just not there, don't bother creating it
+                rest_of_file = """"""
+                
+                if indentation_after_push == 0: # push: is empty
+                  indentation_after_push = push_event_trigger_indentation * 2
+                
+                if not found_branches and not found_branches_ignore: # need to create one ourselves
+                  f.seek(push_event_trigger_location)
+                  rest_of_file = f.read()
+                  f.seek(push_event_trigger_location)
+                  
+                  most_recently_added_line = ''.rjust( indentation_after_push )
+                  most_recently_added_line += 'branches-ignore:\n'
+                  most_recently_added_line += ''.rjust( indentation_after_push ) + "- '"
+                else:
+                  # trim any lines at the end that are empty lines / only a comment
+                  for x in range(len( branches_lines ), 0, -1):
+                    branches_line = branches_lines[x-1]
+                    if removeComment( branches_line ).lstrip() != '':
+                      break
+                    branches_lines.pop(x)
+                    branches_end_location -= len( branches_line ) + extra_line_separator_characters
+                  
+                  f.seek( branches_end_location )
+                  rest_of_file = f.read()
+                  f.seek( branches_end_location )
+                  
+                  if branches_indentation == 0:
+                    branches_indentation = indentation_after_push
+                  
+                  most_recently_added_line = ''.rjust( branches_indentation ) + "- '"
+                  if found_branches:
+                    most_recently_added_line += '!'
+                
+                most_recently_added_line += new_branch_to_exclude + "'\n"
+                f.write( most_recently_added_line )
+                f.write( rest_of_file )
       
       # Clean mafia folder in target branch
       - name: clean target branch
