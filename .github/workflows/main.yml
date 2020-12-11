@@ -137,7 +137,7 @@ jobs:
             if ( $workflow.path -eq "${{ github.workflow }}" -or $workflow.name -eq "${{ github.workflow }}" )
             {
               $workflow_path = $workflow.path
-              echo ::set-output name=workflow-path::$workflow_path
+              echo "::set-output name=workflow-path::$workflow_path"
               break
             }
           }
