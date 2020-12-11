@@ -6,7 +6,6 @@ name: bundle ASH script(s), and push to new branch
 #  It's, however, currently tailored to TourGuide.
 #  If you wish to change its behavior (change the name of the target branch, where it places the result in it, or if you wish to use it on a folder + script other than Source + relay/TourGuide.ash), all you need to modify should be in the "env" section down below.
 # I'm working on making this its own action that can be called as many times as needed, on any script, with as much customization as possible, but github is still not done on the feature I'd need for that :/
-# P.S. please don't change the filename of this workflow. A step depends on that. (if you do, please modify line 135 accordingly)
 
 env:
   # Branch to checkout under ./target_branch/ . If contains {0}, {0} will be replaced by the source branch's name.
@@ -124,15 +123,31 @@ jobs:
           fetch-depth: 0
       
       # If this branch needed to be created, assume the user doesn't want to have this workflow trigger in it
-      # this was way too much work for something so situational...
-      - name: don't carry workflow
+      # this was way too much work for something so situational/niche... X_X
+      - name: get workflow path
+        id: get-workflow-path
         if: ${{ steps.target_get_created.outcome == 'success' }}
+        shell: pwsh
+        run: |
+          $Header = @{"Accept" = "application/vnd.github.v3+json"}
+          $uri = "https://api.github.com/repos/${{ github.repository }}/actions/workflows"
+          $Workflows = Invoke-RestMethod -Method GET -Header $Header -uri $uri
+          Foreach ($workflow in $Workflows.workflows)
+          {
+            if ( $workflow.path -eq "${{ github.workflow }}" -or $workflow.name -eq "${{ github.workflow }}" )
+            {
+              echo ::set-output name=workflow-path::($workflow.path)
+              break
+            }
+          }
+      - name: don't carry workflow
+        if: ${{ steps.get-workflow-path.outcome == 'success' }}
         working-directory: ./target_branch
         shell: python
         run: |
           import os
           
-          workflow_file = '.github/workflows/main.yml' # there's a way to get this, but it's sooooo much work :(
+          workflow_file = '${{ steps.get-workflow-path.outputs.workflow-path }}'
           new_branch_to_exclude = '${{ steps.set-target.outputs.target-branch }}'
           
           
