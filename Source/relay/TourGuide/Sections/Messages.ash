@@ -224,7 +224,7 @@ string generateRandomMessage()
     if (__misc_state["In valhalla"])
         return "rebirth";
     
-	if (__misc_state["in run"])
+    if (__misc_state["in run"])
     {
         if (my_turncount() > 1000 && !in_bad_moon())
             random_messages.listAppend("so many turns");
