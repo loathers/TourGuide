@@ -288,6 +288,7 @@ string generateRandomMessage()
     //random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play alice's army", generateMainLinkMap("aagame.php")));
     random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play witchess", generateMainLinkMap("playwitchess.php?action=another")));
 	random_messages.listAppend("consider your mistakes creative spading");
+    random_messages.listAppend(HTMLGenerateTagWrap("a", "Found inaccurate/questionable information?<br>Have a question/suggestion? Click here!", string [string] {"href":"https://github.com/cdrock/TourGuide/discussions", "target":"_blank", "class":"r_a_undecorated"}));
     
     if (hippy_stone_broken())
         random_messages.listAppend(HTMLGenerateTagWrap("a", "it's not easy having yourself a good time", generateMainLinkMap("peevpee.php")));
