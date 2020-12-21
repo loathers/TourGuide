@@ -2,7 +2,10 @@
 
 since 20.6; //the earliest main release that supports the changes to the terrarium that came with the release of the Melodramedary
 //These settings are for development. Don't worry about editing them.
-string __version = "1.8.0";
+string __version = "1.9.0";
+
+//Path and name of the .js file. In case you change either.
+string __javascript = "TourGuide/TourGuide.js";
 
 //Debugging:
 boolean __setting_debug_mode = false;
@@ -2497,6 +2500,7 @@ static {
     int PATH_EXPLODED = 37;
     int PATH_OF_THE_PLUMBER = 38;
     int PATH_LOW_KEY_SUMMER = 39;
+    int PATH_GREY_GOO = 40;
 }
 
 float numeric_modifier_replacement(item it, string modifier) {
@@ -4070,7 +4074,10 @@ boolean haveSeenBadMoonEncounter(int encounter_id)
 {
     if (!get_property_ascension("lastBadMoonReset")) //badMoonEncounter values are not reset when you ascend
         return false;
-    return get_property_boolean("badMoonEncounter" + encounter_id);
+    string zero = ""; //Encounters under 10 are listed as "01", "02", "03"...
+    if (encounter_id < 10)
+        zero = "0";
+    return get_property_boolean("badMoonEncounter" + zero + encounter_id);
 }
 
 //FIXME make this use static etc. Probably extend Item Filter.ash to support equipment.
@@ -4943,7 +4950,7 @@ void initialiseIOTMsUsable()
     	__iotms_usable[lookupItem("FantasyRealm membership packet")] = true;
     if (get_property_boolean("_neverendingPartyToday") || get_property_boolean("neverendingPartyAlways"))
         __iotms_usable[lookupItem("Neverending Party invitation envelope")] = true;
-    if (get_property_boolean("_voteToday") || get_property_boolean("voteAlways"))
+    if (get_property_boolean("_voteToday") || get_property_boolean("voteAlways") || lookupItem("&quot;I Voted!&quot; sticker").available_amount() > 0)
         __iotms_usable[lookupItem("voter registration form")] = true;
     if (florist_available() && $item[hand turkey outline].is_unrestricted()) //Order of the Green Thumb Order Form is not marked as out of standard.
     	__iotms_usable[$item[Order of the Green Thumb Order Form]] = true;
@@ -8273,6 +8280,7 @@ static
         building_images["naughty sorceress lair"] = KOLImageMake("images/otherimages/main/map6.gif", Vec2iMake(100,100), RectMake(6,0,50,43));
         
         building_images["king imprismed"] = KOLImageMake("images/otherimages/lair/kingprism1.gif", Vec2iMake(100,100));
+        building_images["astral gash"] = KOLImageMake("images/otherimages/gash.gif", Vec2iMake(100,100));
         building_images["campsite"] = KOLImageMake("images/otherimages/plains/plains1.gif", Vec2iMake(100,100));
         building_images["trophy"] = KOLImageMake("images/otherimages/trophy/not_wearing_any_pants.gif", Vec2iMake(100,100));
         building_images["hidden temple"] = KOLImageMake("images/otherimages/woods/temple.gif", Vec2iMake(100,100), RectMake(16, 40, 89, 96));
@@ -9991,7 +9999,7 @@ void QLevel4Init()
     //step3 -> 3 areas unlocked
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL04Bat");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	
 	state.quest_name = "Boss Bat Quest";
 	state.image_name = "Boss Bat";
@@ -10157,7 +10165,7 @@ void QLevel5Init()
 	//questL05Goblin
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL05Goblin");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Knob Goblin Quest";
 	state.image_name = "cobb's knob";
 	state.council_quest = true;
@@ -10183,7 +10191,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Level 5"].in_progress)
 		return;
-    if (my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in aftercore"])
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO || __misc_state["in aftercore"])
         return;
     string url = "place.php?whichplace=plains";
 	//if the quest isn't started and we have unlocked the barracks, wait until it's started:
@@ -10571,7 +10579,7 @@ void QLevel7Init()
 	//questL07Cyrptic
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL07Cyrptic");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Cyrpt Quest";
 	state.image_name = "cyrpt";
 	state.council_quest = true;
@@ -12359,7 +12367,7 @@ void QLevel10Init()
 	//questL10Garbage
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL10Garbage");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Castle Quest";
 	state.image_name = "castle";
 	state.council_quest = true;
@@ -12743,7 +12751,7 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Ron");
-        if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
         state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
         state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
         
@@ -12762,7 +12770,7 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Shen");
-        if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
         state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
         state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
         
@@ -13159,7 +13167,7 @@ void QLevel11PyramidInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Pyramid");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Pyramid Quest";
     state.image_name = "Pyramid";
     __quest_state["Level 11 Pyramid"] = state;
@@ -13392,7 +13400,7 @@ void QLevel11DesertInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Desert");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Desert Quest";
     state.image_name = "Pyramid"; //"__item instant karma";
     
@@ -13609,7 +13617,7 @@ void QLevel11PalindomeInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Palindome");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Palindome Quest";
     state.image_name = "Palindome";
     
@@ -13941,7 +13949,7 @@ void QLevel11ManorInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Manor");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Lord Spookyraven Quest";
     state.image_name = "Spookyraven manor";
     
@@ -14033,10 +14041,10 @@ void QLevel11ManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             {
                 //FIXME also make sure that is relevant when in the haunted bedroom/missing items
                 //FIXME detect the chamber being opened
-                boolean output_final_fight_info = false;
-                if (use_fast_route)
+                boolean output_final_fight_info = base_quest_state.mafia_internal_step >= 4;
+                if (use_fast_route && !output_final_fight_info)
                 {
-                    if ($item[wine bomb].available_amount() > 0 || base_quest_state.mafia_internal_step >= 4)
+                    if ($item[wine bomb].available_amount() > 0)
                     {
                         output_final_fight_info = true;
                     }
@@ -14260,7 +14268,7 @@ int numberOfDenseLianaFoughtInShrine(location shrine)
 void QLevel11HiddenCityInit() {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Worship");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Hidden City Quest";
     state.image_name = "Hidden City";
     
@@ -14362,7 +14370,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         ChecklistSubentry subentry;
         subentry.header = base_quest_state.quest_name;
         subentry.entries.listAppend("Unlock the hidden city via the hidden temple.");
-        if ($item[the Nostril of the Serpent].available_amount() == 0)
+        if ($item[the Nostril of the Serpent].available_amount() == 0 && !get_property_ascension("lastTempleButtonsUnlock"))
             subentry.entries.listAppend("Need nostril of the serpent.");
         if ($item[stone wool].available_amount() > 0 && my_path_id() != PATH_G_LOVER)
         {
@@ -14559,18 +14567,10 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 
                 int totalTurnsSpent = $location[the hidden office building].turns_spent;
                 
-                int delayForNextNoncombat;
+                int delayForNextNoncombat = 4 - (totalTurnsSpent - 1) % 5;
 
-                if (totalTurnsSpent < 6) {
-                    delayForNextNoncombat = 5 - totalTurnsSpent;
-                } else {
-                    delayForNextNoncombat = 4 - (totalTurnsSpent - 5) % 5;
-                }
-
-                if (!hasMcCluskyFile) {
-                    if (numberOfFilesLeft > 0) {
-                        subentry.entries.listAppend("Kill " + pluralise(numberOfFilesLeft, "more pygmy witch accountant", "more pygmy witch accountants") + " for their files.");
-                    }
+                if (!hasMcCluskyFile && numberOfFilesLeft > 0) {
+                    subentry.entries.listAppend("Kill " + pluralise(numberOfFilesLeft, "more pygmy witch accountant", "more pygmy witch accountants") + " for their files.");
                 }
 
                 if (delayForNextNoncombat == 0) {
@@ -14755,8 +14755,7 @@ void QLevel11HiddenTempleInit()
     }
     else
         QuestStateParseMafiaQuestPropertyValue(state, "unstarted");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-    if (my_path_id() == PATH_EXPLOSIONS) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_EXPLOSIONS || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Hidden Temple Unlock";
     state.image_name = "spooky forest";
 
@@ -14902,7 +14901,7 @@ void QLevel11Init()
 	{
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11MacGuffin");
-    	if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    	if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		state.quest_name = "MacGuffin Quest";
 		state.image_name = "MacGuffin";
 		state.council_quest = true;
@@ -16885,8 +16884,7 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-    if (my_path_id() == PATH_BUGBEAR_INVASION || __misc_state["in aftercore"] || (!state.in_progress && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) || my_path_id() == PATH_COMMUNITY_SERVICE) //FIXME mafia may track the ed L13 quest under this variable
+    if (__misc_state["in aftercore"] || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_GREY_GOO || (!state.in_progress && my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)) //FIXME mafia may track the ed L13 quest under this variable
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	if (__misc_state["Example mode"])
         QuestStateParseMafiaQuestPropertyValue(state, "step6");
@@ -19101,6 +19099,7 @@ void QNemesisInit()
     
 	
 	QuestStateParseMafiaQuestProperty(state, "questG04Nemesis");
+    if (my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	
 	state.quest_name = "Nemesis Quest";
 	state.image_name = "__half Nemesis";
@@ -21055,7 +21054,7 @@ void QUntinkerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [i
 	if (base_quest_state.finished || !base_quest_state.startable)
 		return;
     
-    if (my_path_id() == PATH_EXPLOSION) return;
+    if (my_path_id() == PATH_EXPLOSION || my_path_id() == PATH_GREY_GOO) return;
 	ChecklistSubentry subentry;
 	
 	subentry.header = base_quest_state.quest_name;
@@ -21103,7 +21102,7 @@ void QArtistInit()
     if (!state.started && $items[pail of pretentious paint, pretentious paintbrush, pretentious palette].available_amount() > 0)
         QuestStateParseMafiaQuestPropertyValue(state, "started");
     
-    if (my_path_id() == PATH_ZOMBIE_SLAYER) //cannot be done
+    if (my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_GREY_GOO) //cannot be done
         QuestStateParseMafiaQuestPropertyValue(state, "unstarted");
 	
 	state.quest_name = "Pretentious Artist's Quest";
@@ -21740,6 +21739,7 @@ void QWizardOfEgoInit()
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questG03Ego");
+    if (my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     
     if (!state.finished)
     {
@@ -22292,7 +22292,7 @@ void QGuildInit()
         QuestStateParseMafiaQuestPropertyValue(state, "step1");
 	}
 	
-	state.startable = true;
+    state.startable = !(my_path_id() == PATH_GREY_GOO && $classes[seal clubber,turtle tamer] contains my_class());
 	
 	__quest_state["Guild"] = state;
 }
@@ -22307,7 +22307,7 @@ void QGuildGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     if (my_path_id() == PATH_NUCLEAR_AUTUMN)
         return;
 	QuestState base_quest_state = __quest_state["Guild"];
-	if (base_quest_state.finished)
+	if (base_quest_state.finished || !base_quest_state.startable)
 		return;
 		
 	ChecklistSubentry subentry;
@@ -24742,7 +24742,7 @@ void SemirareGenerateDescription(string [int] description)
 			if (!have_outfit_components("Knob Goblin Elite Guard Uniform"))
 			{
 				string [int] reasons;
-				if (!__quest_state["Level 8"].finished)
+				if (!__quest_state["Level 5"].finished)
 					reasons.listAppend("Cobb's Knob quest");
                 if (!dispensary_available() && false)
                 {
@@ -24758,7 +24758,7 @@ void SemirareGenerateDescription(string [int] description)
 				semirares.listAppend(LocationChoiceMake($location[Itznotyerzitz Mine], "|*Acquire mining gear for trapper quest.|*Run +234% item to get drop.", 0));
 		}
         int wool_needed = 1;
-        if ($item[the nostril of the serpent].available_amount() == 0)
+        if ($item[the nostril of the serpent].available_amount() == 0 && !get_property_ascension("lastTempleButtonsUnlock"))
             wool_needed += 1;
 		if ($item[stone wool].available_amount() < wool_needed && !locationAvailable($location[the hidden park]))
 		{
@@ -24806,6 +24806,13 @@ void SemirareGenerateDescription(string [int] description)
 	}
 		
 	//aftercore? sea quest, sand dollars, giant pearl
+
+    // Train up pool skill if not maxed and have Spookyraven billiards room key
+    int permanent_pool_skill = floor(2.0 * sqrt(max(0, get_property_int("poolSharkCount"))));
+    if (permanent_pool_skill < 10 && to_item("7301").available_amount() > 0) {
+        int visits_for_next_level = ceil(pow2f((permanent_pool_skill + 1.0) / 2)) - get_property_int("poolSharkCount");
+        semirares.listAppend(LocationChoiceMake($location[The Haunted Billiards Room], "|*Train permanent pool skill (need " + visits_for_next_level.pluralise(" more visit", " more visits") + " for level " + (permanent_pool_skill + 1) + ")", 0));
+    }
 	
     LocationChoiceSort(semirares);
     
@@ -26560,7 +26567,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         string url = "inventory.php?ftext=stone+wool";
         int quest_needed = 2;
-        if ($item[the nostril of the serpent].available_amount() > 0)
+        if ($item[the nostril of the serpent].available_amount() > 0 || get_property_ascension("lastTempleButtonsUnlock"))
             quest_needed -= 1;
         if (locationAvailable($location[the hidden park]) || !in_run)
             quest_needed = 0;
@@ -28452,7 +28459,7 @@ location [int] generatePossibleLocationsToBurnDelay()
         if (l == $location[the oasis] && $effect[ultrahydrated].have_effect() == 0) continue;
         if (l == $location[the hidden apartment building] && get_property_int("hiddenApartmentProgress") >= 7) continue;
         if (l == $location[the hidden office building] && get_property_int("hiddenOfficeProgress") >= 7) continue;
-        if (__misc_state["in CS aftercore"] && $locations[the spooky forest,the outskirts of cobb's knob] contains l) continue;
+        if ($locations[the spooky forest,the outskirts of cobb's knob] contains l && (my_path_id() == PATH_COMMUNITY_SERVICE || __misc_state["in CS aftercore"] || my_path_id() == PATH_GREY_GOO)) continue;
 
         if (l.delayRemainingInLocation() > 0 && l.locationAvailable())
             possible_locations.listAppend(l);
@@ -29245,7 +29252,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
             }
             if (!__quest_state["Level 8"].state_boolean["Past mine"] && !have_outfit_components("Mining Gear") && __misc_state["can equip just about any weapon"])
                 potential_faxes.listAppend("7-Foot Dwarf Foreman - Mining gear for level 8 quest. Need YR or +234% items.");
-            if (!locationAvailable($location[the hidden park]) && ($item[stone wool].available_amount()) < (2 - MIN(1, $item[the nostril of the serpent].available_amount())))
+            if (!locationAvailable($location[the hidden park]) && $item[stone wool].available_amount() < ($item[the nostril of the serpent].available_amount() == 0 && !get_property_ascension("lastTempleButtonsUnlock") ? 2 : 1))
                 potential_faxes.listAppend("Baa'baa'bu'ran - Stone wool for hidden city unlock. Need +100% items (or as much as you can get for extra wool)");
         }
         
@@ -31545,7 +31552,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 RegisterResourceGenerationFunction("SDemonSummonGenerateResource");
 void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!QuestState("questL11Manor").finished)
+    if (!QuestState("questL11Manor").finished || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO)
         return;
     if (get_property_boolean("demonSummoned"))
         return;
@@ -31565,7 +31572,7 @@ void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if ($item[scroll of ancient forbidden unspeakable evil].available_amount() == 0 && $item[scroll of ancient forbidden unspeakable evil].creatable_amount() > 0)
         {
-            description.listAppend("Create a scroll of scroll of ancient forbidden unspeakable evil.");
+            description.listAppend("Create a scroll of ancient forbidden unspeakable evil.");
             url = "";
         }
         
@@ -34349,7 +34356,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE)
+	if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_BUGBEAR_INVASION || my_path_id() == PATH_ZOMBIE_SLAYER || my_path_id() == PATH_KOLHS || my_path_id() == PATH_HEAVY_RAINS || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_THE_SOURCE || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE || my_path_id() == PATH_GREY_GOO)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -36755,7 +36762,7 @@ void generateRandomMessageLocation(string [int] random_messages)
         random_messages.listAppend(message);
 }
 
-    
+
 void generateRandomMessageFamiliar(string [int] random_messages)
 {
     string lowercase_player_name = my_name().to_lower_case().HTMLEscapeString();
@@ -36901,7 +36908,7 @@ string generateRandomMessage()
     if (__misc_state["In valhalla"])
         return "rebirth";
     
-	if (__misc_state["in run"])
+    if (__misc_state["in run"])
     {
         if (my_turncount() > 1000 && !in_bad_moon())
             random_messages.listAppend("so many turns");
@@ -36965,6 +36972,7 @@ string generateRandomMessage()
     //random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play alice's army", generateMainLinkMap("aagame.php")));
     random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play witchess", generateMainLinkMap("playwitchess.php?action=another")));
 	random_messages.listAppend("consider your mistakes creative spading");
+    random_messages.listAppend(HTMLGenerateTagWrap("a", "Found inaccurate/questionable information?<br>Have a question/suggestion? Click here!", string [string] {"href":"https://github.com/cdrock/TourGuide/discussions", "target":"_blank", "class":"r_a_undecorated"}));
     
     if (hippy_stone_broken())
         random_messages.listAppend(HTMLGenerateTagWrap("a", "it's not easy having yourself a good time", generateMainLinkMap("peevpee.php")));
@@ -41745,7 +41753,7 @@ buffer generateContextualMenu()
         choice_group.append(HTMLGenerateTagWrap("div", "When minimized", string [string] {"class":"ct_menu_choice_subheader"}));
         choice_group.append(generateContextualMenuChoice("Opacity", "opacity", string [string] {"half":"halve opacity","full":"keep full opacity"}));
         choice_group.append(generateContextualMenuChoice("Tile image", "image", string [string] {"none":"don't display", "small":"display smallest", "auto":"don't change image size"}));
-        choice_group.append(generateContextualMenuChoice("Content to show", "collapsing", string [string] {"entries":"title", "modifiers":"title + subtitle", "replace":"replace all with tile ID"}));
+        choice_group.append(generateContextualMenuChoice("Content to show", "collapsing", string [string] {"modifiers":"title", "entries":"title + subtitle", "replace":"replace all with tile ID"}));
         guide_contextual_menu.append(HTMLGenerateTagWrap("div", choice_group, string [string] {"class":"ct_menu_choice_group", "id":"auto_expansion_choice_group"}));
     }
 
@@ -42304,7 +42312,7 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
         if (!$location[the hidden park].locationAvailable())
         {
             wool_needed += 1;
-            if ($item[the nostril of the serpent].available_amount() == 0)
+            if ($item[the nostril of the serpent].available_amount() == 0 && !get_property_ascension("lastTempleButtonsUnlock"))
                 wool_needed += 1;
         }
 		if ($item[stone wool].available_amount() < wool_needed)
@@ -47844,7 +47852,7 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTMBastilleBattalionGenerateTasks");
 void IOTMBastilleBattalionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (lookupItem("Bastille Battalion control rig").available_amount() == 0) return;
+	if (lookupItem("Bastille Battalion control rig").available_amount() == 0 || my_sign().to_lower_case() == "bad moon") return;
 	
 	if (lookupItem("Draftsman's driving gloves").available_amount() > 0 || lookupItem("Nouveau nosering").available_amount() > 0 || lookupItem("Brutal brogues").available_amount() > 0) return;
 	
@@ -48193,7 +48201,7 @@ void IOTMVotingBootGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 {
     if (!mafiaIsPastRevision(18965))
         return;
-    if (!__iotms_usable[lookupItem("voter registration form")]) return;
+    if (!__iotms_usable[lookupItem("voter registration form")] && lookupItem("&quot;I Voted!&quot; sticker").available_amount() == 0) return;
     
     if (lookupItem("&quot;I Voted!&quot; sticker").available_amount() == 0 || false) {
         //Vote!
@@ -48624,7 +48632,7 @@ RegisterResourceGenerationFunction("IOTMRuneSpoonGenerateResource");
 void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	item spoon = lookupItem("hewn moon-rune spoon");
-	if (!spoon.have() && spoon.closet_amount() == 0) return;
+	if (!spoon.have() && spoon.closet_amount() == 0 || my_sign().to_lower_case() == "bad moon") return;
 	
 	if (!get_property_boolean("moonTuned"))
 	{
@@ -49909,9 +49917,95 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
 //FIXME todo: a separate tile to suggest how to use a spare cocktail set, when in run?
 
 // Missing: Iunion
-// Missing: Melodramedary
+RegisterTaskGenerationFunction("IOTMMelodramedaryGenerateTasks");
+void IOTMMelodramedaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (my_familiar() != lookupFamiliar("Melodramedary")) return;
+
+    if (get_property_int("camelSpit") == 100)
+        task_entries.listAppend(ChecklistEntryMake("__familiar Melodramedary", "familiar.php", ChecklistSubentryMake("Melodramedary: Locked and Loaded!", "", HTMLGenerateSpanFont("Spit!", "blue")), -11).ChecklistEntrySetIDTag("Melodramedary familiar spit ready"));
+}
+
+RegisterResourceGenerationFunction("IOTMMelodramedaryResource");
+void IOTMMelodramedaryResource(ChecklistEntry [int] resource_entries)
+{
+    if (!lookupFamiliar("Melodramedary").familiar_is_usable()) return;
+
+    int spit_o_meter = get_property_int("camelSpit");
+    
+    if (!__misc_state["in run"] && spit_o_meter < 100 && my_familiar() != lookupFamiliar("Melodramedary")) return;
+    
+    string title;
+    string [int] description;
+    
+    if (spit_o_meter < 100) {
+        title = spit_o_meter + "% Melodramedary Spit Charge";
+
+        boolean camelCapped = lookupFamiliar("Melodramedary").familiar_equipped_equipment() == lookupItem("dromedary drinking helmet");
+        int fights_left = floor((101 - spit_o_meter) / 3.33);
+        if (camelCapped)
+            fights_left = ceil(fights_left / 1.3);
+
+        description.listAppend("Ready in " + (camelCapped ? "~" : "") + fights_left.pluralise("fight", "fights") + ".");
+    } else {
+        title = "Melodramedary: Locked and Loaded!";
+        description.listAppend(HTMLGenerateSpanFont("Spit!", "blue"));
+    }
+    
+    description.listAppend("Spit on self for 15 turns of +100% stats & weapon/spell dmg.");
+    description.listAppend("Spit on monsters to get 4x of each of their items (2x for conditional items).");
+    //There are also certainly even more options of varying effectiveness.
+    
+    string [int] options;
+    if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE) {
+        int bowling_progress = get_property_int("hiddenBowlingAlleyProgress");
+        if (bowling_progress > 0 && bowling_progress < 7) {
+            int balls_needed = 6 - bowling_progress - $item[bowling ball].available_amount();
+            if (balls_needed >= 2)
+                options.listAppend("Pygmy bowler; needs +150% item.");
+        }
+
+        if (__quest_state["Level 9"].state_boolean["bridge complete"] && __quest_state["Level 9"].state_int["twin peak progress"] != 15 && $item[rusty hedge trimmers].available_amount() < __quest_state["Level 9"].state_int["peak tests remaining"] - 1)
+            options.listAppend("Hedge beast; needs +567% item.");
+        
+        if (__quest_state["Level 11 Ron"].mafia_internal_step == 3 || __quest_state["Level 11 Ron"].mafia_internal_step == 4) //Can't really compare with progress/cable uses for that day, since they could encounter red herring/snapper / wait for the next day
+            options.listAppend("Red butler; needs +234% item.");
+        
+        if (__quest_state["Level 12"].mafia_internal_step > 1 && !__quest_state["Level 12"].state_boolean["Lighthouse Finished"] && $item[barrel of gunpowder].available_amount() < 4)
+            options.listAppend("Lobsterfrogman; prob. a weak option.");
+        
+        if (!__quest_state["Level 12"].finished && __quest_state["Level 12"].state_int["hippies left on battlefield"] > 0 && __quest_state["Level 12"].state_int["hippies left on battlefield"] <= 600 && __misc_state["yellow ray potentially available"])
+            options.listAppend("Green Ops Soldier (for free runaways); needs yellow ray.");
+    }
+    if (options.count() > 0)
+        description.listAppend("Possible targets:" + options.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+    
+    resource_entries.listAppend(ChecklistEntryMake("__familiar Melodramedary", "familiar.php", ChecklistSubentryMake(title, description), 1).ChecklistEntrySetIDTag("Melodramedary familiar resource"));
+}
+
 // Missing: SpinMaster lathe
 // Missing: Cargo cultist shorts
+RegisterTaskGenerationFunction("IOTMComprehensiveCartographyGenerateTasks");
+void IOTMComprehensiveCartographyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!lookupSkill("Map the Monsters").have_skill()) return;
+    if (get_property_boolean("mappingMonsters")) {
+        task_entries.listAppend(ChecklistEntryMake("__skill Map the Monsters", "", ChecklistSubentryMake("Mapping the Monsters now!", "", "Fight a chosen monster in the next zone."), -11).ChecklistEntrySetIDTag("Cartography skill map now"));
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMComprehensiveCartographyGenerateResource");
+void IOTMComprehensiveCartographyGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!lookupSkill("Map the Monsters").have_skill()) return;
+    int casts_remaining = 3 - get_property_int("_monstersMapped");
+    if (casts_remaining > 0) {
+        resource_entries.listAppend(ChecklistEntryMake("__skill Map the Monsters", "skillz.php", ChecklistSubentryMake(casts_remaining.pluralise(" monster mapping", " monster mappings") + " remaining", "", "Cast Map the Monsters, for anything on the olfaction list.")).ChecklistEntrySetIDTag("Cartography skill map resource"));
+    }
+}
+
+// Missing: unwrapped knock-off retro superhero cape
+
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -52963,6 +53057,31 @@ void PathGLoverGenerateResource(ChecklistEntry [int] resource_entries)
 }
 
 
+RegisterResourceGenerationFunction("PathDarkGiftGenerateResource");
+void PathDarkGiftGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (my_path_id() != PATH_VAMPIRE)
+        return;
+
+    int banishes_left = clampi(10 - get_property_int("_balefulHowlUses"), 0, 10);
+    if (banishes_left > 0 && lookupSkill("Baleful Howl").skill_is_usable())
+    {
+        string url;
+        string [int] description;
+        description.listAppend("Free run/banish.");
+        description.listAppend("There's a lot of them, so you might just want to use them as a free run?");
+        Banish banish_entry = BanishByName("Baleful Howl");
+        int turns_left_of_banish = banish_entry.BanishTurnsLeft();
+        if (turns_left_of_banish > 0)
+        {
+            //is this relevant? we don't describe this for pantsgiving
+            description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__skill Baleful Howl", url, ChecklistSubentryMake(pluralise(banishes_left, "baleful howl", "baleful howls"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Dark gyffte path baleful howl banish"));
+    }
+}
+
+
 RegisterResourceGenerationFunction("PathExplosionsGenerateResource");
 void PathExplosionsGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -53033,7 +53152,18 @@ void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
     SLevel13DoorGenerateMissingItems(low_key_entries);
 }
 
-//missing grey goo
+RegisterTaskGenerationFunction("PathGreyGooGenerateTasks");
+void PathGreyGooGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (my_path_id() != PATH_GREY_GOO)
+        return;
+
+    if (my_daycount() >= 3) {
+        task_entries.listAppend(ChecklistEntryMake("astral gash", "place.php?whichplace=greygoo", ChecklistSubentryMake("Ascend", "", "Prism appeared. Ascend whenever."),-10).ChecklistEntrySetIDTag("Grey goo path prism open"));
+    }
+}
+
+
 
 
 void runMain(string relay_filename)
@@ -53350,7 +53480,7 @@ void runMain(string relay_filename)
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "color_fill", "class", "r_vertical_fill", "style", "z-index:-1;background-color:" + __setting_page_background_colour + ";max-width:" + __setting_horizontal_width + "px;"))); //Color fill
         PageWrite(HTMLGenerateTagWrap("div", "", mapMake("id", "vertical_border_lines", "class", "r_vertical_fill", "style", "z-index:-11;border-left:1px solid;border-right:1px solid;border-color:" + __setting_line_colour + ";width:" + (__setting_horizontal_width) + "px;"))); //Vertical border lines, empty background
     }
-    PageWriteHead("<script type=\"text/javascript\" src=\"relay_TourGuide.js\"></script>");
+    PageWriteHead("<script type=\"text/javascript\" src=\"" + __javascript + "\"></script>");
     
     if (matrix_enabled)
     {

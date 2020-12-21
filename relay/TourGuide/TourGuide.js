@@ -1166,7 +1166,7 @@ function toggleTileDisplay(toggle_box_id, want_collapsed)
         {
             toggle_box.title = "Minimize";
             toggle_box.alt = "Minimize";
-            toggle_box.textContent = "▲"; // &#9660;
+            toggle_box.textContent = "▼"; // &#9660;
         }
     }
 
