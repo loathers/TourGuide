@@ -48,6 +48,7 @@ on:
   push:
     paths:
       #- '${{ SOURCE_PATH_TO_MAFIA }}/**' # it's impossible to query env. variables at this point, sorry :(
+      - '**'
       - '!.github/**' # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
 
 
