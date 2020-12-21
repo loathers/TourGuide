@@ -78,7 +78,7 @@ void generateRandomMessageLocation(string [int] random_messages)
         random_messages.listAppend(message);
 }
 
-    
+
 void generateRandomMessageFamiliar(string [int] random_messages)
 {
     string lowercase_player_name = my_name().to_lower_case().HTMLEscapeString();
@@ -224,7 +224,7 @@ string generateRandomMessage()
     if (__misc_state["In valhalla"])
         return "rebirth";
     
-	if (__misc_state["in run"])
+    if (__misc_state["in run"])
     {
         if (my_turncount() > 1000 && !in_bad_moon())
             random_messages.listAppend("so many turns");
@@ -288,6 +288,7 @@ string generateRandomMessage()
     //random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play alice's army", generateMainLinkMap("aagame.php")));
     random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play witchess", generateMainLinkMap("playwitchess.php?action=another")));
 	random_messages.listAppend("consider your mistakes creative spading");
+    random_messages.listAppend(HTMLGenerateTagWrap("a", "Found inaccurate/questionable information?<br>Have a question/suggestion? Click here!", string [string] {"href":"https://github.com/cdrock/TourGuide/discussions", "target":"_blank", "class":"r_a_undecorated"}));
     
     if (hippy_stone_broken())
         random_messages.listAppend(HTMLGenerateTagWrap("a", "it's not easy having yourself a good time", generateMainLinkMap("peevpee.php")));
