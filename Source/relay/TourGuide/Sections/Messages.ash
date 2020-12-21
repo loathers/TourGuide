@@ -78,7 +78,7 @@ void generateRandomMessageLocation(string [int] random_messages)
         random_messages.listAppend(message);
 }
 
-    
+
 void generateRandomMessageFamiliar(string [int] random_messages)
 {
     string lowercase_player_name = my_name().to_lower_case().HTMLEscapeString();
