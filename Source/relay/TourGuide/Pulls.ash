@@ -529,19 +529,19 @@ void generatePullList(Checklist [int] checklists)
     }
     if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
     {
-	if (__misc_state["Torso aware"])
-	    item [int] missing_freebird_components = items_missing($items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches,lynyrd musk]);
-	else
-	    item [int] missing_freebird_components = items_missing($items[lynyrdskin cap,lynyrdskin breeches,lynyrd musk]);
+        if (__misc_state["Torso aware"])
+            item [int] missing_freebird_components = items_missing($items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches,lynyrd musk]);
+        else
+            item [int] missing_freebird_components = items_missing($items[lynyrdskin cap,lynyrdskin breeches,lynyrd musk]);
         if (missing_freebird_components.count() > 0)
         {
             string description = missing_freebird_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
-	    if (__misc_state["Torso aware"] == 0)
-	    {
-		if ($strings[Wombat,Blender,Packrat] contains my_sign() && my_path_id() != PATH_ZOMBIE_SLAYER)	// gnome trainer may be available
-		    description += "|Plus five clovers. Skips protestors in five turns? Or become torso aware and pull the tunic first."
-		else
-		    description += "|Plus five clovers. Skips the entire protestor zone in five turns?"
+            if (__misc_state["Torso aware"] == 0)
+            {
+                if ($strings[Wombat,Blender,Packrat] contains my_sign() && my_path_id() != PATH_ZOMBIE_SLAYER)	// gnome trainer may be available
+                    description += "|Plus five clovers. Skips protestors in five turns? Or become torso aware and pull the tunic first."
+                else
+                    description += "|Plus five clovers. Skips the entire protestor zone in five turns?"
 	    }
 	    else
             	description += "|Plus four clovers. Skips the entire protestor zone in like four turns?";
