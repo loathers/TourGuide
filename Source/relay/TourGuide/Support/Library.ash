@@ -25,6 +25,8 @@ boolean familiar_is_usable(familiar f)
     //r13998 has most of these
     if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE)
         return false;
+    if (my_path_id() == PATH_ZOMBIE_SLAYER && !is_undead_familiar(f))
+        return false;
     if (!is_unrestricted(f))
         return false;
     if (my_path_id() == PATH_G_LOVER && !f.contains_text("g") && !f.contains_text("G"))
@@ -1139,6 +1141,11 @@ int ka_dropped(monster m)
 boolean is_underwater_familiar(familiar f)
 {
     return $familiars[Barrrnacle,Emo Squid,Cuddlefish,Imitation Crab,Magic Dragonfish,Midget Clownfish,Rock Lobster,Urchin Urchin,Grouper Groupie,Squamous Gibberer,Dancing Frog,Adorable Space Buddy] contains f;
+}
+
+boolean is_undead_familiar(familiar f)
+{
+    return $familiars[Baby Z-Rex,Disembodied Hand,Disgeist,Ghost of Crimbo Carols,Ghost of Crimbo Cheer,Ghost of Crimbo Commerce,Ghost Pickle on a Stick,Ghuol Whelp,Gluttonous Green Ghost,Hovering Skull,Hovering Sombrero,Jill-O-Lantern,Mini-Skulldozer,Misshapen Animal Skeleton,Ninja Pirate Zombie Robot,Reagnimated Gnome,Reanimated Reanimator,Reassembled Blackbird,Reconstituted Crow,Restless Cow Skull,Scary Death Orb,Spirit Hobo,Spooky Pirate Skeleton,XO Skeleton] contains f;
 }
 
 float calculateCurrentNinjaAssassinMaxDamage()
