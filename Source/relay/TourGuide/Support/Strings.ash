@@ -311,7 +311,7 @@ string pluraliseWordy(item i) //whatever we have around
 string invSearch(string it)
 {
     string url = "inventory.php?ftext=";
-    url += it.replace_string(" ", "+");
+    url += it.entity_encode().replace_string(" ", "+");
     return url;
 }
 
