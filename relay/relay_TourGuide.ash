@@ -2090,7 +2090,7 @@ string pluraliseWordy(item i) //whatever we have around
 string invSearch(string it)
 {
     string url = "inventory.php?ftext=";
-    url += it.replace_string(" ", "+");
+    url += it.entity_encode().replace_string(" ", "+");
     return url;
 }
 
@@ -50005,7 +50005,10 @@ void IOTMComprehensiveCartographyGenerateResource(ChecklistEntry [int] resource_
 }
 
 // Missing: unwrapped knock-off retro superhero cape
+// Missing: box o' ghosts
 
+// 2021
+// Missing: packaged miniature crystal ball
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
