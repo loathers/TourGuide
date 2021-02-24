@@ -1,6 +1,6 @@
 //This script and its support scripts are in the public domain.
 
-since 20.6; //the earliest main release that supports the changes to the terrarium that came with the release of the Melodramedary
+since 20653; //the earliest release that supports the changes to torso Awareness
 import "relay/TourGuide/Main.ash"
 
 void main()

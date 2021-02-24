@@ -1272,7 +1272,7 @@ item [int] generateEquipmentForExtraExperienceOnStat(stat desired_stat, boolean 
     foreach it in equipmentWithNumericModifier(numeric_modifier_string)
     {
     	slot s = it.to_slot();
-        if (s == $slot[shirt] && !($skill[Torso Awaregness].have_skill() || $skill[Best Dressed].have_skill()))
+        if (s == $slot[shirt] && !($skill[Torso Awareness].have_skill() || $skill[Best Dressed].have_skill()))
         	continue;
         if (it.available_amount() > 0 && (!require_can_equip_currently || it.can_equip()) && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
         {
