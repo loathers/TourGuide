@@ -2,7 +2,7 @@
 
 since 20.6; //the earliest main release that supports the changes to the terrarium that came with the release of the Melodramedary
 //These settings are for development. Don't worry about editing them.
-string __version = "1.9.0";
+string __version = "1.9.1";
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -2090,7 +2090,7 @@ string pluraliseWordy(item i) //whatever we have around
 string invSearch(string it)
 {
     string url = "inventory.php?ftext=";
-    url += it.replace_string(" ", "+");
+    url += it.entity_encode().replace_string(" ", "+");
     return url;
 }
 
@@ -4111,9 +4111,9 @@ item [int] generateEquipmentForExtraExperienceOnStat(stat desired_stat, boolean 
     //foreach it in experience_percent_modifiers
     foreach it in equipmentWithNumericModifier(numeric_modifier_string)
     {
-    	slot s = it.to_slot();
-        if (s == $slot[shirt] && !($skill[Torso Awaregness].have_skill() || $skill[Best Dressed].have_skill()))
-        	continue;
+        slot s = it.to_slot();
+        if (s == $slot[shirt] && !($skill[12].have_skill() || $skill[Best Dressed].have_skill())) // Torso Aware(g)ness
+            continue;
         if (it.available_amount() > 0 && (!require_can_equip_currently || it.can_equip()) && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
         {
             item_slots[it.to_slot()] = it;
@@ -34452,7 +34452,7 @@ void setUpState()
 	__misc_state_string["ballroom song"] = ballroom_song;
 	
 	__misc_state["Torso aware"] = false;
-    if ($skill[Torso Awaregness].skill_is_usable() || $skill[Best Dressed].skill_is_usable())
+    if ($skill[12].skill_is_usable() || $skill[Best Dressed].skill_is_usable()) // Torso Aware(g)ness
         __misc_state["Torso aware"] = true;
 	
 	int hipster_fights_used = get_property_int("_hipsterAdv");
@@ -38853,7 +38853,7 @@ BadMoonAdventure [int] AllBadMoonAdventures()
     adventures.listAppend(BadMoonAdventureMake(42, $location[whitey's grove], "meat", "5000 meat, -20% stats debuff", "finish white citadel quest? (this needs spading)", !(!white_citadel_quest.started || white_citadel_quest.finished)));
     //adventures.listAppend(BadMoonAdventureMake(45, $location[The Arid, Extra-Dry Desert], "ITEMS", "anticheese", "need to not have ultrahydrated", $effect[ultrahydrated].have_effect() == 0)); //is this still here? //retired
     
-    adventures.listAppend(BadMoonAdventureMake(44, $location[the spooky forest], "SKILLS", "torso awaregness, -50% muscle debuff", "unlock hidden temple", !get_property_ascension("lastTempleUnlock")));
+    adventures.listAppend(BadMoonAdventureMake(44, $location[the spooky forest], "SKILLS", "torso awareness, -50% muscle debuff", "unlock hidden temple", !get_property_ascension("lastTempleUnlock")));
     
     __all_bad_moon_adventures_cache = adventures;
     __all_bad_moon_adventures_cache_on_turn = my_turncount();
@@ -39206,7 +39206,7 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     √+resistance all elements, all attributes -%
     √+20 mainstat, -5 other stats
     √+40 mainstat, -50% familiar weight (black cat!)
-    √items, -something (√black kitten and terrarium, √torso awaregness, anticheese (irrelevant), √leprechaun, loaded dice (irrelevant), √potato sprout (irrelevant?)
+    √items, -something (√black kitten and terrarium, √torso awareness, anticheese (irrelevant), √leprechaun, loaded dice (irrelevant), √potato sprout (irrelevant?)
     
     Maybe:
     √+50% stat, -50% other stat
@@ -39232,7 +39232,7 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("STAT2", "STAT1", "STAT3"), "__effect Phorcefullness", "Stat buffs");
     PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, elemental_damage_ordering, "__item oversized snowflake", "Elemental damage buffs", listMake("For defeating ghosts."));
     
-    if (!$skill[torso awaregness].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable())
+    if (!$skill[12].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable()) // Torso Aware(g)ness
     {
         string [int] description;
         description.listAppend("Spooky forest.");
@@ -39244,7 +39244,7 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
         else
             description.listAppend("Farm spices (for spicy burritos) while you're there: " + listMake("Brave the dark thicket", "Follow the even darker path", "Take the scorched path", "Investigate the moist crater").listJoinComponents(__html_right_arrow_character));
         
-        bad_moon_adventures_entries.listAppend(ChecklistEntryMake("__item &quot;Humorous&quot; T-shirt", $location[the spooky forest].getClickableURLForLocation(), ChecklistSubentryMake("Torso Awaregness", "", description), $locations[the spooky forest]).ChecklistEntrySetIDTag("Bad moon path torso awaregness"));
+        bad_moon_adventures_entries.listAppend(ChecklistEntryMake("__item &quot;Humorous&quot; T-shirt", $location[the spooky forest].getClickableURLForLocation(), ChecklistSubentryMake("Torso Awareness", "", description), $locations[the spooky forest]).ChecklistEntrySetIDTag("Bad moon path torso awareness"));
     }
     
     /*
@@ -50005,7 +50005,10 @@ void IOTMComprehensiveCartographyGenerateResource(ChecklistEntry [int] resource_
 }
 
 // Missing: unwrapped knock-off retro superhero cape
+// Missing: box o' ghosts
 
+// 2021
+// Missing: packaged miniature crystal ball
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
