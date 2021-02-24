@@ -516,7 +516,7 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("STAT2", "STAT1", "STAT3"), "__effect Phorcefullness", "Stat buffs");
     PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, elemental_damage_ordering, "__item oversized snowflake", "Elemental damage buffs", listMake("For defeating ghosts."));
     
-    if (!$skill[torso awareness].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable())
+    if (!$skill[12].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable()) // Torso Aware(g)ness
     {
         string [int] description;
         description.listAppend("Spooky forest.");
