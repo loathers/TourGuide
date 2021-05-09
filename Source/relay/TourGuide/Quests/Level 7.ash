@@ -100,25 +100,26 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	}
 
 	// speed up cyrpt using Slay the Dead
-	if ($item[unwrapped knock-off retro superhero cape].available_amount() > 0) {
+	if ($item[unwrapped knock-off retro superhero cape].available_amount() > 0 && __misc_state["can equip just about any weapon"]) {
 		string cape_hero = get_property("retroCapeSuperhero");
 		string cape_tag = get_property("retroCapeWashingInstructions");
-		if (cape_hero == "vampire") {
-			if (cape_tag == "kill") {
-				if ($slot[weapon].equipped_item().item_type() == "sword") {
-					entry.subentries[0].entries.listAppend("Cast Slay the Dead in combat.");
-				} else {
-					entry.subentries[0].entries.listAppend("Equip a sword to Slay the Dead.");
-				}
-			} else {
-				entry.subentries[0].entries.listAppend("Set retro superhero cape washing instructions to \"Kill Me\".");
-			}
-		} else {
-			if (cape_tag == "kill") {
-				entry.subentries[0].entries.listAppend("Set retro superhero cape to \"Vampire Slicer\".");
-			} else {
-				entry.subentries[0].entries.listAppend("Set retro superhero cape to \"Vampire Slicer\" and washing instructions to \"Kill Me\".");
-			}
+
+		string [int] problems;
+		if ($item[unwrapped knock-off retro superhero cape].equipped_amount() == 0) {
+			problems.listAppend("Equip the superhero cape");
+		}
+		if (cape_hero != "vampire" || cape_tag != "kill") {
+			problems.listAppend("Set retro superhero cape to \"Vampire Slicer\"+\"Kill Me\"");
+		}
+		if ($slot[weapon].equipped_item().item_type() != "sword") {
+			problems.listAppend("Equip a sword in your main-hand");
+		}
+
+		if (problems.count() > 0) {
+			entry.subentries[0].entries.listAppend(problems.listJoinComponents(", ", "and") + " to Slay the Dead in combat.");
+		}
+		else {
+			entry.subentries[0].entries.listAppend("Cast Slay the Dead in combat for +1 evil reduction/fight.");
 		}
 	}
 
