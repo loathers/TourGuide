@@ -98,7 +98,31 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			text = (evilness - 25) + " evilness to boss.";
 		evilness_text[property] = text;
 	}
-	
+
+	// speed up cyrpt using Slay the Dead
+	if ($item[unwrapped knock-off retro superhero cape].available_amount() > 0 && __misc_state["can equip just about any weapon"]) {
+		string cape_hero = get_property("retroCapeSuperhero");
+		string cape_tag = get_property("retroCapeWashingInstructions");
+
+		string [int] problems;
+		if ($item[unwrapped knock-off retro superhero cape].equipped_amount() == 0) {
+			problems.listAppend("Equip the superhero cape");
+		}
+		if (cape_hero != "vampire" || cape_tag != "kill") {
+			problems.listAppend("Set retro superhero cape to \"Vampire Slicer\"+\"Kill Me\"");
+		}
+		if ($slot[weapon].equipped_item().item_type() != "sword") {
+			problems.listAppend("Equip a sword in your main-hand");
+		}
+
+		if (problems.count() > 0) {
+			entry.subentries[0].entries.listAppend(problems.listJoinComponents(", ", "and") + " to Slay the Dead in combat.");
+		}
+		else {
+			entry.subentries[0].entries.listAppend("Cast Slay the Dead in combat for +1 evil reduction/fight.");
+		}
+	}
+
 	if (!base_quest_state.state_boolean["nook finished"])
 	{
 		int evilness = base_quest_state.state_int["nook evilness"];
