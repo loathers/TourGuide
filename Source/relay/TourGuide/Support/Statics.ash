@@ -49,6 +49,7 @@ static {
     int PATH_OF_THE_PLUMBER = 38;
     int PATH_LOW_KEY_SUMMER = 39;
     int PATH_GREY_GOO = 40;
+    int PATH_YOU_ROBOT = 41;
 }
 
 float numeric_modifier_replacement(item it, string modifier) {
