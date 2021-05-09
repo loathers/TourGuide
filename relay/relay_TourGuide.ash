@@ -33729,9 +33729,9 @@ void generatePullList(Checklist [int] checklists)
             if (__misc_state["Torso aware"])
             {
                 if ($strings[Wombat,Blender,Packrat] contains my_sign() && my_path_id() != PATH_ZOMBIE_SLAYER)	// gnome trainer may be available
-                    description += "|Plus five clovers. Skips protestors in five turns? Or become torso aware and pull the tunic first."
+                    description += "|Plus five clovers. Skips protestors in five turns? Or become torso aware and pull the tunic first.";
                 else
-                    description += "|Plus five clovers. Skips the entire protestor zone in five turns?"
+                    description += "|Plus five clovers. Skips the entire protestor zone in five turns?";
             }
             else
                 description += "|Plus four clovers. Skips the entire protestor zone in like four turns?";
