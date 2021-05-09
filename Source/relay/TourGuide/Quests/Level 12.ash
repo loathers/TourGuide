@@ -404,7 +404,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 {
                     details.listAppend("Cast suckerpunch to stasis gremlins.");
                 }
-                else if ($item[seal tooth].item_is_usable() && my_path_id() != PATH_ZOMBIE_SLAYER)
+                else if ($item[seal tooth].item_is_usable())
                     details.listAppend(HTMLGenerateSpanFont("Acquire a seal tooth", "red") + " to stasis gremlins. (from hermit)");
                 else if ($item[beehive].available_amount() > 0)
                     details.listAppend("Use your beehive to stasis gremlins.");
