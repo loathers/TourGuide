@@ -32,3 +32,4 @@ import "relay/TourGuide/Sets/Misc Tasks.ash";
 import "relay/TourGuide/Sets/Sweet Synthesis.ash";
 import "relay/TourGuide/Sets/Buff Upkeep.ash";
 import "relay/TourGuide/Sets/Level 13 Door.ash";
+import "relay/TourGuide/Sets/Monorail.ash";
