@@ -77,7 +77,7 @@ import "relay/TourGuide/Items of the Month/Melodramedary.ash";
 // Missing: SpinMaster lathe
 // Missing: Cargo cultist shorts
 import "relay/TourGuide/Items of the Month/Comprehensive Cartography.ash";
-// Missing: unwrapped knock-off retro superhero cape
+import "relay/TourGuide/Items of the Month/Superhero Cape.ash";
 // Missing: box o' ghosts
 
 // 2021

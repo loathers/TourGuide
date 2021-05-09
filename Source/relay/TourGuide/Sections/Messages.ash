@@ -574,7 +574,7 @@ string generateRandomMessage()
     else if (current_hour == 6)
         random_messages.listAppend("the dawn is your enemy");
     
-    random_messages.listAppend("take chances, be courages, go exploring!");
+    random_messages.listAppend("take chances, be courageous, go exploring!");
     switch (my_class())
     {
         case $class[disco bandit]:
