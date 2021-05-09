@@ -2865,6 +2865,8 @@ boolean familiar_is_usable(familiar f)
     //r13998 has most of these
     if (my_path_id() == PATH_AVATAR_OF_BORIS || my_path_id() == PATH_AVATAR_OF_JARLSBERG || my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE || my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING || my_path_id() == PATH_LICENSE_TO_ADVENTURE || my_path_id() == PATH_POCKET_FAMILIARS || my_path_id() == PATH_VAMPIRE)
         return false;
+    if (my_path_id() == PATH_ZOMBIE_SLAYER && !is_undead_familiar(f))
+        return false;
     if (!is_unrestricted(f))
         return false;
     if (my_path_id() == PATH_G_LOVER && !f.contains_text("g") && !f.contains_text("G"))
@@ -3979,6 +3981,11 @@ int ka_dropped(monster m)
 boolean is_underwater_familiar(familiar f)
 {
     return $familiars[Barrrnacle,Emo Squid,Cuddlefish,Imitation Crab,Magic Dragonfish,Midget Clownfish,Rock Lobster,Urchin Urchin,Grouper Groupie,Squamous Gibberer,Dancing Frog,Adorable Space Buddy] contains f;
+}
+
+boolean is_undead_familiar(familiar f)
+{
+    return $familiars[Baby Z-Rex,Disembodied Hand,Disgeist,Ghost of Crimbo Carols,Ghost of Crimbo Cheer,Ghost of Crimbo Commerce,Ghost Pickle on a Stick,Ghuol Whelp,Gluttonous Green Ghost,Hovering Skull,Hovering Sombrero,Jill-O-Lantern,Mini-Skulldozer,Misshapen Animal Skeleton,Ninja Pirate Zombie Robot,Reagnimated Gnome,Reanimated Reanimator,Reassembled Blackbird,Reconstituted Crow,Restless Cow Skull,Scary Death Orb,Spirit Hobo,Spooky Pirate Skeleton,XO Skeleton] contains f;
 }
 
 float calculateCurrentNinjaAssassinMaxDamage()
@@ -15628,7 +15635,7 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 {
                     details.listAppend("Cast suckerpunch to stasis gremlins.");
                 }
-                else if ($item[seal tooth].item_is_usable())
+                else if ($item[seal tooth].item_is_usable() && my_path_id() != PATH_ZOMBIE_SLAYER)
                     details.listAppend(HTMLGenerateSpanFont("Acquire a seal tooth", "red") + " to stasis gremlins. (from hermit)");
                 else if ($item[beehive].available_amount() > 0)
                     details.listAppend("Use your beehive to stasis gremlins.");
@@ -27100,7 +27107,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item BittyCar MeatCar", "inventory.php?ftext=bittycar", ChecklistSubentryMake("BittyCar " + available_items.listJoinComponents(", ", "or") + " usable", "", description), importance_level_unimportant_item).ChecklistEntrySetIDTag("Bittycars resource"));
     }
     
-    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "mysticality" && !get_property_ascension("lastGoofballBuy") && __quest_state["Level 3"].started) {
+    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "mysticality" && !get_property_ascension("lastGoofballBuy") && __quest_state["Level 3"].started && my_path_id() != PATH_ZOMBIE_SLAYER) {
         resource_entries.listAppend(ChecklistEntryMake("__item bottle of goofballs", "tavern.php?place=susguy", ChecklistSubentryMake("Bottle of goofballs obtainable", "", "For the lair stat test.|Costs nothing, but be careful..."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Goofballs resource"));
     }
     
@@ -33386,7 +33393,8 @@ void generatePullList(Checklist [int] checklists)
     {
         pullable_item_list.listAppend(GPItemMake($item[navel ring of navel gazing], "free runaways|easy fights", 1));
         if (combat_items_usable)
-	        pullable_item_list.listAppend(GPItemMake($item[mafia middle finger ring], "one free runaway/banish/day", 1));
+		if (my_path_id() != PATH_ZOMBIE_SLAYER) // can't use due to MP cost
+			pullable_item_list.listAppend(GPItemMake($item[mafia middle finger ring], "one free runaway/banish/day", 1));
     }
 	//pullable_item_list.listAppend(GPItemMake($item[haiku katana], "?", 1));
 	pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
@@ -33695,11 +33703,22 @@ void generatePullList(Checklist [int] checklists)
     }
     if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
     {
-        item [int] missing_freebird_components = items_missing($items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches,lynyrd musk]);
+        if (__misc_state["Torso aware"])
+            item [int] missing_freebird_components = items_missing($items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches,lynyrd musk]);
+        else
+            item [int] missing_freebird_components = items_missing($items[lynyrdskin cap,lynyrdskin breeches,lynyrd musk]);
         if (missing_freebird_components.count() > 0)
         {
             string description = missing_freebird_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
-            description += "|Plus four clovers. Skips the entire protestor zone in like four turns?";
+            if (__misc_state["Torso aware"] == 0)
+            {
+                if ($strings[Wombat,Blender,Packrat] contains my_sign() && my_path_id() != PATH_ZOMBIE_SLAYER)	// gnome trainer may be available
+                    description += "|Plus five clovers. Skips protestors in five turns? Or become torso aware and pull the tunic first."
+                else
+                    description += "|Plus five clovers. Skips the entire protestor zone in five turns?"
+	    }
+	    else
+            	description += "|Plus four clovers. Skips the entire protestor zone in like four turns?";
             pullable_item_list.listAppend(GPItemMake("Weird copperhead NC strategy", "__item " + missing_freebird_components[0], description));
         }
         if (my_path_id() != PATH_GELATINOUS_NOOB)
