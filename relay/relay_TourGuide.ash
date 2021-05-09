@@ -34108,13 +34108,20 @@ void setUpState()
         yellow_ray_source = "Crimbo Shrub";
         yellow_ray_image_name = "__item DNOTC Box"; //uncertain
     }
-	if (familiar_is_usable($familiar[nanorhino]) && __misc_state["have moxie class combat skill"] && get_property_int("_nanorhinoCharge") == 100)
-	{
-		yellow_ray_available = true;
-		yellow_ray_source = "Nanorhino";
-		yellow_ray_image_name = "nanorhino";
-		
-	}
+    if (familiar_is_usable($familiar[nanorhino]) && __misc_state["have moxie class combat skill"] && get_property_int("_nanorhinoCharge") == 100)
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "Nanorhino";
+        yellow_ray_image_name = "nanorhino";
+    }
+    if (lookupItem("unwrapped knock-off retro superhero cape").have())
+    {
+        yellow_ray_available = true;
+        yellow_ray_source = "Superhero cape skill Unleash the Devil's Kiss";
+        yellow_ray_source += get_property("retroCapeSuperhero") != "heck" || get_property("retroCapeWashingInstructions") != "kiss" ? " (Heck General + Kiss me)" : "";
+        yellow_ray_source += !lookupItem("unwrapped knock-off retro superhero cape").equipped() ? " (equip first)" : "";
+        yellow_ray_image_name = "__item unwrapped knock-off retro superhero cape";
+    }
     if ($skill[Ball Lightning].skill_is_usable() && my_path_id() == PATH_HEAVY_RAINS && my_lightning() >= 5)
     {
         yellow_ray_available = true;
@@ -37277,7 +37284,7 @@ string generateRandomMessage()
     else if (current_hour == 6)
         random_messages.listAppend("the dawn is your enemy");
     
-    random_messages.listAppend("take chances, be courages, go exploring!");
+    random_messages.listAppend("take chances, be courageous, go exploring!");
     switch (my_class())
     {
         case $class[disco bandit]:
@@ -41428,7 +41435,7 @@ string [string] generateAPIResponse()
     else if (true)*/
     if (true)
     {
-        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_volcanoItem1,_volcanoItem2,_volcanoItem3,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes,_detectiveCasesCompleted,_pottedTeaTreeUsed,lastIslandUnlock,falloutShelterChronoUsed,_timeSpinnerMinutesUsed,_lynyrdSnareUses,_noobSkillCount,_universeCalculated,_horsery,_expertCornerCutterUsed,boomBoxSong,_questPartyFair,_questPartyFairQuest,_neverendingPartyFreeTurns,_latteRefillsUsed,_latteBanishUsed,_latteCopyUsed,_latteDrinkUsed,_kgbTranquilizerDartUses,banishedMonsters,lastLightsOutTurn,lastVoteMonsterTurn,_lastCombatStarted,_sausageFights,_saberMod,_saberForceMonster,_daycareRecruits,_daycareGymScavenges,_campAwayCloudBuffs,_campAwaySmileBuffs,moonTuned,zeppelinProtestors,questL11Ron,questL11Shen,redSnapperPhylum,_canSeekBirds,questGuzzlr];
+        boolean [string] relevant_mafia_properties = $strings[merkinQuestPath,questF01Primordial,questF02Hyboria,questF03Future,questF04Elves,questF05Clancy,questG01Meatcar,questG02Whitecastle,questG03Ego,questG04Nemesis,questG05Dark,questG06Delivery,questI01Scapegoat,questI02Beat,questL02Larva,questL03Rat,questL04Bat,questL05Goblin,questL06Friar,questL07Cyrptic,questL08Trapper,questL09Topping,questL10Garbage,questL11MacGuffin,questL11Manor,questL11Palindome,questL11Pyramid,questL11Worship,questL12War,questL13Final,questM01Untinker,questM02Artist,questM03Bugbear,questM04Galaktic,questM05Toot,questM06Gourd,questM07Hammer,questM08Baker,questM09Rocks,questM10Azazel,questM11Postal,questM12Pirate,questM13Escape,questM14Bounty,questM15Lol,questS01OldGuy,questS02Monkees,sidequestArenaCompleted,sidequestFarmCompleted,sidequestJunkyardCompleted,sidequestLighthouseCompleted,sidequestNunsCompleted,sidequestOrchardCompleted,cyrptAlcoveEvilness,cyrptCrannyEvilness,cyrptNicheEvilness,cyrptNookEvilness,desertExploration,gnasirProgress,relayCounters,timesRested,currentEasyBountyItem,currentHardBountyItem,currentSpecialBountyItem,volcanoMaze1,_lastDailyDungeonRoom,seahorseName,chasmBridgeProgress,_aprilShower,lastAdventure,lastEncounter,_floristPlantsUsed,_fireStartingKitUsed,_psychoJarUsed,hiddenHospitalProgress,hiddenBowlingAlleyProgress,hiddenApartmentProgress,hiddenOfficeProgress,pyramidPosition,parasolUsed,_discoKnife,lastPlusSignUnlock,olfactedMonster,photocopyMonster,lastTempleUnlock,volcanoMaze1,blankOutUsed,peteMotorbikeCowling,peteMotorbikeGasTank,peteMotorbikeHeadlight,peteMotorbikeMuffler,peteMotorbikeSeat,peteMotorbikeTires,_petePeeledOut,_navelRunaways,_peteRiotIncited,_petePartyThrown,hiddenTavernUnlock,_dnaPotionsMade,_psychokineticHugUsed,dnaSyringe,_warbearGyrocopterUsed,questM20Necklace,questM21Dance,grimstoneMaskPath,cinderellaMinutesToMidnight,merkinVocabularyMastery,_pirateBellowUsed,questM21Dance,_defectiveTokenChecked,questG07Myst,questG08Moxie,questESpClipper,questESpGore,questESpJunglePun,questESpFakeMedium,questESlMushStash,questESlAudit,questESlBacteria,questESlCheeseburger,questESlCocktail,questESlSprinkles,questESlSalt,questESlFish,questESlDebt,_pickyTweezersUsed,_bittycar,questESpSerum,questESpOutOfOrder,_shrubDecorated,questESpEVE,questESpSmokes,questG09Muscle,_rapidPrototypingUsed,nsTowerDoorKeysUsed,_chateauDeskHarvested,lastGoofballBuy,nsChallenge1,nsChallenge2,nsContestants1,nsContestants2,nsContestants3,lastDesertUnlock,questM18Swamp,edPiece,warehouseProgress,questEStFishTrash,questEStNastyBears,questEStSocialJusticeI,questEStSocialJusticeII,questEStSuperLuber,questEStZippityDooDah,_summonAnnoyanceUsed,questEStWorkWithFood,questM24Doc,questEStGiveMeFuel,_mayoTankSoaked,_feastUsed,spelunkyNextNoncombat,spelunkySacrifices,spelunkyStatus,spelunkyUpgrades,spelunkyWinCount,_deckCardsDrawn,_glarkCableUses,_banderRunaways,questM25Armorer,pyramidBombUsed,_powerPillUses,nextAdventure,_volcanoItem1,_volcanoItem2,_volcanoItem3,_barrelPrayer,questECoBucket,_machineTunnelsAdv,_snojoFreeFights,snojoSetting,_lastCombatStarted,batmanZone,batmanUpgrades,batmanTimeLeft,batmanStats,questLTTQuestByWire,questM26Oracle,sourceTerminalEducate1,sourceTerminalEducate2,sourceTerminalEnquiry,_sourceTerminalDigitizeUses,_sourceTerminalEnhanceUses,_sourceTerminalExtrudes,_detectiveCasesCompleted,_pottedTeaTreeUsed,lastIslandUnlock,falloutShelterChronoUsed,_timeSpinnerMinutesUsed,_lynyrdSnareUses,_noobSkillCount,_universeCalculated,_horsery,_expertCornerCutterUsed,boomBoxSong,_questPartyFair,_questPartyFairQuest,_neverendingPartyFreeTurns,_latteRefillsUsed,_latteBanishUsed,_latteCopyUsed,_latteDrinkUsed,_kgbTranquilizerDartUses,banishedMonsters,lastLightsOutTurn,lastVoteMonsterTurn,_lastCombatStarted,_sausageFights,_saberMod,_saberForceMonster,_daycareRecruits,_daycareGymScavenges,_campAwayCloudBuffs,_campAwaySmileBuffs,moonTuned,zeppelinProtestors,questL11Ron,questL11Shen,redSnapperPhylum,_canSeekBirds,questGuzzlr,retroCapeSuperhero,retroCapeWashingInstructions];
         
         if (false)
         {
@@ -48555,21 +48562,20 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterResourceGenerationFunction("IOTMVampireCloakGenerateResource");
 void IOTMVampireCloakGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!$item[vampyric cloake].have())
-		return;
+    if (!$item[vampyric cloake].have())
+        return;
     if (!(__misc_state["in run"] && in_ronin())) return;
     
     int uses_left = clampi(10 - get_property_int("_vampyreCloakeFormUses"), 0, 10);
-    if (uses_left > 0 && my_path_id() != PATH_POCKET_FAMILIARS)
-	{
-		string [int] skills;
+    if (uses_left > 0 && my_path_id() != PATH_POCKET_FAMILIARS) {
+        string [int] skills;
         skills.listAppend("Wolf: +50% muscle, +50% meat");
         skills.listAppend("Mist: +2 all res");
         skills.listAppend("Bat: +50% item");
         
-		string [int] description;
+        string [int] description;
         description.listAppend("In-combat cast one of the Become skills, to gain a buff for that fight:|*" + skills.listJoinComponents("|*"));
-        resource_entries.listAppend(ChecklistEntryMake("__item vampyric cloake", "", ChecklistSubentryMake(pluralise(uses_left, "vampyric skill use", "vampyric skill uses"), "", description), 5).ChecklistEntrySetIDTag("Vampyric cloake combat skills resource"));
+        resource_entries.listAppend(ChecklistEntryMake("__item vampyric cloake", !$item[vampyric cloake].equipped() ? $item[vampyric cloake].invSearch() : "", ChecklistSubentryMake(pluralise(uses_left, "vampyric skill use", "vampyric skill uses"), "", description), 5).ChecklistEntrySetIDTag("Vampyric cloake combat skills resource"));
     }
 }
 
@@ -50023,11 +50029,147 @@ void IOTMComprehensiveCartographyGenerateResource(ChecklistEntry [int] resource_
     }
 }
 
-// Missing: unwrapped knock-off retro superhero cape
+/* RegisterTaskGenerationFunction("IOTMSuperheroCapeGenerateTasks");
+void IOTMSuperheroCapeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    task_entries.listAppend(ChecklistEntryMake("__item unwrapped knock-off retro superhero cape", "", ChecklistSubentryMake("", "", ""), -11).ChecklistEntrySetIDTag("Superhero cape now"));
+} */
+
+RegisterResourceGenerationFunction("IOTMSuperheroCapeGenerateResource");
+void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!mafiaIsPastRevision(20494)) return;
+    item cape = lookupItem("unwrapped knock-off retro superhero cape");
+    if (!cape.have()) return;
+    
+    if (!__misc_state["in run"]) return; //Only relevant information in aftercore is YR, but the YR tile will already mention the cape if needed anyway, in aftercore.
+    
+    // Not too sure if this should even be kept? There's no real precedent of Guide showing a resource that "never ends"...
+    // We could make a new section that lists a player's possessions and everything special related to them, and this would go there, but currently... not too sure...
+    // To be clear, I'm not saying this should be erased, just... commented out for the time being? IDK...
+    
+    string current_hero = get_property("retroCapeSuperhero");
+    string current_wash = get_property("retroCapeWashingInstructions");
+    
+    record CapeConfiguration {
+        string hero_name;
+        string main_modifiers;
+        string [string] tmhmkmkm;
+    };
+    
+    CapeConfiguration [string] cape_configurations = {
+        "vampire":new CapeConfiguration(
+            "Vampire Slicer",
+            "+30% muscle, +50 HP",
+            string [string] {
+                "hold":"+3 all resistances",
+                "thrill":"+3 muscle stats/fight",
+                "kiss":"Skill: Smooch of the Daywalker|Drain 20% of your foe's HP",
+                "kill":"Skill: Slay the Dead|Undead insta-bone (NOT free kill, <font color='red'>requires sword</font>).|+1% Cyrpt evilness reduction."
+            }
+        ),
+        "heck":new CapeConfiguration(
+            "Heck General",
+            "+30% myst, +50 MP",
+            string [string] {
+                "hold":"Auto 3 rounds stun at start of combats",
+                "thrill":"+3 myst stats/fight",
+                "kiss":"Skill: Unleash the Devil's Kiss|Yellow Ray (100 turns)",
+                "kill":"+100% (multiplicative) spell dmg, dealt as spooky dmg"
+            }
+        ),
+        "robot":new CapeConfiguration(
+            "Robot Police",
+            "+30% moxie, +25 HP/MP",
+            string [string] {
+                "hold":"Skill: Deploy Robo-Handcuffs|Stagger + 20% delevel 1x/fight",
+                "thrill":"+3 moxie stats/fight",
+                "kiss":"Skill: Blow a Robo-Kiss<br>Deal ~50 sleaze damage",
+                "kill":"Skill: Precision Shot|Stagger + critical hit (<font color='red'>requires gun</font>)."
+            }
+        )
+    };
+    
+    CapeConfiguration current_cape = cape_configurations[current_hero];
+    
+    
+    ChecklistSubentry getCurrentCapeConfig() {
+        // Title
+        string main_title = "Superhero Cape";
+        
+        // Subtitle
+        string main_hero = current_cape.hero_name != "" ? current_cape.hero_name : "unknown?";
+        string subtitle = " (" + main_hero + " / " + current_wash + " me)";
+        
+        // Entries
+        string [int] description;
+        if (cape_configurations contains current_hero) {
+            description.listAppend( current_cape.main_modifiers );
+            description.listAppend( current_cape.tmhmkmkm[current_wash] );
+        }
+        
+        return ChecklistSubentryMake(main_title, subtitle, description);
+    }
+    
+    
+    ChecklistSubentry usefulCapeConfigs() {
+        string main_title = "Useful configurations: ";
+        string [int] description;
+        string cape_stats;
+        switch ( my_primestat() ) {
+            case $stat[Muscle]:
+                cape_stats = "Vampire";
+                break;
+            case $stat[Mysticality]:
+                cape_stats = "Heck";
+                break;
+            case $stat[Moxie]:
+                cape_stats = "Robot";
+                break;
+        }
+        if ( __misc_state["need to level"] && cape_stats != "" && (current_hero != cape_stats.to_lower_case() || current_wash != "thrill") )
+            description.listAppend( HTMLGenerateSpanOfClass("Mainstat exp: ", "r_bold" ) + cape_stats + " + Thrill" );
+        
+        if ( $effect[Everything looks yellow].have_effect() == 0 && (current_hero != "heck" || current_wash != "kiss") )
+            description.listAppend( HTMLGenerateSpanOfClass("Yellow ray: ", "r_bold" ) + "Heck + Kiss" );
+        
+        if ( current_hero != "vampire" || current_wash != "hold" )
+            description.listAppend( HTMLGenerateSpanOfClass("+3 Res: ", "r_bold" ) + "Vampire + Hold" );
+        
+        if ( current_hero != "vampire" || current_wash != "kill" ) //reminder: add this to the cyrpt tile
+            description.listAppend( HTMLGenerateSpanOfClass("Instakill / Cyrpt Evil: ", "r_bold" ) + "Vampire + Kill" );
+        
+        return ChecklistSubentryMake(main_title, "", description);
+    }
+    
+    
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__item unwrapped knock-off retro superhero cape";
+    entry.url = cape.equipped() ? "inventory.php?action=hmtmkmkm" : cape.invSearch(); // we don't even need to change/adapt the name, kol recognizes it anyway!
+    entry.tags.id = "Superhero cape resource";
+    entry.should_indent_after_first_subentry = true;
+    entry.importance_level = 5;
+
+    ChecklistSubentry ccc = getCurrentCapeConfig();
+    if ( ccc.entries.count() > 0 ) {
+        entry.subentries.listAppend(ccc);
+    }
+    
+    ChecklistSubentry ucc = usefulCapeConfigs();
+    if ( ucc.entries.count() > 0 ) {
+        entry.subentries.listAppend(ucc);
+    }
+    
+    if ( entry.subentries.count() > 0 ) {
+        resource_entries.listAppend(entry);
+    }
+}
+
 // Missing: box o' ghosts
 
 // 2021
 // Missing: packaged miniature crystal ball
+
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
