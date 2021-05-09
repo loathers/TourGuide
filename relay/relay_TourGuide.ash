@@ -33726,7 +33726,7 @@ void generatePullList(Checklist [int] checklists)
         if (missing_freebird_components.count() > 0)
         {
             string description = missing_freebird_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
-            if (__misc_state["Torso aware"] == 0)
+            if (__misc_state["Torso aware"])
             {
                 if ($strings[Wombat,Blender,Packrat] contains my_sign() && my_path_id() != PATH_ZOMBIE_SLAYER)	// gnome trainer may be available
                     description += "|Plus five clovers. Skips protestors in five turns? Or become torso aware and pull the tunic first."
