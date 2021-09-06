@@ -38,7 +38,7 @@ The script will inform you of many resources you have - free runaways, banishes,
 ### Development guidelines
 TourGuide is open source and contributions are encouraged!
 
-The release above is a compiled version of the development version, which can be found by checking out https://github.com/cdrock/TourGuide. The release is compiled via Compile ASH script.rb, which collects many scripts into one for ease of release.
+The release above is a compiled version of the development version, which can be found by checking out https://github.com/Loathing-Associates-Scripting-Society/TourGuide. The release is compiled via Compile ASH script.rb, which collects many scripts into one for ease of release.
 
 This script, as well as its support scripts, are in the public domain.
 
