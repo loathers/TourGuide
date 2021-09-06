@@ -2,7 +2,7 @@
 
 ### Installation
 
-`svn checkout https://github.com/cdrock/TourGuide/branches/Release/`
+`svn checkout https://github.com/Loathing-Associates-Scripting-Society/TourGuide/branches/Release/`
 
 ### Updating
 
@@ -42,6 +42,6 @@ The release above is a compiled version of the development version, which can be
 
 This script, as well as its support scripts, are in the public domain.
 
-Contact me in-game: **cdrock (#2912644)**
+This is a fork of https://github.com/cdrock/TourGuide, which is in turn a fork of Ezandora's Guide.
 
-Or in discord: **cdrock7#1898**
+For support, questions, and comments visit the Ascension Speed Society discord channel.
