@@ -2,11 +2,15 @@
 
 ### Installation
 
-`svn checkout https://github.com/Loathing-Associates-Scripting-Society/TourGuide/branches/Release/`
+```
+svn checkout https://github.com/Loathing-Associates-Scripting-Society/TourGuide/branches/Release/
+```
 
 ### Updating
 
-`svn update`
+```
+svn update
+```
 
 ### How do I use it?
 Once it's installed, look in the relay browser. In the upper-right, there will be a **"run script"** menu. Select TourGuide and it will dock to the side of your window.
