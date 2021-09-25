@@ -74,8 +74,8 @@ import "relay/TourGuide/Items of the Month/Better Shrooms and Gardens.ash";
 import "relay/TourGuide/Items of the Month/Guzzlr.ash";
 // Missing: Iunion
 import "relay/TourGuide/Items of the Month/Melodramedary.ash";
-// Missing: SpinMaster lathe
-// Missing: Cargo cultist shorts
+import "relay/TourGuide/Items of the Month/Spinmaster Lathe.ash";
+import "relay/TourGuide/Items of the Month/Cargo Cultist Shorts.ash";
 import "relay/TourGuide/Items of the Month/Comprehensive Cartography.ash";
 import "relay/TourGuide/Items of the Month/Superhero Cape.ash";
 // Missing: box o' ghosts
