@@ -78,7 +78,7 @@ import "relay/TourGuide/Items of the Month/Spinmaster Lathe.ash";
 import "relay/TourGuide/Items of the Month/Cargo Cultist Shorts.ash";
 import "relay/TourGuide/Items of the Month/Comprehensive Cartography.ash";
 import "relay/TourGuide/Items of the Month/Superhero Cape.ash";
-// Missing: box o' ghosts
+import "relay/TourGuide/Items of the Month/Box o Ghosts.ash";
 
 // 2021
 // Missing: packaged miniature crystal ball
