@@ -1,5 +1,5 @@
-import "relay/TourGuide/Items of the Month/Smithsness.ash";
-import "relay/TourGuide/Items of the Month/Sugar.ash";
+import "relay/TourGuide/Items of the Month/2013/Smithsness.ash";
+import "relay/TourGuide/Items of the Month/2009/Sugar.ash";
 
 RegisterResourceGenerationFunction("IOTMTomesGenerateResource");
 void IOTMTomesGenerateResource(ChecklistEntry [int] resource_entries)
