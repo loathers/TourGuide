@@ -148,6 +148,18 @@ void runMain(string relay_filename)
         image_map["title"] = image_map["alt"];
         PageWrite(HTMLGenerateTagWrap("div", HTMLGenerateTagPrefix("img", image_map), string [string] {"id":"close_button_position_reference", "style":"position:fixed;z-index:5;width:100%;max-width:" + max_width_setting + "px;"}));
         
+        //Hacky layout, sorry:
+        image_map = mapCopy(base_image_map);
+        image_map["width"] = "12";
+        image_map["height"] = "12";
+        image_map["class"] = "r_button";
+        image_map["src"] = __refresh_image_data;
+        image_map["id"] = "button_refresh";
+        image_map["onclick"] = "document.location.reload(true)";
+        image_map["style"] = "right:5px;top:5px;";
+        image_map["alt"] = "Refresh";
+        image_map["title"] = image_map["alt"];
+        PageWrite(HTMLGenerateTagWrap("div", HTMLGenerateTagPrefix("img", image_map), string [string] {"id":"refresh_button_position_reference", "style":"position:fixed;z-index:5;width:100%;max-width:" + max_width_setting + "px;"}));
         
         //position:absolute holding container, so we can absolutely position these, absolutely:
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "top_buttons_position_reference", "style", "position:absolute;" + "width:100%;max-width:" + max_width_setting + "px;")));
@@ -156,7 +168,7 @@ void runMain(string relay_filename)
         image_map["src"] = __new_window_image_data;
         image_map["id"] = "button_new_window";
         image_map["onclick"] = "buttonNewWindowClicked(event)";
-        image_map["style"] = "right:5px;top:5px;";
+        image_map["style"] = "right:30px;top:5px;";
         image_map["alt"] = "Open in new window";
         image_map["title"] = image_map["alt"];
         PageWrite(HTMLGenerateTagPrefix("img", image_map));
@@ -165,7 +177,7 @@ void runMain(string relay_filename)
         image_map["src"] = __left_arrow_image_data;
         image_map["id"] = "button_arrow_right_left";
         image_map["onclick"] = "buttonRightLeftClicked(event)";
-        image_map["style"] = "right:30px;top:5px;";
+        image_map["style"] = "right:55px;top:5px;";
         image_map["alt"] = "Show chat pane";
         image_map["title"] = image_map["alt"];
         PageWrite(HTMLGenerateTagPrefix("img", image_map));
@@ -174,7 +186,7 @@ void runMain(string relay_filename)
         image_map["src"] = __right_arrow_image_data;
         image_map["id"] = "button_arrow_right_right";
         image_map["onclick"] = "buttonRightRightClicked(event)";
-        image_map["style"] = "right:30px;top:5px;";
+        image_map["style"] = "right:55px;top:5px;";
         image_map["alt"] = "Hide chat pane";
         image_map["title"] = image_map["alt"];
         PageWrite(HTMLGenerateTagPrefix("img", image_map));
@@ -283,22 +295,6 @@ void runMain(string relay_filename)
         line += "<br>" + __version;
         
         PageWrite(HTMLGenerateTagWrap("div", line, mapMake("style", "font-size:0.777em;color:gray;margin-top:-12px;", "id", "Guide_foot")));
-        
-        if (true)
-        {
-            //Hacky layout, sorry:
-            string [string] image_map;
-            image_map["width"] = "12";
-            image_map["height"] = "12";
-            image_map["class"] = "r_button";
-            image_map["src"] = __refresh_image_data;
-            image_map["id"] = "button_refresh";
-            image_map["onclick"] = "document.location.reload(true)";
-            image_map["style"] = "position:relative;top:-12px;right:3px;visibility:visible;";
-            image_map["alt"] = "Refresh";
-            image_map["title"] = image_map["alt"];
-            PageWrite(HTMLGenerateTagWrap("div", HTMLGenerateTagPrefix("img", image_map), mapMake("style", "max-height:0px;width:100%;text-align:right;", "id", "refresh_button_position_reference")));
-        }
     }
     boolean matrix_enabled = false;
     if (my_path_id() == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
