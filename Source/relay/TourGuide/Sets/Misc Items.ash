@@ -1229,6 +1229,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if (glitch_in_closet >= 1)
             description.listAppend("Uncloset " + (glitch_in_closet > 1 ? "some" : "one") + " to " + (glitch_amount > 1 ? "increase" : "multiply") + " its power and reward.");
 
-        resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "inventory.php?ftext=%5Bglitch+season+reward+name%5D", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
     }
 }
