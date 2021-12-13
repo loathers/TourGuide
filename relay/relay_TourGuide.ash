@@ -36966,7 +36966,7 @@ string generateRandomMessage()
             random_messages.listAppend("no king, forever");
         else if (my_daycount() >= 11)
             random_messages.listAppend("does the king even exist...?");
-        else if (my_turncount() > 500 && my_daycount() == 1)
+        else if (my_turncount() > 400 && my_daycount() == 1)
             random_messages.listAppend("you are ascending too... wait, what?");
         else if (gameday_to_int() == 7)
             random_messages.listAppend("you are ascending at a reasonable pace, could do better");
