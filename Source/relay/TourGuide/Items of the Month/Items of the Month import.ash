@@ -100,7 +100,7 @@ import "relay/TourGuide/Items of the Month/2020/Superhero Cape.ash";
 import "relay/TourGuide/Items of the Month/2020/Box o Ghosts.ash";
 
 // 2021
-import "relay/TourGuide/Items of the Month/2021/Minuature Crystal Ball.ash";
+import "relay/TourGuide/Items of the Month/2021/Miniature Crystal Ball.ash";
 import "relay/TourGuide/Items of the Month/2021/Emotion Chip.ash";
 // Missing: Power Plant
 import "relay/TourGuide/Items of the Month/2021/Backup Camera.ash";
