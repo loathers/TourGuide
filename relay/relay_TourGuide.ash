@@ -50276,8 +50276,350 @@ void IOTMCommerceGhostGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 }
 
 // 2021
-// Missing: packaged miniature crystal ball
+//2021
+//Miniature Crystal ball
+RegisterTaskGenerationFunction("IOTMCrystalBallGenerateTasks");
+void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+		string title;
+		title = "Miniature crystal ball monster prediction";
+		string image_name = "__item miniature crystal ball";
+		monster crystalBallPrediction = (get_property_monster("crystalBallMonster"));
+		location crystalBallZone = (get_property_location("crystalBallLocation"));
+		image_name = "__monster " + crystalBallPrediction;
+		string [int] description;
+            if (!lookupItem("miniature crystal ball").equipped())
+            {
+				if (crystalBallPrediction != $monster[none])
+				{
+					description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "black") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "black"));
+					description.listAppend("" + HTMLGenerateSpanFont("Equip the miniature crystal ball first!", "red") + "");
+					optional_task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
+				}
+				else
+					description.listAppend("Equip the miniature crystal ball to predict a monster!");
+					optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "url", ChecklistSubentryMake(title, description)));
+			}
+            else
+			{
+                if (crystalBallPrediction != $monster[none])
+				{
+					description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "blue") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "blue"));
+					task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
+				}
+				else
+				{
+					description.listAppend("Adventure in a snarfblat to predict a monster!");
+					task_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", "url", ChecklistSubentryMake(title, description)));
+				}	
+			}	
+}
 
+//Emotion Chip
+RegisterResourceGenerationFunction("IOTMEmotionChipGenerateResource");
+void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!lookupSkill("Emotionally Chipped").have_skill())
+    return;
+    ChecklistSubentry getEmotions() {
+        // Title
+        string main_title = "Emotion chip feelings";
+        // Entries
+		string [int] description;
+		string [int] emotions;
+				
+        int emotionDisappointed = clampi(3 - get_property_int("_feelDisappointedUsed"), 0, 3);
+        if (emotionDisappointed > 0)
+			{
+            emotions.listAppend(emotionDisappointed + " Disappointments left. This must be the 'your parents' emotion chip.");
+			}
+        int emotionExcitement = clampi(3 - get_property_int("_feelExcitementUsed"), 0, 3);
+        if (emotionExcitement > 0)
+			{
+            emotions.listAppend(emotionExcitement + " Excitement left. 20 advs of +25 Mus/Mys/Mox.");
+			}
+        int emotionLonely = clampi(3 - get_property_int("_feelLonelyUsed"), 0, 3);
+        if (emotionLonely > 0)
+			{
+            emotions.listAppend(emotionLonely + " Lonelys left. 20 advs of -5% Combat.");
+			}
+        int emotionLost = clampi(3 - get_property_int("_feelLostUsed"), 0, 3);
+        if (emotionLost > 0)
+			{
+            emotions.listAppend(emotionLost + " Losts left. 20 advs of weird Teleportitis buff.");
+			}
+        int emotionNervous = clampi(3 - get_property_int("_feelNervousUsed"), 0, 3);
+        if (emotionNervous > 0)
+			{
+            emotions.listAppend(emotionNervous + " Nervouses left. 20 advs of passive damage.");
+			}
+        int emotionPeaceful = clampi(3 - get_property_int("_feelPeacefulUsed"), 0, 3);
+        if (emotionPeaceful > 0)
+			{
+            emotions.listAppend(emotionPeaceful + " Peacefuls left. 20 advs of +2 elemental resist.");
+			}
+        int emotionPride = clampi(3 - get_property_int("_feelPrideUsed"), 0, 3);
+        if (emotionPride > 0)
+			{
+            emotions.listAppend(emotionPride + " Prides left. Triple stat gain from current fight.");
+			}
+        int emotionHatred = clampi(3 - get_property_int("_feelHatredUsed"), 0, 3);
+        if (emotionHatred > 0)
+			{
+            emotions.listAppend(emotionHatred + " Hatreds left. 50-turn banish.");
+			
+			resource_entries.listAppend(ChecklistEntryMake("__skill feel hatred", "", ChecklistSubentryMake(pluralise(emotionHatred, "Feel Hatred", "Feels Hatreds"), "", "Cast Feel Hatred. Free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Emotion chip feel hatred banish"));
+			}
+        int emotionEnvy = clampi(3 - get_property_int("_feelEnvyUsed"), 0, 3);
+        if (emotionEnvy > 0)
+			{
+            emotions.listAppend(emotionEnvy + " Envys left. Black Ray.");
+			}
+        int emotionNostalgic = clampi(3 - get_property_int("_feelNostalgicUsed"), 0, 3);
+		monster nostalgicMonster = (get_property_monster("lastCopyableMonster"));
+        if (emotionNostalgic > 0)
+			{
+            emotions.listAppend(emotionNostalgic + " Nostalgias left. Item copying. Can currently feel nostalgic for: " + HTMLGenerateSpanFont(nostalgicMonster, "blue"));
+			}
+        int emotionSuperior = clampi(3 - get_property_int("_feelSuperiorUsed"), 0, 3);
+        if (emotionSuperior > 0)
+			{
+            emotions.listAppend(emotionSuperior + " Superiors left. +1 PvP Fight if used as killshot.");
+			}   		
+        return ChecklistSubentryMake(main_title, description, emotions);
+    }
+
+	ChecklistEntry entry;
+    entry.image_lookup_name = "__item emotion chip";
+    entry.tags.id = "emotion chip resource";
+
+    ChecklistSubentry emotions = getEmotions();
+    if (emotions.entries.count() > 0) {
+        entry.subentries.listAppend(emotions);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
+
+// Missing: Power Plant
+
+//Backup Camera
+RegisterResourceGenerationFunction("IOTMBackupCameraGenerateResource");
+void IOTMBackupCameraGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!lookupItem("backup camera").have()) return;
+		// Title
+        string main_title = "Backupcheek cameracity snapshots";
+		string [int] description;
+
+	
+		// Entries
+		int backup_camera_snapsUsed = get_property_int("_backUpUses");
+        int totalBackupCameras = 11;
+        if (my_path_id() == PATH_YOU_ROBOT) {
+            totalBackupCameras = 16;
+			//for whatever awful reason, this is buggy and will miscount when you break prism until you relog
+        }
+		
+		string url = "inventory.php?ftext=backup+camera";
+		int backup_camera_uses_remaining = totalBackupCameras - backup_camera_snapsUsed;
+		if (backup_camera_uses_remaining < totalBackupCameras)
+    {
+        string [int] description;
+        description.listAppend("Back up and fight the last monster you fought.");
+		
+		monster nostalgicMonster = (get_property_monster("lastCopyableMonster"));
+        description.listAppend(HTMLGenerateSpanFont(nostalgicMonster, "blue") + " is currently in your cringe compilation.");
+		
+		if (!lookupItem("backup camera").equipped())
+            description.listAppend(HTMLGenerateSpanFont("Equip the backup camera first", "red"));
+        else
+            description.listAppend("Re-fight your last encountered monster.");
+
+		
+		resource_entries.listAppend(ChecklistEntryMake("__item backup camera", url, ChecklistSubentryMake(backup_camera_uses_remaining + " backup camera snaps left", "", description)).ChecklistEntrySetIDTag("Backup camera skill resource"));
+    }
+}
+// Missing: Shortest-Order Cook
+//Familiar scrapbook
+RegisterResourceGenerationFunction("IOTMFamiliarScrapbookGenerateResource");
+void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries)
+{
+        // Title
+        string main_title = "Familiar scraps";
+		string [int] description;
+
+		// Entries
+		int familiar_scraps = get_property_int("scrapbookCharges");
+		int familiar_scrap_banishes = familiar_scraps / 100;
+		
+		if (familiar_scraps < 100) {
+            description.listAppend(familiar_scraps + " /100 scraps until a banish is available.");
+        } else {
+			description.listAppend(familiar_scraps + " scraps collected.");
+        }
+	
+        description.listAppend("Charge up your familiar scrapbook by letting familiars act in combat.");
+		if (!lookupItem("familiar scrapbook").equipped())
+            description.listAppend(HTMLGenerateSpanFont("Equip the familiar scrapbook first", "red"));
+        		
+		resource_entries.listAppend(ChecklistEntryMake("__item familiar scrapbook", "url", ChecklistSubentryMake(familiar_scraps / 100 + " scrapbook banishes available", "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Familiar scrapbook boring pictures banish"));
+}
+//Underground Fireworks Shop
+RegisterTaskGenerationFunction("IOTMUndergroundFireworksShopGenerateTasks");
+void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	if (__misc_state["in run"] && my_path_id() != PATH_G_LOVER)
+	{
+		if ($effect[Ready to Eat].have_effect() > 0) 
+		{
+			string [int] description;
+			description.listAppend(HTMLGenerateSpanFont("5x food statgain on the next thing you eat!", "red"));
+			description.listAppend(HTMLGenerateSpanFont("Don't waste it on fire crackers!", "red"));
+			task_entries.listAppend(ChecklistEntryMake("__effect Ready to Eat", "", ChecklistSubentryMake("Ready to Eat!", "", description), -11));
+		}
+		if ($effect[Everything Looks Red].have_effect() == 0)
+		{
+			string [int] description;
+			string url = "clan_viplounge.php?action=fwshop&whichfloor=2";
+			description.listAppend(HTMLGenerateSpanFont("5x food statgain on the next thing you eat.", "red"));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item red rocket", url, ChecklistSubentryMake("Fire a red rocket", "", description), 8));
+		}		
+		if ($effect[Everything Looks Blue].have_effect() == 0)
+		{
+			string [int] description;
+			string url = "clan_viplounge.php?action=fwshop&whichfloor=2";
+			description.listAppend(HTMLGenerateSpanFont("More MP than your body has room for!", "blue"));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item blue rocket", url, ChecklistSubentryMake("Fire a blue rocket", "", description), 8));
+		}
+		if ($effect[Everything Looks Yellow].have_effect() == 0)
+		{
+			string [int] description;
+			string url = "clan_viplounge.php?action=fwshop&whichfloor=2";
+			description.listAppend(HTMLGenerateSpanFont("Best yellow ray!", "orange"));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item yellow rocket", url, ChecklistSubentryMake("Fire a yellow rocket", "", description), 8));
+		}
+	}
+}
+
+//FIXME: these do not track properly and will remain even when purchased, may fix eventually
+
+RegisterResourceGenerationFunction("IOTMUndergroundFireworksShopGenerateResource");
+void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (!get_property_boolean("_fireworksShopEquipmentBought"));
+		{
+			string [int] description;
+			description.listAppend("Can buy one of the following (1000 meat):");
+			description.listAppend("Catherine Wheel: +3 exp back item");
+			description.listAppend("Oversized sparkler: +20% item drop club");
+			description.listAppend("Rocket boots: +100% initiative accessory");
+			resource_entries.listAppend(ChecklistEntryMake("__item oversized sparkler", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Explosive equipment", description), 8).ChecklistEntrySetIDTag("Clan fireworks equipment resource"));
+		}
+	if (!get_property_boolean("_fireworksShopHatBought"));
+		{
+			string [int] description;
+			description.listAppend("Can buy one of the following (500 meat):");
+			description.listAppend("Fedora-mounted mountain: +20 ML hat");
+			description.listAppend("Sombrero-mounted sparkler: +5% combat hat");
+			description.listAppend("Porkpie-mounted popper: -5% combat hat");
+			resource_entries.listAppend(ChecklistEntryMake("__item fedora-mounted mountain", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Dangerous hats", description), 8).ChecklistEntrySetIDTag("Clan fireworks hat resource"));
+		}
+}
+// Missing: Candles
+//Emotion Chip
+RegisterResourceGenerationFunction("IOTMEmotionChipGenerateResource");
+void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!lookupSkill("Emotionally Chipped").have_skill())
+    return;
+    ChecklistSubentry getEmotions() {
+        // Title
+        string main_title = "Emotion chip feelings";
+        // Entries
+		string [int] description;
+		string [int] emotions;
+				
+        int emotionDisappointed = clampi(3 - get_property_int("_feelDisappointedUsed"), 0, 3);
+        if (emotionDisappointed > 0)
+			{
+            emotions.listAppend(emotionDisappointed + " Disappointments left. This must be the 'your parents' emotion chip.");
+			}
+        int emotionExcitement = clampi(3 - get_property_int("_feelExcitementUsed"), 0, 3);
+        if (emotionExcitement > 0)
+			{
+            emotions.listAppend(emotionExcitement + " Excitement left. 20 advs of +25 Mus/Mys/Mox.");
+			}
+        int emotionLonely = clampi(3 - get_property_int("_feelLonelyUsed"), 0, 3);
+        if (emotionLonely > 0)
+			{
+            emotions.listAppend(emotionLonely + " Lonelys left. 20 advs of -5% Combat.");
+			}
+        int emotionLost = clampi(3 - get_property_int("_feelLostUsed"), 0, 3);
+        if (emotionLost > 0)
+			{
+            emotions.listAppend(emotionLost + " Losts left. 20 advs of weird Teleportitis buff.");
+			}
+        int emotionNervous = clampi(3 - get_property_int("_feelNervousUsed"), 0, 3);
+        if (emotionNervous > 0)
+			{
+            emotions.listAppend(emotionNervous + " Nervouses left. 20 advs of passive damage.");
+			}
+        int emotionPeaceful = clampi(3 - get_property_int("_feelPeacefulUsed"), 0, 3);
+        if (emotionPeaceful > 0)
+			{
+            emotions.listAppend(emotionPeaceful + " Peacefuls left. 20 advs of +2 elemental resist.");
+			}
+        int emotionPride = clampi(3 - get_property_int("_feelPrideUsed"), 0, 3);
+        if (emotionPride > 0)
+			{
+            emotions.listAppend(emotionPride + " Prides left. Triple stat gain from current fight.");
+			}
+        int emotionHatred = clampi(3 - get_property_int("_feelHatredUsed"), 0, 3);
+        if (emotionHatred > 0)
+			{
+            emotions.listAppend(emotionHatred + " Hatreds left. 50-turn banish.");
+			
+			resource_entries.listAppend(ChecklistEntryMake("__skill feel hatred", "", ChecklistSubentryMake(pluralise(emotionHatred, "Feel Hatred", "Feels Hatreds"), "", "Cast Feel Hatred. Free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Emotion chip feel hatred banish"));
+			}
+        int emotionEnvy = clampi(3 - get_property_int("_feelEnvyUsed"), 0, 3);
+        if (emotionEnvy > 0)
+			{
+            emotions.listAppend(emotionEnvy + " Envys left. Black Ray.");
+			}
+        int emotionNostalgic = clampi(3 - get_property_int("_feelNostalgicUsed"), 0, 3);
+		monster nostalgicMonster = (get_property_monster("lastCopyableMonster"));
+        if (emotionNostalgic > 0)
+			{
+            emotions.listAppend(emotionNostalgic + " Nostalgias left. Item copying. Can currently feel nostalgic for: " + HTMLGenerateSpanFont(nostalgicMonster, "blue"));
+			}
+        int emotionSuperior = clampi(3 - get_property_int("_feelSuperiorUsed"), 0, 3);
+        if (emotionSuperior > 0)
+			{
+            emotions.listAppend(emotionSuperior + " Superiors left. +1 PvP Fight if used as killshot.");
+			}   		
+        return ChecklistSubentryMake(main_title, description, emotions);
+    }
+
+	ChecklistEntry entry;
+    entry.image_lookup_name = "__item emotion chip";
+    entry.tags.id = "emotion chip resource";
+
+    ChecklistSubentry emotions = getEmotions();
+    if (emotions.entries.count() > 0) {
+        entry.subentries.listAppend(emotions);
+    }
+    
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
+}
+
+// Missing: Vampire Vintner
+// Missing: Daylight Shavings Helmet
+// Missing: Cold Medicine Cabinet
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
