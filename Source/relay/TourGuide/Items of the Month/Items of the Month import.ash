@@ -100,4 +100,15 @@ import "relay/TourGuide/Items of the Month/2020/Superhero Cape.ash";
 import "relay/TourGuide/Items of the Month/2020/Box o Ghosts.ash";
 
 // 2021
-// Missing: packaged miniature crystal ball
+import "relay/TourGuide/Items of the Month/2021/Minuature Crystal Ball.ash";
+import "relay/TourGuide/Items of the Month/2021/Emotion Chip.ash";
+// Missing: Power Plant
+import "relay/TourGuide/Items of the Month/2021/Backup Camera.ash";
+// Missing: Shortest-Order Cook
+import "relay/TourGuide/Items of the Month/2021/Familiar Scrapbook";
+import "relay/TourGuide/Items of the Month/2021/Underground Fireworks Shop.ash";
+// Missing: Candles
+import "relay/TourGuide/Items of the Month/2021/Industrial Fire Extinguisher.ash";
+// Missing: Vampire Vintner
+// Missing: Daylight Shavings Helmet
+// Missing: Cold Medicine Cabinet
