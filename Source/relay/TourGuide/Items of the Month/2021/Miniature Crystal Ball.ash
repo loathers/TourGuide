@@ -12,7 +12,7 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 	{
 		if (predictionArray != "") {
 			foreach x in predictionArray {
-				description.listApprend(predictionArray[x]);
+				description.listAppend(predictionArray[x]);
 			}
 			optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "url", ChecklistSubentryMake(title, description)));			
 		}
