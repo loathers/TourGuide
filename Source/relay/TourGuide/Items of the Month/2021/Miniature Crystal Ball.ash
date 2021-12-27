@@ -6,29 +6,27 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 	string title;
 	title = "Miniature crystal ball monster prediction";
 	string image_name = "__item miniature crystal ball";
-	monster crystalBallPrediction = (get_property_monster("crystalBallMonster"));
-	location crystalBallZone = (get_property_location("crystalBallLocation"));
-	image_name = "__monster " + crystalBallPrediction;
+	string predictionArray = get_property("crystalBallPredictions").split_string("[|]");
 	string [int] description;
 	if (available_amount($item[miniature crystal ball]) > 0) 
 	{
+		if (predictionArray != "") {
+			foreach x in predictionArray {
+				description.listApprend(predictionArray[x]);
+			}
+		}
+		else {
+ 			description.listAppend("You currently have no predicitons.");
+		}
+
 		if (!have_equipped($item[miniature crystal ball]))
-		{
-			if (crystalBallPrediction != $monster[none])
-			{
-				description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "black") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "black"));
-				description.listAppend("" + HTMLGenerateSpanFont("Equip the miniature crystal ball first!", "red") + "");
-				optional_task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
-			}
-			else 
-			{				
-				description.listAppend("Equip the miniature crystal ball to predict a monster!");
-				optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "url", ChecklistSubentryMake(title, description)));
-			}
+		{							
+			description.listAppend("Equip the miniature crystal ball to predict a monster!");
+			optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "url", ChecklistSubentryMake(title, description)));			
 		}
 		else
 		{
-			if (crystalBallPrediction != $monster[none])
+			if (predictionArray != "")
 			{
 				description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "blue") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "blue"));
 				task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
