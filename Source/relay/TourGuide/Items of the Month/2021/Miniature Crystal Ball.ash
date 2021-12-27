@@ -14,9 +14,11 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 			foreach x in predictionArray {
 				description.listApprend(predictionArray[x]);
 			}
+			optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "url", ChecklistSubentryMake(title, description)));			
 		}
 		else {
  			description.listAppend("You currently have no predicitons.");
+			optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "url", ChecklistSubentryMake(title, description)));			
 		}
 
 		if (!have_equipped($item[miniature crystal ball]))
@@ -24,18 +26,18 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 			description.listAppend("Equip the miniature crystal ball to predict a monster!");
 			optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "url", ChecklistSubentryMake(title, description)));			
 		}
-		else
-		{
-			if (predictionArray != "")
-			{
-				description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "blue") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "blue"));
-				task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
-			}
-			else
-			{
-				description.listAppend("Adventure in a snarfblat to predict a monster!");
-				task_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", "url", ChecklistSubentryMake(title, description)));
-			}	
-		}
+		// else
+		// {
+		// 	if (predictionArray != "")
+		// 	{
+		// 		description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "blue") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "blue"));
+		// 		task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
+		// 	}
+		// 	else
+		// 	{
+		// 		description.listAppend("Adventure in a snarfblat to predict a monster!");
+		// 		task_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", "url", ChecklistSubentryMake(title, description)));
+		// 	}	
+		// }
 	}
 }
