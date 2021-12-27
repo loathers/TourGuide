@@ -10,7 +10,8 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 	location crystalBallZone = (get_property_location("crystalBallLocation"));
 	image_name = "__monster " + crystalBallPrediction;
 	string [int] description;
-	if ( && available_amount($item[miniature crystal ball]) > 0) {
+	if (available_amount($item[miniature crystal ball]) > 0) 
+	{
 		if (!have_equipped($item[miniature crystal ball]))
 		{
 			if (crystalBallPrediction != $monster[none])
