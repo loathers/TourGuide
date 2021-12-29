@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("IOTMFireExtinguisherGenerateResource");
 void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!available_amount($item[industrial fire extinguisher]) > 0) return;
+    if (!(available_amount($item[industrial fire extinguisher]) > 0)) return;
 		// Title
 	string [int] description;
 	string [int] options;
@@ -59,6 +59,7 @@ void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 		if (options.count() > 0)
 			description.listAppend(HTMLGenerateSpanOfClass("Zone-specific skills (20% charge):", "r_bold") + " 1/ascension special options in the following zones:|*-" + options.listJoinComponents("|*-"));
 		}	
-	if ((is_on_fire && !get_property_boolean("_fireExtinguisherRefilled") || extinguisher_charge >= 5))		
-	resource_entries.listAppend(ChecklistEntryMake("__item industrial fire extinguisher", url, ChecklistSubentryMake(extinguisher_charge + "% fire extinguisher available", "", description)).ChecklistEntrySetIDTag("industrial fire extinguisher skills resource"));
+	if ((is_on_fire && !get_property_boolean("_fireExtinguisherRefilled") || extinguisher_charge >= 5)) {
+		resource_entries.listAppend(ChecklistEntryMake("__item industrial fire extinguisher", url, ChecklistSubentryMake(extinguisher_charge + "% fire extinguisher available", "", description)).ChecklistEntrySetIDTag("industrial fire extinguisher skills resource"));
+	}
 }
