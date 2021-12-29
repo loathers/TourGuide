@@ -36405,7 +36405,7 @@ void generateDailyResources(Checklist [int] checklists)
         boolean go_chateau = get_property_boolean("restUsingChateau");
         boolean go_away = get_property_boolean("restUsingCampAwayTent");
         string [int] order;
-        order [go_chateau ? 0 : 1] = "Chateau Magenta";
+        order [go_chateau ? 0 : 1] = "Chateau Mantegna";
         order [go_chateau ? 1 : 0] = go_away ? "Getaway Campsite" : "Your Campsite";
         order [2] = go_away ? "Your Campsite" : "Getaway Campsite";
 
@@ -36417,8 +36417,8 @@ void generateDailyResources(Checklist [int] checklists)
         foreach i, loc in order {
             ChecklistSubentry subentry;
             switch {
-                case loc == "Chateau Magenta" && __misc_state["Chateau Mantegna available"]:
-                    subentry.header = "At your Chateau Magenta:";
+                case loc == "Chateau Mantegna" && __misc_state["Chateau Mantegna available"]:
+                    subentry.header = "At your Chateau Mantegna:";
                     url.listAppend(__misc_state_string["resting url Chateau Mantegna"]);
 
                     stat nightstand_stat = $stat[none];
@@ -36700,7 +36700,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauDeskHarvested")) {
         string image_name = "__item fancy calligraphy pen";
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8).ChecklistEntrySetIDTag("Chateau magenta desk resource"));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8).ChecklistEntrySetIDTag("Chateau Mantegna desk resource"));
     }
 
     if (!get_property_boolean("_lyleFavored")) {
@@ -50287,15 +50287,16 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 	if (available_amount($item[miniature crystal ball]) > 0) // Only do things if we have the orb.
 	{
 		if (orb_predictions[0] != "") { // If the prediction property isn't empty:
+            description.listAppend(HTMLGenerateSpanFont("These predictions may not be accurate, the crystal ball is very fiddly.", "grey"));
 			foreach x in orb_predictions { // For every indidivual prediction,
                 string [int] split_predictions = orb_predictions[x].split_string(":"); // break down the prediciton into turn/zone/monster
-				description.listAppend("Monster: " + split_predictions[2] + " | Zone: "+ split_predictions[1] + " | Turns until expiration: " + (split_predictions[0].to_int() + 2 - my_turncount())); // then format and add the prediction substrings to the crystal ball tile.
+				description.listAppend("Monster: " + split_predictions[2] + " | Zone: "+ split_predictions[1] + " | " + (split_predictions[0].to_int() + 2 - my_turncount() > 0 ? ("Turns left: " + (split_predictions[0].to_int() + 2 - my_turncount()).to_string()) : "Expired")); // then format and add the prediction substrings to the crystal ball tile.
 			}
 
             string tile_image = count(orb_predictions) == 1 ? "__monster " + orb_predictions[0].split_string(":")[2] : "__item quantum of familiar";
 
             if (!have_equipped($item[miniature crystal ball])) { // If we don't have the crystal ball equipped, add a reminder.
-                description.listAppend("Equip your miniature crystal ball if you want to encounter your predictions!");
+                description.listAppend(HTMLGenerateSpanFont("Equip your miniature crystal ball if you want to encounter your predictions!", "red"));
                 optional_task_entries.listAppend(ChecklistEntryMake(tile_image, "familiar.php", ChecklistSubentryMake(title, description), -1)); // Optional task if not equipped.
             }
 			else {
@@ -50303,10 +50304,11 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 			}
         }
         else { // If we don't have any predictions, let us know.
+            description.listAppend("The crystal ball will predict the next monster in a zone. Adventure in the zone again to encounter the monster, or elsewhere to reset the prediction.");
  			description.listAppend("You currently have no predicitons.");
             if (!have_equipped($item[miniature crystal ball]))
             {							
-                description.listAppend("Equip the miniature crystal ball to predict a monster!");	
+                description.listAppend(HTMLGenerateSpanFont("Equip the miniature crystal ball to predict a monster!", "red"));	
             }
 			optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "familiar.php", ChecklistSubentryMake(title, description), -1));			
         }
@@ -50408,63 +50410,68 @@ RegisterResourceGenerationFunction("IOTMBackupCameraGenerateResource");
 void IOTMBackupCameraGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!lookupItem("backup camera").have()) return;
-		// Title
-        string main_title = "Backupcheek cameracity snapshots";
-		string [int] description;
+    // Title
+    string main_title = "Backupcheek cameracity snapshots";
+    string [int] description;
 
-	
-		// Entries
-		int backup_camera_snapsUsed = get_property_int("_backUpUses");
-        int totalBackupCameras = 11;
-        if (my_path_id() == PATH_YOU_ROBOT) {
-            totalBackupCameras = 16;
-			//for whatever awful reason, this is buggy and will miscount when you break prism until you relog
-        }
-		
-		string url = "inventory.php?ftext=backup+camera";
-		int backup_camera_uses_remaining = totalBackupCameras - backup_camera_snapsUsed;
-		if (backup_camera_uses_remaining < totalBackupCameras)
-    {
+
+    // Entries
+    int backup_camera_snapsUsed = get_property_int("_backUpUses");
+    int totalBackupCameras = 11;
+    if (my_path_id() == PATH_YOU_ROBOT) {
+        totalBackupCameras = 16;
+        //for whatever awful reason, this is buggy and will miscount when you break prism until you relog
+    }
+    
+    string url = "inventory.php?ftext=backup+camera";
+    int backup_camera_uses_remaining = totalBackupCameras - backup_camera_snapsUsed;
+    if (backup_camera_uses_remaining > 0) {
         string [int] description;
         description.listAppend("Back up and fight the last monster you fought.");
 		
 		monster nostalgicMonster = (get_property_monster("lastCopyableMonster"));
         description.listAppend(HTMLGenerateSpanFont(nostalgicMonster, "blue") + " is currently in your cringe compilation.");
 		
-		if (!lookupItem("backup camera").equipped())
+		if (!lookupItem("backup camera").equipped()) {
             description.listAppend(HTMLGenerateSpanFont("Equip the backup camera first", "red"));
-        else
+        }
+        else {
             description.listAppend("Re-fight your last encountered monster.");
-
+        }
 		
 		resource_entries.listAppend(ChecklistEntryMake("__item backup camera", url, ChecklistSubentryMake(backup_camera_uses_remaining + " backup camera snaps left", "", description)).ChecklistEntrySetIDTag("Backup camera skill resource"));
     }
 }
+
 // Missing: Shortest-Order Cook
 //Familiar scrapbook
 RegisterResourceGenerationFunction("IOTMFamiliarScrapbookGenerateResource");
 void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries)
 {
-        // Title
-        string main_title = "Familiar scraps";
-		string [int] description;
+	// Title
+	string main_title = "Familiar scraps";
+	string [int] description;
 
-		// Entries
-		int familiar_scraps = get_property_int("scrapbookCharges");
-		int familiar_scrap_banishes = familiar_scraps / 100;
-		
-		if (familiar_scraps < 100) {
-            description.listAppend(familiar_scraps + " /100 scraps until a banish is available.");
-        } else {
-			description.listAppend(familiar_scraps + " scraps collected.");
-        }
+	// Entries
+	int familiar_scraps = get_property_int("scrapbookCharges");
+	int familiar_scrap_banishes = familiar_scraps / 100;
 	
-        description.listAppend("Charge up your familiar scrapbook by letting familiars act in combat.");
-		if (!lookupItem("familiar scrapbook").equipped())
-            description.listAppend(HTMLGenerateSpanFont("Equip the familiar scrapbook first", "red"));
-        		
+	if (available_amount($item[familiar scrapbook]) > 0) {
+		if (familiar_scraps < 100) {
+			description.listAppend(familiar_scraps + " /100 scraps until a banish is available.");
+		} 
+		else {
+			description.listAppend(familiar_scraps + " scraps collected.");
+		}
+
+		description.listAppend("Charge up your familiar scrapbook by letting familiars act in combat.");
+		if (!have_equipped($item[familiar scrapbook]))
+			description.listAppend(HTMLGenerateSpanFont("Equip the familiar scrapbook first", "red"));
+				
 		resource_entries.listAppend(ChecklistEntryMake("__item familiar scrapbook", "url", ChecklistSubentryMake(familiar_scraps / 100 + " scrapbook banishes available", "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Familiar scrapbook boring pictures banish"));
+	}
 }
+
 //Underground Fireworks Shop
 RegisterTaskGenerationFunction("IOTMUndergroundFireworksShopGenerateTasks");
 void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -50526,71 +50533,74 @@ void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_
 			resource_entries.listAppend(ChecklistEntryMake("__item fedora-mounted mountain", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Dangerous hats", description), 8).ChecklistEntrySetIDTag("Clan fireworks hat resource"));
 		}
 }
+
 // Missing: Candles
 //Industrial fire extinguisher
 RegisterResourceGenerationFunction("IOTMFireExtinguisherGenerateResource");
 void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!lookupItem("industrial fire extinguisher").have()) return;
+    if (!(available_amount($item[industrial fire extinguisher]) > 0)) return;
 		// Title
-        string [int] description;
-		string [int] options;
+	string [int] description;
+	string [int] options;
 
-		// Entries
-		int extinguisher_charge = get_property_int("_fireExtinguisherCharge");
-		boolean extinguisher_refill = get_property_boolean("_fireExtinguisherRefilled");
-		boolean is_on_fire = my_path_id() == 43; // Path 43 is Wildfire.
+	// Entries
+	int extinguisher_charge = get_property_int("_fireExtinguisherCharge");
+	boolean extinguisher_refill = get_property_boolean("_fireExtinguisherRefilled");
+	boolean is_on_fire = my_path_id() == 43; // Path 43 is Wildfire.
 
-		string url = "inventory.php?ftext=industrial+fire+extinguisher";
-		description.listAppend("Extinguish the fires in your life!");
-		if (extinguisher_charge > 5) 
-		{
-            description.listAppend(HTMLGenerateSpanOfClass("Blast the Area (5% charge):", "r_bold") + " 1 turn of passive damage.");
-			description.listAppend(HTMLGenerateSpanOfClass("Foam 'em Up (5% charge):", "r_bold") + " Stun!");
-		if (extinguisher_charge >= 10)
-			description.listAppend(HTMLGenerateSpanOfClass("Foam Yourself (10% charge):", "r_bold") + " 1 turn of +30 Hot Resist.");
-			description.listAppend(HTMLGenerateSpanOfClass("Polar Vortex (10% charge):", "r_bold") + " Hugpocket duplicator, usable more than once per fight.");
-        } 
+	string url = "inventory.php?ftext=industrial+fire+extinguisher";
+	description.listAppend("Extinguish the fires in your life!");
+	if (extinguisher_charge >= 5) 
+	{
+		description.listAppend(HTMLGenerateSpanOfClass("Blast the Area (5% charge):", "r_bold") + " 1 turn of passive damage.");
+		description.listAppend(HTMLGenerateSpanOfClass("Foam 'em Up (5% charge):", "r_bold") + " Stun!");
+	if (extinguisher_charge >= 10)
+		description.listAppend(HTMLGenerateSpanOfClass("Foam Yourself (10% charge):", "r_bold") + " 1 turn of +30 Hot Resist.");
+		description.listAppend(HTMLGenerateSpanOfClass("Polar Vortex (10% charge):", "r_bold") + " Hugpocket duplicator, usable more than once per fight.");
+	} 
+
 	
-	    
-		if (__misc_state["in run"] && is_on_fire && !get_property_boolean("_fireExtinguisherRefilled") )
-		{
-			string description = "Tank refill available";
-			resource_entries.listAppend(ChecklistEntryMake("__item fireman's helmet", "place.php?whichplace=wildfire_camp&action=wildfire_captain", ChecklistSubentryMake("Tank refill available", "", description)).ChecklistEntrySetIDTag("Tank refill resource"));
-		}   
-	
-		if (!lookupItem("industrial fire extinguisher").equipped())
-            description.listAppend(HTMLGenerateSpanFont("Equip the fire extinguisher first.", "red"));
+	if (__misc_state["in run"] && is_on_fire && !get_property_boolean("_fireExtinguisherRefilled") )
+	{
+		string description = "Tank refill available";
+		resource_entries.listAppend(ChecklistEntryMake("__item fireman's helmet", "place.php?whichplace=wildfire_camp&action=wildfire_captain", ChecklistSubentryMake("Tank refill available", "", description)).ChecklistEntrySetIDTag("Tank refill resource"));
+	}   
 
-		if (__misc_state["in run"] && my_path_id() != 25 && extinguisher_charge > 19) // Path 25 is Community Service.
+	if (!lookupItem("industrial fire extinguisher").equipped())
+		description.listAppend(HTMLGenerateSpanFont("Equip the fire extinguisher first.", "red"));
+
+	if (__misc_state["in run"] && my_path_id() != 25 && extinguisher_charge >= 20) // Path 25 is Community Service.
+	{
+		if (!get_property_boolean("fireExtinguisherBatHoleUsed") && !__quest_state["Level 4"].finished);
 		{
-			if (!get_property_boolean("fireExtinguisherBatHoleUsed") && !__quest_state["Level 4"].finished);
-			{
-				options.listAppend(HTMLGenerateSpanOfClass("Bat Hole:", "r_bold") + " Unlock next zone for free.");
-			}
-			if (!get_property_boolean("fireExtinguisherHaremUsed") && !__quest_state["Level 5"].finished);
-			{
-				options.listAppend(HTMLGenerateSpanOfClass("Cobb's Knob Harem:", "r_bold") + " Get harem outfit for free.");
-            }
-			if (!get_property_boolean("fireExtinguisherCyrptUsed") && !__quest_state["Level 7"].finished);
-			{
-				options.listAppend(HTMLGenerateSpanOfClass("The Cyrpt:", "r_bold") + " -10 Evilness in one zone.");
-            }
-			if (!get_property_boolean("fireExtinguisherChasmUsed") && !__quest_state["Level 9"].finished);
-			{
-				options.listAppend(HTMLGenerateSpanOfClass("Smut Orc Logging Camp:", "r_bold") + " +66% Blech House progress.");
-            }
-			if (!get_property_boolean("fireExtinguisherDesertUsed") && !locationAvailable($location[The Upper Chamber]) == true);
-			{
-				options.listAppend(HTMLGenerateSpanOfClass("Arid, Extrawhatever Desert:", "r_bold") + " Ultrahydrated (15 advs).");
-            }
+			options.listAppend(HTMLGenerateSpanOfClass("Bat Hole:", "r_bold") + " Unlock next zone for free.");
+		}
+		if (!get_property_boolean("fireExtinguisherHaremUsed") && !__quest_state["Level 5"].finished);
+		{
+			options.listAppend(HTMLGenerateSpanOfClass("Cobb's Knob Harem:", "r_bold") + " Get harem outfit for free.");
+		}
+		if (!get_property_boolean("fireExtinguisherCyrptUsed") && !__quest_state["Level 7"].finished);
+		{
+			options.listAppend(HTMLGenerateSpanOfClass("The Cyrpt:", "r_bold") + " -10 Evilness in one zone.");
+		}
+		if (!get_property_boolean("fireExtinguisherChasmUsed") && !__quest_state["Level 9"].finished);
+		{
+			options.listAppend(HTMLGenerateSpanOfClass("Smut Orc Logging Camp:", "r_bold") + " +66% Blech House progress.");
+		}
+		if (!get_property_boolean("fireExtinguisherDesertUsed") && !locationAvailable($location[The Upper Chamber]) == true);
+		{
+			options.listAppend(HTMLGenerateSpanOfClass("Arid, Extrawhatever Desert:", "r_bold") + " Ultrahydrated (15 advs).");
+		}
 
 		if (options.count() > 0)
 			description.listAppend(HTMLGenerateSpanOfClass("Zone-specific skills (20% charge):", "r_bold") + " 1/ascension special options in the following zones:|*-" + options.listJoinComponents("|*-"));
-        }	
-        		
+		}	
+	if ((is_on_fire && !get_property_boolean("_fireExtinguisherRefilled") || extinguisher_charge >= 5)) {
 		resource_entries.listAppend(ChecklistEntryMake("__item industrial fire extinguisher", url, ChecklistSubentryMake(extinguisher_charge + "% fire extinguisher available", "", description)).ChecklistEntrySetIDTag("industrial fire extinguisher skills resource"));
+	}
 }
+
 // Missing: Vampire Vintner
 // Missing: Daylight Shavings Helmet
 // Missing: Cold Medicine Cabinet
