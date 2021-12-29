@@ -347,7 +347,7 @@ void generateDailyResources(Checklist [int] checklists)
         boolean go_chateau = get_property_boolean("restUsingChateau");
         boolean go_away = get_property_boolean("restUsingCampAwayTent");
         string [int] order;
-        order [go_chateau ? 0 : 1] = "Chateau Magenta";
+        order [go_chateau ? 0 : 1] = "Chateau Mantegna";
         order [go_chateau ? 1 : 0] = go_away ? "Getaway Campsite" : "Your Campsite";
         order [2] = go_away ? "Your Campsite" : "Getaway Campsite";
 
@@ -359,8 +359,8 @@ void generateDailyResources(Checklist [int] checklists)
         foreach i, loc in order {
             ChecklistSubentry subentry;
             switch {
-                case loc == "Chateau Magenta" && __misc_state["Chateau Mantegna available"]:
-                    subentry.header = "At your Chateau Magenta:";
+                case loc == "Chateau Mantegna" && __misc_state["Chateau Mantegna available"]:
+                    subentry.header = "At your Chateau Mantegna:";
                     url.listAppend(__misc_state_string["resting url Chateau Mantegna"]);
 
                     stat nightstand_stat = $stat[none];
@@ -642,7 +642,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauDeskHarvested")) {
         string image_name = "__item fancy calligraphy pen";
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8).ChecklistEntrySetIDTag("Chateau magenta desk resource"));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8).ChecklistEntrySetIDTag("Chateau Mantegna desk resource"));
     }
 
     if (!get_property_boolean("_lyleFavored")) {
