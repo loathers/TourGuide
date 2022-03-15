@@ -432,11 +432,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
         resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Ten-leaf clover resource"));
     }
-    if (in_run && $item[lucky pill].have() && availableSpleen() > 0) {
-        string [int] description;
-        description.listAppend("Chew for clovers.");
-        resource_entries.listAppend(ChecklistEntryMake("__item lucky pill", "inventory.php?ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Lucky pill resource"));
-    }
     if (in_run) {
         if ($item[gameinformpowerdailypro magazine].available_amount() > 0) {
             string [int] description;
