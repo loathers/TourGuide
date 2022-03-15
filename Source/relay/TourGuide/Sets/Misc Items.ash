@@ -388,9 +388,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice a day on monsters for good-level food."), 6).ChecklistEntrySetIDTag("Pigification wand resource"));
     }
         
-    int clovers_available = $items[disassembled clover,ten-leaf clover].available_amount() + $item[disassembled clover].closet_amount() + $item[ten-leaf clover].closet_amount();
-    if (my_path_id() == PATH_BEES_HATE_YOU || my_path_id() == PATH_G_LOVER)
-        clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
+    int clovers_available = $items[11-leaf clover].available_amount() + $item[11-leaf clover].closet_amount();
+    if (my_path_id() == PATH_G_LOVER)
+        clovers_available = 0; // Ouch
     if (clovers_available > 0 && in_run) {
         ChecklistSubentry subentry;
         subentry.header = pluralise(clovers_available, "clover", "clovers") + " available";
