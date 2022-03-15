@@ -387,13 +387,16 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[wand of pigification].available_amount() > 0 && in_bad_moon() && __misc_state["in run"]) {
         resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice a day on monsters for good-level food."), 6).ChecklistEntrySetIDTag("Pigification wand resource"));
     }
-        
+    
     int clovers_available = $items[11-leaf clover].available_amount() + $item[11-leaf clover].closet_amount();
     if (my_path_id() == PATH_G_LOVER)
-        clovers_available = 0; // Ouch
+        clovers_available = 0; // This is assumed, has anyone checked using 11-leaves in G Lover yet?
+    if (have_effect($effect[Lucky!]) > 0)  // May want to change how this works, since having the effect means you have to use it immediately
+        clovers_available += 1;
+    
     if (clovers_available > 0 && in_run) {
         ChecklistSubentry subentry;
-        subentry.header = pluralise(clovers_available, "clover", "clovers") + " available";
+        subentry.header = pluralise(clovers_available, "lucky", "luckies") + " available";
         
         
         if (!__quest_state["Level 9"].state_boolean["bridge complete"])
@@ -430,7 +433,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         //put relevant tower items here
         
-        resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Ten-leaf clover resource"));
+        resource_entries.listAppend(ChecklistEntryMake("lucky", "", subentry, 7).ChecklistEntrySetCombinationTag("luckies").ChecklistEntrySetIDTag("Lucky Adventure resource"));
     }
     if (in_run) {
         if ($item[gameinformpowerdailypro magazine].available_amount() > 0) {
