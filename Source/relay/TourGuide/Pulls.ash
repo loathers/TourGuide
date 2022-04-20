@@ -588,10 +588,12 @@ void generatePullList(Checklist [int] checklists)
         if (casts < 10)
             pullable_item_list.listAppend(GPItemMake($item[blue mana], "+3 adventures each.|Probably a bad idea.", clampi(10 - casts, 0, 10)));
     }
-    if (my_path_id() == PATH_GELATINOUS_NOOB || my_path_id() == PATH_NUCLEAR_AUTUMN)
-    {
-        pullable_item_list.listAppend(GPItemMake($item[filthy lucre], "Turn into odor extractors for olfaction.", 6));
-    }
+    // Turning off because these are now useless.
+    
+    // if (my_path_id() == PATH_GELATINOUS_NOOB || my_path_id() == PATH_NUCLEAR_AUTUMN)
+    // {
+    //     pullable_item_list.listAppend(GPItemMake($item[filthy lucre], "Turn into odor extractors for olfaction.", 6));
+    // }
     if (my_path_id() != PATH_SLOW_AND_STEADY)
     {
     	//unify these... later...
