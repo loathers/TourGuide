@@ -102,7 +102,7 @@ import "relay/TourGuide/Items of the Month/2020/Box o Ghosts.ash";
 // 2021
 import "relay/TourGuide/Items of the Month/2021/Miniature Crystal Ball.ash";
 import "relay/TourGuide/Items of the Month/2021/Emotion Chip.ash";
-// Missing: Power Plant
+import "relay/TourGuide/Items of the Month/2021/Potted Power Plant.ash";
 import "relay/TourGuide/Items of the Month/2021/Backup Camera.ash";
 // Missing: Shortest-Order Cook
 import "relay/TourGuide/Items of the Month/2021/Familiar Scrapbook.ash";
@@ -110,5 +110,10 @@ import "relay/TourGuide/Items of the Month/2021/Underground Fireworks Shop.ash";
 // Missing: Candles
 import "relay/TourGuide/Items of the Month/2021/Industrial Fire Extinguisher.ash";
 // Missing: Vampire Vintner
-// Missing: Daylight Shavings Helmet
-// Missing: Cold Medicine Cabinet
+import "relay/TourGuide/Items of the Month/2021/Daylight Shavings Helmet.ash";
+import "relay/TourGuide/Items of the Month/2021/Cold Medicine Cabinet.ash";
+
+// 2022
+import "relay/TourGuide/Items of the Month/2021/Cursed Magnifying Glass.ash";
+import "relay/TourGuide/Items of the Month/2021/Cosmic Bowling Ball.ash";
+import "relay/TourGuide/Items of the Month/2021/Combat Lover Locket.ash";
