@@ -114,6 +114,6 @@ import "relay/TourGuide/Items of the Month/2021/Daylight Shavings Helmet.ash";
 import "relay/TourGuide/Items of the Month/2021/Cold Medicine Cabinet.ash";
 
 // 2022
-import "relay/TourGuide/Items of the Month/2021/Cursed Magnifying Glass.ash";
-import "relay/TourGuide/Items of the Month/2021/Cosmic Bowling Ball.ash";
-import "relay/TourGuide/Items of the Month/2021/Combat Lover Locket.ash";
+import "relay/TourGuide/Items of the Month/2022/Cursed Magnifying Glass.ash";
+import "relay/TourGuide/Items of the Month/2022/Cosmic Bowling Ball.ash";
+import "relay/TourGuide/Items of the Month/2022/Combat Lover Locket.ash";
