@@ -12,7 +12,6 @@ void SetsInit()
 void SetsGenerateResources(ChecklistEntry [int] resource_entries)
 {
 	SFamiliarsGenerateResource(resource_entries);
-	SSemirareGenerateResource(resource_entries);
 	SSkillsGenerateResource(resource_entries);
 	SMiscItemsGenerateResource(resource_entries);
 	SCopiedMonstersGenerateResource(resource_entries);
@@ -29,7 +28,6 @@ void SetsGenerateResources(ChecklistEntry [int] resource_entries)
 void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	SFamiliarsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	SSemirareGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SDispensaryGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SCouncilGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SCopiedMonstersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
