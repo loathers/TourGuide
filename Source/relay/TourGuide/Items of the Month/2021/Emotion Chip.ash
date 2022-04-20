@@ -14,7 +14,7 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
         int emotionDisappointed = clampi(3 - get_property_int("_feelDisappointedUsed"), 0, 3);
         if (emotionDisappointed > 0)
 			{
-            emotions.listAppend(emotionDisappointed + " Disappointments left. This must be the 'your parents' emotion chip.");
+            emotions.listAppend(emotionDisappointed + " Disappointments left. Your therapist has a lot of feelings about this one.");
 			}
         int emotionExcitement = clampi(3 - get_property_int("_feelExcitementUsed"), 0, 3);
         if (emotionExcitement > 0)
@@ -29,7 +29,7 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
         int emotionLost = clampi(3 - get_property_int("_feelLostUsed"), 0, 3);
         if (emotionLost > 0)
 			{
-            emotions.listAppend(emotionLost + " Losts left. 20 advs of weird Teleportitis buff.");
+            emotions.listAppend(emotionLost + " Losts left. 20 advs of a weird Teleportitis buff.");
 			}
         int emotionNervous = clampi(3 - get_property_int("_feelNervousUsed"), 0, 3);
         if (emotionNervous > 0)
@@ -56,13 +56,13 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
         int emotionEnvy = clampi(3 - get_property_int("_feelEnvyUsed"), 0, 3);
         if (emotionEnvy > 0)
 			{
-            emotions.listAppend(emotionEnvy + " Envys left. Black Ray.");
+            emotions.listAppend(emotionEnvy + " Envys left. Forces the monster to drop all items, but leaves killing it up to you.");
 			}
         int emotionNostalgic = clampi(3 - get_property_int("_feelNostalgicUsed"), 0, 3);
 		monster nostalgicMonster = (get_property_monster("lastCopyableMonster"));
         if (emotionNostalgic > 0)
 			{
-            emotions.listAppend(emotionNostalgic + " Nostalgias left. Item copying. Can currently feel nostalgic for: " + HTMLGenerateSpanFont(nostalgicMonster, "blue"));
+            emotions.listAppend(emotionNostalgic + " Nostalgias left. Copy a drop table. Can currently feel nostalgic for: " + HTMLGenerateSpanFont(nostalgicMonster, "blue"));
 			}
         int emotionSuperior = clampi(3 - get_property_int("_feelSuperiorUsed"), 0, 3);
         if (emotionSuperior > 0)
