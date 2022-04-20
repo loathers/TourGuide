@@ -389,54 +389,57 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
         
     int clovers_available = $items[disassembled clover,ten-leaf clover].available_amount() + $item[disassembled clover].closet_amount() + $item[ten-leaf clover].closet_amount();
-    if (my_path_id() == PATH_BEES_HATE_YOU || my_path_id() == PATH_G_LOVER)
-        clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
-    if (clovers_available > 0 && in_run) {
-        ChecklistSubentry subentry;
-        subentry.header = pluralise(clovers_available, "clover", "clovers") + " available";
+    // Removing clover code and swapping to lucky code like TES has.
+    // if (my_path_id() == PATH_BEES_HATE_YOU || my_path_id() == PATH_G_LOVER)
+    //     clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
+    // if (clovers_available > 0 && in_run) {
+    //     ChecklistSubentry subentry;
+    //     subentry.header = pluralise(clovers_available, "clover", "clovers") + " available";
         
         
-        if (!__quest_state["Level 9"].state_boolean["bridge complete"])
-            subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building. (3/3)", $location[the smut orc logging camp]));
-        if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && my_path_id() != PATH_G_LOVER)
-            subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues. (2)", $location[a-boo peak]));
-        if (__misc_state["wand of nagamar needed"] && $item[wand of nagamar].creatable_amount() == 0)
-            subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
-        boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
-        if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
-            subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
+    //     if (!__quest_state["Level 9"].state_boolean["bridge complete"])
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building. (3/3)", $location[the smut orc logging camp]));
+    //     if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && my_path_id() != PATH_G_LOVER)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues. (2)", $location[a-boo peak]));
+    //     if (__misc_state["wand of nagamar needed"] && $item[wand of nagamar].creatable_amount() == 0)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
+    //     boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
+    //     if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
    
-           if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
-            subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mob of zeppelin protestors NC", $location[A Mob of Zeppelin Protesters]));         
-        if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) { //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
-            subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
-        }
-        if (!__quest_state["Level 8"].state_boolean["Past mine"]) {
-            item ore_needed = __quest_state["Level 8"].state_string["ore needed"].to_item();
-            if (ore_needed == $item[none])
-                subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mining ore. (1)", $location[itznotyerzitz mine]));
-            else
-                subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability(ore_needed.capitaliseFirstLetter() + ". (1)", $location[itznotyerzitz mine]));
-        }
-        if (__misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"]) {
-            location l = $location[none];
-            if (my_primestat() == $stat[moxie])
-                l = $location[the haunted ballroom];
-            else if (my_primestat() == $stat[mysticality])
-                l = $location[the haunted bathroom];
-            else if (my_primestat() == $stat[muscle])
-                l = $location[the haunted gallery];
-            subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Powerlevelling (" + l + ")", l));
-        }
-        //put relevant tower items here
+    //        if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mob of zeppelin protestors NC", $location[A Mob of Zeppelin Protesters]));         
+    //     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) { //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
+    //     }
+    //     if (!__quest_state["Level 8"].state_boolean["Past mine"]) {
+    //         item ore_needed = __quest_state["Level 8"].state_string["ore needed"].to_item();
+    //         if (ore_needed == $item[none])
+    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mining ore. (1)", $location[itznotyerzitz mine]));
+    //         else
+    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability(ore_needed.capitaliseFirstLetter() + ". (1)", $location[itznotyerzitz mine]));
+    //     }
+    //     if (__misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"]) {
+    //         location l = $location[none];
+    //         if (my_primestat() == $stat[moxie])
+    //             l = $location[the haunted ballroom];
+    //         else if (my_primestat() == $stat[mysticality])
+    //             l = $location[the haunted bathroom];
+    //         else if (my_primestat() == $stat[muscle])
+    //             l = $location[the haunted gallery];
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Powerlevelling (" + l + ")", l));
+    //     }
+    //     //put relevant tower items here
         
-        resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Ten-leaf clover resource"));
-    }
-    if (in_run && $item[lucky pill].have() && availableSpleen() > 0) {
-        string [int] description;
-        description.listAppend("Chew for clovers.");
-        resource_entries.listAppend(ChecklistEntryMake("__item lucky pill", "inventory.php?ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Lucky pill resource"));
-    }
+    //     resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Ten-leaf clover resource"));
+    // }
+    // Turning off because lucky pills are garbage now.
+
+    // if (in_run && $item[lucky pill].have() && availableSpleen() > 0) {
+    //     string [int] description;
+    //     description.listAppend("Chew for clovers.");
+    //     resource_entries.listAppend(ChecklistEntryMake("__item lucky pill", "inventory.php?ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Lucky pill resource"));
+    // }
     if (in_run) {
         if ($item[gameinformpowerdailypro magazine].available_amount() > 0) {
             string [int] description;

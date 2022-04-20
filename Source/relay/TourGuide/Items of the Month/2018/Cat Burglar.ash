@@ -1,22 +1,34 @@
-
 RegisterResourceGenerationFunction("IOTMCatBurglarGenerateResource");
 void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!lookupFamiliar("cat burglar").familiar_is_usable()) return;
-    
-    int charges_left = CatBurglarChargesLeftToday();
-    if (charges_left > 0) {
-        string [int] description;
-        string url = "familiar.php";
+	if (!lookupFamiliar("cat burglar").familiar_is_usable()) return;
+	
+	int charges_left = CatBurglarChargesLeftToday();
+	int burglar_progress = (get_property_int("_catBurglarCharge"));
+	if (charges_left > 0)
+	{
+		string [int] description;
+  		string url = "familiar.php";
         if (my_familiar() == lookupFamiliar("cat burglar"))
-            url = "main.php?heist=1";
-        //√rusty hedge trimmers
+        	url = "main.php?heist=1";
+  		//√rusty hedge trimmers
         //√bowling ball
         //cigarette lighter, if they're doing zeppelin
         //scent glands, but only if they don't xoxoxoxo
         //√green smoke bomb
         //There are also certainly even more options.
-        description.listAppend("Obtains one item from a recent fight.");
+		description.listAppend("Obtains one item from a recent fight.");
+		if (burglar_progress >= 150)
+			description.listAppend("" + burglar_progress + "/310 charges today for 5th heist.");
+		else if (burglar_progress >= 70)
+			description.listAppend("" + burglar_progress + "/150 charges today for 4th heist.");
+		else if (burglar_progress >= 30)
+			description.listAppend("" + burglar_progress + "/70 charges today for 3rd heist.");
+		else if (burglar_progress >= 10)
+			description.listAppend("" + burglar_progress + "/30 charges today for 2nd heist.");
+		else if (burglar_progress >= 0)
+			description.listAppend("" + burglar_progress + "/10 charges today for 1st heist.");
+			
         string [int] options;
         if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE) {
             int bowling_progress = get_property_int("hiddenBowlingAlleyProgress");
