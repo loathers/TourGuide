@@ -381,12 +381,7 @@ void setUpState()
     {
 		some_olfact_available = true;
         some_reusable_olfact_available = true;
-        if ($effect[on the trail].have_effect() > 0)
-            olfacted_monster = get_property("olfactedMonster");
-    }
-    if ($item[odor extractor].available_amount() > 0)
-    {
-        some_olfact_available = true;
+        olfacted_monster = get_property("olfactedMonster");
     }
     if ($familiar[nosy nose].familiar_is_usable()) //weakened, but still relevant
     {
