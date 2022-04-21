@@ -23,7 +23,7 @@ void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries
 		if (!have_equipped($item[familiar scrapbook]))
 			description.listAppend(HTMLGenerateSpanFont("Equip the familiar scrapbook first", "red"));
 		
-		string url;
+		string url = invSearch("familiar scrapbook");
 		resource_entries.listAppend(ChecklistEntryMake("__item familiar scrapbook", url, ChecklistSubentryMake(familiar_scraps / 100 + " scrapbook banishes available", "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Familiar scrapbook boring pictures banish"));
 	}
 }

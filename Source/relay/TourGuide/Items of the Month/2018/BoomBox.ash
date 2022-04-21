@@ -1,5 +1,5 @@
-RegisterTaskGenerationFunction("IOTMBoomBoxGenerateTasks");
-void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterResourceGenerationFunction("IOTMBoomBoxGenerateTasks");
+void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] resource_entries)
 {
 	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0)
 		return;
@@ -25,7 +25,7 @@ void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 			description.listAppend(HTMLGenerateSpanFont("Boombox drop next fight", "red"));
 		}
 		description.listAppend("" + changes_left + " song changes left today.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), -11));
+		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), -11));
 	}	
 	
 	if (song == "" && changes_left > 0)
@@ -37,7 +37,7 @@ void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 			description.listAppend("Food Vibrations: extra adventures from food" + (__misc_state["in run"] ? ", +30% food drop" : "") + ".");
 		description.listAppend("Total Eclipse of Your Meat: extra meat, +30% meat.");
 		
-		optional_task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Set BoomBox song", "", description), 8));
+		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Set BoomBox song", "", description), 8));
 	}
 	
 }
