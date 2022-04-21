@@ -2,23 +2,23 @@
 RegisterTaskGenerationFunction("IOTMColdMedicineCabinetGenerateTasks");
 void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    monster gregarious_monster = get_property_monster("beGregariousMonster");
-    int fights_left = clampi(get_property_int("beGregariousFightsLeft"), 0, 3);
+	monster gregarious_monster = get_property_monster("beGregariousMonster");
+	int fights_left = clampi(get_property_int("beGregariousFightsLeft"), 0, 3);
 	string [int] description;
 	
 	if (gregarious_monster != $monster[none] && fights_left > 0) 
 	{
-        description.listAppend("Neaaaar, faaaaaaar, wherever you aaaaaaaare, I believe that the heart does go on.");
+		description.listAppend("Neaaaar, faaaaaaar, wherever you aaaaaaaare, I believe that the heart does go on.");
 		description.listAppend("Will appear in any zone, so try to find a zone with few monsters.");
 		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, "url", ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
-    }
-	#if (!__iotms_usable[lookupItem("cold medicine cabinet")])
-    #   return;
+	}
+	if (!__iotms_usable[lookupItem("cold medicine cabinet")])
+		return;
+
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
 	if (CMC_consults > 0) 
 	{
 		int next_CMC_Turn = get_property_int("_nextColdMedicineConsult");
-		int next_CMC_Timer = (next_CMC_Turn - total_turns_played());
 		string [int] description;
 		string url = "campground.php?action=workshed";
 			
@@ -26,13 +26,13 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 		{
 			description.listAppend(HTMLGenerateSpanFont("Consultation ready next turn!", "blue"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
-			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
 		}
 		else if (next_CMC_Turn <= total_turns_played())
 		{
 			description.listAppend(HTMLGenerateSpanFont("Just what the doctor ordered!", "blue"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
-			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
 		}
 	}
 }
@@ -40,52 +40,48 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 RegisterResourceGenerationFunction("IOTMColdMedicineCabinetGenerateResource");
 void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    //gregariousness
+	//gregariousness
 	int uses_remaining = get_property_int("beGregariousCharges");
 	if (uses_remaining > 0) 
 	{
-        if (true) 
-		{
-            //The section that will be sent as a stand-alone resource
-            string url;
-            
-            string [int] description;
-            description.listAppend("Be gregarious in combat, which lets you turn foe into friend!");
-			string [int] gregfriends;
-			gregfriends.listAppend("eldritch tentacle");
-			gregfriends.listAppend("lobsterfrogman");
-			gregfriends.listAppend("lynyrd");
-			gregfriends.listAppend("dense liana");
-			gregfriends.listAppend("drunk pygmy");
-			gregfriends.listAppend("war monster");
-			gregfriends.listAppend("[degenerate aftercore farming target]");
-			
-			description.listAppend("Potentially good friendships:|*" + gregfriends.listJoinComponents("|*"));
-            resource_entries.listAppend(ChecklistEntryMake("__effect Good Karma", url, ChecklistSubentryMake(uses_remaining.pluralise("gregarious handshake", "gregarious handshakes"), "", description)).ChecklistEntrySetIDTag("gregarious wanderer resource")); 
-        }
-    }
+		//The section that will be sent as a stand-alone resource
+		string url;
+		string [int] description;
+		description.listAppend("Be gregarious in combat, which lets you turn foe into friend!");
+		string [int] gregfriends;
+		gregfriends.listAppend("eldritch tentacle");
+		gregfriends.listAppend("lobsterfrogman");
+		gregfriends.listAppend("lynyrd");
+		gregfriends.listAppend("dense liana");
+		gregfriends.listAppend("drunk pygmy");
+		gregfriends.listAppend("war monster");
+		gregfriends.listAppend("[degenerate aftercore farming target]");
+		
+		description.listAppend("Potentially good friendships:|*" + gregfriends.listJoinComponents("|*"));
+		resource_entries.listAppend(ChecklistEntryMake("__effect Good Karma", url, ChecklistSubentryMake(uses_remaining.pluralise("gregarious handshake", "gregarious handshakes"), "", description)).ChecklistEntrySetIDTag("gregarious wanderer resource")); 
+	}
 	
 	//breathitin
 	int breaths_remaining = get_property_int("breathitinCharges");
 	if (breaths_remaining > 0) 
 	{
-        string [int] description;
-        description.listAppend("Outdoor fights become free.");
-        resource_entries.listAppend(ChecklistEntryMake("__item beefy pill", "", ChecklistSubentryMake(pluralise(breaths_remaining, "breathitin breath", "breathitin breaths"), "", description), -2));
-    }
+		string [int] description;
+		description.listAppend("Outdoor fights become free.");
+		resource_entries.listAppend(ChecklistEntryMake("__item beefy pill", "", ChecklistSubentryMake(pluralise(breaths_remaining, "breathitin breath", "breathitin breaths"), "", description), -2));
+	}
 	//homebodyl
 	int homebodyls_remaining = get_property_int("homebodylCharges");
 	if (homebodyls_remaining > 0) 
 	{
-        string [int] description;
-        description.listAppend("Free crafting.");
+		string [int] description;
+		description.listAppend("Free crafting.");
 		description.listAppend("Lynyrd equipment, potions, and more.");
-        resource_entries.listAppend(ChecklistEntryMake("__item excitement pill", "", ChecklistSubentryMake(pluralise(homebodyls_remaining, "homebodyl free craft", "homebodyl free crafts"), "", description)));
-    }
+		resource_entries.listAppend(ChecklistEntryMake("__item excitement pill", "", ChecklistSubentryMake(pluralise(homebodyls_remaining, "homebodyl free craft", "homebodyl free crafts"), "", description)));
+	}
 	
 	//consultation counter
 	if (!__iotms_usable[lookupItem("cold medicine cabinet")])
-        return;
+		return;
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
 	if (CMC_consults > 0) 
 	{
