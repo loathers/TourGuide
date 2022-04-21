@@ -5,12 +5,13 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 	monster gregarious_monster = get_property_monster("beGregariousMonster");
 	int fights_left = clampi(get_property_int("beGregariousFightsLeft"), 0, 3);
 	string [int] description;
+	string url;
 	
 	if (gregarious_monster != $monster[none] && fights_left > 0) 
 	{
 		description.listAppend("Neaaaar, faaaaaaar, wherever you aaaaaaaare, I believe that the heart does go on.");
 		description.listAppend("Will appear in any zone, so try to find a zone with few monsters.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, "url", ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
+		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, url, ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
 	}
 	if (!__iotms_usable[lookupItem("cold medicine cabinet")])
 		return;

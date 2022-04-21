@@ -11,18 +11,19 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 	location crystalBallZone = (get_property_location("crystalBallLocation"));
 	image_name = "__monster " + crystalBallPrediction;
 	string [int] description;
+	string url;
 	if (!lookupItem("miniature crystal ball").equipped())
 	{
 		if (crystalBallPrediction != $monster[none])
 		{
 			description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "black") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "black"));
 			description.listAppend("" + HTMLGenerateSpanFont("Equip the miniature crystal ball first!", "red") + "");
-			optional_task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
+			optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
 		}
 		else
 		{
 			description.listAppend("Equip the miniature crystal ball to predict a monster!");
-			optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "url", ChecklistSubentryMake(title, description)));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", url, ChecklistSubentryMake(title, description)));
 		}
 	}
 	else
@@ -30,12 +31,12 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 		if (crystalBallPrediction != $monster[none])
 		{
 			description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "blue") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "blue"));
-			task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
+			optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
 		}
 		else
 		{
 			description.listAppend("Adventure in a snarfblat to predict a monster!");
-			task_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", "url", ChecklistSubentryMake(title, description)));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", url, ChecklistSubentryMake(title, description)));
 		}	
 	}
 }
