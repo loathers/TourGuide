@@ -29,7 +29,8 @@ void IOTMGreyGooseResource(ChecklistEntry [int] resource_entries)
         // Return if you aren't in-run, because this tile is really not needed in aftercore. Commenting out for testing.
         // if (!__misc_state["in run"]) return;
         
-        string title;
+        string main_title;
+        string subtitle;
         string [int] description;
 
         int dronesGenerated = max(gooseWeight-5,0);
