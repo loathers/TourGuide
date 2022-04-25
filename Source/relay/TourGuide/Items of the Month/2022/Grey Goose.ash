@@ -70,7 +70,7 @@ void IOTMGreyGooseResource(ChecklistEntry [int] resource_entries)
     entry.tags.id = "Grey Goose familiar resource";
 
     ChecklistSubentry skills = gooseInfo();
-    if skills.entries.count() > 0) {
+    if (skills.entries.count() > 0) {
         entry.subentries.listAppend(skills);
     }
 
