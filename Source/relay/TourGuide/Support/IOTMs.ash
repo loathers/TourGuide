@@ -22,6 +22,8 @@ void initialiseIOTMsUsable()
             __iotms_usable[lookupItem("Asdon Martin keyfob")] = true;
         if (__campground[lookupItem("diabolic pizza cube")] > 0)
             __iotms_usable[lookupItem("diabolic pizza cube")] = true;
+        if (__campground[lookupItem("cold medicine cabinet")] > 0)
+            __iotms_usable[lookupItem("cold medicine cabinet")] = true;
 
         // Garden
         if (__campground[lookupItem("packet of mushroom spores")] > 0)
@@ -82,6 +84,9 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Distant Woods Getaway Brochure")] = true;
     if (lookupItem("Eight Days a Week Pill Keeper").available_amount() > 0)
         __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] = true;
+	if (lookupItem("cosmic bowling ball").available_amount() > 0)
+        // change to use tracking property if/when mafia adds one from coolitems.php
+        __iotms_usable[lookupItem("cosmic bowling ball")] = true;
     if ($item[clan vip lounge key].item_amount() > 0)
     {
     	//FIXME all
