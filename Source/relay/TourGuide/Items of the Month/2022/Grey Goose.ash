@@ -40,8 +40,8 @@ void IOTMGreyGooseResource(ChecklistEntry [int] resource_entries)
 
         int gooseExpToSix = max(36-$familiar[Grey Goose].experience,0);
 
-        main_title = "Goose Skills"
-        subtitle = "You have a " + gooseWeight + " pound Grey Goose."
+        main_title = "Goose Skills";
+        subtitle = "You have a " + gooseWeight + " pound Grey Goose.";
         // Only show descriptive stuff if the goose can use the skills (IE, weight > 5)
         if (gooseWeight > 5) 
         { 
