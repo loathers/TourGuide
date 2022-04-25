@@ -48311,7 +48311,7 @@ void IOTMLilDoctorBagGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
 
     if (doctor_bag_upgrades < 7) {
         if (title == "") {
-            title = "Upgrade your Lil' doctor bag";
+            title = "Upgrade your Lil' Doctor™ bag";
             description.listAppend("Adventure with your doctor bag equipped to get a delivery quest."); // no way to know if they "turned off" their bag
         }
         description.listAppend(pluralise(35 - doctor_bag_lights - doctor_bag_upgrades * 5, "quest", "quests") + " until bag is fully upgraded.");
@@ -48334,7 +48334,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0)
         {
-            description.listAppend("Equip the Lil'l Doctor™ bag first.");
+            description.listAppend("Equip the Lil' Doctor™ bag first.");
             url = "inventory.php?ftext=lil'+doctor";
         }
         //if (snojo_skill_entry.image_lookup_name == "")
@@ -48351,7 +48351,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0)
         {
-        	description.listAppend("Equip the Lil'l Doctor™ bag first.");
+        	description.listAppend("Equip the Lil' Doctor™ bag first.");
             url = "inventory.php?which=3";
         }
         //if (snojo_skill_entry.image_lookup_name == "")
@@ -48366,7 +48366,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         string url;
         string [int] description;
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0) {
-            description.listAppend(HTMLGenerateSpanFont("Equip the Lil'l Doctor™ bag first", "red"));
+            description.listAppend(HTMLGenerateSpanFont("Equip the Lil' Doctor™ bag first", "red"));
             url = "inventory.php?which=3";
         } else {
             description.listAppend("Free run/banish");
