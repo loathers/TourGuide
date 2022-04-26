@@ -4903,6 +4903,8 @@ void initialiseIOTMsUsable()
             __iotms_usable[lookupItem("Asdon Martin keyfob")] = true;
         if (__campground[lookupItem("diabolic pizza cube")] > 0)
             __iotms_usable[lookupItem("diabolic pizza cube")] = true;
+        if (__campground[lookupItem("cold medicine cabinet")] > 0)
+            __iotms_usable[lookupItem("cold medicine cabinet")] = true;
 
         // Garden
         if (__campground[lookupItem("packet of mushroom spores")] > 0)
@@ -4963,6 +4965,9 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Distant Woods Getaway Brochure")] = true;
     if (lookupItem("Eight Days a Week Pill Keeper").available_amount() > 0)
         __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] = true;
+    if (lookupItem("cosmic bowling ball").available_amount() > 0 || get_property_int("_cosmicBowlingSkillsUsed") > 0)
+        // change to use tracking property if/when mafia adds one from coolitems.php
+        __iotms_usable[lookupItem("cosmic bowling ball")] = true;
     if ($item[clan vip lounge key].item_amount() > 0)
     {
     	//FIXME all
@@ -26487,7 +26492,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
     }
     
-    foreach it in $items[carton of astral energy drinks,astral hot dog dinner,astral six-pack] {
+    foreach it in $items[[10882]carton of astral energy drinks,astral hot dog dinner,astral six-pack] {
         if (it.available_amount() == 0)
             continue;
         resource_entries.listAppend(ChecklistEntryMake("__item " + it, "inventory.php?ftext=" + it.replace_string(" ", "+"), ChecklistSubentryMake(pluralise(it), "", "Open for astral consumables."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Astral consumable open"));
@@ -47566,10 +47571,11 @@ void IOTMGodLobsterGenerateResource(ChecklistEntry [int] resource_entries)
     resource_entries.listAppend(ChecklistEntryMake("__familiar god lobster", url, ChecklistSubentryMake(pluralise(free_fights_left, "free God Lobster fight", "free God Lobster fights"), "", description)).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("God lobster daily fights"));
 }
 
-RegisterTaskGenerationFunction("IOTMBoomBoxGenerateTasks");
-void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterResourceGenerationFunction("IOTMBoomBoxGenerateTasks");
+void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] resource_entries)
 {
-	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0) return;
+	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0)
+		return;
 	
 	string song = get_property("boomBoxSong");
 	int changes_left = get_property_int("_boomBoxSongsLeft"); //the boys are back in town, eleven times. everyone will love it
@@ -47577,33 +47583,34 @@ void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	int boomboxProgress = get_property_int("_boomBoxFights");
 	string [int] description;
 	{
+		if (song == "")
+		{
+			song = "The Sound of Silence";
+		}
 		description.listAppend("Currently playing " + song + ", the soundtrack of your life!");
 		description.listAppend("Currently " + boomboxProgress + "/11 fights until next drop.");
 		if (boomboxProgress == 9)
 		{
-            description.listAppend(HTMLGenerateSpanFont("Boombox drop soon", "blue"));
-			task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), -11));
-        }	
-		description.listAppend("" + changes_left + " song changes left today.");
-	
+			description.listAppend(HTMLGenerateSpanFont("Boombox drop soon", "blue"));
+		}
 		if (boomboxProgress == 10)
-        {
-            description.listAppend(HTMLGenerateSpanFont("Boombox drop next fight", "red"));
-			task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), -11));
-        }
-		optional_task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), 8));
+		{
+			description.listAppend(HTMLGenerateSpanFont("Boombox drop next fight", "red"));
+		}
+		description.listAppend("" + changes_left + " song changes left today.");
+		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), -11));
 	}	
 	
 	if (song == "" && changes_left > 0)
 	{
-        string [int] description;
-        if (!__quest_state["Level 7"].finished && my_path_id() != PATH_COMMUNITY_SERVICE)
-        	description.listAppend("Eye of the Giger: Nightmare Fuel for the cyrpt.");
-        if (fullness_limit() > 0)
-	        description.listAppend("Food Vibrations: extra adventures from food" + (__misc_state["in run"] ? ", +30% food drop" : "") + ".");
-        description.listAppend("Total Eclipse of Your Meat: extra meat, +30% meat.");
-        
-        optional_task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Set BoomBox song", "", description), 8));
+		string [int] description;
+		if (!__quest_state["Level 7"].finished && my_path_id() != PATH_COMMUNITY_SERVICE)
+			description.listAppend("Eye of the Giger: Nightmare Fuel for the cyrpt.");
+		if (fullness_limit() > 0)
+			description.listAppend("Food Vibrations: extra adventures from food" + (__misc_state["in run"] ? ", +30% food drop" : "") + ".");
+		description.listAppend("Total Eclipse of Your Meat: extra meat, +30% meat.");
+		
+		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Set BoomBox song", "", description), 8));
 	}
 	
 }
@@ -48304,7 +48311,7 @@ void IOTMLilDoctorBagGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
 
     if (doctor_bag_upgrades < 7) {
         if (title == "") {
-            title = "Upgrade your Lil' doctor bag";
+            title = "Upgrade your Lil' Doctor™ bag";
             description.listAppend("Adventure with your doctor bag equipped to get a delivery quest."); // no way to know if they "turned off" their bag
         }
         description.listAppend(pluralise(35 - doctor_bag_lights - doctor_bag_upgrades * 5, "quest", "quests") + " until bag is fully upgraded.");
@@ -48327,7 +48334,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0)
         {
-            description.listAppend("Equip the Lil'l Doctor™ bag first.");
+            description.listAppend("Equip the Lil' Doctor™ bag first.");
             url = "inventory.php?ftext=lil'+doctor";
         }
         //if (snojo_skill_entry.image_lookup_name == "")
@@ -48344,7 +48351,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0)
         {
-        	description.listAppend("Equip the Lil'l Doctor™ bag first.");
+        	description.listAppend("Equip the Lil' Doctor™ bag first.");
             url = "inventory.php?which=3";
         }
         //if (snojo_skill_entry.image_lookup_name == "")
@@ -48359,7 +48366,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         string url;
         string [int] description;
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0) {
-            description.listAppend(HTMLGenerateSpanFont("Equip the Lil'l Doctor™ bag first", "red"));
+            description.listAppend(HTMLGenerateSpanFont("Equip the Lil' Doctor™ bag first", "red"));
             url = "inventory.php?which=3";
         } else {
             description.listAppend("Free run/banish");
@@ -50088,33 +50095,30 @@ void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTMCommerceGhostGenerateTasks");
 void IOTMCommerceGhostGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    item commerce_item = get_property_item("commerceGhostItem");
+	item commerce_item = get_property_item("commerceGhostItem");
 	int commerce_statgain1 = my_level() * 20;
 	int commerce_statgain2 = my_level() * 25;
-	#if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE)
+	if (__misc_state["in run"] && $familiar[Ghost of Crimbo Commerce].familiar_is_usable())
 	{
 		// Title
-        int commerceCombats = get_property_int("commerceGhostCombats");
 		string url = "familiar.php";
-		string title = commerceCombats + "/11 Commerce Ghost combats";
-        string [int] description;
+		string title = get_property("commerceGhostCombats") + "/11 Commerce Ghost combats";
+		string [int] description;
 		description.listAppend(HTMLGenerateSpanFont("Don't", "red") + " " + HTMLGenerateSpanFont("ask", "green") + " " + HTMLGenerateSpanFont("questions,", "red") + " " + HTMLGenerateSpanFont("just", "green") + " " + HTMLGenerateSpanFont("consume", "red") + " " + HTMLGenerateSpanFont("product", "green") + " " + HTMLGenerateSpanFont("and", "red") + " " + HTMLGenerateSpanFont("then", "green") + " " + HTMLGenerateSpanFont("get", "red") + " " + HTMLGenerateSpanFont("excited", "green") + " " + HTMLGenerateSpanFont("for", "red") + " " + HTMLGenerateSpanFont("new", "green") + " " + HTMLGenerateSpanFont("products.", "red"));
 		description.listAppend("Gain ~" + commerce_statgain1 + "-" + commerce_statgain2 + " to all 3 substats.");
 		description.listAppend("Wins, losses, banishes, anything works.");
-        // Subtitle
-        string subtitle = "";
 		
 		if (commerce_item != $item[none]) 
 		{
 			string title = "Give yourself the gift of getting!";
-				description.listAppend(HTMLGenerateSpanFont("Buy", "red") + " " + HTMLGenerateSpanFont("buy ", "green") + " " + HTMLGenerateSpanFont("buy", "red") + " " + HTMLGenerateSpanFont("buy ", "green") + " " + HTMLGenerateSpanFont("buy!", "red"));
+			description.listAppend(HTMLGenerateSpanFont("Buy", "red") + " " + HTMLGenerateSpanFont("buy ", "green") + " " + HTMLGenerateSpanFont("buy", "red") + " " + HTMLGenerateSpanFont("buy ", "green") + " " + HTMLGenerateSpanFont("buy!", "red"));
 			
-				string url = "mall.php?justitems=0&pudnuggler=%22" + commerce_item + "%22";
+			string url = "mall.php?justitems=0&pudnuggler=%22" + commerce_item + "%22";
 			
-				description.listAppend("Buy " + commerce_item + " to get ~" + commerce_statgain1 + "-" + commerce_statgain2 + " to all 3 substats!");
-				description.listAppend(HTMLGenerateSpanFont("Buy", "green") + " " + HTMLGenerateSpanFont("buy ", "red") + " " + HTMLGenerateSpanFont("buy ", "green") + " " + HTMLGenerateSpanFont("buy", "red") + " " + HTMLGenerateSpanFont("buy!", "green"));
+			description.listAppend("Buy " + commerce_item + " to get ~" + commerce_statgain1 + "-" + commerce_statgain2 + " to all 3 substats!");
+			description.listAppend(HTMLGenerateSpanFont("Buy", "green") + " " + HTMLGenerateSpanFont("buy ", "red") + " " + HTMLGenerateSpanFont("buy ", "green") + " " + HTMLGenerateSpanFont("buy", "red") + " " + HTMLGenerateSpanFont("buy!", "green"));
 		
-				task_entries.listAppend(ChecklistEntryMake("__familiar Ghost of Crimbo Commerce", url, ChecklistSubentryMake(title, description), -11));
+			task_entries.listAppend(ChecklistEntryMake("__familiar Ghost of Crimbo Commerce", url, ChecklistSubentryMake(title, description), -11));
 		}
 		optional_task_entries.listAppend(ChecklistEntryMake("__familiar Ghost of Crimbo Commerce", url, ChecklistSubentryMake(title, description)));
 	}
@@ -50123,41 +50127,45 @@ void IOTMCommerceGhostGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 // 2021
 //2021
 //Miniature Crystal ball
-RegisterTaskGenerationFunction("IOTMCrystalBallGenerateTasks");
-void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterResourceGenerationFunction("IOTMCrystalBallGenerateTasks");
+void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] resource_entries)
 {
-		string title;
-		title = "Miniature crystal ball monster prediction";
-		string image_name = "__item miniature crystal ball";
-		monster crystalBallPrediction = (get_property_monster("crystalBallMonster"));
-		location crystalBallZone = (get_property_location("crystalBallLocation"));
-		image_name = "__monster " + crystalBallPrediction;
-		string [int] description;
-            if (!lookupItem("miniature crystal ball").equipped())
-            {
-				if (crystalBallPrediction != $monster[none])
-				{
-					description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "black") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "black"));
-					description.listAppend("" + HTMLGenerateSpanFont("Equip the miniature crystal ball first!", "red") + "");
-					optional_task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
-				}
-				else
-					description.listAppend("Equip the miniature crystal ball to predict a monster!");
-					optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "url", ChecklistSubentryMake(title, description)));
-			}
-            else
-			{
-                if (crystalBallPrediction != $monster[none])
-				{
-					description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "blue") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "blue"));
-					task_entries.listAppend(ChecklistEntryMake(image_name, "url", ChecklistSubentryMake(title, description), -11));
-				}
-				else
-				{
-					description.listAppend("Adventure in a snarfblat to predict a monster!");
-					task_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", "url", ChecklistSubentryMake(title, description)));
-				}	
-			}	
+	if (lookupItem("miniature crystal ball").available_amount() == 0)
+		return;
+	string title = "Miniature crystal ball monster prediction";
+	string image_name = "__item miniature crystal ball";
+	monster crystalBallPrediction = (get_property_monster("crystalBallMonster"));
+	location crystalBallZone = (get_property_location("crystalBallLocation"));
+	image_name = "__monster " + crystalBallPrediction;
+	string [int] description;
+	string url = invSearch("miniature crystal ball");
+	if (!lookupItem("miniature crystal ball").equipped())
+	{
+		if (crystalBallPrediction != $monster[none])
+		{
+			description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "black") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "black"));
+			description.listAppend("" + HTMLGenerateSpanFont("Equip the miniature crystal ball first!", "red") + "");
+			resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
+		}
+		else
+		{
+			description.listAppend("Equip the miniature crystal ball to predict a monster!");
+			resource_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", url, ChecklistSubentryMake(title, description)));
+		}
+	}
+	else
+	{
+		if (crystalBallPrediction != $monster[none])
+		{
+			description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "blue") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "blue"));
+			resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
+		}
+		else
+		{
+			description.listAppend("Adventure in a snarfblat to predict a monster!");
+			resource_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", url, ChecklistSubentryMake(title, description)));
+		}	
+	}
 }
 //Emotion Chip
 RegisterResourceGenerationFunction("IOTMEmotionChipGenerateResource");
@@ -50251,23 +50259,28 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterResourceGenerationFunction("IOTMPowerPlantGenerateResource");
 void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!lookupItem("potted power plant").have()) return;
+	if (!lookupItem("potted power plant").have())
+		return;
+	// Title
+	string main_title = "Power plant batteries";
+	string [int] description;
+	string batteriesToHarvest = (get_property("_pottedPowerPlant"));
+	// Entries
+	if (batteriesToHarvest != "0,0,0,0,0,0,0")
 	{
-		// Title
-        string main_title = "Power plant batteries";
-		string [int] description;
-		string batteriesToHarvest = (get_property("_pottedPowerPlant"));
-		// Entries
-		if (batteriesToHarvest != "0,0,0,0,0,0,0")
-		{
-			string [int] harvest;
-			harvest.listAppend("Harvest your potted power plant batteries.");
-			resource_entries.listAppend(ChecklistEntryMake("__item potted power plant", "inv_use.php?pwd=" + my_hash() + "&whichitem=10738", ChecklistSubentryMake("Power plant batteries", "", harvest), 1));
-		}
+		string [int] harvest;
+		harvest.listAppend("Harvest your potted power plant batteries.");
+		resource_entries.listAppend(ChecklistEntryMake("__item potted power plant", "inv_use.php?pwd=" + my_hash() + "&whichitem=10738", ChecklistSubentryMake("Power plant batteries", "", harvest), 1));
+	}
 
-		int batteryTotalCharge;
-		for i from 1 to 6
+	int batteryTotalCharge;
+	string url;
+	for i from 1 to 6
+	{
 		batteryTotalCharge += i*available_amount(to_item(10738+i));
+	}
+	if (batteryTotalCharge > 3)
+	{
 		description.listAppend(HTMLGenerateSpanFont("This free kill is also a yellow ray!", "orange"));
 		if (batteriesToHarvest != "0,0,0,0,0,0,0") {
 			description.listAppend("(Harvest your batteries for a more accurate count.)");
@@ -50275,7 +50288,7 @@ void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 		description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 5, "r_bold") + " lantern batteries for +100% item drops.");
 		description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 6, "r_bold") + " car batteries for +100% item/meat drops.");
 		description.listAppend("Total charge: " + HTMLGenerateSpanOfClass(batteryTotalCharge, "r_bold") + "");
-		resource_entries.listAppend(ChecklistEntryMake("__item eternal car battery", "url", ChecklistSubentryMake(batteryTotalCharge / 4 + " shocking licks available", "", description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Shocking lick free kill"));
+		resource_entries.listAppend(ChecklistEntryMake("__item eternal car battery", url, ChecklistSubentryMake((get_property_int("shockingLickCharges") + (batteryTotalCharge / 4)) + " shocking licks available", "", description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Shocking lick free kill"));
 	}
 }
 //Backup Camera
@@ -50327,16 +50340,18 @@ void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries
 	if (available_amount($item[familiar scrapbook]) > 0) {
 		if (familiar_scraps < 100) {
 			description.listAppend(familiar_scraps + " /100 scraps until a banish is available.");
-		} 
-		else {
+		}
+		else
+		{
 			description.listAppend(familiar_scraps + " scraps collected.");
 		}
 
 		description.listAppend("Charge up your familiar scrapbook by letting familiars act in combat.");
 		if (!have_equipped($item[familiar scrapbook]))
 			description.listAppend(HTMLGenerateSpanFont("Equip the familiar scrapbook first", "red"));
-				
-		resource_entries.listAppend(ChecklistEntryMake("__item familiar scrapbook", "url", ChecklistSubentryMake(familiar_scraps / 100 + " scrapbook banishes available", "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Familiar scrapbook boring pictures banish"));
+		
+		string url = invSearch("familiar scrapbook");
+		resource_entries.listAppend(ChecklistEntryMake("__item familiar scrapbook", url, ChecklistSubentryMake(familiar_scraps / 100 + " scrapbook banishes available", "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Familiar scrapbook boring pictures banish"));
 	}
 }
 
@@ -50549,26 +50564,27 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 	}
 }
 //Cold Medicine Cabinet
-RegisterTaskGenerationFunction("IOTMColdMedicineCabinetGenerateTasks");
-void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+RegisterResourceGenerationFunction("IOTMColdMedicineCabinetGenerateTasks");
+void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] resource_entries)
 {
-    monster gregarious_monster = get_property_monster("beGregariousMonster");
-    int fights_left = clampi(get_property_int("beGregariousFightsLeft"), 0, 3);
+	monster gregarious_monster = get_property_monster("beGregariousMonster");
+	int fights_left = clampi(get_property_int("beGregariousFightsLeft"), 0, 3);
 	string [int] description;
+	string url;
 	
 	if (gregarious_monster != $monster[none] && fights_left > 0) 
 	{
-        description.listAppend("Neaaaar, faaaaaaar, wherever you aaaaaaaare, I believe that the heart does go on.");
+		description.listAppend("Neaaaar, faaaaaaar, wherever you aaaaaaaare, I believe that the heart does go on.");
 		description.listAppend("Will appear in any zone, so try to find a zone with few monsters.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, "url", ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
-    }
-	#if (!__iotms_usable[lookupItem("cold medicine cabinet")])
-    #   return;
+		resource_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, url, ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
+	}
+	if (!__iotms_usable[lookupItem("cold medicine cabinet")])
+		return;
+
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
 	if (CMC_consults > 0) 
 	{
 		int next_CMC_Turn = get_property_int("_nextColdMedicineConsult");
-		int next_CMC_Timer = (next_CMC_Turn - total_turns_played());
 		string [int] description;
 		string url = "campground.php?action=workshed";
 			
@@ -50576,13 +50592,13 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 		{
 			description.listAppend(HTMLGenerateSpanFont("Consultation ready next turn!", "blue"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
-			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
+			resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
 		}
 		else if (next_CMC_Turn <= total_turns_played())
 		{
 			description.listAppend(HTMLGenerateSpanFont("Just what the doctor ordered!", "blue"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
-			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
+			resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
 		}
 	}
 }
@@ -50590,52 +50606,48 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 RegisterResourceGenerationFunction("IOTMColdMedicineCabinetGenerateResource");
 void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    //gregariousness
+	//gregariousness
 	int uses_remaining = get_property_int("beGregariousCharges");
 	if (uses_remaining > 0) 
 	{
-        if (true) 
-		{
-            //The section that will be sent as a stand-alone resource
-            string url;
-            
-            string [int] description;
-            description.listAppend("Be gregarious in combat, which lets you turn foe into friend!");
-			string [int] gregfriends;
-			gregfriends.listAppend("eldritch tentacle");
-			gregfriends.listAppend("lobsterfrogman");
-			gregfriends.listAppend("lynyrd");
-			gregfriends.listAppend("dense liana");
-			gregfriends.listAppend("drunk pygmy");
-			gregfriends.listAppend("war monster");
-			gregfriends.listAppend("[degenerate aftercore farming target]");
-			
-			description.listAppend("Potentially good friendships:|*" + gregfriends.listJoinComponents("|*"));
-            resource_entries.listAppend(ChecklistEntryMake("__effect Good Karma", url, ChecklistSubentryMake(uses_remaining.pluralise("gregarious handshake", "gregarious handshakes"), "", description)).ChecklistEntrySetIDTag("gregarious wanderer resource")); 
-        }
-    }
+		//The section that will be sent as a stand-alone resource
+		string url;
+		string [int] description;
+		description.listAppend("Be gregarious in combat, which lets you turn foe into friend!");
+		string [int] gregfriends;
+		gregfriends.listAppend("eldritch tentacle");
+		gregfriends.listAppend("lobsterfrogman");
+		gregfriends.listAppend("lynyrd");
+		gregfriends.listAppend("dense liana");
+		gregfriends.listAppend("drunk pygmy");
+		gregfriends.listAppend("war monster");
+		gregfriends.listAppend("[degenerate aftercore farming target]");
+		
+		description.listAppend("Potentially good friendships:|*" + gregfriends.listJoinComponents("|*"));
+		resource_entries.listAppend(ChecklistEntryMake("__effect Good Karma", url, ChecklistSubentryMake(uses_remaining.pluralise("gregarious handshake", "gregarious handshakes"), "", description)).ChecklistEntrySetIDTag("gregarious wanderer resource")); 
+	}
 	
 	//breathitin
 	int breaths_remaining = get_property_int("breathitinCharges");
 	if (breaths_remaining > 0) 
 	{
-        string [int] description;
-        description.listAppend("Outdoor fights become free.");
-        resource_entries.listAppend(ChecklistEntryMake("__item beefy pill", "", ChecklistSubentryMake(pluralise(breaths_remaining, "breathitin breath", "breathitin breaths"), "", description), -2));
-    }
+		string [int] description;
+		description.listAppend("Outdoor fights become free.");
+		resource_entries.listAppend(ChecklistEntryMake("__item beefy pill", "", ChecklistSubentryMake(pluralise(breaths_remaining, "breathitin breath", "breathitin breaths"), "", description), -2));
+	}
 	//homebodyl
 	int homebodyls_remaining = get_property_int("homebodylCharges");
 	if (homebodyls_remaining > 0) 
 	{
-        string [int] description;
-        description.listAppend("Free crafting.");
+		string [int] description;
+		description.listAppend("Free crafting.");
 		description.listAppend("Lynyrd equipment, potions, and more.");
-        resource_entries.listAppend(ChecklistEntryMake("__item excitement pill", "", ChecklistSubentryMake(pluralise(homebodyls_remaining, "homebodyl free craft", "homebodyl free crafts"), "", description)));
-    }
+		resource_entries.listAppend(ChecklistEntryMake("__item excitement pill", "", ChecklistSubentryMake(pluralise(homebodyls_remaining, "homebodyl free craft", "homebodyl free crafts"), "", description)));
+	}
 	
 	//consultation counter
 	if (!__iotms_usable[lookupItem("cold medicine cabinet")])
-        return;
+		return;
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
 	if (CMC_consults > 0) 
 	{
@@ -50708,16 +50720,19 @@ void IOTYCursedMagnifyingGlassGenerateTasks(ChecklistEntry [int] task_entries, C
 RegisterTaskGenerationFunction("IOTMCosmicBowlingBallGenerateTasks");
 void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+	if (!__iotms_usable[lookupItem("cosmic bowling ball")])
+		return;
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
 	int bowlingCooldown2 = bowlingUses * 2 + 6;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
+	string url;
 	if (bowlingCooldown == 0)
 	{
 		string [int] description;
 		string main_title = "Cosmic bowling ball usable";
 		description.listAppend(HTMLGenerateSpanFont("You can bowl again next turn!", "blue"));
 		description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
-		task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", "url", ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), -11));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), -11));
 	}
 }
 
@@ -50725,42 +50740,46 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 RegisterResourceGenerationFunction("IOTMCosmicBowlingBallGenerateResource");
 void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries)
 {
+	if (!__iotms_usable[lookupItem("cosmic bowling ball")])
+		return;
+
 	// Entries
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
 	int bowlingCooldown2 = bowlingUses * 2 + 6;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
+	string url;
 	if (bowlingCooldown == -1)
 	{
-        string main_title = "Cosmic bowling ball usable";
+		string main_title = "Cosmic bowling ball usable";
 		string [int] description;
-        description.listAppend("Hit a strike! Knock the competition down a pin with your hole-y ball.");
+		description.listAppend("Hit a strike! Knock the competition down a pin with your hole-y ball.");
 		description.listAppend("Give yourself an item/meat buff, gain stats in a zone, or banish for the next " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " combats.");
 		
 		resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", "", ChecklistSubentryMake("Cosmic bowling ball banish", "", "Has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration and cooldown.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball banish"));
-		resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", "url", ChecklistSubentryMake("Cosmic bowling ball use available", "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
+		resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball use available", "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 	}
 	if (bowlingCooldown > -1)
 	{
-        string main_title = HTMLGenerateSpanFont("" + bowlingCooldown, "red") + " combats until cosmic bowling ball returns";
+		string main_title = HTMLGenerateSpanFont("" + bowlingCooldown, "red") + " combats until cosmic bowling ball returns";
 		string [int] description;
-        Banish banish_entry = BanishByName("Bowl a Curveball");
-        int turns_left_of_banish = banish_entry.BanishTurnsLeft();
-        if (turns_left_of_banish > 0)
-        {
-            description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
-        }
+		Banish banish_entry = BanishByName("Bowl a Curveball");
+		int turns_left_of_banish = banish_entry.BanishTurnsLeft();
+		if (turns_left_of_banish > 0)
+		{
+			description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
+		}
 		if (bowlingCooldown == 0)
 		{
 			description.listAppend(HTMLGenerateSpanFont("You can bowl again next turn!", "blue"));
 			description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
-			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", "url", ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), -11).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
-			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", "url", ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
+			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), -11).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
+			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 		}
 		else
 		{	
 			description.listAppend("Bowling ball in the sky with your diamonds.");
-			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", "url", ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
-			resource_entries.listAppend(ChecklistEntryMake("__effect trash-wrapped", "url", ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
+			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
+			resource_entries.listAppend(ChecklistEntryMake("__effect trash-wrapped", url, ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 		}
 	}
 }
@@ -50880,6 +50899,86 @@ void IOTMCombatLoversLocketGenerateResource(ChecklistEntry [int] resource_entrie
 			}
 		}
 	}
+}
+//Grey Goose
+RegisterTaskGenerationFunction("IOTMGreyGooseGenerateTasks");
+void IOTMGreyGooseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    // This tile just posts up a task if your Goose is hefty enough to snag adventures, and you have it equipped.
+    int gooseWeight = min(floor(sqrt($familiar[Grey Goose].experience)),20);
+    string [int] description;
+
+     if (my_familiar() != lookupFamiliar("Grey Goose")) return;
+
+    // Surprisingly, the "class" is called Grey Goo even if the path is Grey You. This is not a typo!
+    if (my_class() == $class[grey goo] && gooseWeight > 5) 
+    {
+        string main_title = HTMLGenerateSpanFont("GOOSO is 6 pounds or higher", "grey");
+        description.listAppend("GOOSO IS LIT.");
+        description.listAppend("Re-Process a bunch of matter to gain a bunch of adventures, Grey You.");
+        task_entries.listAppend(ChecklistEntryMake("__familiar grey goose", "", ChecklistSubentryMake(main_title, "", description), -11));
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMGreyGooseResource");
+void IOTMGreyGooseResource(ChecklistEntry [int] resource_entries)
+{
+    ChecklistSubentry gooseInfo() {
+
+        int gooseDrones = get_property_int("gooseDronesRemaining");
+        int gooseWeight = min(floor(sqrt($familiar[Grey Goose].experience)),20);
+        
+        // Return if you aren't in-run, because this tile is really not needed in aftercore. Commenting out for testing.
+        // if (!__misc_state["in run"]) return;
+        
+        string main_title;
+        string subtitle;
+        string [int] description;
+
+        int dronesGenerated = max(gooseWeight-5,0);
+        int meatifyAmount = dronesGenerated**2;
+        int statGenerated = dronesGenerated**3;
+        int statGeneratedGoo = dronesGenerated**2;
+
+        int gooseExpToSix = max(36-$familiar[Grey Goose].experience,0);
+
+        main_title = "Goose Skills";
+        subtitle = "You have a " + gooseWeight + " pound Grey Goose.";
+        // Only show descriptive stuff if the goose can use the skills (IE, weight > 5)
+        if (gooseWeight > 5) 
+        { 
+            if (my_class() == $class[grey goo]) 
+            {
+                description.listAppend(HTMLGenerateSpanOfClass("Re-Process Matter:", "r_bold") + " Get adventures from a monster, again!");
+                description.listAppend(HTMLGenerateSpanOfClass("Gain Stats:", "r_bold") + " Process for Protein, Energy, or Pomade for " + statGeneratedGoo + " mus/mys/mox.");
+            } else {
+                description.listAppend(HTMLGenerateSpanOfClass("Gain Stats:", "r_bold") + " Process for Protein, Energy, or Pomade for " + statGenerated + " mus/mys/mox substats.");
+            }
+            description.listAppend(HTMLGenerateSpanOfClass("Replication Drones:", "r_bold") + " Copy " + dronesGenerated + " items from monsters via drone warfare.");
+            description.listAppend(HTMLGenerateSpanOfClass("Meatify Matter:", "r_bold") + " Get " + meatifyAmount + " meat, instantly.");
+        } else {
+            description.listAppend("You can't use goose skills yet. Darn. Gain " + gooseExpToSix + " familiar XP to embrace GOOSO.");
+        }
+
+        return ChecklistSubentryMake(main_title, subtitle, description);
+
+    }
+    
+    // Return if the goose is not usable in your path (or you don't own it)
+    if (!lookupFamiliar("Grey Goose").familiar_is_usable()) return;
+
+    ChecklistEntry entry;
+    entry.image_lookup_name = "__familiar grey goose";
+    entry.tags.id = "Grey Goose familiar resource";
+
+    ChecklistSubentry skills = gooseInfo();
+    if (skills.entries.count() > 0) {
+        entry.subentries.listAppend(skills);
+    }
+
+    if (entry.subentries.count() > 0) {
+        resource_entries.listAppend(entry);
+    }
 }
 
 
@@ -53902,9 +54001,9 @@ void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, Chec
         {
             description.listAppend("Jet-Powered Skis: +30% init");
         }
-        if (!get_property_boolean("bondSpleen") && social_capital_available >= 5 && $item[astral energy drink].available_amount() >= 2 && bond_points >= 9)
+        if (!get_property_boolean("bondSpleen") && social_capital_available >= 5 && bond_points >= 9)
         {
-            description.listAppend("Robo-Speen: Consume two AEDs in a day.");
+            description.listAppend("Robo-Speen: +2 max spleen.");
         }
             
             
@@ -53975,8 +54074,6 @@ void PathExplosionsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (isotope_amount >= 10 && !$item[antique accordion].have() && my_class() != $class[accordion thief])
             description.listAppend("<strong>antique accordion</strong> - casting AT buffs.");
-        if (isotope_amount >= 20 && availableSpleen() > $item[lucky pill].available_amount())
-            description.listAppend("<strong>lucky pill</strong> - extra clovers, super useful.");
         if (isotope_amount >= 25 && !lookupItem("signal jammer").have())
             description.listAppend("<strong>signal jammer</strong> - deals with those troublesome wandering skeletons. Equipped this in non-delay-burning areas.");
         if (isotope_amount >= 25 && !lookupItem("space shield").have() && ($item[digital key].have() || $item[white pixel].available_amount() >= 30))
