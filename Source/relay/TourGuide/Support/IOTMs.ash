@@ -94,7 +94,7 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[clan floundry]] = true;
     }
     //Can't use many things in G-Lover
-    if (my_path_id() = PATH_G_LOVER)
+    if (my_path_id() == PATH_G_LOVER)
     {
         __iotms_usable[lookupItem("Bird-a-Day calendar")] = false;
         __iotms_usable[lookupItem("Deck of Every Card")] = false;
