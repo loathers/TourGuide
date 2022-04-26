@@ -84,7 +84,7 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Distant Woods Getaway Brochure")] = true;
     if (lookupItem("Eight Days a Week Pill Keeper").available_amount() > 0)
         __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] = true;
-	if (lookupItem("cosmic bowling ball").available_amount() > 0)
+    if (lookupItem("cosmic bowling ball").available_amount() > 0 || get_property_int("_cosmicBowlingSkillsUsed") > 0)
         // change to use tracking property if/when mafia adds one from coolitems.php
         __iotms_usable[lookupItem("cosmic bowling ball")] = true;
     if ($item[Clan VIP Lounge key].item_amount() > 0)
