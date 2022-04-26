@@ -19,7 +19,7 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
     	url = "inventory.php?which=2";
         latte_needs_equipping = true;
     }
-    if (banishes_available > 0)
+    if (banishes_available > 0 && $skill[Throw Latte on Opponent].skill_is_usable())
     {
     	string banish_url = url;
     	string [int] description;
@@ -49,7 +49,7 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(HTMLGenerateSpanFont("Use banish first.", "red"));
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(refills_remaining, "latte refill", "latte refills"), "", description));
     }
-    if (copies_available > 0)
+    if (copies_available > 0 && $skill[Offer Latte to Opponent].skill_is_usable())
     {
         string [int] description;
         description.listAppend("Offer Latte to Opponent in combat.");

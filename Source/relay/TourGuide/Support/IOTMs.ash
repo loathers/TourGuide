@@ -87,11 +87,20 @@ void initialiseIOTMsUsable()
 	if (lookupItem("cosmic bowling ball").available_amount() > 0)
         // change to use tracking property if/when mafia adds one from coolitems.php
         __iotms_usable[lookupItem("cosmic bowling ball")] = true;
-    if ($item[clan vip lounge key].item_amount() > 0)
+    if ($item[Clan VIP Lounge key].item_amount() > 0)
     {
     	//FIXME all
     	__iotms_usable[lookupItem("Clan Carnival Game")] = true;
         __iotms_usable[$item[clan floundry]] = true;
+    }
+    //Can't use many things in G-Lover
+    if (my_path_id() = PATH_G_LOVER)
+    {
+        __iotms_usable[lookupItem("Bird-a-Day calendar")] = false;
+        __iotms_usable[lookupItem("Deck of Every Card")] = false;
+        __iotms_usable[lookupItem("Fourth of May Cosplay Saber")] = false;
+        __iotms_usable[lookupItem("Potted power plant")] = false;
+        __iotms_usable[lookupItem("Underground Fireworks Shop")] = false;  
     }
     //Remove non-standard:
     foreach it in __iotms_usable

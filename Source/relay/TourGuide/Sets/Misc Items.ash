@@ -157,7 +157,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 
 
         int banishes_available = 5 - get_property_int("_pantsgivingBanish");
-        if (banishes_available > 0) {
+        if (banishes_available > 0 && $skill[Talk About Politics].skill_is_usable()) {
             //subentry.entries.listAppend(pluralise(banishes_available, "banish", "banishes") + " available.");
             string [int] tasks;
             if ($item[pantsgiving].equipped_amount() == 0)

@@ -1,7 +1,7 @@
 
 
-RegisterResourceGenerationFunction("IOTMZutaraGenerateResource");
-void IOTMZutaraGenerateResource(ChecklistEntry [int] resource_entries)
+RegisterResourceGenerationFunction("IOTMZataraGenerateResource");
+void IOTMZataraGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["VIP available"] || !lookupItem("Clan Carnival Game").is_unrestricted())
         return;
