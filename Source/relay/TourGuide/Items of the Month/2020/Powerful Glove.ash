@@ -1,8 +1,7 @@
 RegisterResourceGenerationFunction("IOTMPowerfulGloveGenerateResource");
 void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__iotms_usable[$item[Powerful Glove]])
-        return;
+    if (!__iotms_usable[$item[Powerful Glove]]) return;
 
     int chargeLeft = 100 - get_property_int("_powerfulGloveBatteryPowerUsed");
 

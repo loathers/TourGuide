@@ -1,8 +1,7 @@
 RegisterTaskGenerationFunction("IOTMBirdADayGenerateTasks");
 void IOTMBirdADayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!__iotms_usable[$item[Bird-a-Day calendar]])
-        return;
+    if (!__iotms_usable[$item[Bird-a-Day calendar]]) return;
     if (!get_property_boolean("_canSeekBirds")) {
         string [int] description;
 

@@ -1,8 +1,7 @@
 RegisterTaskGenerationFunction("IOTMMaySaberPartyGenerateTasks");
 void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__iotms_usable[$item[Fourth of May Cosplay Saber]])
-		return;
+	if (!__iotms_usable[$item[Fourth of May Cosplay Saber]]) return;
 
     if (get_property_int("_saberMod") == 0) {
         string [int] options;

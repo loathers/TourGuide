@@ -4,7 +4,7 @@ RegisterResourceGenerationFunction("IOTMRuneSpoonGenerateResource");
 void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	item spoon = lookupItem("hewn moon-rune spoon");
-	if (!spoon.have() && spoon.closet_amount() == 0 || my_sign().to_lower_case() == "bad moon") return;
+	if (!__iotms_usable[lookupItem("hewn moon-rune spoon")] && spoon.closet_amount() == 0 || my_sign().to_lower_case() == "bad moon") return;
 	
 	if (!get_property_boolean("moonTuned"))
 	{
@@ -77,7 +77,7 @@ void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
 	        description.listAppend("Ideas:|*" + options.listJoinComponents("<hr>"));
         
         string url = "inv_use.php?whichitem=10254&pwd=" + my_hash();
-        if (!spoon.have() && spoon.closet_amount() > 0)
+        if (!__iotms_usable[lookupItem("hewn moon-rune spoon")] && spoon.closet_amount() > 0)
         	url = "closet.php?which=2";
 		resource_entries.listAppend(ChecklistEntryMake("__item " + spoon, url, ChecklistSubentryMake("Moon sign tunable", "", description), 10).ChecklistEntrySetIDTag("Roon spoon moon boon toon moon"));
 	}
