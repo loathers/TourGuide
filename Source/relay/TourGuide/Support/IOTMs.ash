@@ -83,6 +83,8 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("voter registration form")] = true;
     if (get_property_boolean("daycareOpen")) //Dec 2018
     	__iotms_usable[lookupItem("Boxing Day care package")] = true;
+    if (lookupItem("vampyric cloake").available_amount() > 0) //Mar 2019
+        __iotms_usable[lookupItem("vampyric cloake")] = true;
     if (lookupItem("Fourth of May Cosplay Saber").available_amount() > 0) //May 2019
         __iotms_usable[lookupItem("Fourth of May Cosplay Saber")] = true;    
     if (lookupItem("hewn moon-rune spoon").available_amount() > 0) //Jun 2019

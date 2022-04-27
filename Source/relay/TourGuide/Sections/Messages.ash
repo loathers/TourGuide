@@ -551,7 +551,7 @@ string generateRandomMessage()
     if (get_property_boolean("_warbearGyrocopterUsed"))
         random_messages.listAppend("[gyroseaten] => 109");
         
-    random_messages.listAppend(HTMLGenerateTagWrap("a", "&#x266b;", mapMake("class", "r_a_undecorated", "href", "http://www.kingdomofloathing.com/radio.php", "target", "_blank")));
+    //random_messages.listAppend(HTMLGenerateTagWrap("a", "&#x266b;", mapMake("class", "r_a_undecorated", "href", "http://www.kingdomofloathing.com/radio.php", "target", "_blank")));
     
     if (__misc_state_int["free rests remaining"] > 0)
         random_messages.listAppend(HTMLGenerateTagWrap("a", "dream your life away", generateMainLinkMap(__misc_state_string["resting url"])));
