@@ -115,7 +115,8 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
     }
 
 
-    if (!lookupItem("Bird-a-Day calendar").have()) return;
+    if (!__iotms_usable[$item[Bird-a-Day calendar]])
+        return;
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__effect Blessing of the Bird";

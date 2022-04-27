@@ -35,7 +35,8 @@ void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 RegisterResourceGenerationFunction("IOTMMaySaberGenerateResource");
 void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (lookupItem("Fourth of May Cosplay Saber").available_amount() == 0) return;
+	if (!__iotms_usable[$item[Fourth of May Cosplay Saber]])
+		return;
 
     int uses_remaining = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
 

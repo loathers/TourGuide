@@ -84,7 +84,9 @@ void initialiseIOTMsUsable()
     if (get_property_boolean("daycareOpen")) //Dec 2018
     	__iotms_usable[lookupItem("Boxing Day care package")] = true;
     if (lookupItem("Fourth of May Cosplay Saber").available_amount() > 0) //May 2019
-        __iotms_usable[lookupItem("Fourth of May Cosplay Saber")] = true;        
+        __iotms_usable[lookupItem("Fourth of May Cosplay Saber")] = true;    
+    if (lookupItem("hewn moon-rune spoon").available_amount() > 0) //Jun 2019
+        __iotms_usable[lookupItem("hewn moon-rune spoon")] = true; 
     if (get_property_boolean("getawayCampsiteUnlocked")) //Aug 2019
         __iotms_usable[lookupItem("Distant Woods Getaway Brochure")] = true;
     if (lookupItem("Eight Days a Week Pill Keeper").available_amount() > 0) //Oct 2019
