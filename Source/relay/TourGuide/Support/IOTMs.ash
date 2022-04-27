@@ -32,7 +32,7 @@ void initialiseIOTMsUsable()
     }
     if (florist_available() && $item[hand turkey outline].is_unrestricted()) //May 2013
         //Order of the Green Thumb Order Form is not marked as out of standard.
-    	__iotms_usable[$item[Order of the Green Thumb Order Form]] = true; 
+        __iotms_usable[$item[Order of the Green Thumb Order Form]] = true; 
     if (get_property_boolean("sleazeAirportAlways") || get_property_boolean("_sleazeAirportToday")) //May 2014
         __iotms_usable[$item[airplane charter: Spring Break Beach]] = true;
     if (get_property_boolean("spookyAirportAlways") || get_property_boolean("_spookyAirportToday")) //Oct 2014
@@ -74,7 +74,7 @@ void initialiseIOTMsUsable()
     if (lookupItem("January's Garbage Tote").available_amount() > 0) //Jan 2018
         __iotms_usable[lookupItem("January's Garbage Tote")] = true;
     if (get_property_boolean("_frToday") || get_property_boolean("frAlways")) //Apr 2018
-    	__iotms_usable[lookupItem("FantasyRealm membership packet")] = true;
+        __iotms_usable[lookupItem("FantasyRealm membership packet")] = true;
     if (get_property_boolean("_neverendingPartyToday") || get_property_boolean("neverendingPartyAlways")) //Sep 2018
         __iotms_usable[lookupItem("Neverending Party invitation envelope")] = true;
     if (lookupItem("latte lovers member's mug").available_amount() > 0) //Oct 2018
@@ -82,7 +82,7 @@ void initialiseIOTMsUsable()
     if (get_property_boolean("_voteToday") || get_property_boolean("voteAlways") || lookupItem("&quot;I Voted!&quot; sticker").available_amount() > 0) //Nov 2018
         __iotms_usable[lookupItem("voter registration form")] = true;
     if (get_property_boolean("daycareOpen")) //Dec 2018
-    	__iotms_usable[lookupItem("Boxing Day care package")] = true;
+        __iotms_usable[lookupItem("Boxing Day care package")] = true;
     if (lookupItem("vampyric cloake").available_amount() > 0) //Mar 2019
         __iotms_usable[lookupItem("vampyric cloake")] = true;
     if (lookupItem("Fourth of May Cosplay Saber").available_amount() > 0) //May 2019
@@ -103,7 +103,7 @@ void initialiseIOTMsUsable()
     if ($item[Clan VIP Lounge key].item_amount() > 0)
     {
     	//FIXME all
-    	__iotms_usable[lookupItem("Clan Carnival Game")] = true;
+        __iotms_usable[lookupItem("Clan Carnival Game")] = true;
         __iotms_usable[$item[clan floundry]] = true;
     }
     //Can't use many things in G-Lover
@@ -112,12 +112,14 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Bird-a-Day calendar")] = false;
         __iotms_usable[lookupItem("Deck of Every Card")] = false;
         __iotms_usable[lookupItem("Fourth of May Cosplay Saber")] = false;
+        __iotms_usable[lookupItem("hewn moon-rune spoon")] = false;
         __iotms_usable[lookupItem("Potted power plant")] = false;
-        __iotms_usable[lookupItem("Underground Fireworks Shop")] = false;  
+        __iotms_usable[lookupItem("Underground Fireworks Shop")] = false;
+        __iotms_usable[lookupItem("vampyric cloake")] = false;
     }
     if (my_path_id() == PATH_EXPLOSIONS) //Path 37
     {
-    	__iotms_usable[lookupItem("Spacegate access badge")] = false;
+        __iotms_usable[lookupItem("Spacegate access badge")] = false;
     }
     //Remove non-standard:
     foreach it in __iotms_usable
