@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("IOTMPowerPlantGenerateResource");
 void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!lookupItem("potted power plant").have())
+	if (!__iotms_usable[$item[Potted power plant]])
 		return;
 	// Title
 	string main_title = "Power plant batteries";
