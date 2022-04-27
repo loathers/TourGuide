@@ -5,11 +5,11 @@ void IOTMBirdADayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     if (!get_property_boolean("_canSeekBirds")) {
         string [int] description;
 
-        description.listAppend("Use your calendar to get a new skill for the day");
+        description.listAppend("Use your calendar to get a new skill for the day.");
         if (have_effect($effect[Blessing of the Bird]) > 0)
             description.listAppend(HTMLGenerateSpanFont("Still have an old blessing", "red") + "|Using the calendar will replace the old buff's modifiers with the new ones.");
 
-        optional_task_entries.listAppend(ChecklistEntryMake("__effect Blessing of the Bird", "inventory.php?ftext=bird-a-day+calendar", ChecklistSubentryMake("Discover your daily Bird.", "", description), 8).ChecklistEntrySetIDTag("Bird-a-day calendar"));
+        optional_task_entries.listAppend(ChecklistEntryMake("__effect Blessing of the Bird", "inventory.php?ftext=bird-a-day+calendar", ChecklistSubentryMake("Discover your daily Bird", "", description), 8).ChecklistEntrySetIDTag("Bird-a-day calendar"));
     }
 }
 
