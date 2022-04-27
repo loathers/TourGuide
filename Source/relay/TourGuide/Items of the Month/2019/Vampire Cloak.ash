@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("IOTMVampireCloakGenerateResource");
 void IOTMVampireCloakGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__iotms_usable[$item[vampyric cloak]])
+    if (!__iotms_usable[$item[vampyric cloake]])
         return;
     if (!(__misc_state["in run"] && in_ronin())) return;
     
