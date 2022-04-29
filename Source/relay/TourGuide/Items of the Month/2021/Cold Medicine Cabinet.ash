@@ -1,6 +1,6 @@
 //Cold Medicine Cabinet
-RegisterResourceGenerationFunction("IOTMColdMedicineCabinetGenerateTasks");
-void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] resource_entries)
+RegisterTaskGenerationFunction("IOTMColdMedicineCabinetGenerateTasks");
+void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	monster gregarious_monster = get_property_monster("beGregariousMonster");
 	int fights_left = clampi(get_property_int("beGregariousFightsLeft"), 0, 3);
@@ -11,7 +11,7 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] resource_entries)
 	{
 		description.listAppend("Neaaaar, faaaaaaar, wherever you aaaaaaaare, I believe that the heart does go on.");
 		description.listAppend("Will appear in any zone, so try to find a zone with few monsters.");
-		resource_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, url, ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
+		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, url, ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
 	}
 	if (!__iotms_usable[lookupItem("cold medicine cabinet")])
 		return;
@@ -27,13 +27,13 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] resource_entries)
 		{
 			description.listAppend(HTMLGenerateSpanFont("Consultation ready next turn!", "blue"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
-			resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
 		}
 		else if (next_CMC_Turn <= total_turns_played())
 		{
 			description.listAppend(HTMLGenerateSpanFont("Just what the doctor ordered!", "blue"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
-			resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
 		}
 	}
 }
