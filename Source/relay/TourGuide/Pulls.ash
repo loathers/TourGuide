@@ -352,7 +352,7 @@ void generatePullList(Checklist [int] checklists)
     //pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3)); //marginal now. low-skill oil peak/cyrpt?
 	
 	
-    if (!get_property_boolean("_blankoutUsed") && __misc_state["free runs usable"] && if ($item[bottle of blank-out].item_is_usable()))
+    if (!get_property_boolean("_blankoutUsed") && __misc_state["free runs usable"] && $item[bottle of blank-out].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems", 1));
 	
 	
@@ -385,7 +385,7 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	//Quest-relevant items:
-	if ($familiar[Intergnat].familiar_is_usable() && if ($item[infinite BACON machine].item_is_usable()))
+	if ($familiar[Intergnat].familiar_is_usable() && $item[infinite BACON machine].item_is_usable())
     {
         pullable_item_list.listAppend(GPItemMake($item[infinite BACON machine], "One copy/day with ~seven turns of intergnat.", 1));
     }
@@ -395,7 +395,7 @@ void generatePullList(Checklist [int] checklists)
 		
 		boxes_needed = MIN(6, boxes_needed); //bridge! farming?
 		
-		if (boxes_needed > 0 && if ($item[smut orc keepsake box].item_is_usable()))
+		if (boxes_needed > 0 && $item[smut orc keepsake box].item_is_usable())
 			pullable_item_list.listAppend(GPItemMake($item[smut orc keepsake box], "Skip level 9 bridge building.", boxes_needed));
 	}
     if (__quest_state["Level 9"].state_int["peak tests remaining"] > 0)
