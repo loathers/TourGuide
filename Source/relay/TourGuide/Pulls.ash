@@ -136,14 +136,14 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	//IOTMs:
-	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0 && $items[empty rain-doh can,can of rain-doh].item_is_usable())
+	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0 && $item[can of rain-doh].item_is_usable())
 		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
 	if ($items[empty rain-doh can,can of rain-doh,spooky putty monster].available_amount() == 0)
 		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
     if (true)
     {
         string line = "So many things!";
-        if ($item[over-the-shoulder folder holder].storage_amount() > 0)
+        if ($item[over-the-shoulder folder holder].storage_amount() > 0 && $item[over-the-shoulder folder holder].item_is_usable())
         {
             string [int] description;
             string [item] folder_descriptions;
@@ -201,20 +201,23 @@ void generatePullList(Checklist [int] checklists)
         else if ($item[buddy bjorn].available_amount() == 0)
             pullable_item_list.listAppend(GPItemMake($item[crown of thrones], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
     }
-	pullable_item_list.listAppend(GPItemMake($item[boris's helm], "+15ML/+5 familiar weight/+init/+mp regeneration/+weapon damage", 1));
+    if ($item[boris's helm].item_is_usable())
+	    pullable_item_list.listAppend(GPItemMake($item[boris's helm], "+15ML/+5 familiar weight/+init/+mp regeneration/+weapon damage", 1));
     if (__misc_state["need to level"])
     {
         pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Large stat gain, once/day.", 1));
         pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "+america", 1));
         pullable_item_list.listAppend(GPItemMake($item[the crown of ed the undying], "Various in-run modifiers. (init, HP, ML/item/meat/etc)", 1));
     }
-    pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "?", 1));
+    if ($item[v for vivala mask].item_is_usable())
+        pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "?", 1));
 	
 	if (my_primestat() == $stat[mysticality] && my_path_id() != PATH_HEAVY_RAINS) //should we only suggest this for mysticality classes?
 		pullable_item_list.listAppend(GPItemMake($item[Jarlsberg's Pan], "?", 1)); //"
 	pullable_item_list.listAppend(GPItemMake($item[loathing legion knife], "?", 1));
 	pullable_item_list.listAppend(GPItemMake($item[greatest american pants], "navel runaways|others", 1));
-	pullable_item_list.listAppend(GPItemMake($item[juju mojo mask], "?", 1));
+	if ($item[juju mojo mask].item_is_usable())
+        pullable_item_list.listAppend(GPItemMake($item[juju mojo mask], "?", 1));
     if (__misc_state["free runs usable"])
     {
         pullable_item_list.listAppend(GPItemMake($item[navel ring of navel gazing], "free runaways|easy fights", 1));
@@ -223,8 +226,10 @@ void generatePullList(Checklist [int] checklists)
 			pullable_item_list.listAppend(GPItemMake($item[mafia middle finger ring], "one free runaway/banish/day", 1));
     }
 	//pullable_item_list.listAppend(GPItemMake($item[haiku katana], "?", 1));
-	pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
-	pullable_item_list.listAppend(GPItemMake($item[jekyllin hide belt], "+variable% item", 3));
+	if ($item[bottle-rocket crossbow].item_is_usable())
+        pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
+	if ($item[jekyllin hide belt].item_is_usable())
+        pullable_item_list.listAppend(GPItemMake($item[jekyllin hide belt], "+variable% item", 3));
     
     if (__misc_state["need to level"])
     {
@@ -347,7 +352,7 @@ void generatePullList(Checklist [int] checklists)
     //pullable_item_list.listAppend(GPItemMake($item[slimy alveolus], "40 turns of +50ML (" + floor(40 * 50 * __misc_state_float["ML to mainstat multiplier"]) +" mainstat total, cave bar levelling)|1 spleen", 3)); //marginal now. low-skill oil peak/cyrpt?
 	
 	
-    if (!get_property_boolean("_blankoutUsed") && __misc_state["free runs usable"])
+    if (!get_property_boolean("_blankoutUsed") && __misc_state["free runs usable"] && if ($item[bottle of blank-out].item_is_usable()))
         pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "run away from your problems", 1));
 	
 	
@@ -380,7 +385,7 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	//Quest-relevant items:
-	if ($familiar[Intergnat].familiar_is_usable() && my_path_id() != PATH_G_LOVER)
+	if ($familiar[Intergnat].familiar_is_usable() && if ($item[infinite BACON machine].item_is_usable()))
     {
         pullable_item_list.listAppend(GPItemMake($item[infinite BACON machine], "One copy/day with ~seven turns of intergnat.", 1));
     }
@@ -390,7 +395,7 @@ void generatePullList(Checklist [int] checklists)
 		
 		boxes_needed = MIN(6, boxes_needed); //bridge! farming?
 		
-		if (boxes_needed > 0 && my_path_id() != PATH_G_LOVER)
+		if (boxes_needed > 0 && if ($item[smut orc keepsake box].item_is_usable()))
 			pullable_item_list.listAppend(GPItemMake($item[smut orc keepsake box], "Skip level 9 bridge building.", boxes_needed));
 	}
     if (__quest_state["Level 9"].state_int["peak tests remaining"] > 0)
