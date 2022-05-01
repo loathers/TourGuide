@@ -136,7 +136,7 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	//IOTMs:
-	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0)
+	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0 && $items[empty rain-doh can,can of rain-doh].item_is_usable())
 		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
 	if ($items[empty rain-doh can,can of rain-doh,spooky putty monster].available_amount() == 0)
 		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
@@ -259,7 +259,7 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake($item[mohawk wig], "Speeds up top floor of castle.", 1));
         }
     }
-    if (my_path_id() != PATH_G_LOVER)
+    if ($item[Clara's Bell].item_is_usable())
 	    pullable_item_list.listAppend(GPItemMake($item[Clara's Bell], "Forces a non-combat, once/day.", 1));
     if (combat_items_usable)
     	pullable_item_list.listAppend(GPItemMake($item[replica bat-oomerang], "Saves three turns/day.", 1));
