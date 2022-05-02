@@ -329,7 +329,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if ($item[crystal skull].available_amount() > 0)
             resource_entries.listAppend(ChecklistEntryMake("__item crystal skull", "", ChecklistSubentryMake(pluralise($item[crystal skull]), "", "Turn-costing banishing"), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Crystal skull banish"));
             
-        if ($item[harold's bell].available_amount() > 0 && && $item[harold's bell].item_is_usable())
+        if ($item[harold's bell].available_amount() > 0 && $item[harold's bell].item_is_usable())
             resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Turn-costing banishing"), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
         
         if ($item[lost key].available_amount() > 0 && $item[lost key].item_is_usable()){
