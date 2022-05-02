@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTMUndergroundFireworksShopGenerateTasks");
 void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__misc_state["in run"] && my_path_id() != 33 && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean())
+	if (__misc_state["in run"] && my_path_id() != PATH_G_LOVER && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean())
 	{
 		if ($effect[Ready to Eat].have_effect() > 0) 
 		{
@@ -40,7 +40,7 @@ void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries
 RegisterResourceGenerationFunction("IOTMUndergroundFireworksShopGenerateResource");
 void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!get_property_boolean("_fireworksShopEquipmentBought") && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean())
+	if (!get_property_boolean("_fireworksShopEquipmentBought") && my_path_id() != PATH_G_LOVER && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean())
 		{
 			string [int] description;
 			description.listAppend("Can buy one of the following (1000 meat):");

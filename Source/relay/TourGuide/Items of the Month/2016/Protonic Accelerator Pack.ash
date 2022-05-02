@@ -156,8 +156,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
 RegisterResourceGenerationFunction("IOTMProtonicAcceleratorPackGenerateResource");
 void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if ($item[protonic accelerator pack].available_amount() == 0)
-        return;
+    if (!__iotms_usable[$item[protonic accelerator pack]]) return;
     
     if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085) && my_path_id() != PATH_G_LOVER)
     {

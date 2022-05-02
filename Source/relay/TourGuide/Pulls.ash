@@ -192,7 +192,7 @@ void generatePullList(Checklist [int] checklists)
     }
     
 	pullable_item_list.listAppend(GPItemMake($item[pantsgiving], "5x banish/day|+2 stats/fight|+15% items|2 extra fullness (realistically)", 1));
-    if (!__misc_state["familiars temporarily blocked"]) //relevant in heavy rains, on the +item/+meat underwater familiars
+    if (!__misc_state["familiars temporarily blocked"] && $item[snow suit].item_is_usable()) //relevant in heavy rains, on the +item/+meat underwater familiars
         pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while" + (($familiar[pair of stomping boots].is_unrestricted() && __misc_state["free runs usable"]) ? ", +4 free runs" : "") + "|+10% item|spleen items", 1));
     if (!__misc_state["familiars temporarily blocked"] && ($item[protonic accelerator pack].available_amount() == 0 || $familiar[machine elf].familiar_is_usable())) //if you have a machine elf, it might be worth pulling a bjorn with a protonic pack anyways
     {
@@ -236,7 +236,7 @@ void generatePullList(Checklist [int] checklists)
         pullable_item_list.listAppend(GPItemMake($item[hockey stick of furious angry rage], "+30ML accessory.", 1));
     }
     pullable_item_list.listAppend(GPItemMake($item[ice sickle], "+15ML 1h weapon|+item/+meat/+init foldables", 1));
-    if ($item[buddy bjorn].available_amount() == 0)
+    if ($item[buddy bjorn].available_amount() == 0 && $item[camp scout backpack].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[camp scout backpack], "+15% items on back", 1));
     if (__misc_state["Torso aware"])
     {
@@ -266,7 +266,7 @@ void generatePullList(Checklist [int] checklists)
     }
     if ($item[Clara's Bell].item_is_usable())
 	    pullable_item_list.listAppend(GPItemMake($item[Clara's Bell], "Forces a non-combat, once/day.", 1));
-    if (combat_items_usable)
+    if (combat_items_usable && $item[replica bat-oomerang].item_is_usable())
     	pullable_item_list.listAppend(GPItemMake($item[replica bat-oomerang], "Saves three turns/day.", 1));
     
     if (__misc_state["spooky airport available"] && __misc_state["need to level"] && __misc_state["can drink just about anything"] && $effect[jungle juiced].have_effect() == 0)
@@ -303,7 +303,7 @@ void generatePullList(Checklist [int] checklists)
             string [int] which_pies;
             if ($items[boris's key,boris's key lime pie].available_amount() == 0 && $item[boris's key lime pie].item_is_usable())
                 which_pies.listAppend("Boris");
-            if ($items[jarlsberg's key,jarlsberg's key lime pie].available_amount() == 0)
+            if ($items[jarlsberg's key,jarlsberg's key lime pie].available_amount() == 0 && $item[jarlsberg's key lime pie].item_is_usable())
                 which_pies.listAppend("Jarlsberg");
             if ($items[sneaky pete's key,sneaky pete's key lime pie].available_amount() == 0 && $item[sneaky pete's key lime pie].item_is_usable())
                 which_pies.listAppend("Sneaky Pete");
@@ -486,7 +486,7 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake($item[red shoe], "-combat"));
     }
 	
-	if (my_path_id() != PATH_COMMUNITY_SERVICE)
+	if (my_path_id() != PATH_COMMUNITY_SERVICE && $item[ten-leaf clover].item_is_usable())
 		pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull.", 20));
     
     if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && my_path_id() != PATH_G_LOVER)
@@ -525,7 +525,7 @@ void generatePullList(Checklist [int] checklists)
     
     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 95)
     {
-        if (!__quest_state["Level 11 Desert"].state_boolean["Wormridden"] && my_path_id() != PATH_G_LOVER)
+        if (!__quest_state["Level 11 Desert"].state_boolean["Wormridden"] && $item[drum machine].item_is_usable())
             pullable_item_list.listAppend(GPItemMake($item[drum machine], "30% desert exploration with pages.", 1));
         if (!__quest_state["Level 11 Desert"].state_boolean["Killing Jar Given"] && $location[the haunted bedroom].locationAvailable())
             pullable_item_list.listAppend(GPItemMake($item[killing jar], "15% desert exploration.", 1));

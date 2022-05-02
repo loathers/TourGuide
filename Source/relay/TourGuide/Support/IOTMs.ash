@@ -57,6 +57,10 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[LT&T telegraph office deed]] = true;
     if (get_property_boolean("hasDetectiveSchool")) //Jul 2016
         __iotms_usable[$item[detective school application]] = true;
+    if (lookupItem("protonic accelerator pack").available_amount() > 0) //Aug 2016
+        __iotms_usable[lookupItem("protonic accelerator pack")] = true;   
+    if (lookupItem("Time-Spinner").available_amount() > 0) //Sep 2016
+        __iotms_usable[lookupItem("Time-Spinner")] = true;        
     if (get_property_boolean("gingerbreadCityAvailable") || get_property_boolean("_gingerbreadCityToday")) //Dec 2016
         __iotms_usable[$item[Build-a-City Gingerbread kit]] = true;
     if (get_property_boolean("loveTunnelAvailable")) //Feb 2017
@@ -114,6 +118,8 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Fourth of May Cosplay Saber")] = false;
         __iotms_usable[lookupItem("hewn moon-rune spoon")] = false;
         __iotms_usable[lookupItem("Potted power plant")] = false;
+        __iotms_usable[lookupItem("protonic accelerator pack")] = false;        
+        __iotms_usable[lookupItem("Time-Spinner")] = false;        
         __iotms_usable[lookupItem("Underground Fireworks Shop")] = false;
         __iotms_usable[lookupItem("vampyric cloake")] = false;
     }

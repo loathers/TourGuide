@@ -129,7 +129,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         }
         
         
-        if (__misc_state["can use clovers"] && sonars_needed >= 2 && my_path_id() != PATH_G_LOVER)
+        if (__misc_state["can use clovers"] && sonars_needed >= 2 && $item[sonar-in-a-biscuit].item_is_usable())
             subentry.entries.listAppend("Potentially clover Guano Junction for two sonar-in-a-biscuit");
         if ($item[enchanted bean].available_amount() == 0 && !__quest_state["Level 10"].state_boolean["beanstalk grown"])
         {
@@ -152,7 +152,7 @@ void QLevel4GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         else
             subentry.entries.listAppend("Screambat after " + pluraliseWordy(turns_until_next_screambat, "turn", "turns") + ".");
         
-        if (!screambat_up_now && my_path_id() != PATH_G_LOVER)
+        if (!screambat_up_now && $item[sonar-in-a-biscuit].item_is_usable())
         {
             if (__misc_state["yellow ray available"] && sonars_needed > 0)
                 subentry.entries.listAppend("Potentially yellow ray for sonar-in-a-biscuit.");

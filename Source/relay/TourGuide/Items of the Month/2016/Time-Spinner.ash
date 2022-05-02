@@ -4,10 +4,7 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
     if (!mafiaIsPastRevision(17209))
         return;
     //Warn about eating if they're low on turns - you can't use the time spinner when you're out of adventures.
-    if ($item[Time-Spinner].available_amount() == 0)
-        return;
-    if (my_path_id() == PATH_G_LOVER)
-    	return;
+	if (!__iotms_usable[$item[Time-Spinner]]) return;
     int minutes_left = clampi(10 - get_property_int("_timeSpinnerMinutesUsed"), 0, 10);
     if (minutes_left <= 0)
         return;

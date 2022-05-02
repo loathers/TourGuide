@@ -103,14 +103,14 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         if (__misc_state["Torso aware"])
             relevant_lynyrdskin_items[$item[lynyrdskin tunic]] = true;
         
-        if ($item[lynyrd musk].available_amount() > 0 && $effect[Musky].have_effect() == 0 && my_path_id() != PATH_G_LOVER) {
+        if ($item[lynyrd musk].available_amount() > 0 && $effect[Musky].have_effect() == 0 && $item[lynyrd musk].item_is_usable(()) {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use lynyrd musk.", "red"));
             url = "inventory.php?ftext=lynyrd+musk";
         }
         if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"] && my_path_id() != PATH_POCKET_FAMILIARS) {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use cigarette lighter in-combat.", "red"));
         }
-        if ($item[lynyrd snare].available_amount() > 0 && $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches].items_missing().count() > 0 && $item[lynyrd snare].item_is_usable() && get_property_int("_lynyrdSnareUses") < 3 && my_path_id() != PATH_G_LOVER) {
+        if ($item[lynyrd snare].available_amount() > 0 && $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches].items_missing().count() > 0 && $item[lynyrd snare].item_is_usable() && get_property_int("_lynyrdSnareUses") < 3 && $item[lynyrd snare].item_is_usable()) {
             subentry.entries.listAppend("Possibly use the lynyrd snare. (free combat)");
         }
         string [int] what_not_not_to_wear;

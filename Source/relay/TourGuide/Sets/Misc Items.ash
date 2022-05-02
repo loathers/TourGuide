@@ -863,11 +863,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[burned government manual fragment].available_amount() > 0) {
         resource_entries.listAppend(ChecklistEntryMake("__item burned government manual fragment", "inventory.php?ftext=burned+government+manual+fragment", ChecklistSubentryMake(pluralise($item[burned government manual fragment]), "", "Foreign language study.|Will disappear on ascension."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Burned government manual fragment"));
     }
-    if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3 && my_path_id() != PATH_G_LOVER) { // && in_run && __misc_state["need to level"])
+    if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3 && $item[lynyrd snare].item_is_usable()) { // && in_run && __misc_state["need to level"])
         int uses_remaining = MIN($item[lynyrd snare].available_amount(), clampi(3 - get_property_int("_lynyrdSnareUses"), 0, 3));
         resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
     }
-    if (in_run && $item[red box].available_amount() > 0 && my_path_id() != PATH_G_LOVER) {
+    if (in_run && $item[red box].available_amount() > 0 && $item[red box].item_is_usable()) {
         resource_entries.listAppend(ChecklistEntryMake("__item red box", "inventory.php?ftext=red+box", ChecklistSubentryMake(pluralise($item[red box]), "", "Open for stuff."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Red box resource"));
     }
     

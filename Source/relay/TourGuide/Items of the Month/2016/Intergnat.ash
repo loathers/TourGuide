@@ -65,9 +65,9 @@ void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
         if (meme_shop != $coinmaster[none])
         {
             string [item] bacon_description;
-            if (!__misc_state["yellow ray available"] & $effect[everything looks yellow].have_effect() == 0 && my_path_id() != PATH_G_LOVER)
+            if (!__misc_state["yellow ray available"] & $effect[everything looks yellow].have_effect() == 0 && $item[viral video].item_is_usable())
                 bacon_description[$item[Viral video]] = "yellow ray";
-            if (my_path_id() != PATH_G_LOVER)
+            if ($item[print screen button].item_is_usable())
 	            bacon_description[$item[print screen button]] = "copies a monster";
             if (__misc_state_int["fat loot tokens needed"] > 0)
                 bacon_description[$item[daily dungeon malware]] = "expensive DD token source";
