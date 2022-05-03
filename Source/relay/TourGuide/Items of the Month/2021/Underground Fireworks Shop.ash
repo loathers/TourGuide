@@ -49,7 +49,7 @@ void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_
 			description.listAppend("Rocket boots: +100% initiative accessory");
 			resource_entries.listAppend(ChecklistEntryMake("__item oversized sparkler", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Explosive equipment", description), 8).ChecklistEntrySetIDTag("Clan fireworks equipment resource"));
 		}
-	if (!get_property_boolean("_fireworksShopHatBought") && available_amount($item[Clan VIP Lounge key]) > 0)
+	if (!get_property_boolean("_fireworksShopHatBought") && my_path_id() != PATH_G_LOVER && available_amount($item[Clan VIP Lounge key]) > 0)
 		{
 			string [int] description;
 			description.listAppend("Can buy one of the following (500 meat):");

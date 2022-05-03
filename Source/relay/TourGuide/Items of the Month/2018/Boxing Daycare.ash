@@ -35,14 +35,16 @@ void IOTMBoxingDaycareGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!get_property_boolean("_daycareSpa"))
 	{
 		string [int] description;
-        if (in_ronin())
+        if (in_ronin() && my_path_id() != PATH_G_LOVER)
         {
         	description.listAppend("+200% muscle, +15 ML");
             description.listAppend("+200% moxie, +50% init");
             description.listAppend("+200% myst, +25% item");
             description.listAppend("+100 HP, +50 MP, +25 DR, +~8 MP regen, +~15 HP regen");
         }
-        else
+        else if (in_ronin() && my_path_id() == PATH_G_LOVER)
+            description.listAppend("+100 HP, +50 MP, +25 DR, +~8 MP regen, +~15 HP regen");            
+        else if
             description.listAppend("+200% myst, +25% item");
 		resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "place.php?whichplace=town_wrong&action=townwrong_boxingdaycare", ChecklistSubentryMake("Boxing daycare buff (100 turns)", description), 5).ChecklistEntrySetCombinationTag("boxing daycare resources").ChecklistEntrySetIDTag("Boxing daycare daily spa"));
 	}

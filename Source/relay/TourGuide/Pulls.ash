@@ -319,12 +319,12 @@ void generatePullList(Checklist [int] checklists)
         {
             if (my_level() >= 13 && my_path_id() != PATH_G_LOVER)
                 food_selections.listAppend("hi meins");
-            else if ($item[moon pie].is_unrestricted() && my_path_id() != PATH_G_LOVER)
+            else if ($item[moon pie].is_unrestricted() && $item[moon pie].item_is_usable())
                 food_selections.listAppend("moon pies");
             
-            if (my_path_id() != PATH_G_LOVER)
+            if ($item[fleetwood mac 'n' cheese].item_is_usable())
 	            food_selections.listAppend("fleetwood mac 'n' cheese" + (my_level() < 8 ? " (level 8)" : ""));
-            if ($item[karma shawarma].is_unrestricted())
+            if ($item[karma shawarma].is_unrestricted() && $item[karma shawarma].item_is_usable())
                 food_selections.listAppend("karma shawarma? (expensive" + (my_level() < 7 ? ", level 7" : "") + ")");
             //FIXME maybe the new pasta?
         }
@@ -337,9 +337,9 @@ void generatePullList(Checklist [int] checklists)
 	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 0 && inebriety_limit() >= 5)
 	{
         string [int] drink_selections;
-        if ($item[wrecked generator].is_unrestricted())
+        if ($item[wrecked generator].is_unrestricted() && $item[wrecked generator].item_is_usable())
             drink_selections.listAppend("wrecked generators");
-        if ($item[Ice Island Long Tea].is_unrestricted())
+        if ($item[Ice Island Long Tea].is_unrestricted() && $item[Ice Island Long Tea].item_is_usable())
             drink_selections.listAppend("Ice Island Long Tea");
         
         string description;
@@ -489,7 +489,7 @@ void generatePullList(Checklist [int] checklists)
 	if (my_path_id() != PATH_COMMUNITY_SERVICE && $item[ten-leaf clover].item_is_usable())
 		pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull.", 20));
     
-    if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && my_path_id() != PATH_G_LOVER)
+    if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && $item[spooky-gro fertilizer].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));
 	
 	string [int] scrip_reasons;
@@ -573,7 +573,7 @@ void generatePullList(Checklist [int] checklists)
     }
     if ($item[Mr. Cheeng's spectacles] != $item[none])
         pullable_item_list.listAppend(GPItemMake($item[Mr. Cheeng's spectacles], "+15% item, +30% spell damage, acquire random potions in-combat.|Not particularly optimal, but fun."));
-    if (availableSpleen() > 0 && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
+    if (availableSpleen() > 0 && $item[stench jelly].item_is_usable() && my_path_id() != PATH_LIVE_ASCEND_REPEAT)
 	    pullable_item_list.listAppend(GPItemMake($item[stench jelly], "Skips ahead to an NC, saves 2.5? turns each.", 20));
      
     if ($item[pocket wish].item_is_usable())
