@@ -486,7 +486,7 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake($item[red shoe], "-combat"));
     }
 	
-	if (my_path_id() != PATH_COMMUNITY_SERVICE && $item[ten-leaf clover].item_is_usable())
+	if (my_path_id() != PATH_COMMUNITY_SERVICE)
 		pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull.", 20));
     
     if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && $item[spooky-gro fertilizer].item_is_usable())
