@@ -138,7 +138,7 @@ void generatePullList(Checklist [int] checklists)
 	//IOTMs:
 	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0 && $item[can of rain-doh].item_is_usable())
 		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
-	if ($items[empty rain-doh can,can of rain-doh,spooky putty monster].available_amount() == 0)
+	if ($items[empty rain-doh can,can of rain-doh,spooky putty monster].available_amount() == 0 && $item[spooky putty sheet].item_is_usable())
 		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
     if (true)
     {
@@ -244,7 +244,7 @@ void generatePullList(Checklist [int] checklists)
         if (__misc_state["need to level"] && $item[Sneaky Pete's leather jacket (collar popped)].available_amount() == 0 && $item[Sneaky Pete's leather jacket].available_amount() == 0)
         {
             
-            if ($item[Sneaky Pete's leather jacket (collar popped)].storage_amount() + $item[Sneaky Pete's leather jacket].storage_amount() > 0)
+            if ($item[Sneaky Pete's leather jacket (collar popped)].storage_amount() + $item[Sneaky Pete's leather jacket].storage_amount() > 0 && $item[Sneaky Pete's leather jacket].item_is_usable())
             {
                 if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE)
                     pullable_item_list.listAppend(GPItemMake($item[Sneaky Pete's leather jacket], "+30ML/+meat/+adv/+init/+moxie shirt", 1));
@@ -487,7 +487,7 @@ void generatePullList(Checklist [int] checklists)
     }
 	
 	if (my_path_id() != PATH_COMMUNITY_SERVICE)
-		pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull.", 20));
+		pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull."));
     
     if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && $item[spooky-gro fertilizer].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));
