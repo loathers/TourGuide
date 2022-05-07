@@ -51012,7 +51012,7 @@ void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entri
         description.listAppend("Understanda" + HTMLGenerateSpanFont("B", "red") + "le have a nice day.");
 		
 		if (unbrellaMode == "broken") {
-			int modifiedML = ceil(numeric_modifier("monster level") * 1.25);
+			int modifiedML = round(numeric_modifier("monster level") * 1.25,0);
 			unbrellaEnchant = "+25% ML. Unbrella-boosted ML will be " + modifiedML + ".";
 		}
 		else if (unbrellaMode == "forward") {
