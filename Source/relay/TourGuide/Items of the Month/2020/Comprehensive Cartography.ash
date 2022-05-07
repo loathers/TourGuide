@@ -11,7 +11,9 @@ void IOTMComprehensiveCartographyGenerateTasks(ChecklistEntry [int] task_entries
 RegisterResourceGenerationFunction("IOTMCartographyMapsGenerateResource");
 void IOTMCartographyMapsGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!(__misc_state["in run"] && in_ronin())) return;
+	boolean in_grey_you = my_class() == $class[grey goo]; // Grey You cannot use cartography.
+
+	if (!(__misc_state["in run"] && in_ronin()) || in_grey_you) return;
     
     int maps_left = clampi(3 - get_property_int("_monstersMapped"), 0, 3);
     if (maps_left > 0 && my_path_id() != PATH_POCKET_FAMILIARS)

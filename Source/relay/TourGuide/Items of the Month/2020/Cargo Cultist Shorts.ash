@@ -11,19 +11,19 @@ void IOTMCargoCultistShortsGenerateResource(ChecklistEntry [int] resource_entrie
         description.listAppend("Pick a pocket for something useful! Too many to list!");
         if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE)
 		{
-        	if (!locationAvailable($location[The royal guard Chamber]) == true)
-			{
-				options.listAppend(HTMLGenerateSpanOfClass("343 - Filthworm Drone Stench:", "r_bold") + " Stinky!");
-            }		
-			if ($item[star chart].available_amount() < 1 || $item[richard's star key].available_amount() < 1)
+        	if (locationAvailable($location[The royal guard Chamber]) == true)
+            {
+                options.listAppend(HTMLGenerateSpanOfClass("343 - Filthworm Drone Stench:", "r_bold") + " Stinky!");
+            }        
+            if ($item[star chart].available_amount() == 0 && $item[richard's star key].available_amount() == 0)
             {
                 options.listAppend(HTMLGenerateSpanOfClass("533 - greasy desk bell:", "r_bold") + " star key components");
-			}
-			if (!locationAvailable($location[The eXtreme Slope]) == false)
-			{
-				options.listAppend(HTMLGenerateSpanOfClass("565 - mountain man:", "r_bold") + " YR for 2x ore");
-            }				
-			if ($location[The Battlefield (Frat Uniform)].turns_spent < 100)
+            }
+            if (locationAvailable($location[The eXtreme Slope]) == false)
+            {
+                options.listAppend(HTMLGenerateSpanOfClass("565 - mountain man:", "r_bold") + " YR for 2x ore");
+            }                
+            if (locationAvailable($location[The Battlefield (Frat Uniform)]) == false)
             {
                 options.listAppend(HTMLGenerateSpanOfClass("589 - Green Ops Soldier:", "r_bold") + " olfact for funny meme strategies.");
             }
