@@ -7,6 +7,8 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
 	int bowlingCooldown2 = bowlingUses * 2 + 6;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
+	boolean bowlingSupernag = get_property_boolean("tourGuideBowlingBallSupernag");
+
 	string url;
 	if (bowlingCooldown == 0)
 	{
@@ -15,6 +17,15 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 		description.listAppend(HTMLGenerateSpanFont("You can bowl again next turn!", "blue"));
 		description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
 		optional_task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), -11));
+	}
+
+	if (bowlingCooldown < 0 && bowlingSupernag)
+	{
+		string [int] description;
+		string main_title = "Cosmic bowling ball usable";
+		description.listAppend(HTMLGenerateSpanFont("You can bowl again -- right now!", "blue"));
+		description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
+		optional_task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball is in your inventory!", "", description), -11));
 	}
 }
 
