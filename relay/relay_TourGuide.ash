@@ -2,7 +2,7 @@
 
 since 20.6; //the earliest main release that supports the changes to the terrarium that came with the release of the Melodramedary
 //These settings are for development. Don't worry about editing them.
-string __version = "1.9.2";
+string __version = "2.0.0";
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -49850,19 +49850,19 @@ void IOTMCargoCultistShortsGenerateResource(ChecklistEntry [int] resource_entrie
         description.listAppend("Pick a pocket for something useful! Too many to list!");
         if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE)
 		{
-        	if (!locationAvailable($location[The royal guard Chamber]) == true)
-			{
-				options.listAppend(HTMLGenerateSpanOfClass("343 - Filthworm Drone Stench:", "r_bold") + " Stinky!");
-            }		
-			if ($item[star chart].available_amount() < 1 || $item[richard's star key].available_amount() < 1)
+        	if (locationAvailable($location[The royal guard Chamber]) == true)
+            {
+                options.listAppend(HTMLGenerateSpanOfClass("343 - Filthworm Drone Stench:", "r_bold") + " Stinky!");
+            }        
+            if ($item[star chart].available_amount() == 0 && $item[richard's star key].available_amount() == 0)
             {
                 options.listAppend(HTMLGenerateSpanOfClass("533 - greasy desk bell:", "r_bold") + " star key components");
-			}
-			if (!locationAvailable($location[The eXtreme Slope]) == false)
-			{
-				options.listAppend(HTMLGenerateSpanOfClass("565 - mountain man:", "r_bold") + " YR for 2x ore");
-            }				
-			if ($location[The Battlefield (Frat Uniform)].turns_spent < 100)
+            }
+            if (locationAvailable($location[The eXtreme Slope]) == false)
+            {
+                options.listAppend(HTMLGenerateSpanOfClass("565 - mountain man:", "r_bold") + " YR for 2x ore");
+            }                
+            if (locationAvailable($location[The Battlefield (Frat Uniform)]) == false)
             {
                 options.listAppend(HTMLGenerateSpanOfClass("589 - Green Ops Soldier:", "r_bold") + " olfact for funny meme strategies.");
             }
@@ -49887,7 +49887,9 @@ void IOTMComprehensiveCartographyGenerateTasks(ChecklistEntry [int] task_entries
 RegisterResourceGenerationFunction("IOTMCartographyMapsGenerateResource");
 void IOTMCartographyMapsGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!(__misc_state["in run"] && in_ronin())) return;
+	boolean in_grey_you = my_class() == $class[grey goo]; // Grey You cannot use cartography.
+
+	if (!(__misc_state["in run"] && in_ronin()) || in_grey_you) return;
     
     int maps_left = clampi(3 - get_property_int("_monstersMapped"), 0, 3);
     if (maps_left > 0 && my_path_id() != PATH_POCKET_FAMILIARS)
@@ -50098,7 +50100,9 @@ void IOTMCommerceGhostGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	item commerce_item = get_property_item("commerceGhostItem");
 	int commerce_statgain1 = my_level() * 20;
 	int commerce_statgain2 = my_level() * 25;
-	if (__misc_state["in run"] && $familiar[Ghost of Crimbo Commerce].familiar_is_usable())
+	boolean in_grey_you = my_class() == $class[grey goo]; // Grey You gains zero stats from your commerce ghost.
+
+	if (__misc_state["in run"] && $familiar[Ghost of Crimbo Commerce].familiar_is_usable() && !in_grey_you)
 	{
 		// Title
 		string url = "familiar.php";
@@ -50455,23 +50459,23 @@ void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 
 	if (__misc_state["in run"] && my_path_id() != 25 && extinguisher_charge >= 20) // Path 25 is Community Service.
 	{
-		if (!get_property_boolean("fireExtinguisherBatHoleUsed") && !__quest_state["Level 4"].finished);
+		if (!get_property_boolean("fireExtinguisherBatHoleUsed") && !__quest_state["Level 4"].finished)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("Bat Hole:", "r_bold") + " Unlock next zone for free.");
 		}
-		if (!get_property_boolean("fireExtinguisherHaremUsed") && !__quest_state["Level 5"].finished);
+		if (!get_property_boolean("fireExtinguisherHaremUsed") && !__quest_state["Level 5"].finished)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("Cobb's Knob Harem:", "r_bold") + " Get harem outfit for free.");
 		}
-		if (!get_property_boolean("fireExtinguisherCyrptUsed") && !__quest_state["Level 7"].finished);
+		if (!get_property_boolean("fireExtinguisherCyrptUsed") && !__quest_state["Level 7"].finished)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("The Cyrpt:", "r_bold") + " -10 Evilness in one zone.");
 		}
-		if (!get_property_boolean("fireExtinguisherChasmUsed") && !__quest_state["Level 9"].finished);
+		if (!get_property_boolean("fireExtinguisherChasmUsed") && !__quest_state["Level 9"].finished)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("Smut Orc Logging Camp:", "r_bold") + " +66% Blech House progress.");
 		}
-		if (!get_property_boolean("fireExtinguisherDesertUsed") && !locationAvailable($location[The Upper Chamber]) == true);
+		if (!get_property_boolean("fireExtinguisherDesertUsed") && !locationAvailable($location[The Upper Chamber]) == true)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("Arid, Extrawhatever Desert:", "r_bold") + " Ultrahydrated (15 advs).");
 		}
@@ -50725,6 +50729,8 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
 	int bowlingCooldown2 = bowlingUses * 2 + 6;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
+	boolean bowlingSupernag = get_property_boolean("tourGuideBowlingBallSupernag");
+
 	string url;
 	if (bowlingCooldown == 0)
 	{
@@ -50733,6 +50739,15 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 		description.listAppend(HTMLGenerateSpanFont("You can bowl again next turn!", "blue"));
 		description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
 		optional_task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), -11));
+	}
+
+	if (bowlingCooldown < 0 && bowlingSupernag)
+	{
+		string [int] description;
+		string main_title = "Cosmic bowling ball usable";
+		description.listAppend(HTMLGenerateSpanFont("You can bowl again -- right now!", "blue"));
+		description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
+		optional_task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball is in your inventory!", "", description), -11));
 	}
 }
 
@@ -50980,7 +50995,46 @@ void IOTMGreyGooseResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(entry);
     }
 }
-
+//Unbreakable Umbrella
+RegisterResourceGenerationFunction("IOTMUnbreakableUmbrellaGenerateResource");
+void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    item unbrella = lookupItem("unbreakable umbrella");
+    if (!unbrella.have()) return;
+    if (!__misc_state["in run"]) return; 
+    string url;
+	string unbrellaMode = get_property("umbrellaState");
+	string unbrellaEnchant;
+	string [int] description;
+    url = invSearch("unbreakable umbrella");
+    // Title
+        string main_title = "Umbrella machine " + HTMLGenerateSpanFont("B", "red") + "roke";
+        description.listAppend("Understanda" + HTMLGenerateSpanFont("B", "red") + "le have a nice day.");
+		
+		if (unbrellaMode == "broken") {
+			int modifiedML = ceil(numeric_modifier("monster level") * 1.25);
+			unbrellaEnchant = "+25% ML. Unbrella-boosted ML will be " + modifiedML + ".";
+		}
+		else if (unbrellaMode == "forward") {
+			unbrellaEnchant = "+25 DR shield";
+		}
+		else if (unbrellaMode == "bucket") {
+			unbrellaEnchant = "+25% item drops";
+		}
+		else if (unbrellaMode == "pitchfork") {
+			unbrellaEnchant = "+25 Weapon Damage";
+		}
+		else if (unbrellaMode == "twirling") {
+			unbrellaEnchant = "+25 Spell Damage";
+		}
+		else if (unbrellaMode == "cocoon") {
+			unbrellaEnchant = "-10% Combat Frequency";
+		}
+		description.listAppend(HTMLGenerateSpanOfClass("Current enchantment: ", "r_bold") + unbrellaMode);
+		description.listAppend(HTMLGenerateSpanFont(unbrellaEnchant, "blue") + "");
+		resource_entries.listAppend(ChecklistEntryMake("__item unbreakable umbrella", "inventory.php?action=useumbrella&pwd=" + my_hash(), ChecklistSubentryMake(main_title, "", description)));
+}
+// Missing: MayDay Package. Simple tile, just need to make it lol.
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
