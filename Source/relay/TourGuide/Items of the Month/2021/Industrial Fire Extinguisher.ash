@@ -35,23 +35,23 @@ void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 
 	if (__misc_state["in run"] && my_path_id() != 25 && extinguisher_charge >= 20) // Path 25 is Community Service.
 	{
-		if (!get_property_boolean("fireExtinguisherBatHoleUsed") && !__quest_state["Level 4"].finished);
+		if (!get_property_boolean("fireExtinguisherBatHoleUsed") && !__quest_state["Level 4"].finished)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("Bat Hole:", "r_bold") + " Unlock next zone for free.");
 		}
-		if (!get_property_boolean("fireExtinguisherHaremUsed") && !__quest_state["Level 5"].finished);
+		if (!get_property_boolean("fireExtinguisherHaremUsed") && !__quest_state["Level 5"].finished)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("Cobb's Knob Harem:", "r_bold") + " Get harem outfit for free.");
 		}
-		if (!get_property_boolean("fireExtinguisherCyrptUsed") && !__quest_state["Level 7"].finished);
+		if (!get_property_boolean("fireExtinguisherCyrptUsed") && !__quest_state["Level 7"].finished)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("The Cyrpt:", "r_bold") + " -10 Evilness in one zone.");
 		}
-		if (!get_property_boolean("fireExtinguisherChasmUsed") && !__quest_state["Level 9"].finished);
+		if (!get_property_boolean("fireExtinguisherChasmUsed") && !__quest_state["Level 9"].finished)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("Smut Orc Logging Camp:", "r_bold") + " +66% Blech House progress.");
 		}
-		if (!get_property_boolean("fireExtinguisherDesertUsed") && !locationAvailable($location[The Upper Chamber]) == true);
+		if (!get_property_boolean("fireExtinguisherDesertUsed") && !locationAvailable($location[The Upper Chamber]) == true)
 		{
 			options.listAppend(HTMLGenerateSpanOfClass("Arid, Extrawhatever Desert:", "r_bold") + " Ultrahydrated (15 advs).");
 		}

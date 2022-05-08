@@ -118,3 +118,5 @@ import "relay/TourGuide/Items of the Month/2022/Cursed Magnifying Glass.ash";
 import "relay/TourGuide/Items of the Month/2022/Cosmic Bowling Ball.ash";
 import "relay/TourGuide/Items of the Month/2022/Combat Lover Locket.ash";
 import "relay/TourGuide/Items of the Month/2022/Grey Goose.ash";
+import "relay/TourGuide/Items of the Month/2022/Unbreakable Umbrella.ash";
+// Missing: MayDay Package. Simple tile, just need to make it lol.
