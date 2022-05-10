@@ -111,13 +111,17 @@ void generatePullList(Checklist [int] checklists)
     {
         if (my_primestat() == $stat[muscle])
         {
-            pullable_item_list.listAppend(GPItemMake($item[fake washboard], "+25% to mainstat gain, offhand."));
-            pullable_item_list.listAppend(GPItemMake($item[red LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+            if $item[fake washboard].item_is_usable()
+                pullable_item_list.listAppend(GPItemMake($item[fake washboard], "+25% to mainstat gain, offhand."));
+            if $item[red LavaCo Lamp&trade;].item_is_usable()
+                pullable_item_list.listAppend(GPItemMake($item[red LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
         }
         else if (my_primestat() == $stat[mysticality])
         {
-            pullable_item_list.listAppend(GPItemMake($item[basaltamander buckler], "+25% to mainstat gain, offhand."));
-            pullable_item_list.listAppend(GPItemMake($item[blue LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+            if $item[basaltamander buckler].item_is_usable()
+                pullable_item_list.listAppend(GPItemMake($item[basaltamander buckler], "+25% to mainstat gain, offhand."));
+            if $item[blue LavaCo Lamp&trade;].item_is_usable()            
+                pullable_item_list.listAppend(GPItemMake($item[blue LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
             if (my_path_id() == PATH_THE_SOURCE)
             {
                 int amount = 3;
@@ -128,8 +132,10 @@ void generatePullList(Checklist [int] checklists)
         }
         else if (my_primestat() == $stat[moxie])
         {
-            pullable_item_list.listAppend(GPItemMake($item[backwoods banjo], "+20% to mainstat gain, 2h weapon."));
-            pullable_item_list.listAppend(GPItemMake($item[green LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
+            if $item[backwoods banjo].item_is_usable()
+                pullable_item_list.listAppend(GPItemMake($item[backwoods banjo], "+20% to mainstat gain, 2h weapon."));
+            if $item[green LavaCo Lamp&trade;].item_is_usable()
+                pullable_item_list.listAppend(GPItemMake($item[green LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
             if (my_path_id() == PATH_THE_SOURCE)
                 pullable_item_list.listAppend(GPItemMake($item[wal-mart overalls], "+4 mainstat/fight"));
         }
@@ -206,7 +212,8 @@ void generatePullList(Checklist [int] checklists)
     if (__misc_state["need to level"])
     {
         pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Large stat gain, once/day.", 1));
-        pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "+america", 1));
+	if ($item[operation patriot shield].item_is_usable())
+            pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "+america", 1));
         pullable_item_list.listAppend(GPItemMake($item[the crown of ed the undying], "Various in-run modifiers. (init, HP, ML/item/meat/etc)", 1));
     }
     if ($item[v for vivala mask].item_is_usable())
@@ -250,7 +257,8 @@ void generatePullList(Checklist [int] checklists)
                     pullable_item_list.listAppend(GPItemMake($item[Sneaky Pete's leather jacket], "+30ML/+meat/+adv/+init/+moxie shirt", 1));
             }
             else
-                pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
+	            if ($item[cane-mail shirt].item_is_usable())
+                    pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
         }
     }
     if (__quest_state["Level 10"].mafia_internal_step >= 8)
