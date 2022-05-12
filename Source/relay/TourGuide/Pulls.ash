@@ -111,16 +111,16 @@ void generatePullList(Checklist [int] checklists)
     {
         if (my_primestat() == $stat[muscle])
         {
-            if $item[fake washboard].item_is_usable()
+            if ($item[fake washboard].item_is_usable())
                 pullable_item_list.listAppend(GPItemMake($item[fake washboard], "+25% to mainstat gain, offhand."));
-            if $item[red LavaCo Lamp&trade;].item_is_usable()
+            if ($item[red LavaCo Lamp&trade;].item_is_usable())
                 pullable_item_list.listAppend(GPItemMake($item[red LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
         }
         else if (my_primestat() == $stat[mysticality])
         {
-            if $item[basaltamander buckler].item_is_usable()
+            if ($item[basaltamander buckler].item_is_usable())
                 pullable_item_list.listAppend(GPItemMake($item[basaltamander buckler], "+25% to mainstat gain, offhand."));
-            if $item[blue LavaCo Lamp&trade;].item_is_usable()            
+            if ($item[blue LavaCo Lamp&trade;].item_is_usable())            
                 pullable_item_list.listAppend(GPItemMake($item[blue LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
             if (my_path_id() == PATH_THE_SOURCE)
             {
@@ -132,9 +132,9 @@ void generatePullList(Checklist [int] checklists)
         }
         else if (my_primestat() == $stat[moxie])
         {
-            if $item[backwoods banjo].item_is_usable()
+            if ($item[backwoods banjo].item_is_usable())
                 pullable_item_list.listAppend(GPItemMake($item[backwoods banjo], "+20% to mainstat gain, 2h weapon."));
-            if $item[green LavaCo Lamp&trade;].item_is_usable()
+            if ($item[green LavaCo Lamp&trade;].item_is_usable())
                 pullable_item_list.listAppend(GPItemMake($item[green LavaCo Lamp&trade;], "+5 adventures, 50 turns of +50% mainstat gain after rollover."));
             if (my_path_id() == PATH_THE_SOURCE)
                 pullable_item_list.listAppend(GPItemMake($item[wal-mart overalls], "+4 mainstat/fight"));
