@@ -99,6 +99,8 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] = true;
     if (lookupItem("Bird-a-Day calendar").available_amount() > 0) //Jan 2020
         __iotms_usable[lookupItem("Bird-a-Day calendar")] = true;
+    if (lookupItem("unwrapped knock-off retro superhero cape").available_amount() > 0) //Nov 2020
+        __iotms_usable[lookupItem("unwrapped knock-off retro superhero cape")] = true;
     if (lookupItem("Potted power plant").available_amount() > 0) //Mar 2021
         __iotms_usable[lookupItem("Potted power plant")] = true;
     if (lookupItem("cosmic bowling ball").available_amount() > 0 || get_property_int("_cosmicBowlingSkillsUsed") > 0) //Jan 2022
@@ -121,6 +123,7 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("protonic accelerator pack")] = false;        
         __iotms_usable[lookupItem("Time-Spinner")] = false;        
         __iotms_usable[lookupItem("Underground Fireworks Shop")] = false;
+        __iotms_usable[lookupItem("unwrapped knock-off retro superhero cape")] = false;        
         __iotms_usable[lookupItem("vampyric cloake")] = false;
     }
     if (my_path_id() == PATH_EXPLOSIONS) //Path 37

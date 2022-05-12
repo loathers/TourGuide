@@ -9,7 +9,7 @@ void IOTMSuperheroCapeGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!mafiaIsPastRevision(20494)) return;
     item cape = lookupItem("unwrapped knock-off retro superhero cape");
-    if (!cape.have()) return;
+    if (!__iotms_usable[$item[unwrapped knock-off retro superhero cape]]) return;
     
     if (!__misc_state["in run"]) return; //Only relevant information in aftercore is YR, but the YR tile will already mention the cape if needed anyway, in aftercore.
     
