@@ -106,6 +106,8 @@ void initialiseIOTMsUsable()
     if (lookupItem("cosmic bowling ball").available_amount() > 0 || get_property_int("_cosmicBowlingSkillsUsed") > 0) //Jan 2022
         // change to use tracking property if/when mafia adds one from coolitems.php
         __iotms_usable[lookupItem("cosmic bowling ball")] = true;
+    if (lookupItem("unbreakable umbrella").available_amount() > 0) //Mar 2021
+        __iotms_usable[lookupItem("unbreakable umbrella")] = true;
     if ($item[Clan VIP Lounge key].item_amount() > 0)
     {
     	//FIXME all
@@ -121,8 +123,9 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("hewn moon-rune spoon")] = false;
         __iotms_usable[lookupItem("Potted power plant")] = false;
         __iotms_usable[lookupItem("protonic accelerator pack")] = false;        
-        __iotms_usable[lookupItem("Time-Spinner")] = false;        
-        __iotms_usable[lookupItem("Underground Fireworks Shop")] = false;
+        __iotms_usable[lookupItem("Time-Spinner")] = false;
+        __iotms_usable[lookupItem("unbreakable umbrella")] = false;
+        __iotms_usable[lookupItem("Underground Fireworks Shop")] = false; //can't use any items here
         __iotms_usable[lookupItem("unwrapped knock-off retro superhero cape")] = false;        
         __iotms_usable[lookupItem("vampyric cloake")] = false;
     }
