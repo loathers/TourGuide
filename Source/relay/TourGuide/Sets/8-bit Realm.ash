@@ -69,7 +69,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     if (my_path_id() == PATH_EXPLOSIONS) need_route_output = false;
     if (need_route_output)
     {
-        if (in_hardcore() || !$item[jar of psychoses (The Crackpot Mystic)].is_unrestricted())
+        if (in_hardcore() || !$item[jar of psychoses (The Crackpot Mystic)].is_unrestricted() || !$item[jar of psychoses (The Crackpot Mystic)].item_is_usable())
         {
             string url = "place.php?whichplace=woods";
             string [int] description;

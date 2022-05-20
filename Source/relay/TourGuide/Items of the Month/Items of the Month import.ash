@@ -59,7 +59,7 @@ import "relay/TourGuide/Items of the Month/2017/XO Skeleton.ash";
 
 // 2018
 import "relay/TourGuide/Items of the Month/2018/Garbage Tote.ash";
-import "relay/TourGuide/Items of the Month/2018/Zutara.ash";
+import "relay/TourGuide/Items of the Month/2018/Zatara.ash";
 // Missing: Pokefam
 // Missing: FantasyRealm
 import "relay/TourGuide/Items of the Month/2018/God Lobster.ash";

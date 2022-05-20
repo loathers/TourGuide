@@ -1,11 +1,11 @@
 RegisterTaskGenerationFunction("IOTMBirdADayGenerateTasks");
 void IOTMBirdADayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (!lookupItem("Bird-a-Day calendar").have()) return;
+    if (!__iotms_usable[$item[Bird-a-Day calendar]]) return;
     if (!get_property_boolean("_canSeekBirds")) {
         string [int] description;
 
-        description.listAppend("Use your calendar to get a new skill for the day");
+        description.listAppend("Use your calendar to get a new skill for the day.");
         if (have_effect($effect[Blessing of the Bird]) > 0)
             description.listAppend(HTMLGenerateSpanFont("Still have an old blessing", "red") + "|Using the calendar will replace the old buff's modifiers with the new ones.");
 
@@ -114,7 +114,8 @@ void IOTMBirdADayCalendar(ChecklistEntry [int] resource_entries)
     }
 
 
-    if (!lookupItem("Bird-a-Day calendar").have()) return;
+    if (!__iotms_usable[$item[Bird-a-Day calendar]])
+        return;
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__effect Blessing of the Bird";

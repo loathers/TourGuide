@@ -30,7 +30,7 @@ void listAppend(DOECSummon [int] list, DOECSummon entry)
 RegisterResourceGenerationFunction("IOTMDeckOfEveryCardGenerateResource");
 void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if ($item[Deck of Every Card].available_amount() == 0 || !$item[Deck of Every Card].is_unrestricted())
+    if (!__iotms_usable[$item[Deck of Every Card]])
         return;
     
     if (!mafiaIsPastRevision(16018))

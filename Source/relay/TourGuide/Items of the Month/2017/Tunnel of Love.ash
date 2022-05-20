@@ -61,7 +61,7 @@ void IOTMTunnelOfLoveGenerateResource(ChecklistEntry [int] resource_entries)
             
         }*/
         item chocolate = lookupItem("LOV Extraterrestrial Chocolate");
-        if (chocolate.available_amount() > 0 && my_path_id() != PATH_SLOW_AND_STEADY)
+        if (chocolate.available_amount() > 0 && $item[LOV Extraterrestrial Chocolate].item_is_usable())
         {
             //FIXME list other chocolates?
             resource_entries.listAppend(ChecklistEntryMake("__item LOV Extraterrestrial Chocolate", "", ChecklistSubentryMake(pluralise(chocolate), "", "Adventures!"), 5).ChecklistEntrySetIDTag("Love tunnel chocolates resource"));

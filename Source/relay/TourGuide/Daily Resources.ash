@@ -117,7 +117,7 @@ void generateDailyResources(Checklist [int] checklists)
     
     
     
-    if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"] && $item[Clan looking glass].is_unrestricted()) {
+    if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"] && $item[Clan looking glass].is_unrestricted() && $item[&quot;DRINK ME&quot; potion].item_is_usable()){
         string [int] description;
         string line = "Various effects.";
         if (__misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER && $item[pail].available_amount() > 0) {
@@ -645,7 +645,7 @@ void generateDailyResources(Checklist [int] checklists)
         resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8).ChecklistEntrySetIDTag("Chateau Mantegna desk resource"));
     }
 
-    if (!get_property_boolean("_lyleFavored")) {
+    if (!get_property_boolean("_lyleFavored") && my_path_id() != PATH_G_LOVER) {
         string image_name = "__effect favored by lyle";
         string description = $effect[Favored by Lyle].have_effect() > 0 ? "Increases duration of Favored by Lyle." : "+10% all attributes.";
         resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=monorail", ChecklistSubentryMake("Visit Lyle", "10 turns", description), 10).ChecklistEntrySetIDTag("Lyle favored resource"));

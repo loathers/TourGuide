@@ -157,7 +157,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 
 
         int banishes_available = 5 - get_property_int("_pantsgivingBanish");
-        if (banishes_available > 0) {
+        if (banishes_available > 0 && $skill[Talk About Politics].skill_is_usable()) {
             //subentry.entries.listAppend(pluralise(banishes_available, "banish", "banishes") + " available.");
             string [int] tasks;
             if ($item[pantsgiving].equipped_amount() == 0)
@@ -204,7 +204,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
                 subentry.entries.listAppend(pluralise(number_left_for_next, "adventure", "adventures") + " until next stored fullness.");
         }
 
-        if (pantsgiving_potential_crumbs_remaining > 0)
+        if (pantsgiving_potential_crumbs_remaining > 0 && $skill[pocket crumbs].skill_is_usable())
             subentry.entries.listAppend(pluralise(pantsgiving_potential_crumbs_remaining, " pocket crumb item", " pocket crumb items") + " left.");
 
         if (subentry.entries.count() > 0) {
@@ -329,10 +329,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if ($item[crystal skull].available_amount() > 0)
             resource_entries.listAppend(ChecklistEntryMake("__item crystal skull", "", ChecklistSubentryMake(pluralise($item[crystal skull]), "", "Turn-costing banishing"), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Crystal skull banish"));
             
-        if ($item[harold's bell].available_amount() > 0)
+        if ($item[harold's bell].available_amount() > 0 && $item[harold's bell].item_is_usable())
             resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Turn-costing banishing"), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
         
-        if ($item[lost key].available_amount() > 0) {
+        if ($item[lost key].available_amount() > 0 && $item[lost key].item_is_usable()){
             string [int] details;
             details.listAppend("Lost pill bottle is mini-fridge, take a nap, open the pill bottle.");
             //FIXME does stunning work on tower monsters?
@@ -863,11 +863,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[burned government manual fragment].available_amount() > 0) {
         resource_entries.listAppend(ChecklistEntryMake("__item burned government manual fragment", "inventory.php?ftext=burned+government+manual+fragment", ChecklistSubentryMake(pluralise($item[burned government manual fragment]), "", "Foreign language study.|Will disappear on ascension."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Burned government manual fragment"));
     }
-    if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3 && my_path_id() != PATH_G_LOVER) { // && in_run && __misc_state["need to level"])
+    if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3 && $item[lynyrd snare].item_is_usable()) { // && in_run && __misc_state["need to level"])
         int uses_remaining = MIN($item[lynyrd snare].available_amount(), clampi(3 - get_property_int("_lynyrdSnareUses"), 0, 3));
         resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
     }
-    if (in_run && $item[red box].available_amount() > 0 && my_path_id() != PATH_G_LOVER) {
+    if (in_run && $item[red box].available_amount() > 0 && $item[red box].item_is_usable()) {
         resource_entries.listAppend(ChecklistEntryMake("__item red box", "inventory.php?ftext=red+box", ChecklistSubentryMake(pluralise($item[red box]), "", "Open for stuff."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Red box resource"));
     }
     

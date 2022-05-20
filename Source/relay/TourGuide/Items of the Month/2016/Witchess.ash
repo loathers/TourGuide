@@ -26,16 +26,16 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
             if (my_path_id() != PATH_G_LOVER)
 	            fight_descriptions.listAppend(listMake("Rook", "+25 ML/+statgain potion. (25 turns)"));
             //ox - shield
-            if ($item[ox-head shield].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
+            if ($item[ox-head shield].available_amount() == 0 && $item[ox-head shield].item_is_usable())
                 fight_descriptions.listAppend(listMake("Ox", "+100HP, +2 all res, +8 PVP fights shield."));
             //king - club
-            if ((my_path_id() == PATH_COMMUNITY_SERVICE || my_primestat() == $stat[muscle]) && $item[dented scepter].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
+            if ((my_path_id() == PATH_COMMUNITY_SERVICE || my_primestat() == $stat[muscle]) && $item[dented scepter].available_amount() == 0 && $item[dented scepter].item_is_usable())
                 fight_descriptions.listAppend(listMake("King", "+5 muscle stats/fight, +50% muscle, +50% weapon damage club."));
             //queen - -combat hat
-            if ($item[very pointy crown].available_amount() == 0 && my_path_id() != PATH_G_LOVER)
+            if ($item[very pointy crown].available_amount() == 0 && $item[very pointy crown].item_is_usable())
                 fight_descriptions.listAppend(listMake("Queen", "-combat, +5 adventures, +50% moxie, +5 moxie stats/fight hat.|Queen is exceptionally difficult to defeat, probably requiring deleveling via items" + ($skill[tricky knifework].have_skill() ? ", or maybe knife tricks" : "") + "."));
             //witch - myst broom
-            if ((my_path_id() == PATH_COMMUNITY_SERVICE || my_primestat() == $stat[mysticality]) && $item[battle broom].available_amount() == 0)
+            if ((my_path_id() == PATH_COMMUNITY_SERVICE || my_primestat() == $stat[mysticality]) && $item[battle broom].available_amount() == 0 && $item[battle broom].item_is_usable())
                 fight_descriptions.listAppend(listMake("Witch", "+5 myst stats/fight, +50% myst, +100% spell damage accessory.|Immune to spells, but not skills."));
         }
         //knight - epic food, +meat drop

@@ -98,11 +98,11 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     property_summon_limits["_grimoireConfiscatorSummons"] = 1;
     property_summon_limits["_candySummons"] = 1;
 
-    if ($skill[advanced saucecrafting].have_skill())
+    if ($skill[advanced saucecrafting].have_skill() && $skill[advanced saucecrafting].skill_is_usable())
         property_summons_to_skills["reagentSummons"] = listMake($skill[advanced saucecrafting], $skill[the way of sauce]);
-    if ($skill[Pastamastery].have_skill())
+    if ($skill[Pastamastery].have_skill() && $skill[Pastamastery].skill_is_usable())
         property_summons_to_skills["noodleSummons"] = listMake($skill[Pastamastery], $skill[Transcendental Noodlecraft]);
-    if ($skill[Advanced Cocktailcrafting].have_skill())
+    if ($skill[Advanced Cocktailcrafting].have_skill() && $skill[Advanced Cocktailcrafting].skill_is_usable())
         property_summons_to_skills["cocktailSummons"] = listMake($skill[Advanced Cocktailcrafting], $skill[Superhuman Cocktailcrafting]);
     property_summons_to_skills["_coldOne"] = listMake($skill[Grab a Cold One]);
     property_summons_to_skills["_spaghettiBreakfast"] = listMake($skill[spaghetti breakfast]);

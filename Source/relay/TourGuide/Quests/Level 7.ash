@@ -100,7 +100,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	}
 
 	// speed up cyrpt using Slay the Dead
-	if ($item[unwrapped knock-off retro superhero cape].available_amount() > 0 && __misc_state["can equip just about any weapon"]) {
+	if ($item[unwrapped knock-off retro superhero cape].available_amount() > 0 && __iotms_usable[lookupItem("unwrapped knock-off retro superhero cape")] && __misc_state["can equip just about any weapon"]) {
 		string cape_hero = get_property("retroCapeSuperhero");
 		string cape_tag = get_property("retroCapeWashingInstructions");
 

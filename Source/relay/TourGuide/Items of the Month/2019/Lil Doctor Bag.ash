@@ -43,7 +43,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
 	if (lookupItem("Lil' Doctor&trade; bag").available_amount() == 0) return;
 	//Otoscope: +200% item
     int otoscopes_left = clampi(3 - get_property_int("_otoscopeUsed"), 0, 3);
-    if (otoscopes_left > 0 && __misc_state["in run"])
+    if (otoscopes_left > 0 && $skill[Otoscope].skill_is_usable() && __misc_state["in run"])
     {
         string url;
         string [int] description;
@@ -60,7 +60,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
     }
 	//Chest X-Ray: instakill
     int instakills_left = clampi(3 - get_property_int("_chestXRayUsed"), 0, 3);
-    if (instakills_left > 0)
+    if (instakills_left > 0 && $skill[Chest X-Ray].skill_is_usable())
     {
     	string url;
         string [int] description;
@@ -78,7 +78,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
     }
 	//Reflex Hammer: Banish
     int banishes_left = clampi(3 - get_property_int("_reflexHammerUsed"), 0, 3);
-    if (banishes_left > 0)
+    if (banishes_left > 0 && $skill[Reflex Hammer].skill_is_usable())
     {
         string url;
         string [int] description;

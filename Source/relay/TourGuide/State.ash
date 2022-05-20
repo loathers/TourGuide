@@ -247,7 +247,7 @@ void setUpState()
         yellow_ray_source = "Nanorhino";
         yellow_ray_image_name = "nanorhino";
     }
-    if (lookupItem("unwrapped knock-off retro superhero cape").have())
+    if (lookupItem("unwrapped knock-off retro superhero cape").have() && __iotms_usable[lookupItem("unwrapped knock-off retro superhero cape")])
     {
         yellow_ray_available = true;
         yellow_ray_source = "Superhero cape skill Unleash the Devil's Kiss";
