@@ -18,7 +18,7 @@ void IOTMBackupCameraGenerateResource(ChecklistEntry [int] resource_entries)
 		
 		string url = "inventory.php?ftext=backup+camera";
 		int backup_camera_uses_remaining = totalBackupCameras - backup_camera_snapsUsed;
-		if (backup_camera_uses_remaining < 0)
+		if (backup_camera_uses_remaining > 0)
 		{
 			string [int] description;
 			monster nostalgicMonster = (get_property_monster("lastCopyableMonster"));
