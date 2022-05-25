@@ -27,7 +27,7 @@ void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entri
 		else if (unbrellaMode == "pitchfork style") {
 			unbrellaEnchant = "+25 Weapon Damage";
 		}
-		else if (unbrellaMode == "constant twirl") {
+		else if (unbrellaMode == "constantly twirling") {
 			unbrellaEnchant = "+25 Spell Damage";
 		}
 		else if (unbrellaMode == "cocoon") {
