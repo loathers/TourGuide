@@ -18,16 +18,16 @@ void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entri
 			int modifiedML = round(numeric_modifier("monster level") * 1.25,0);
 			unbrellaEnchant = "+25% ML. Unbrella-boosted ML will be " + modifiedML + ".";
 		}
-		else if (unbrellaMode == "forward") {
+		else if (unbrellaMode == "forward-facing") {
 			unbrellaEnchant = "+25 DR shield";
 		}
-		else if (unbrellaMode == "bucket") {
+		else if (unbrellaMode == "bucket style") {
 			unbrellaEnchant = "+25% item drops";
 		}
-		else if (unbrellaMode == "pitchfork") {
+		else if (unbrellaMode == "pitchfork style") {
 			unbrellaEnchant = "+25 Weapon Damage";
 		}
-		else if (unbrellaMode == "twirling") {
+		else if (unbrellaMode == "constant twirl") {
 			unbrellaEnchant = "+25 Spell Damage";
 		}
 		else if (unbrellaMode == "cocoon") {
