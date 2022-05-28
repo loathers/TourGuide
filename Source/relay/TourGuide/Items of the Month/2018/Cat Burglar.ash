@@ -55,8 +55,13 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
             if ($item[S.O.C.K.].available_amount() == 0) {
                 string [int] airship_stealables;
                 foreach it in $items[mohawk wig,amulet of extreme plot significance] {
-                    if (it.available_amount() == 0)
-                        airship_stealables.listAppend(it);
+                    if (it.available_amount() == 0) {
+                        if (it == $item[mohawk wig] && lookupSkill("Comprehensive Cartography").skill_is_usable() && $item[model airship].available_amount() >= 1) {
+                            //mohawk wig not needed with a model airship and Cartography
+                        }
+                        else
+                            airship_stealables.listAppend(it);
+                    }
                 }
                 if (airship_stealables.count() > 0)
                     options.listAppend(airship_stealables.listJoinComponents(", ", "and").capitaliseFirstLetter() + ", from the airship.");
