@@ -39,6 +39,9 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (lookupSkill("Expert Corner-Cutter").skill_is_usable()) {
             free_crafts_left += clampi(5 - get_property_int("_expertCornerCutterUsed"), 0, 5);
+        }    
+        if (get_property_int("homebodylCharges") > 0) {
+            free_crafts_left += (get_property_int("homebodylCharges"));
         }
 
         int free_smiths_left = 0;
