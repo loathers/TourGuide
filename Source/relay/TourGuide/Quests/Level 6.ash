@@ -43,6 +43,7 @@ float QLevel6TurnsToCompleteArea(location place)
         foreach key, s in location_ncs
         {
             if (area_known_ncs contains s)
+                {
                 if (place == $location[the dark neck of the woods])
                     base_quest_state.state_int["dark neck turns on last nc"] = turns_spent_in_zone;
                 if (place == $location[the dark heart of the woods])
@@ -50,11 +51,15 @@ float QLevel6TurnsToCompleteArea(location place)
                 if (place == $location[the dark elbow of the woods])
                     base_quest_state.state_int["dark elbow turns on last nc"] = turns_spent_in_zone;
                 ncs_found += 1;
+                }
         }
     }
+
     if (ncs_found == 4)
+    {
         return 0.0;
-    
+    }
+
     float turns_remaining = 0.0;
     int ncs_remaining = MAX(0, 4 - ncs_found);
     
