@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("IOTMPowerPlantGenerateResource");
 void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!__iotms_usable[$item[Potted power plant]])
+	if (!lookupItem("potted power plant").have())
 		return;
 	// Title
 	string main_title = "Power plant batteries";
@@ -18,6 +18,7 @@ void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 
 	int batteryTotalCharge;
 	string url;
+	url = "inventory.php?ftext=battery+(";
 	for i from 1 to 6
 	{
 		batteryTotalCharge += i*available_amount(to_item(10738+i));
