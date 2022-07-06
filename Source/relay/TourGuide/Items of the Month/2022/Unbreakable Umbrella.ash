@@ -3,7 +3,7 @@ RegisterResourceGenerationFunction("IOTMUnbreakableUmbrellaGenerateResource");
 void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entries)
 {
     item unbrella = lookupItem("unbreakable umbrella");
-    if (!__iotms_usable[$item[unbreakable umbrella]]) return;
+    if (!unbrella.have()) return;
     if (!__misc_state["in run"]) return; 
     string url;
 	string unbrellaMode = get_property("umbrellaState");
