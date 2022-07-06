@@ -723,6 +723,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         string image_name = "";
         string [int] autosell_list;
         boolean [item] autosellable_items = $items[meat stack, dense meat stack, really dense meat stack, solid gold bowling ball, fancy seashell necklace, commemorative war stein,huge gold coin].makeConstantItemArrayMutable();
+        if (!__iotms_usable[lookupItem("diabolic pizza cube")])
+            autosellable_items[$item[space blanket]] = true;
+            autosellable_items[$item[1952 Mickey Mantle card]] = true;
         if ($item[pixel coin] != $item[none])
             autosellable_items[$item[pixel coin]] = true;
         foreach it in autosellable_items {
