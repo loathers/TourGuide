@@ -25,13 +25,22 @@ void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 	if (batteryTotalCharge > 3)
 	{
-		description.listAppend(HTMLGenerateSpanFont("This free kill is also a yellow ray!", "orange"));
 		if (batteriesToHarvest != "0,0,0,0,0,0,0") {
 			description.listAppend("(Harvest your batteries for a more accurate count.)");
 		}
-		description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 5, "r_bold") + " lantern batteries for +100% item drops.");
-		description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 6, "r_bold") + " car batteries for +100% item/meat drops.");
-		description.listAppend("Total charge: " + HTMLGenerateSpanOfClass(batteryTotalCharge, "r_bold") + "");
-		resource_entries.listAppend(ChecklistEntryMake("__item eternal car battery", url, ChecklistSubentryMake((get_property_int("shockingLickCharges") + (batteryTotalCharge / 4)) + " shocking licks available", "", description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Shocking lick free kill"));
+		description.listAppend("Make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 4, "r_bold") + " 9-volt batteries to Shockingly Lick.");
+		description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 5, "r_bold") + " lantern batteries for a Lick and +100% item drops.");
+		description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 6, "r_bold") + " car batteries for a Lick and +100% item and meat drops.");
+		int shockingLicksAvailable = get_property_int("shockingLickCharges");
+		if (shockingLicksAvailable > 0) {
+			string title;
+			title = HTMLGenerateSpanFont((get_property_int("shockingLickCharges")) + " Shocking Licks available", "orange");
+			description.listAppend(HTMLGenerateSpanFont("This free kill is also a yellow ray!", "orange"));
+			description.listAppend("Still have " + HTMLGenerateSpanOfClass(batteryTotalCharge, "r_bold") + " worth of batteries.");
+			resource_entries.listAppend(ChecklistEntryMake("__item eternal car battery", url, ChecklistSubentryMake(title, "", description), 0).ChecklistEntrySetCombinationTag("batteries available").ChecklistEntrySetIDTag("Shocking lick free kill"));
+		}
+		else {
+			resource_entries.listAppend(ChecklistEntryMake("__item battery (aaa)", url, ChecklistSubentryMake("Power plant battery charge: " + (batteryTotalCharge), "", description), 0).ChecklistEntrySetCombinationTag("batteries available").ChecklistEntrySetIDTag("Shocking lick free kill"));
+		}
 	}
 }
