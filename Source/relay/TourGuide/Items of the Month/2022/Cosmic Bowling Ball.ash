@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTMCosmicBowlingBallGenerateTasks");
 void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__iotms_usable[lookupItem("cosmic bowling ball")])
+	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
 	int bowlingCooldown2 = bowlingUses * 2 + 6;
@@ -16,7 +16,7 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 		string main_title = "Cosmic bowling ball usable";
 		description.listAppend(HTMLGenerateSpanFont("You can bowl again next turn!", "blue"));
 		description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), -11));
+		task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), -11));
 	}
 
 	if (bowlingCooldown < 0 && bowlingSupernag)
@@ -25,7 +25,7 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 		string main_title = "Cosmic bowling ball usable";
 		description.listAppend(HTMLGenerateSpanFont("You can bowl again -- right now!", "blue"));
 		description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball is in your inventory!", "", description), -11));
+		task_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball is in your inventory!", "", description), -11));
 	}
 }
 
@@ -33,7 +33,7 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 RegisterResourceGenerationFunction("IOTMCosmicBowlingBallGenerateResource");
 void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!__iotms_usable[lookupItem("cosmic bowling ball")])
+	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
 
 	// Entries
@@ -71,6 +71,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 		else
 		{	
 			description.listAppend("Bowling ball in the sky with your diamonds.");
+			description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");  
 			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 			resource_entries.listAppend(ChecklistEntryMake("__effect trash-wrapped", url, ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 		}
