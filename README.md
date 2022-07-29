@@ -3,14 +3,24 @@
 ### Installation
 
 ```
-svn checkout https://github.com/Loathing-Associates-Scripting-Society/TourGuide/branches/Release/
+git checkout https://github.com/Loathing-Associates-Scripting-Society/TourGuide.git Release
 ```
 
 ### Updating
 
 ```
-svn update
+git update
 ```
+
+### Migrating from SVN to Git
+
+With Mafia support now implemented for git you can now remove the old SVN repo and convert to git.
+
+```
+svn delete Loathing-Associates-Scripting-Society-TourGuide-branches-Release
+```
+
+Then install TourGuide as normal.
 
 ### How do I use it?
 Once it's installed, look in the relay browser. In the upper-right, there will be a **"run script"** menu. Select TourGuide and it will dock to the side of your window.
