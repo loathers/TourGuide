@@ -2,7 +2,7 @@
 
 since 20.6; //the earliest main release that supports the changes to the terrarium that came with the release of the Melodramedary
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.1";
+string __version = "2.0.2";
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
