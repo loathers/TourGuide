@@ -122,4 +122,5 @@ import "relay/TourGuide/Items of the Month/2022/Unbreakable Umbrella.ash";
 import "relay/TourGuide/Items of the Month/2022/Mayday Supply Package.ash";
 import "relay/TourGuide/Items of the Month/2022/June Cleaver.ash";
 import "relay/TourGuide/Items of the Month/2022/Designer Sweatpants.ash";
+import "relay/TourGuide/Items of the Month/2022/Tiny Stillsuit.ash";
 // Missing: MayDay Package. Simple tile, just need to make it lol.
