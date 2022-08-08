@@ -109,7 +109,7 @@ import "relay/TourGuide/Items of the Month/2021/Familiar Scrapbook.ash";
 import "relay/TourGuide/Items of the Month/2021/Underground Fireworks Shop.ash";
 // Missing: Candles
 import "relay/TourGuide/Items of the Month/2021/Industrial Fire Extinguisher.ash";
-// Missing: Vampire Vintner
+import "relay/TourGuide/Items of the Month/2021/Vampire Vintner.ash";
 import "relay/TourGuide/Items of the Month/2021/Daylight Shavings Helmet.ash";
 import "relay/TourGuide/Items of the Month/2021/Cold Medicine Cabinet.ash";
 
