@@ -4,7 +4,8 @@ void IOTMTinyStillsuitResource(ChecklistEntry [int] resource_entries)
 {
     int fam_sweat_o_meter = get_property_int("familiarSweat");
 
-    if (!lookupItem("tiny stillsuit").have() && fam_sweat_o_meter == 0 ) return;
+    // Cannot drink the distillate until you have 10+ drams.
+    if (!lookupItem("tiny stillsuit").have() || fam_sweat_o_meter < 10 ) return;
 
 	int sweatAdvs = (fam_sweat_o_meter ** 0.4);
 	int sweatAdvsConversion = (sweatAdvs - 0.5) ** 2.5;
