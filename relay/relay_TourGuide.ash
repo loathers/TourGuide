@@ -51216,7 +51216,10 @@ void IOTMGreyGooseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 RegisterResourceGenerationFunction("IOTMGreyGooseGenerateResource");
 void IOTMGreyGooseGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    // Title
+	// Properly avoid a goose tile if the user has no familiar
+    if (!lookupFamiliar("Grey Goose").familiar_is_usable()) return;
+
+	// Title
     int gooseWeight = floor(sqrt($familiar[Grey Goose].experience));
 	int gooseExperience = ($familiar[Grey Goose].experience);
 	int famExperienceGain = numeric_modifier("familiar experience") +1;
