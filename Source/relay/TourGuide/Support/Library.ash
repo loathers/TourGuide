@@ -1695,3 +1695,23 @@ boolean canAccessMall()
 	if (my_ascensions() == 0 && !get_property_ascension("lastDesertUnlock")) return false;
 	return true;
 }
+
+
+// In Mafia r26631, the locations list was refactored and some locations were renamed. These are
+// helper functions to get the right zone on either old or new versions.
+
+location fratHouseInDisguise() {
+    location house = to_location("Frat House In Disguise");
+    if (house == $location[none]) {
+        house = to_location("Frat House (Frat Disguise)");
+    }
+    return house;
+}
+
+location hippyCampInDisguise() {
+    location camp = to_location("Hippy Camp In Disguise");
+    if (camp == $location[none]) {
+        camp = to_location("Hippy Camp (Hippy Disguise)");
+    }
+    return camp;
+}
