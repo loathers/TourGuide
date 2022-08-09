@@ -30,38 +30,30 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 			nextBeardBuff = ((((my_class().to_int() % 6 +1 + shavingBuffCounter) % 11)));
 		}	
 		// Map buff number to buff result
-		if (nextBeardBuff == 1) {
-			nextBeardBuffEffect = "Toiletbrush, +25 ML and +5 " + HTMLGenerateSpanFont("Stench", "dark green") + " resist";
-		}
-		else if (nextBeardBuff == 2) {
-			nextBeardBuffEffect = "Barbell, +25 Muscle and +50% Gear drops";
-		}
-		else if (nextBeardBuff == 3) {
-			nextBeardBuffEffect = "Grizzly, +25-50 MP regen and +5 " + HTMLGenerateSpanFont("Cold", "blue") + " resist";
-		}
-		else if (nextBeardBuff == 4) {
-			nextBeardBuffEffect = "Surrealist, +25 Mysticality and +50% Food drops";
-		}
-		else if (nextBeardBuff == 5) {
-			nextBeardBuffEffect = "Musician, +25 Moxie and +50% Booze drops";
-		}
-		else if (nextBeardBuff == 6) {
-			nextBeardBuffEffect = "Gull-Wing, +100% init and +5 " + HTMLGenerateSpanFont("Hot", "red") + " resist";
-		}
-		else if (nextBeardBuff == 7) {
-			nextBeardBuffEffect = "Space Warlord, +25 Weapon damage and +10% Crit";
-		}
-		else if (nextBeardBuff == 8) {
-			nextBeardBuffEffect = "Pointy Wizard, +25 Spell damage and +10% Spell Crit";
-		}
-		else if (nextBeardBuff == 9) {
-			nextBeardBuffEffect = "Cowboy, +25 Ranged damage and +50 maximum HP";
-		}
-		else if (nextBeardBuff == 10) {
-			nextBeardBuffEffect = "Friendly, +100% meat and +5 " + HTMLGenerateSpanFont("Sleaze", "purple") + " resist";
-		}
-		else if (nextBeardBuff == 0) {
-			nextBeardBuffEffect = "Spectacle, +25% item and +5 " + HTMLGenerateSpanFont("Spooky", "grey") + " resist";
+		switch (nextBeardBuff)			
+		{
+			case 1:
+				nextBeardBuffEffect = "Toiletbrush, +25 ML and +5 " + HTMLGenerateSpanFont("Stench", "dark green") + " resist"; break;
+			case 2:
+				nextBeardBuffEffect = "Barbell, +25 Muscle and +50% Gear drops"; break;
+			case 3:
+				nextBeardBuffEffect = "Grizzly, +25-50 MP regen and +5 " + HTMLGenerateSpanFont("Cold", "blue") + " resist"; break;
+			case 4:
+				nextBeardBuffEffect = "Surrealist, +25 Mysticality and +50% Food drops"; break;
+			case 5:
+				nextBeardBuffEffect = "Musician, +25 Moxie and +50% Booze drops"; break;
+			case 6:
+				nextBeardBuffEffect = "Gull-Wing, +100% init and +5 " + HTMLGenerateSpanFont("Hot", "red") + " resist"; break;
+			case 7:
+				nextBeardBuffEffect = "Space Warlord, +25 Weapon damage and +10% Crit"; break;
+			case 8:
+				nextBeardBuffEffect = "Pointy Wizard, +25 Spell damage and +10% Spell Crit"; break;
+			case 9:
+				nextBeardBuffEffect = "Cowboy, +25 Ranged damage and +50 maximum HP"; break;
+			case 10:
+				nextBeardBuffEffect = "Friendly, +100% meat and +5 " + HTMLGenerateSpanFont("Sleaze", "purple") + " resist"; break;
+			case 0:
+				nextBeardBuffEffect = "Spectacle, +50% item and +5 " + HTMLGenerateSpanFont("Spooky", "grey") + " resist"; break;
 		}
 		if (!lookupItem("daylight shavings helmet").equipped())
 			description.listAppend(HTMLGenerateSpanFont("Equip the helmet first.", "red"));

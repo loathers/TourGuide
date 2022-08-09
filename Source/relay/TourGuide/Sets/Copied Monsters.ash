@@ -429,7 +429,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
             copy_source_entry.image_lookup_name = copy_source_list[0];
 	}
     
-    if (!get_property_boolean("_cameraUsed") && $item[4-d camera].available_amount() > 0)
+    if (!get_property_boolean("_cameraUsed") && (get_property("cameraMonster") == "") && $item[4-d camera].available_amount() > 0)
     {
 		//resource_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
         
