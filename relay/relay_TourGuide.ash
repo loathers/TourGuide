@@ -2,7 +2,7 @@
 
 since 20.6; //the earliest main release that supports the changes to the terrarium that came with the release of the Melodramedary
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.1";
+string __version = "2.0.2";
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -4537,6 +4537,25 @@ boolean canAccessMall()
 	return true;
 }
 
+
+// In Mafia r26631, the locations list was refactored and some locations were renamed. These are
+// helper functions to get the right zone on either old or new versions.
+
+location fratHouseInDisguise() {
+    location house = to_location("Frat House In Disguise");
+    if (house == $location[none]) {
+        house = to_location("Frat House (Frat Disguise)");
+    }
+    return house;
+}
+
+location hippyCampInDisguise() {
+    location camp = to_location("Hippy Camp In Disguise");
+    if (camp == $location[none]) {
+        camp = to_location("Hippy Camp (Hippy Disguise)");
+    }
+    return camp;
+}
 
 
 float __setting_indention_width_in_em = 1.45;
@@ -11362,7 +11381,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
             copy_source_entry.image_lookup_name = copy_source_list[0];
 	}
     
-    if (!get_property_boolean("_cameraUsed") && $item[4-d camera].available_amount() > 0)
+    if (!get_property_boolean("_cameraUsed") && (get_property("cameraMonster") == "") && $item[4-d camera].available_amount() > 0)
     {
 		//resource_entries.listAppend(ChecklistEntryMake("__item 4-d camera", "", ChecklistSubentryMake("4-d camera copy available", "", potential_copies)));
         
@@ -13683,8 +13702,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             line += line_extra;
             subentry.entries.listAppend(line);
         }
-    } else
-        subentry.entries.listAppend("Could bring along Melodramedary.");
+    }
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the arid\, extra-dry desert,the oasis]).ChecklistEntrySetIDTag("Council L11 quest desert exploration"));
 }
 
@@ -38567,9 +38585,11 @@ static
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(5, $location[Cobb's Knob Kitchens], "STAT2", "+40 myst, -50% familiar weight", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(6, $location[Cobb's Knob Harem], "STAT2", "+40 moxie, -50% familiar weight", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(7, $location[Frat House], "STAT3", "+50% muscle, -50% myst", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, $location[Frat House In Disguise], "STAT3", "+50% muscle, -50% moxie", "", false));
+        // __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, $location[Frat House In Disguise], "STAT3", "+50% muscle, -50% moxie", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, fratHouseInDisguise(), "STAT3", "+50% muscle, -50% moxie", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(9, $location[Hippy Camp], "STAT3", "+50% myst, -50% moxie", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, $location[Hippy Camp In Disguise], "STAT3", "+50% myst, -50% muscle", "", false));
+        // __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, $location[Hippy Camp In Disguise], "STAT3", "+50% myst, -50% muscle", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, hippyCampInDisguise(), "STAT3", "+50% myst, -50% muscle", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(11, $location[The Obligatory Pirate's Cove], "STAT3", "+50% moxie, -50% muscle", "", false));
         //12 is gone? was: The Obligatory Pirate's Cove (In Disguise) //retired
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(15, $location[The Haunted Kitchen], "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[hot]) + " damage, -2 DR", "", false));
@@ -45044,6 +45064,123 @@ void IOTMDetectiveSchoolGenerateResource(ChecklistEntry [int] resource_entries)
     }
 }
 
+//Gingerbread City
+RegisterTaskGenerationFunction("IOTMGingerbreadCityGenerateTasks");
+void IOTMGingerbreadCityGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	#if (get_property_boolean("gingerbreadCityAvailable") == false) return;
+	string [int] description;
+	string [int] trainOptions;
+	string [int] civicOptions;
+	string [int] industrialOptions;
+	string [int] retailOptions;
+	string url = "place.php?whichplace=gingerbreadcity";
+	{
+		int GingerCityTimer = get_property_int("_gingerbreadCityTurns");
+		if (get_property_boolean("_gingerbreadClockAdvanced") == true) {
+            GingerCityTimer += 5;
+			//increment gingercity timer by 5 if clock is used
+        }
+		
+		if (GingerCityTimer == 9)
+		{
+			trainOptions.listAppend("Look for candy.");
+			civicOptions.listAppend("Knock over a sprinkle column (+50 sprinkles).");
+			if ($item[gingerbread blackmail photos].available_amount() == 1) {
+				civicOptions.listAppend("Use the photos to blackmail a politician.");
+			}
+			if (get_property_int("gingerLawChoice") >= 3) {
+				industrialOptions.listAppend("Buy a teethpick (1000 sprinkles).");
+			}
+			if (get_property_boolean("gingerRetailUnlocked") == false) {
+				civicOptions.listAppend("Build a retail district.");
+			}
+			if (get_property_boolean("gingerSewersUnlocked") == false) {
+				civicOptions.listAppend("Build a sewer... district.");
+			}
+			if (get_property_boolean("gingerRetailUnlocked") == true) {
+				retailOptions.listAppend("Buy some stuff (50-500 sprinkles).");
+			}
+			if ($item[fruit-leather negatives].available_amount() == 1) {
+				retailOptions.listAppend("Develop your fruit-leather negatives.");
+			}
+			if (get_property_boolean("gingerNegativesDropped") == true) {
+				retailOptions.listAppend("Pick up your blackmail photos.");
+			}
+			if (trainOptions.count() > 0) {
+				description.listAppend(HTMLGenerateSpanOfClass("Train Station:", "r_bold") + "|*" + trainOptions.listJoinComponents("|*"));
+			}
+			if (civicOptions.count() > 0) {
+				description.listAppend(HTMLGenerateSpanOfClass("Civic Center:", "r_bold") + "|*" + civicOptions.listJoinComponents("|*"));
+			}
+			if (industrialOptions.count() > 0) {
+				description.listAppend(HTMLGenerateSpanOfClass("Industrial District:", "r_bold") + "|*" + industrialOptions.listJoinComponents("|*"));
+			}
+			if (retailOptions.count() > 0) {
+				description.listAppend(HTMLGenerateSpanOfClass("Retail District:", "r_bold") + "|*" + retailOptions.listJoinComponents("|*"));
+			}
+			task_entries.listAppend(ChecklistEntryMake("__item gingerbread house", url, ChecklistSubentryMake("Gingerbread City Noon noncom available!", "", description), -11));
+		}
+		if (GingerCityTimer == 19)
+		{
+			if (get_property_int("gingerMuscleChoice") < 3) {
+				int gingerTracksLeft = clampi(3 - get_property_int("gingerMuscleChoice"), 0, 3);
+				trainOptions.listAppend("Lay some track (" + gingerTracksLeft + " remaining).");
+			}
+			if (get_property_boolean("gingerSubwayLineUnlocked") == true && !get_property_boolean("gingerBlackmailAccomplished") == true) {
+				trainOptions.listAppend("Get some fruit-leather negatives.");
+			}
+			if ($item[teethpick].available_amount() == 1) {
+				int gingerDigsLeft = clampi(7 - get_property_int("gingerDigCount"), 0, 7);
+				if (gingerDigsLeft > 4) {
+					trainOptions.listAppend("Dig up " + pluralise(gingerDigsLeft -4, " green-iced sweet roll", "green-iced sweet rolls") + ".");
+				}
+				else if (gingerDigsLeft > 1) {
+					trainOptions.listAppend("Dig up " + pluralise(gingerDigsLeft -1, " green rock candy", "green rock candies") + ".");
+				}
+				else if (gingerDigsLeft == 1) {
+					trainOptions.listAppend("Dig up a sugar raygun (final).");
+				}
+			}
+			if (get_property_boolean("_gingerbreadColumnDestroyed") == true) {
+				civicOptions.listAppend("Fight Judge Fudge to take his gavel " + HTMLGenerateSpanFont("(no other Civic options available)", "red"));
+			}
+			if (get_property_boolean("_gingerbreadColumnDestroyed") == false) {
+				civicOptions.listAppend("Buy some cigarettes (5 sprinkles).");
+				civicOptions.listAppend("Buy a counterfeit city (300 sprinkles).");
+				if (get_property_int("gingerLawChoice") < 3) {
+					int gingerStudiesLeft = clampi(3 - get_property_int("gingerLawChoice"), 0, 3);
+					civicOptions.listAppend("Study digging laws (" + gingerStudiesLeft + " remaining).");
+				}
+			}
+			if (have_outfit_components("Gingerbread Best")) {
+				retailOptions.listAppend("Get some ginger wine (free)");
+				retailOptions.listAppend("Buy a chocolate sculpture (300 sprinkles)");
+				if (!is_wearing_outfit("Gingerbread Best")) {
+					retailOptions.listAppend(HTMLGenerateSpanFont("Retail District options require Gingerbread Best equipped", "red"));
+				}
+				else {
+					retailOptions.listAppend(HTMLGenerateSpanFont("Gingerbread Best equipped for Retail District options", "blue"));
+				}
+			}
+			if (trainOptions.count() > 0) {
+				description.listAppend(HTMLGenerateSpanOfClass("Train Station:", "r_bold") + "|*" + trainOptions.listJoinComponents("|*"));
+			}
+			if (civicOptions.count() > 0) {
+				description.listAppend(HTMLGenerateSpanOfClass("Civic Center:", "r_bold") + "|*" + civicOptions.listJoinComponents("|*"));
+			}
+			if (industrialOptions.count() > 0) {
+				description.listAppend(HTMLGenerateSpanOfClass("Industrial District:", "r_bold") + "|*" + industrialOptions.listJoinComponents("|*"));
+			}
+			if (retailOptions.count() > 0) {
+				description.listAppend(HTMLGenerateSpanOfClass("Retail District:", "r_bold") + "|*" + retailOptions.listJoinComponents("|*"));
+			}
+
+			task_entries.listAppend(ChecklistEntryMake("__item gingerbread house", url, ChecklistSubentryMake("Gingerbread City Midnight noncom available!", "", description), -11));
+		}
+	}
+}
+
 RegisterResourceGenerationFunction("IOTMGingerbreadCityGenerateResource");
 void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -45062,7 +45199,7 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
             string [int] description;
             description.listAppend("Combat skill, win a fight without taking a turn.");
             //FIXME replace with a better image
-            resource_entries.listAppend(ChecklistEntryMake("__familiar Penguin Goodfella", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Gingerbread city mob hit free kill"));
+            resource_entries.listAppend(ChecklistEntryMake("__item kneecapping stick", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Gingerbread city mob hit free kill"));
             
         }
     }
@@ -45109,7 +45246,6 @@ void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
         //There's no per-turn tracker for this area.
     }
 }
-
 RegisterTaskGenerationFunction("IOTMIntergnatGenerateTasks");
 void IOTMIntergnatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -49650,67 +49786,67 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
 // Missing: Left-Hand Man
 RegisterTaskGenerationFunction("IOTMGuzzlrGenerateTask");
 void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-
+ 
     if (!lookupItem("Guzzlr tablet").have()) return;
-
+ 
     boolean startedQuest = get_property("questGuzzlr") != "unstarted";
     string questTier = get_property("guzzlrQuestTier");
-
+ 
     int guzzlrQuestProgressLeft = 100 - get_property_int("guzzlrDeliveryProgress");
     float guzzlrQuestIncrement = max(3, 10 - get_property_int("_guzzlrDeliveries"));
     float guzzlrQuestShoedIncrement = floor(1.5 * guzzlrQuestIncrement);
     int guzzlrQuestFightsLeft = ceil(guzzlrQuestProgressLeft / guzzlrQuestIncrement);
     int guzzlrQuestShoedFightsLeft = ceil(guzzlrQuestProgressLeft / guzzlrQuestShoedIncrement);
-
+ 
     boolean hasShoes = lookupItem("Guzzlr shoes").available_amount() > 0;
     boolean hasPants = lookupItem("Guzzlr pants").available_amount() > 0;
-
+ 
     if (startedQuest) {
         boolean hasShoesEquipped = lookupItem("Guzzlr shoes").equipped_amount() > 0;
         boolean hasPantsEquipped = lookupItem("Guzzlr pants").equipped_amount() > 0;
-
+ 
         location questLocation = get_property("guzzlrQuestLocation").to_location();
         item questBooze = get_property("guzzlrQuestBooze").to_item();
         boolean [item] questBoozePlatinum;
         foreach platinumDrink in $strings[Steamboat, Ghiaccio Colada, Nog-on-the-Cob, Sourfinger, Buttery Boy] {
             questBoozePlatinum [lookupItem(platinumDrink)] = true;
         }
-
+ 
         boolean hasBooze = questTier == "platinum" ? questBoozePlatinum.item_amount() > 0 : questBooze.item_amount() > 0;
         boolean hasBoozeSomewhere = questTier == "platinum" ? questBoozePlatinum.available_amount() + questBoozePlatinum.display_amount() > 0 : questBooze.available_amount() + questBooze.display_amount() > 0;
-
+ 
         boolean oneFightRemains = hasShoesEquipped && guzzlrQuestShoedFightsLeft <= 1 || !hasShoesEquipped && guzzlrQuestFightsLeft <= 1;
-
+ 
         string subtitle = "free fights";
         initialiseLocationCombatRates(); //not done anywhere else in this script
         if (__location_combat_rates contains questLocation) {
             int rate = __location_combat_rates [questLocation];
-
+ 
             if (rate == -1) //if unknown
                 subtitle += ", +combat";
             else if (rate != 100 && rate != 0)
                 subtitle += ", +" + (100 - rate) + "% combat";
         } else //if unlisted
             subtitle += ", +combat";
-
+ 
         string [int] description;
-
+ 
         if (hasBooze) {
             description.listAppend("Deliver " + (questTier == "platinum" ? "platinum booze" : questBooze) + " by adventuring in " + questLocation + ".");
         } else {
             string color_of_reminder_to_get_drink = __last_adventure_location == questLocation ? "red" : "dark";
-
+ 
             if (questTier == "platinum") {
                 int [item] creatablePlatinumDrinks = questBoozePlatinum.creatable_items();
                 buffer message;
-
+ 
                 message.append(HTMLGenerateSpanFont("Obtain one of the following:", color_of_reminder_to_get_drink));
                 message.append(to_buffer("| • Steamboat" + (creatablePlatinumDrinks contains lookupItem("Steamboat") ? " (can make with a miniature boiler)" : "") + " | • Ghiaccio Colada" + (creatablePlatinumDrinks contains lookupItem("Ghiaccio Colada") ? " (can make with a cold wad)" : "") + " | • Nog-on-the-Cob" + (creatablePlatinumDrinks contains lookupItem("Nog-on-the-Cob") ? " (can make with a robin's egg)" : "") + " | • Sourfinger" + (creatablePlatinumDrinks contains lookupItem("Sourfinger") ? " (can make with a mangled finger)" : "") + " | • Buttery Boy" + (creatablePlatinumDrinks contains lookupItem("Buttery Boy") ? " (can make with a Dish of Clarified Butter)" : "") ) );
                 description.listAppend(message);
-
+ 
                 if (hasBoozeSomewhere) {
                     string [int] goLookThere;
-
+ 
                     if (get_property_boolean("autoSatisfyWithStorage") && questBoozePlatinum.storage_amount() > 0 && can_interact())
                         goLookThere.listAppend("in hagnk's storage");
                     if (get_property_boolean("autoSatisfyWithCloset") && questBoozePlatinum.closet_amount() > 0)
@@ -49719,14 +49855,14 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
                         goLookThere.listAppend("in your clan stash");
                     if (questBoozePlatinum.display_amount() > 0) // there's no relevant mafia property; is never taken into consideration
                         goLookThere.listAppend("in your display case");
-
+ 
                     description.listAppend("Go look " + (goLookThere.count() > 0 ? goLookThere.listJoinComponents(", ", "or") + "." : "...somewhere?"));
                 }
             } else {
                 description.listAppend(HTMLGenerateSpanFont("Obtain a " + questBooze + ".", color_of_reminder_to_get_drink));
                 if (hasBoozeSomewhere) {
                     string [int] goLookThere;
-
+ 
                     if (get_property_boolean("autoSatisfyWithStorage") && questBooze.storage_amount() > 0 && can_interact())
                         goLookThere.listAppend(questBooze.storage_amount() + " in hagnk's storage");
                     if (get_property_boolean("autoSatisfyWithCloset") && questBooze.closet_amount() > 0)
@@ -49735,17 +49871,32 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
                         goLookThere.listAppend(questBooze.stash_amount() + " in your clan stash");
                     if (questBooze.display_amount() > 0)
                         goLookThere.listAppend(questBooze.display_amount() + " in your display case");
-
+ 
                     description.listAppend("Have " + (goLookThere.count() > 0 ? goLookThere.listJoinComponents(", ", "and") + "." : "some... somewhere..?"));
                 }
-
+ 
                 if (questBooze.creatable_amount() > 0)
                     description.listAppend("Could craft one.");
             }
         }
-
+ 
+		if (guzzlrQuestProgressLeft == 1 || guzzlrQuestShoedFightsLeft == 1)
+		{
+            if (hasShoesEquipped)
+				description.listAppend("Takes " + pluralise(guzzlrQuestShoedFightsLeft, "more fight", "more fights") + " (" + guzzlrQuestFightsLeft + " without shoes).");
+			else {
+				description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
+			}
+			#task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", "inventory.php?tap=guzzlr", ChecklistSubentryMake("Guzzlr delivery", "", description), -11));
+			task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", questLocation.getClickableURLForLocation(), ChecklistSubentryMake("Guzzlr delivery", subtitle, description), -11, boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("Guzzlr quest task"));
+        }	
+ 
         if (guzzlrQuestProgressLeft <= 0)
             description.listAppend("Shouldn't this be over already?");
+		else if (guzzlrQuestProgressLeft == 1)
+            description.listAppend(HTMLGenerateSpanFont("Delivery on next fight", "blue"));
+        else if (guzzlrQuestShoedFightsLeft == 1)
+            description.listAppend(HTMLGenerateSpanFont("Equip shoes to receive delivery on next fight", "blue"));  
         else if (!hasShoes || guzzlrQuestFightsLeft == guzzlrQuestShoedFightsLeft) // if no shoes or if doesn't matter at that point
             description.listAppend("Takes " + pluralise(guzzlrQuestFightsLeft, "more fight", "more fights") + ".");
         else if (hasShoesEquipped)
@@ -49754,19 +49905,19 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
             description.listAppend("Takes " + guzzlrQuestFightsLeft + " more fights (" + guzzlrQuestShoedFightsLeft + " with shoes).");
             description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
         }
-
+ 
         if (hasPants && !hasPantsEquipped)
             description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr pants for more Guzzlrbucks.", (oneFightRemains ? "red" : "dark")));
-
+ 
         if (!hasShoes)
             description.listAppend(HTMLGenerateSpanFont("Could buy Guzzlr shoes for quicker deliveries.", "grey"));
         if (!hasPants)
             description.listAppend(HTMLGenerateSpanFont("Could buy Guzzlr pants for more Guzzlrbucks.", "grey"));
-
+ 
         optional_task_entries.listAppend(ChecklistEntryMake("__item Guzzlrbuck", questLocation.getClickableURLForLocation(), ChecklistSubentryMake("Deliver booze", subtitle, description), boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("Guzzlr quest task"));
     }
-
-
+ 
+ 
     if (true) { // for either telling the player to accept a quest, or reminding them if they can abandon it
         boolean canAbandonQuest = !get_property_boolean("_guzzlrQuestAbandoned");
         int platinumDeliveriesLeft = 1 - get_property_int("_guzzlrPlatinumDeliveries");
@@ -49774,11 +49925,11 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
         int bronzeDeliveriesTotal = get_property_int("guzzlrBronzeDeliveries");
         boolean canAcceptPlatinum = get_property_int("guzzlrGoldDeliveries") >= 5;
         boolean canAcceptGold = bronzeDeliveriesTotal >= 5;
-
+ 
         string main_title;
         string subtitle;
         string [int] description;
-
+ 
         if (startedQuest && canAbandonQuest) {
             main_title = "Can abandon quest";
             description.listAppend("I mean... if you think you're not up to it...");
@@ -49793,16 +49944,16 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
             } else if (!__misc_state["in run"]) {
                 main_title = "Accept a booze delivery quest";
                 string [int] chooseDeliveryMessage;
-
+ 
                 if (bronzeDeliveriesTotal < 196)
                     chooseDeliveryMessage.listAppend("• Bronze");
-
+ 
                 if (goldDeliveriesLeft > 0 && canAcceptGold)
                     chooseDeliveryMessage.listAppend("• Gold " + HTMLGenerateSpanFont("(" + goldDeliveriesLeft + " available)", "grey"));
-
+ 
                 if (platinumDeliveriesLeft > 0 && canAcceptPlatinum)
                     chooseDeliveryMessage.listAppend("• Platinum " + HTMLGenerateSpanFont("(" + platinumDeliveriesLeft + " available)", "grey") + (canAbandonQuest ? " (Abandon for free cocktail set?)" : ""));
-
+ 
                 if (chooseDeliveryMessage.count() > 0) {
                     description.listAppend("Start a delivery by choosing a client:" + chooseDeliveryMessage.HTMLGenerateIndentedText());
                     description.listAppend("Will take " + (hasShoes ? guzzlrQuestShoedFightsLeft + "-" : "") + guzzlrQuestFightsLeft + " fights.");
@@ -49811,13 +49962,11 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
                 }
             }
         }
-
+ 
         if (description.count() > 0)
             optional_task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", "inventory.php?tap=guzzlr", ChecklistSubentryMake(main_title, subtitle, description)).ChecklistEntrySetIDTag("Guzzlr tablet tap"));
     }
 }
-//FIXME todo: a separate tile to suggest how to use a spare cocktail set, when in run?
-
 // Missing: Iunion
 RegisterTaskGenerationFunction("IOTMMelodramedaryGenerateTasks");
 void IOTMMelodramedaryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -50326,15 +50475,15 @@ void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!lookupItem("potted power plant").have())
 		return;
 	// Title
-	string main_title = "Power plant batteries";
 	string [int] description;
 	string batteriesToHarvest = (get_property("_pottedPowerPlant"));
 	// Entries
 	if (batteriesToHarvest != "0,0,0,0,0,0,0")
 	{
+		string main_title = "Power plant batteries";
 		string [int] harvest;
 		harvest.listAppend("Harvest your potted power plant batteries.");
-		resource_entries.listAppend(ChecklistEntryMake("__item potted power plant", "inv_use.php?pwd=" + my_hash() + "&whichitem=10738", ChecklistSubentryMake("Power plant batteries", "", harvest), 1));
+		resource_entries.listAppend(ChecklistEntryMake("__item potted power plant", "inv_use.php?pwd=" + my_hash() + "&whichitem=10738", ChecklistSubentryMake(main_title, "", harvest), 1));
 	}
 
 	int batteryTotalCharge;
@@ -50344,25 +50493,32 @@ void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 	{
 		batteryTotalCharge += i*available_amount(to_item(10738+i));
 	}
-	if (batteryTotalCharge > 3)
 	{
 		if (batteriesToHarvest != "0,0,0,0,0,0,0") {
 			description.listAppend("(Harvest your batteries for a more accurate count.)");
 		}
-		description.listAppend("Make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 4, "r_bold") + " 9-volt batteries to Shockingly Lick.");
-		description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 5, "r_bold") + " lantern batteries for a Lick and +100% item drops.");
-		description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 6, "r_bold") + " car batteries for a Lick and +100% item and meat drops.");
+		if (batteryTotalCharge > 3)
+		{
+			description.listAppend("Make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 4, "r_bold") + " 9-volt batteries to Shockingly Lick.");
+			description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 5, "r_bold") + " lantern batteries for a Lick and +100% item drops.");
+			description.listAppend("Alternatively, make " + HTMLGenerateSpanOfClass(batteryTotalCharge / 6, "r_bold") + " car batteries for a Lick and +100% item and meat drops.");
+		}
+		else
+		{
+			description.listAppend("Can't do much with so few batteries, but you can still use them as expensive potions. Maybe save them?");
+		}
 		int shockingLicksAvailable = get_property_int("shockingLickCharges");
 		if (shockingLicksAvailable > 0) {
 			string title;
 			title = HTMLGenerateSpanFont((get_property_int("shockingLickCharges")) + " Shocking Licks available", "orange");
 			description.listAppend(HTMLGenerateSpanFont("This free kill is also a yellow ray!", "orange"));
-			description.listAppend("Still have " + HTMLGenerateSpanOfClass(batteryTotalCharge, "r_bold") + " worth of batteries.");
+			description.listAppend("Still have " + HTMLGenerateSpanOfClass(batteryTotalCharge, "r_bold") + " charge worth of batteries.");
 			resource_entries.listAppend(ChecklistEntryMake("__item eternal car battery", url, ChecklistSubentryMake(title, "", description), 0).ChecklistEntrySetCombinationTag("batteries available").ChecklistEntrySetIDTag("Shocking lick free kill"));
 		}
-		else {
+		else if (shockingLicksAvailable == 0) {
 			resource_entries.listAppend(ChecklistEntryMake("__item battery (aaa)", url, ChecklistSubentryMake("Power plant battery charge: " + (batteryTotalCharge), "", description), 0).ChecklistEntrySetCombinationTag("batteries available").ChecklistEntrySetIDTag("Shocking lick free kill"));
 		}
+
 	}
 }
 //Backup Camera
@@ -50559,7 +50715,90 @@ void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 }
 
-// Missing: Vampire Vintner
+//Vampire Vintner
+RegisterTaskGenerationFunction("IOTMVampireVintnerGenerateTasks");
+void IOTMVampireVintnerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	if (!__misc_state["in run"] && lookupFamiliar("vampire vintner").familiar_is_usable()) return;
+	
+	int vintnerFightsLeft = clampi(14 - get_property_int("vintnerCharge"), 0, 14);
+	int vintnerWineLevel = get_property_int("vintnerWineLevel");
+	string url = "familiar.php";
+	
+	string [int] description;
+	string [int] wineDescription;
+	string wineType = (get_property("vintnerWineType"));
+	description.listAppend("Use certain damage types to get premium wines:");
+	description.listAppend(HTMLGenerateSpanFont("Hot damage:", "red") + " +item% wine.");
+	description.listAppend(HTMLGenerateSpanFont("Cold damage:", "blue") + " +meat% wine.");
+	description.listAppend(HTMLGenerateSpanFont("Familiar damage:", "orange") + " +fam xp and +ML wine.");
+
+	if ($item[1950 vampire vintner wine].available_amount() == 1 && $item[1950 vampire vintner wine].item_is_usable())
+	{
+	   url = "inventory.php?ftext=vintner+wine";
+	   wineDescription.listAppend(HTMLGenerateSpanFont("Can't charge another vintner wine until you use this one.", "red"));
+	   	switch (wineType)			
+		{
+			case "hot":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Hot wine: grants +" + vintnerWineLevel * 3 + " hot damage and +" + vintnerWineLevel * 5 + "% item drops.", "red")); break;
+			case "cold":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Cold wine: grants +" + vintnerWineLevel * 3 + " cold damage and +" + vintnerWineLevel * 5 + "% meat drops.", "blue")); break;
+			case "stench":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Stench wine: grants +" + vintnerWineLevel * 3 + " stench damage and +" + vintnerWineLevel + " familiar weight.", "green")); break;
+			case "spooky":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Spooky wine: grants +" + vintnerWineLevel * 4 + " spooky damage and +" + vintnerWineLevel * 2 + "% spell critical.", "grey")); break;
+			case "sleaze":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Sleaze wine: grants +" + vintnerWineLevel * 3 + " sleaze damage and +" + vintnerWineLevel * 5 + "% pickpocket chance.", "purple")); break;
+			case "physical":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Physical wine: grants +" + vintnerWineLevel * 2 + "% critical hit and +" + vintnerWineLevel * 10 + "% initiative.", "black")); break;
+			case "familiar":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Familiar wine: grants +" + vintnerWineLevel + " familiar experience and +" + vintnerWineLevel * 3 + " ML.", "purple")); break;
+		}
+	   optional_task_entries.listAppend(ChecklistEntryMake("__item 1950 vampire vintner wine", url, ChecklistSubentryMake("Drink your vampire vintner wine", wineDescription)));
+	}
+	else if (vintnerFightsLeft > 1)
+	{
+        optional_task_entries.listAppend(ChecklistEntryMake("__familiar vampire vintner", url, ChecklistSubentryMake(vintnerFightsLeft + " Vintner combats remaining", "", description)));
+    }	
+	else if (vintnerFightsLeft == 1)
+	{
+        description.listAppend(HTMLGenerateSpanFont("Vintner will make wine next combat.", "purple"));
+		task_entries.listAppend(ChecklistEntryMake("__familiar vampire vintner", url, ChecklistSubentryMake("Vintner wine soon", "", description), -11));
+    }	
+}
+RegisterResourceGenerationFunction("IOTMVampireVintnerGenerateResource");
+void IOTMVampireVintnerGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!__misc_state["in run"]) return;
+	int vintnerWineLevel = get_property_int("vintnerWineLevel");
+	string [int] description;
+	string [int] wineDescription;
+	string url = "inventory.php?ftext=vintner+wine";
+	string wineType = (get_property("vintnerWineType"));
+	
+	if ($item[1950 vampire vintner wine].available_amount() == 1 && $item[1950 vampire vintner wine].item_is_usable())
+	{
+	   wineDescription.listAppend(HTMLGenerateSpanFont("Can't charge another vintner wine until you use this one.", "red"));
+	   	switch (wineType)			
+		{
+			case "hot":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Hot wine: grants +" + vintnerWineLevel * 3 + " hot damage and +" + vintnerWineLevel * 5 + "% item drops.", "red")); break;
+			case "cold":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Cold wine: grants +" + vintnerWineLevel * 3 + " cold damage and +" + vintnerWineLevel * 5 + "% meat drops.", "blue")); break;
+			case "stench":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Stench wine: grants +" + vintnerWineLevel * 3 + " stench damage and +" + vintnerWineLevel + " familiar weight.", "green")); break;
+			case "spooky":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Spooky wine: grants +" + vintnerWineLevel * 4 + " spooky damage and +" + vintnerWineLevel * 2 + "% spell critical.", "grey")); break;
+			case "sleaze":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Sleaze wine: grants +" + vintnerWineLevel * 3 + " sleaze damage and +" + vintnerWineLevel * 5 + "% pickpocket chance.", "purple")); break;
+			case "physical":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Physical wine: grants +" + vintnerWineLevel * 2 + "% critical hit and +" + vintnerWineLevel * 10 + "% initiative.", "black")); break;
+			case "familiar":
+				wineDescription.listAppend(HTMLGenerateSpanFont("Familiar wine: grants +" + vintnerWineLevel + " familiar experience and +" + vintnerWineLevel * 3 + " ML.", "purple")); break;
+		}
+	   resource_entries.listAppend(ChecklistEntryMake("__item 1950 vampire vintner wine", url, ChecklistSubentryMake("Drink your vampire vintner wine", wineDescription), -11));
+	}
+}
 //Daylight Shavings Helmet
 RegisterTaskGenerationFunction("IOTMDaylightShavingsHelmetGenerateTasks");
 void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -50592,38 +50831,30 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 			nextBeardBuff = ((((my_class().to_int() % 6 +1 + shavingBuffCounter) % 11)));
 		}	
 		// Map buff number to buff result
-		if (nextBeardBuff == 1) {
-			nextBeardBuffEffect = "Toiletbrush, +25 ML and +5 " + HTMLGenerateSpanFont("Stench", "dark green") + " resist";
-		}
-		else if (nextBeardBuff == 2) {
-			nextBeardBuffEffect = "Barbell, +25 Muscle and +50% Gear drops";
-		}
-		else if (nextBeardBuff == 3) {
-			nextBeardBuffEffect = "Grizzly, +25-50 MP regen and +5 " + HTMLGenerateSpanFont("Cold", "blue") + " resist";
-		}
-		else if (nextBeardBuff == 4) {
-			nextBeardBuffEffect = "Surrealist, +25 Mysticality and +50% Food drops";
-		}
-		else if (nextBeardBuff == 5) {
-			nextBeardBuffEffect = "Musician, +25 Moxie and +50% Booze drops";
-		}
-		else if (nextBeardBuff == 6) {
-			nextBeardBuffEffect = "Gull-Wing, +100% init and +5 " + HTMLGenerateSpanFont("Hot", "red") + " resist";
-		}
-		else if (nextBeardBuff == 7) {
-			nextBeardBuffEffect = "Space Warlord, +25 Weapon damage and +10% Crit";
-		}
-		else if (nextBeardBuff == 8) {
-			nextBeardBuffEffect = "Pointy Wizard, +25 Spell damage and +10% Spell Crit";
-		}
-		else if (nextBeardBuff == 9) {
-			nextBeardBuffEffect = "Cowboy, +25 Ranged damage and +50 maximum HP";
-		}
-		else if (nextBeardBuff == 10) {
-			nextBeardBuffEffect = "Friendly, +100% meat and +5 " + HTMLGenerateSpanFont("Sleaze", "purple") + " resist";
-		}
-		else if (nextBeardBuff == 0) {
-			nextBeardBuffEffect = "Spectacle, +25% item and +5 " + HTMLGenerateSpanFont("Spooky", "grey") + " resist";
+		switch (nextBeardBuff)			
+		{
+			case 1:
+				nextBeardBuffEffect = "Toiletbrush, +25 ML and +5 " + HTMLGenerateSpanFont("Stench", "dark green") + " resist"; break;
+			case 2:
+				nextBeardBuffEffect = "Barbell, +25 Muscle and +50% Gear drops"; break;
+			case 3:
+				nextBeardBuffEffect = "Grizzly, +25-50 MP regen and +5 " + HTMLGenerateSpanFont("Cold", "blue") + " resist"; break;
+			case 4:
+				nextBeardBuffEffect = "Surrealist, +25 Mysticality and +50% Food drops"; break;
+			case 5:
+				nextBeardBuffEffect = "Musician, +25 Moxie and +50% Booze drops"; break;
+			case 6:
+				nextBeardBuffEffect = "Gull-Wing, +100% init and +5 " + HTMLGenerateSpanFont("Hot", "red") + " resist"; break;
+			case 7:
+				nextBeardBuffEffect = "Space Warlord, +25 Weapon damage and +10% Crit"; break;
+			case 8:
+				nextBeardBuffEffect = "Pointy Wizard, +25 Spell damage and +10% Spell Crit"; break;
+			case 9:
+				nextBeardBuffEffect = "Cowboy, +25 Ranged damage and +50 maximum HP"; break;
+			case 10:
+				nextBeardBuffEffect = "Friendly, +100% meat and +5 " + HTMLGenerateSpanFont("Sleaze", "purple") + " resist"; break;
+			case 0:
+				nextBeardBuffEffect = "Spectacle, +50% item and +5 " + HTMLGenerateSpanFont("Spooky", "grey") + " resist"; break;
 		}
 		if (!lookupItem("daylight shavings helmet").equipped())
 			description.listAppend(HTMLGenerateSpanFont("Equip the helmet first.", "red"));
@@ -50642,38 +50873,36 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 RegisterTaskGenerationFunction("IOTMColdMedicineCabinetGenerateTasks");
 void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	monster gregarious_monster = get_property_monster("beGregariousMonster");
-	int fights_left = clampi(get_property_int("beGregariousFightsLeft"), 0, 3);
+    monster gregarious_monster = get_property_monster("beGregariousMonster");
+    int fights_left = clampi(get_property_int("beGregariousFightsLeft"), 0, 3);
 	string [int] description;
-	string url;
 	
 	if (gregarious_monster != $monster[none] && fights_left > 0) 
 	{
-		description.listAppend("Neaaaar, faaaaaaar, wherever you aaaaaaaare, I believe that the heart does go on.");
+        description.listAppend("Neaaaar, faaaaaaar, wherever you spaaaaaaar, I believe that the heart does go onnnnn.");
 		description.listAppend("Will appear in any zone, so try to find a zone with few monsters.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, url, ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
-	}
-	if (!__iotms_usable[lookupItem("cold medicine cabinet")])
-		return;
-
+		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, "url", ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
+    }
+	if (!__iotms_usable[lookupItem("cold medicine cabinet")]) return;
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
 	if (CMC_consults > 0) 
 	{
 		int next_CMC_Turn = get_property_int("_nextColdMedicineConsult");
+		int next_CMC_Timer = (next_CMC_Turn - total_turns_played());
 		string [int] description;
 		string url = "campground.php?action=workshed";
 			
 		if (next_CMC_Turn -1 == total_turns_played())
 		{
-			description.listAppend(HTMLGenerateSpanFont("Consultation ready next turn!", "blue"));
+			description.listAppend(HTMLGenerateSpanFont("Consultation ready next turn!", "red"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
-			optional_task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
+			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
 		}
 		else if (next_CMC_Turn <= total_turns_played())
 		{
 			description.listAppend(HTMLGenerateSpanFont("Just what the doctor ordered!", "blue"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
-			optional_task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
+			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
 		}
 	}
 }
@@ -50681,48 +50910,52 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 RegisterResourceGenerationFunction("IOTMColdMedicineCabinetGenerateResource");
 void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	//gregariousness
+    //gregariousness
 	int uses_remaining = get_property_int("beGregariousCharges");
 	if (uses_remaining > 0) 
 	{
-		//The section that will be sent as a stand-alone resource
-		string url;
-		string [int] description;
-		description.listAppend("Be gregarious in combat, which lets you turn foe into friend!");
-		string [int] gregfriends;
-		gregfriends.listAppend("eldritch tentacle");
-		gregfriends.listAppend("lobsterfrogman");
-		gregfriends.listAppend("lynyrd");
-		gregfriends.listAppend("dense liana");
-		gregfriends.listAppend("drunk pygmy");
-		gregfriends.listAppend("war monster");
-		gregfriends.listAppend("[degenerate aftercore farming target]");
-		
-		description.listAppend("Potentially good friendships:|*" + gregfriends.listJoinComponents("|*"));
-		resource_entries.listAppend(ChecklistEntryMake("__effect Good Karma", url, ChecklistSubentryMake(uses_remaining.pluralise("gregarious handshake", "gregarious handshakes"), "", description)).ChecklistEntrySetIDTag("gregarious wanderer resource")); 
-	}
+        if (true) 
+		{
+            //The section that will be sent as a stand-alone resource
+            string url;
+            
+            string [int] description;
+            description.listAppend("Be gregarious in combat, which lets you turn foes into friends!");
+			string [int] gregfriends;
+			gregfriends.listAppend("Bob Racecar or his brother Racecar Bob");
+			gregfriends.listAppend("dirty old lihc (cyrpt progress)");
+			gregfriends.listAppend("lobsterfrogman (gunpowder)");
+			gregfriends.listAppend("modern zmobie (cyrpt progress)");
+			gregfriends.listAppend("dense liana (free fight)");
+			gregfriends.listAppend("drunk pygmy (free fight)");
+			gregfriends.listAppend("eldritch tentacle (free fight, difficult)");
+			gregfriends.listAppend("lynyrd (free fight)");
+			gregfriends.listAppend("[degenerate aftercore farming target]");
+			description.listAppend("Potentially good friendships:|*" + gregfriends.listJoinComponents("|*"));
+            resource_entries.listAppend(ChecklistEntryMake("__effect Good Karma", url, ChecklistSubentryMake(uses_remaining.pluralise("gregarious handshake", "gregarious handshakes"), "", description)).ChecklistEntrySetIDTag("gregarious wanderer resource")); 
+        }
+    }
 	
 	//breathitin
 	int breaths_remaining = get_property_int("breathitinCharges");
 	if (breaths_remaining > 0) 
 	{
-		string [int] description;
-		description.listAppend("Outdoor fights become free.");
-		resource_entries.listAppend(ChecklistEntryMake("__item beefy pill", "", ChecklistSubentryMake(pluralise(breaths_remaining, "breathitin breath", "breathitin breaths"), "", description), -2));
-	}
+        string [int] description;
+        description.listAppend("Outdoor fights become free.");
+        resource_entries.listAppend(ChecklistEntryMake("__item beefy pill", "", ChecklistSubentryMake(pluralise(breaths_remaining, "breathitin breath", "breathitin breaths"), "", description), -2));
+    }
 	//homebodyl
 	int homebodyls_remaining = get_property_int("homebodylCharges");
 	if (homebodyls_remaining > 0) 
 	{
-		string [int] description;
-		description.listAppend("Free crafting.");
+        string [int] description;
+        description.listAppend("Free crafting.");
 		description.listAppend("Lynyrd equipment, potions, and more.");
-		resource_entries.listAppend(ChecklistEntryMake("__item excitement pill", "", ChecklistSubentryMake(pluralise(homebodyls_remaining, "homebodyl free craft", "homebodyl free crafts"), "", description)));
-	}
+        resource_entries.listAppend(ChecklistEntryMake("__item excitement pill", "", ChecklistSubentryMake(pluralise(homebodyls_remaining, "homebodyl free craft", "homebodyl free crafts"), "", description)));
+    }
 	
 	//consultation counter
-	if (!__iotms_usable[lookupItem("cold medicine cabinet")])
-		return;
+	if (!__iotms_usable[lookupItem("cold medicine cabinet")]) return;
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
 	if (CMC_consults > 0) 
 	{
@@ -50883,73 +51116,54 @@ void IOTMCombatLoversLocketGenerateResource(ChecklistEntry [int] resource_entrie
         string url = "inventory.php?reminisce=1";
 		string locketType = (get_property("locketPhylum"));
 		string locketEnchant;
+		switch (get_property("locketPhylum"))
+		{
+			case "beast":
+				locketEnchant = "+10% Crit Chance and +20 Muscle"; break;
+			case "bug":
+				locketEnchant = "+25% Weapon Damage and +25% max MP"; break;
+			case "constellation":
+				locketEnchant = "+10% Spell Crit and +20 Mysticality"; break;
+			case "construct":
+				locketEnchant = "+3 Moxie exp and +25 Spell Damage"; break;
+			case "demon":
+				locketEnchant = HTMLGenerateSpanFont("+25 Hot", "red") + " and  +50% Gear drops"; break;
+			case "dude":
+				locketEnchant = HTMLGenerateSpanFont("+25 Cold", "cold") + " and  +50% Moxie"; break;
+			case "elemental":
+				locketEnchant = HTMLGenerateSpanFont("+3 Hot res", "red") + " and " + HTMLGenerateSpanFont("+25 Stench Spell", "dark green"); break;
+			case "elf":
+				locketEnchant = "+5 exp and +75% Candy drops"; break;
+			case "fish":
+				locketEnchant = "+50% Meat Drops and " + HTMLGenerateSpanFont("+25 Spooky Spell", "grey"); break;
+			case "goblin":
+				locketEnchant = HTMLGenerateSpanFont("+25 Stench", "dark green") + " and  +50% Mysticality"; break;
+			case "hippy":
+				locketEnchant = HTMLGenerateSpanFont("+3 Stench res", "dark green") + " and  +10 DR"; break;
+			case "hobo":
+				locketEnchant = "+3 Mysticality exp and " + HTMLGenerateSpanFont("+25 Hot Spell", "red"); break;
+			case "horror":
+				locketEnchant = HTMLGenerateSpanFont("+3 Spooky res", "grey") + " and  +50 HP"; break;
+			case "humanoid":
+				locketEnchant = "+25% Spell Damage and +20 Moxie"; break;
+			case "mer-kin":
+				locketEnchant = "+25% Item Drops and " + HTMLGenerateSpanFont("+25 Sleaze Spell", "purple"); break;
+			case "orc":
+				locketEnchant = HTMLGenerateSpanFont("+3 Sleaze res", "purple") + " and +25 MP"; break;
+			case "penguin":
+				locketEnchant = "+3 Muscle exp and " + HTMLGenerateSpanFont("+25 Cold Spell", "blue"); break;
+			case "pirate":
+				locketEnchant = "+50% Booze Drops and " + HTMLGenerateSpanFont("+25 Sleaze", "purple"); break;
+			case "plant":
+				locketEnchant = "+50% Initiative and +50% max HP"; break;
+			case "slime":
+				locketEnchant = HTMLGenerateSpanFont("+3 Cold res", "cold") + " and  +50 DA"; break;
+			case "undead":
+				locketEnchant = HTMLGenerateSpanFont("+25 Spooky", "grey") + " and  +50% Muscle"; break;
+			case "weird":
+				locketEnchant = "+50% Food Drops and +25 Weapon Damage"; break;
+		}
 		
-		if (locketType == "beast") {
-			locketEnchant = "+10% Crit Chance and +20 Muscle";
-		}
-		else if (locketType == "bug") {
-			locketEnchant = "+25% Weapon Damage and +25% max MP";
-		}
-		else if (locketType == "constellation") {
-			locketEnchant = "+10% Spell Crit and +20 Mysticality";
-		}
-		else if (locketType == "construct") {
-			locketEnchant = "+3 Moxie exp and +25 Spell Damage";
-		}
-		else if (locketType == "demon") {
-			locketEnchant = HTMLGenerateSpanFont("+25 Hot", "red") + " and  +50% Gear drops";
-		}
-		else if (locketType == "dude") {
-			locketEnchant = HTMLGenerateSpanFont("+25 Cold", "cold") + " and  +50% Moxie";
-		}
-		else if (locketType == "elemental") {
-			locketEnchant = HTMLGenerateSpanFont("+3 Hot res", "red") + " and " + HTMLGenerateSpanFont("+25 Stench Spell", "dark green");
-		}
-		else if (locketType == "elf") {
-			locketEnchant = "+5 exp and +75% Candy drops";
-		}
-		else if (locketType == "fish") {
-			locketEnchant = "+50% Meat Drops and " + HTMLGenerateSpanFont("+25 Spooky Spell", "grey");
-		}
-		else if (locketType == "goblin") {
-			locketEnchant = HTMLGenerateSpanFont("+25 Stench", "dark green") + " and  +50% Mysticality";
-		}
-		else if (locketType == "hippy") {
-			locketEnchant = HTMLGenerateSpanFont("+3 Stench res", "dark green") + " and  +10 DR";
-		}
-		else if (locketType == "hobo") {
-			locketEnchant = "+3 Mysticality exp and " + HTMLGenerateSpanFont("+25 Hot Spell", "red");
-		}
-		else if (locketType == "horror") {
-			locketEnchant = HTMLGenerateSpanFont("+3 Spooky res", "grey") + " and  +50 HP";
-		}
-		else if (locketType == "humanoid") {
-			locketEnchant = "+25% Spell Damage and +20 Moxie";
-		}
-		else if (locketType == "mer-kin") {
-			locketEnchant = "+25% Item Drops and " + HTMLGenerateSpanFont("+25 Sleaze Spell", "purple");
-		}
-		else if (locketType == "orc") {
-			locketEnchant = HTMLGenerateSpanFont("+3 Sleaze res", "purple") + " and +25 MP";
-		}
-		else if (locketType == "penguin") {
-			locketEnchant = "+3 Muscle exp and " + HTMLGenerateSpanFont("+25 Cold Spell", "blue");
-		}
-		else if (locketType == "pirate") {
-			locketEnchant = "+50% Booze Drops and " + HTMLGenerateSpanFont("+25 Sleaze", "purple");
-		}
-		else if (locketType == "plant") {
-			locketEnchant = "+50% Initiative and +50% max HP";
-		}
-		else if (locketType == "slime") {
-			locketEnchant = HTMLGenerateSpanFont("+3 Cold res", "cold") + " and  +50 DA";
-		}
-		else if (locketType == "undead") {
-			locketEnchant = HTMLGenerateSpanFont("+25 Spooky", "grey") + " and  +50% Muscle";
-		}
-		else if (locketType == "weird") {
-			locketEnchant = "+50% Food Drops and +25 Weapon Damage";
-		}
 		description.listAppend(HTMLGenerateSpanOfClass("Current enchantment: ", "r_bold") + locketType);
 		description.listAppend(HTMLGenerateSpanFont(locketEnchant, "blue") + "");
 		
@@ -51020,7 +51234,10 @@ void IOTMGreyGooseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 RegisterResourceGenerationFunction("IOTMGreyGooseGenerateResource");
 void IOTMGreyGooseGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    // Title
+	// Properly avoid a goose tile if the user has no familiar
+    if (!lookupFamiliar("Grey Goose").familiar_is_usable()) return;
+
+	// Title
     int gooseWeight = floor(sqrt($familiar[Grey Goose].experience));
 	int gooseExperience = ($familiar[Grey Goose].experience);
 	int famExperienceGain = numeric_modifier("familiar experience") +1;
@@ -51112,24 +51329,21 @@ void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entri
         string main_title = "Umbrella machine " + HTMLGenerateSpanFont("B", "red") + "roke";
         description.listAppend("Understanda" + HTMLGenerateSpanFont("B", "red") + "le have a nice day.");
 		
-		if (unbrellaMode == "broken") {
-			int modifiedML = round(numeric_modifier("monster level") * 1.25,0);
-			unbrellaEnchant = "+25% ML. Unbrella-boosted ML will be " + modifiedML + ".";
-		}
-		else if (unbrellaMode == "forward-facing") {
-			unbrellaEnchant = "+25 DR shield";
-		}
-		else if (unbrellaMode == "bucket style") {
-			unbrellaEnchant = "+25% item drops";
-		}
-		else if (unbrellaMode == "pitchfork style") {
-			unbrellaEnchant = "+25 Weapon Damage";
-		}
-		else if (unbrellaMode == "constantly twirling") {
-			unbrellaEnchant = "+25 Spell Damage";
-		}
-		else if (unbrellaMode == "cocoon") {
-			unbrellaEnchant = "-10% Combat Frequency";
+		switch (unbrellaMode)			
+		{
+			case "broken":
+				int modifiedML = round(numeric_modifier("monster level") * 1.25,0);
+				unbrellaEnchant = "+25% ML. Unbrella-boosted ML will be " + modifiedML + ".";
+			case "forward-facing":
+				unbrellaEnchant = "+25 DR shield";
+			case "bucket style":
+				unbrellaEnchant = "+25% item drops";
+			case "pitchfork style":
+				unbrellaEnchant = "+25 Weapon Damage";
+			case "constantly twirling":
+				unbrellaEnchant = "+25 Spell Damage";
+			case "cocoon":
+				unbrellaEnchant = "-10% Combat Frequency";
 		}
 		description.listAppend(HTMLGenerateSpanOfClass("Current enchantment: ", "r_bold") + unbrellaMode);
 		description.listAppend(HTMLGenerateSpanFont(unbrellaEnchant, "blue") + "");
@@ -51305,7 +51519,86 @@ void IOTMDesignerSweatpantsResource(ChecklistEntry [int] resource_entries)
         description.listAppend(HTMLGenerateSpanOfClass("Sweat Out Some Booze (25% sweat):", "r_bold") + HTMLGenerateSpanFont(" -1 Drunkenness. " + booze_sweats_left + " uses left for today.", "orange"));
     resource_entries.listAppend(ChecklistEntryMake("__item designer sweatpants", url, ChecklistSubentryMake(title, description), 1).ChecklistEntrySetIDTag("designer sweatpants resource"));
 }
-// Missing: MayDay Package. Simple tile, just need to make it lol.
+//Tiny stillsuit
+RegisterResourceGenerationFunction("IOTMTinyStillsuitResource");
+void IOTMTinyStillsuitResource(ChecklistEntry [int] resource_entries)
+{
+    int fam_sweat_o_meter = get_property_int("familiarSweat");
+
+    // Cannot drink the distillate until you have 10+ drams.
+    if (!lookupItem("tiny stillsuit").have() || fam_sweat_o_meter < 10 ) return;
+
+	int sweatAdvs = (fam_sweat_o_meter ** 0.4);
+	int sweatAdvsConversion = (sweatAdvs - 0.5) ** 2.5;
+	int nextSweatDrams = (sweatAdvs+0.51) ** 2.5; # - fam_sweat_o_meter;
+	
+    string title;
+    string [int] description;
+    string url = "inventory.php?action=distill&pwd=" + my_hash();
+	title = HTMLGenerateSpanFont(fam_sweat_o_meter + " drams of stillsuit sweat", "purple");
+	description.listAppend("Two gross tastes that taste horrible together.");
+	//an amish paradise is as primitive as can be
+	int sweatCalcSweat;
+	int sweatCalcAdvs;
+
+	if (fam_sweat_o_meter >= 279) {
+		sweatCalcSweat = 358;
+		sweatCalcAdvs = 10;
+	}
+	else if (fam_sweat_o_meter >= 211) {
+		sweatCalcSweat = 279;
+		sweatCalcAdvs = 9;
+	}
+	else if (fam_sweat_o_meter >= 155) {
+		sweatCalcSweat = 211;
+		sweatCalcAdvs = 8;
+	}
+	else if (fam_sweat_o_meter >= 108) {
+		sweatCalcSweat = 155;
+		sweatCalcAdvs = 7;
+	}
+	else if (fam_sweat_o_meter >= 71) {
+		sweatCalcSweat = 108;
+		sweatCalcAdvs = 6;
+	}
+	else if (fam_sweat_o_meter >= 43) {
+		sweatCalcSweat = 71;
+		sweatCalcAdvs = 5;
+	}
+	else if (fam_sweat_o_meter >= 23) {
+		sweatCalcSweat = 43;
+		sweatCalcAdvs = 4;
+	}
+	else if (fam_sweat_o_meter >= 10) {
+		sweatCalcSweat = 23;
+		sweatCalcAdvs = 3;
+	}
+	
+	if (fam_sweat_o_meter > 358) {
+		description.listAppend("" + HTMLGenerateSpanOfClass("11", "r_bold") + " advs when guzzling now (costs 1 liver).");
+		description.listAppend("You should probably guzzle your sweat now.");
+	}
+	else {
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcAdvs, "r_bold") + " advs when guzzling now (costs 1 liver).");
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + CEIL(sweatCalcSweat - fam_sweat_o_meter)/3 + " combats on current familiar)");
+	}
+		
+#	description.listAppend("" + HTMLGenerateSpanOfClass(sweatAdvs, "r_bold") + " advs when guzzling now (costs 1 liver).");
+
+    if ($item[tiny stillsuit].item_amount() == 1) {
+		description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
+		url = "familiar.php";
+	}
+	else if ($item[tiny stillsuit].equipped_amount() == 1) {
+		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat from current familiar!", "purple") + "");
+	} else {
+		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
+		#description.listAppend("Currently collecting sweat from " + HTMLGenerateSpanFont(stillsuitFamiliar, "purple") + "");
+    }
+		
+    resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
+}
+
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
 void PathActuallyEdtheUndyingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
