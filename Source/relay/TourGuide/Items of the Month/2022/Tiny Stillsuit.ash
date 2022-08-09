@@ -8,7 +8,7 @@ void IOTMTinyStillsuitResource(ChecklistEntry [int] resource_entries)
 
 	int sweatAdvs = (fam_sweat_o_meter ** 0.4);
 	int sweatAdvsConversion = (sweatAdvs - 0.5) ** 2.5;
-	int nextSweatDrams = (sweatAdvs+0.51) ** 2.5;# - fam_sweat_o_meter;
+	int nextSweatDrams = (sweatAdvs+0.51) ** 2.5; # - fam_sweat_o_meter;
 	
     string title;
     string [int] description;
