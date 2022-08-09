@@ -4538,6 +4538,25 @@ boolean canAccessMall()
 }
 
 
+// In Mafia r26631, the locations list was refactored and some locations were renamed. These are
+// helper functions to get the right zone on either old or new versions.
+
+location fratHouseInDisguise() {
+    location house = to_location("Frat House In Disguise");
+    if (house == $location[none]) {
+        house = to_location("Frat House (Frat Disguise)");
+    }
+    return house;
+}
+
+location hippyCampInDisguise() {
+    location camp = to_location("Hippy Camp In Disguise");
+    if (camp == $location[none]) {
+        camp = to_location("Hippy Camp (Hippy Disguise)");
+    }
+    return camp;
+}
+
 
 float __setting_indention_width_in_em = 1.45;
 string __setting_indention_width = __setting_indention_width_in_em + "em";
@@ -38569,9 +38588,11 @@ static
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(5, $location[Cobb's Knob Kitchens], "STAT2", "+40 myst, -50% familiar weight", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(6, $location[Cobb's Knob Harem], "STAT2", "+40 moxie, -50% familiar weight", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(7, $location[Frat House], "STAT3", "+50% muscle, -50% myst", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, $location[Frat House In Disguise], "STAT3", "+50% muscle, -50% moxie", "", false));
+        // __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, $location[Frat House In Disguise], "STAT3", "+50% muscle, -50% moxie", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, fratHouseInDisguise(), "STAT3", "+50% muscle, -50% moxie", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(9, $location[Hippy Camp], "STAT3", "+50% myst, -50% moxie", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, $location[Hippy Camp In Disguise], "STAT3", "+50% myst, -50% muscle", "", false));
+        // __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, $location[Hippy Camp In Disguise], "STAT3", "+50% myst, -50% muscle", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, hippyCampInDisguise(), "STAT3", "+50% myst, -50% muscle", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(11, $location[The Obligatory Pirate's Cove], "STAT3", "+50% moxie, -50% muscle", "", false));
         //12 is gone? was: The Obligatory Pirate's Cove (In Disguise) //retired
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(15, $location[The Haunted Kitchen], "ELEMENTALDAMAGE1", "+10 " + HTMLGenerateElementSpanDesaturated($element[hot]) + " damage, -2 DR", "", false));
@@ -51505,13 +51526,79 @@ void IOTMDesignerSweatpantsResource(ChecklistEntry [int] resource_entries)
 RegisterResourceGenerationFunction("IOTMTinyStillsuitResource");
 void IOTMTinyStillsuitResource(ChecklistEntry [int] resource_entries)
 {
+    int fam_sweat_o_meter = get_property_int("familiarSweat");
+
+    if (!lookupItem("tiny stillsuit").have() && fam_sweat_o_meter == 0 ) return;
+
+	int sweatAdvs = (fam_sweat_o_meter ** 0.4);
+	int sweatAdvsConversion = (sweatAdvs - 0.5) ** 2.5;
+	int nextSweatDrams = (sweatAdvs+0.51) ** 2.5; # - fam_sweat_o_meter;
+	
     string title;
     string [int] description;
     string url = "inventory.php?action=distill&pwd=" + my_hash();
-    title = "Distill a Familiar's Sweat via Stillsuit";
-    description.listAppend("Two gross tastes that taste horrible together!");
-    
-    resource_entries.listAppend(ChecklistEntryMake("__item sweat-ade", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
+	title = HTMLGenerateSpanFont(fam_sweat_o_meter + " drams of stillsuit sweat", "purple");
+	description.listAppend("Two gross tastes that taste horrible together.");
+	//an amish paradise is as primitive as can be
+	int sweatCalcSweat;
+	int sweatCalcAdvs;
+
+	if (fam_sweat_o_meter >= 279) {
+		sweatCalcSweat = 358;
+		sweatCalcAdvs = 10;
+	}
+	else if (fam_sweat_o_meter >= 211) {
+		sweatCalcSweat = 279;
+		sweatCalcAdvs = 9;
+	}
+	else if (fam_sweat_o_meter >= 155) {
+		sweatCalcSweat = 211;
+		sweatCalcAdvs = 8;
+	}
+	else if (fam_sweat_o_meter >= 108) {
+		sweatCalcSweat = 155;
+		sweatCalcAdvs = 7;
+	}
+	else if (fam_sweat_o_meter >= 71) {
+		sweatCalcSweat = 108;
+		sweatCalcAdvs = 6;
+	}
+	else if (fam_sweat_o_meter >= 43) {
+		sweatCalcSweat = 71;
+		sweatCalcAdvs = 5;
+	}
+	else if (fam_sweat_o_meter >= 23) {
+		sweatCalcSweat = 43;
+		sweatCalcAdvs = 4;
+	}
+	else if (fam_sweat_o_meter >= 10) {
+		sweatCalcSweat = 23;
+		sweatCalcAdvs = 3;
+	}
+	
+	if (fam_sweat_o_meter > 358) {
+		description.listAppend("" + HTMLGenerateSpanOfClass("11", "r_bold") + " advs when guzzling now (costs 1 liver).");
+		description.listAppend("You should probably guzzle your sweat now.");
+	}
+	else {
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcAdvs, "r_bold") + " advs when guzzling now (costs 1 liver).");
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + CEIL(sweatCalcSweat - fam_sweat_o_meter)/3 + " combats on current familiar)");
+	}
+		
+#	description.listAppend("" + HTMLGenerateSpanOfClass(sweatAdvs, "r_bold") + " advs when guzzling now (costs 1 liver).");
+
+    if ($item[tiny stillsuit].item_amount() == 1) {
+		description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
+		url = "familiar.php";
+	}
+	else if ($item[tiny stillsuit].equipped_amount() == 1) {
+		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat from current familiar!", "purple") + "");
+	} else {
+		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
+		#description.listAppend("Currently collecting sweat from " + HTMLGenerateSpanFont(stillsuitFamiliar, "purple") + "");
+    }
+		
+    resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
 }
 
 
