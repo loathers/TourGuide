@@ -868,9 +868,11 @@ static
         lookup_map["The Defiled Niche"] = "crypt.php";
         lookup_map["Haert of the Cyrpt"] = "crypt.php";
         lookup_map["Frat House"] = "island.php";
+        lookup_map["Frat House In Disguise"] = "island.php";
         lookup_map["Frat House (frat disguise)"] = "island.php";
         lookup_map["The Frat House (Bombed Back to the Stone Age)"] = "island.php";
         lookup_map["Hippy Camp"] = "island.php";
+        lookup_map["Hippy Camp In Disguise"] = "island.php";
         lookup_map["Hippy Camp (hippy disguise)"] = "island.php";
         lookup_map["The Hippy Camp (Bombed Back to the Stone Age)"] = "island.php";
         lookup_map["The Obligatory Pirate's Cove"] = "island.php";
