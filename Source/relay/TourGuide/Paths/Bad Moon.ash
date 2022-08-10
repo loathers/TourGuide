@@ -539,6 +539,6 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     "Frat House" unknown to locationAvailable
     "Frat House (Frat Disguise)" unknown to locationAvailable
     "Hippy Camp" unknown to locationAvailable
-    "Frat House (Hippy Disguise)" unknown to locationAvailable
+    "Hippy Camp (Hippy Disguise)" unknown to locationAvailable
     */
 }
