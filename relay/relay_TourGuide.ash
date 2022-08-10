@@ -50719,7 +50719,7 @@ void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTMVampireVintnerGenerateTasks");
 void IOTMVampireVintnerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__misc_state["in run"] && lookupFamiliar("vampire vintner").familiar_is_usable()) return;
+	if (!__misc_state["in run"] || !lookupFamiliar("vampire vintner").familiar_is_usable()) return;
 	
 	int vintnerFightsLeft = clampi(14 - get_property_int("vintnerCharge"), 0, 14);
 	int vintnerWineLevel = get_property_int("vintnerWineLevel");
