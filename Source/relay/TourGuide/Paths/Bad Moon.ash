@@ -537,8 +537,8 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     FIXME
     "Tower Ruins" unknown to locationAvailable
     "Frat House" unknown to locationAvailable
-    "Frat House In Disguise" unknown to locationAvailable
+    "Frat House (Frat Disguise)" unknown to locationAvailable
     "Hippy Camp" unknown to locationAvailable
-    "Hippy Camp In Disguise" unknown to locationAvailable
+    "Hippy Camp (Hippy Disguise)" unknown to locationAvailable
     */
 }
