@@ -30,7 +30,7 @@ void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
             
             "Platypus":"+5 familiar weight and canadia access",
             "Opossum":"+5 adventures/day from food and canadia access",
-        	"Marmot":"+1 extra clover/day and canadia access",
+        	"Marmot":"+1 all resistance and canadia access",
             
             "Wombat":"+20% meat and gnome access",
             "Blender":"+5 adventures/day from drinks and gnome access",
