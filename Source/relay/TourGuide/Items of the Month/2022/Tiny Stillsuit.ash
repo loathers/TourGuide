@@ -19,10 +19,10 @@ void IOTMTinyStillsuitResource(ChecklistEntry [int] resource_entries)
   }
   else
   {
-    int sweatAdvs = (fam_sweat_o_meter ** 0.4);
-    int nextSweatDrams = CEIL((sweatAdvs + 1) ** 2.5);
+    int sweatAdvs = round(fam_sweat_o_meter ** 0.4);
+    int nextSweatDrams = ceil((sweatAdvs + 1) ** 2.5);
     description.listAppend("" + HTMLGenerateSpanOfClass(sweatAdvs, "r_bold") + " advs when guzzling now (costs 1 liver).");
-    description.listAppend("" + HTMLGenerateSpanOfClass(nextSweatDrams - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + CEIL(nextSweatDrams - fam_sweat_o_meter)/3 + " combats on current familiar)");
+    description.listAppend("" + HTMLGenerateSpanOfClass(nextSweatDrams - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + ceil(nextSweatDrams - fam_sweat_o_meter)/3 + " combats on current familiar)");
   }
   
   if ($item[tiny stillsuit].item_amount() == 1) {
