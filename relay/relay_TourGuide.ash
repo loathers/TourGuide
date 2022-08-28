@@ -13573,7 +13573,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         if (__last_adventure_location == $location[the arid, extra-dry desert]) {
             string [int] description;
             description.listAppend("Adventure in the Oasis.");
-            if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
+            if ($items[11-leaf clover].available_amount() > 0)
                 description.listAppend("Potentially clover for 20 turns, versus 5.");
             task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "place.php?whichplace=desertbeach", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11).ChecklistEntrySetIDTag("Council L11 quest desert ultrahydrated"));
         }
@@ -26245,7 +26245,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice a day on monsters for good-level food."), 6).ChecklistEntrySetIDTag("Pigification wand resource"));
     }
         
-    int clovers_available = $items[disassembled clover,ten-leaf clover].available_amount() + $item[disassembled clover].closet_amount() + $item[ten-leaf clover].closet_amount();
+    int clovers_available = $items[11-leaf clover].available_amount() + $item[11-leaf clover].closet_amount();
     // Removing clover code and swapping to lucky code like TES has.
     // if (my_path_id() == PATH_BEES_HATE_YOU || my_path_id() == PATH_G_LOVER)
     //     clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
@@ -33430,13 +33430,14 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake($item[xiblaxian stealth vest], "-combat shirt"));
         if ($item[duonoculars].item_is_usable())
 	        pullable_item_list.listAppend(GPItemMake($item[duonoculars], "-combat, +5 ML"));
-        pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
+        if ($item[ring of conflict].item_is_usable())
+            pullable_item_list.listAppend(GPItemMake($item[ring of conflict], "-combat"));
         if (($item[red shoe].can_equip() || my_path_id() == PATH_GELATINOUS_NOOB) && $item[red shoe].item_is_usable())
             pullable_item_list.listAppend(GPItemMake($item[red shoe], "-combat"));
     }
 	
-	if (my_path_id() != PATH_COMMUNITY_SERVICE)
-		pullable_item_list.listAppend(GPItemMake($item[ten-leaf clover], "Various turn saving.|Generic pull."));
+	if (my_path_id() != PATH_COMMUNITY_SERVICE && $item[11-leaf clover].item_is_usable())
+		pullable_item_list.listAppend(GPItemMake($item[11-leaf clover], "Various turn saving.|Generic pull."));
     
     if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && $item[spooky-gro fertilizer].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2.5 turns while unlocking temple."));
@@ -33628,7 +33629,7 @@ void generatePullList(Checklist [int] checklists)
                         url = "storage.php?which=2";
                 }
                 
-                if (it.storage_amount() == 0 && (__pulls_reasonable_to_buy_in_run contains it) && it != $item[ten-leaf clover] && it != $item[none])
+                if (it.storage_amount() == 0 && (__pulls_reasonable_to_buy_in_run contains it) && it != $item[11-leaf clover] && it != $item[none])
                     url = "mall.php";
                 
                 string title = pluralise(actual_amount, it);
@@ -33647,7 +33648,7 @@ void generatePullList(Checklist [int] checklists)
 void PullsInit()
 {
     //Pulls which are reasonable to buy in the mall, then pull:
-	__pulls_reasonable_to_buy_in_run = $items[peppermint parasol,slimy alveolus,bottle of blank-out,disassembled clover,ten-leaf clover,ninja rope,ninja crampons,ninja carabiner,clockwork maid,sonar-in-a-biscuit,knob goblin perfume,chrome ore,linoleum ore,asbestos ore,goat cheese,enchanted bean,dusty bottle of Marsala,dusty bottle of Merlot,dusty bottle of Muscat,dusty bottle of Pinot Noir,dusty bottle of Port,dusty bottle of Zinfandel,ketchup hound,lion oil,bird rib,stunt nuts,drum machine,beer helmet,distressed denim pants,bejeweled pledge pin,reinforced beaded headband,bullet-proof corduroys,round purple sunglasses,wand of nagamar,ng,star crossbow,star hat,star staff,star sword,Star key lime pie,Boris's key lime pie,Jarlsberg's key lime pie,Sneaky Pete's key lime pie,tomb ratchet,tangle of rat tails,swashbuckling pants,stuffed shoulder parrot,eyepatch,Knob Goblin harem veil,knob goblin harem pants,knob goblin elite polearm,knob goblin elite pants,knob goblin elite helm,cyclops eyedrops,mick's icyvapohotness inhaler,large box,marzipan skull,jaba&ntilde;ero-flavored chewing gum,handsomeness potion,Meleegra&trade; pills,pickle-flavored chewing gum,lime-and-chile-flavored chewing gum,gremlin juice,wussiness potion,Mick's IcyVapoHotness Rub,super-spiky hair gel,adder bladder,black no. 2,skeleton,rock and roll legend,wet stew,glass of goat's milk,hot wing,frilly skirt,pygmy pygment,wussiness potion,gremlin juice,adder bladder,Angry Farmer candy,thin black candle,super-spiky hair gel,Black No. 2,Mick's IcyVapoHotness Rub,Frigid ninja stars,Spider web,Sonar-in-a-biscuit,Black pepper,Pygmy blowgun,Meat vortex,Chaos butterfly,Photoprotoneutron torpedo,Fancy bath salts,inkwell,Hair spray,disease,bronzed locust,Knob Goblin firecracker,powdered organs,leftovers of indeterminate origin,mariachi G-string,NG,plot hole,baseball,razor-sharp can lid,tropical orchid,stick of dynamite,barbed-wire fence,smut orc keepsake box,spooky-gro fertilizer,machetito,muculent machete,antique machete,rusty hedge trimmers,Ice Island Long Tea,killing jar,can of black paint,gravy boat,ring of conflict,bram's choker,duonoculars];
+	__pulls_reasonable_to_buy_in_run = $items[peppermint parasol,slimy alveolus,bottle of blank-out,11-leaf clover,ninja rope,ninja crampons,ninja carabiner,clockwork maid,sonar-in-a-biscuit,knob goblin perfume,chrome ore,linoleum ore,asbestos ore,goat cheese,enchanted bean,dusty bottle of Marsala,dusty bottle of Merlot,dusty bottle of Muscat,dusty bottle of Pinot Noir,dusty bottle of Port,dusty bottle of Zinfandel,ketchup hound,lion oil,bird rib,stunt nuts,drum machine,beer helmet,distressed denim pants,bejeweled pledge pin,reinforced beaded headband,bullet-proof corduroys,round purple sunglasses,wand of nagamar,ng,star crossbow,star hat,star staff,star sword,Star key lime pie,Boris's key lime pie,Jarlsberg's key lime pie,Sneaky Pete's key lime pie,tomb ratchet,tangle of rat tails,swashbuckling pants,stuffed shoulder parrot,eyepatch,Knob Goblin harem veil,knob goblin harem pants,knob goblin elite polearm,knob goblin elite pants,knob goblin elite helm,cyclops eyedrops,mick's icyvapohotness inhaler,large box,marzipan skull,jaba&ntilde;ero-flavored chewing gum,handsomeness potion,Meleegra&trade; pills,pickle-flavored chewing gum,lime-and-chile-flavored chewing gum,gremlin juice,wussiness potion,Mick's IcyVapoHotness Rub,super-spiky hair gel,adder bladder,black no. 2,skeleton,rock and roll legend,wet stew,glass of goat's milk,hot wing,frilly skirt,pygmy pygment,wussiness potion,gremlin juice,adder bladder,Angry Farmer candy,thin black candle,super-spiky hair gel,Black No. 2,Mick's IcyVapoHotness Rub,Frigid ninja stars,Spider web,Sonar-in-a-biscuit,Black pepper,Pygmy blowgun,Meat vortex,Chaos butterfly,Photoprotoneutron torpedo,Fancy bath salts,inkwell,Hair spray,disease,bronzed locust,Knob Goblin firecracker,powdered organs,leftovers of indeterminate origin,mariachi G-string,NG,plot hole,baseball,razor-sharp can lid,tropical orchid,stick of dynamite,barbed-wire fence,smut orc keepsake box,spooky-gro fertilizer,machetito,muculent machete,antique machete,rusty hedge trimmers,Ice Island Long Tea,killing jar,can of black paint,gravy boat,ring of conflict,bram's choker,duonoculars];
 }
 
 
@@ -34283,7 +34284,7 @@ void setUpState()
 		__misc_state["dungeons of doom unlocked"] = false;
 	
 	__misc_state["can use clovers"] = true;
-	if (in_bad_moon() && $items[ten-leaf clover, disassembled clover].available_amount() == 0)
+	if (in_bad_moon() && $item[11-leaf clover].available_amount() == 0)
 		__misc_state["can use clovers"] = false;
 		
 		
@@ -48699,7 +48700,7 @@ void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
             
             "Platypus":"+5 familiar weight and canadia access",
             "Opossum":"+5 adventures/day from food and canadia access",
-        	"Marmot":"+1 extra clover/day and canadia access",
+        	"Marmot":"+1 all resistance and canadia access",
             
             "Wombat":"+20% meat and gnome access",
             "Blender":"+5 adventures/day from drinks and gnome access",
