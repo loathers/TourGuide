@@ -79,7 +79,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         if (__last_adventure_location == $location[the arid, extra-dry desert]) {
             string [int] description;
             description.listAppend("Adventure in the Oasis.");
-            if ($items[ten-leaf clover, disassembled clover].available_amount() > 0)
+            if ($items[11-leaf clover].available_amount() > 0)
                 description.listAppend("Potentially clover for 20 turns, versus 5.");
             task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "place.php?whichplace=desertbeach", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11).ChecklistEntrySetIDTag("Council L11 quest desert ultrahydrated"));
         }

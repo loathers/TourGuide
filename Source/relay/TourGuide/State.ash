@@ -637,7 +637,7 @@ void setUpState()
 		__misc_state["dungeons of doom unlocked"] = false;
 	
 	__misc_state["can use clovers"] = true;
-	if (in_bad_moon() && $items[ten-leaf clover, disassembled clover].available_amount() == 0)
+	if (in_bad_moon() && $item[11-leaf clover].available_amount() == 0)
 		__misc_state["can use clovers"] = false;
 		
 		
