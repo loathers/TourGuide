@@ -297,7 +297,7 @@ void runMain(string relay_filename)
         PageWrite(HTMLGenerateTagWrap("div", line, mapMake("style", "font-size:0.777em;color:gray;margin-top:-12px;", "id", "Guide_foot")));
     }
     boolean matrix_enabled = false;
-    if (my_path_id() == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
+    if (my_path().id == PATH_THE_SOURCE || $familiars[dataspider,Baby Bugged Bugbear] contains my_familiar())
     {
         matrix_enabled = !PreferenceGetBoolean("matrix disabled");
         if (true)

@@ -5,7 +5,7 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Ron");
-        if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
         state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
         state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
         
@@ -24,7 +24,7 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Shen");
-        if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
         state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
         state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
         
@@ -32,7 +32,7 @@ void QLevel11CopperheadInit()
         
         
         //other than in exploathing, if mafia_internal_step == 1, we haven't "locked" which items are going to be asked
-        if (state.state_boolean["should output"] && (state.mafia_internal_step > 1 || my_path_id() == PATH_KINGDOM_OF_EXPLOATHING)) {
+        if (state.state_boolean["should output"] && (state.mafia_internal_step > 1 || my_path().id == PATH_KINGDOM_OF_EXPLOATHING)) {
             state.state_int["Shen meetings"] = state.mafia_internal_step / 2;
             state.state_int["snakes slain"] = (state.mafia_internal_step - 1) / 2;
             
@@ -46,7 +46,7 @@ void QLevel11CopperheadInit()
                 state.state_boolean["on an assignment"] = true;
                 
                 //Verify if mafia's quest item matches the predicted one. If it doesn't, stop predicting assignments for the rest of the session
-                if (my_path_id() != PATH_KINGDOM_OF_EXPLOATHING) { //we know this path has a hardcoded set of requests
+                if (my_path().id != PATH_KINGDOM_OF_EXPLOATHING) { //we know this path has a hardcoded set of requests
                     item quest_item = get_property_item("shenQuestItem");
                     item predicted_quest_item = __shen_start_day_to_assignments[daycount_when_first_met_Shen] [state.state_int["Shen meetings"]];
                     if (quest_item != predicted_quest_item)
@@ -107,7 +107,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use lynyrd musk.", "red"));
             url = "inventory.php?ftext=lynyrd+musk";
         }
-        if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"] && my_path_id() != PATH_POCKET_FAMILIARS) {
+        if ($item[cigarette lighter].available_amount() > 0 && base_quest_state.state_boolean["need protestor speed tricks"] && my_path().id != PATH_POCKET_FAMILIARS) {
             subentry.entries.listAppend(HTMLGenerateSpanFont("Use cigarette lighter in-combat.", "red"));
         }
         if ($item[lynyrd snare].available_amount() > 0 && $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches].items_missing().count() > 0 && $item[lynyrd snare].item_is_usable() && get_property_int("_lynyrdSnareUses") < 3 && $item[lynyrd snare].item_is_usable()) {
@@ -188,7 +188,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         subentry.entries.listAppend("Search for Ron in the zeppelin.");
         //possibly 50% chance of no progress without a ticket (unconfirmed chat rumour)
         
-        if (my_path_id() != PATH_POCKET_FAMILIARS) {
+        if (my_path().id != PATH_POCKET_FAMILIARS) {
             subentry.modifiers.listAppend("+234% item");
             foreach m in $monsters[Red Herring,Red Snapper] {
                 if (!m.is_banished())
@@ -210,7 +210,7 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 subentry.entries.listAppend("No ticket.");
         }
         
-        if (my_path_id() != PATH_POCKET_FAMILIARS) {
+        if (my_path().id != PATH_POCKET_FAMILIARS) {
             if (get_property_int("_glarkCableUses") < 5) {
                 if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == $monster[red butler]))
                     subentry.entries.listAppend("Olfact red butlers for glark cables.");
@@ -286,7 +286,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     subentry.header = base_quest_state.quest_name;
     
     item [int] current_assignments;
-    if (my_path_id() == PATH_EXPLOSIONS)
+    if (my_path().id == PATH_EXPLOSIONS)
         current_assignments = __shen_exploathing_assignments;
     else if (__shen_start_day_to_assignments contains base_quest_state.state_int["Shen initiation day"])
         current_assignments = __shen_start_day_to_assignments[base_quest_state.state_int["Shen initiation day"]];
@@ -297,7 +297,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
     if (base_quest_state.mafia_internal_step <= 1) { //Need to meet shen for the first time.
         subentry.entries.listAppend("Adventure in the Copperhead Club and meet Shen.");
         subentry.entries.listAppend("This will give you unremovable -5 stat poison.");
-        if (my_path_id() == PATH_EXPLOSIONS)
+        if (my_path().id == PATH_EXPLOSIONS)
             subentry.entries.listAppend("On this path, he'll always ask for: |*• " + current_assignments.shenAssignmentsJoinLocations().listJoinComponents("|*• "));
         else {
             int daycount = my_daycount();
@@ -306,7 +306,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             if (__shen_start_day_to_assignments contains ++daycount)
                 subentry.entries.listAppend("Tomorrow will instead be:|*• " + __shen_start_day_to_assignments[daycount].shenAssignmentsJoinLocations().listJoinComponents("|*• "));
         }
-        if (my_daycount() == 1 && my_path_id() != PATH_EXPLOSIONS)
+        if (my_daycount() == 1 && my_path().id != PATH_EXPLOSIONS)
             subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
     } else {
         int club_turns_spent = $location[the copperhead club].turns_spent;
@@ -314,7 +314,7 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         int total_delay_remaining = 15 - (3 - base_quest_state.state_int["Shen meetings"]) - club_turns_spent;
         boolean is_disguised = $effect[Crappily Disguised as a Waiter].have_effect() > 0;
         string club_hazard = get_property("copperheadClubHazard"); //none, gong, fire, ice
-        boolean need_diamond = $items[priceless diamond,Red Zeppelin ticket].available_amount() == 0 && __quest_state["Level 11 Ron"].mafia_internal_step < 5 && my_meat() < 5000 && my_path_id() != PATH_NUCLEAR_AUTUMN;
+        boolean need_diamond = $items[priceless diamond,Red Zeppelin ticket].available_amount() == 0 && __quest_state["Level 11 Ron"].mafia_internal_step < 5 && my_meat() < 5000 && my_path().id != PATH_NUCLEAR_AUTUMN;
         boolean need_flaming_whatshisname = __quest_state["Level 11 Ron"].state_boolean["need protestor speed tricks"];
         
         string [int] club_modifiers;

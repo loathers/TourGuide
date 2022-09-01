@@ -3,7 +3,7 @@
 RegisterResourceGenerationFunction("PathSneakyPeteGenerateResource");
 void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785)) return;
+    if (my_path().id != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785)) return;
     
     
     ChecklistEntry entry;
@@ -99,7 +99,7 @@ void PathSneakyPeteGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("PathSneakyPeteGenerateTasks");
 void PathSneakyPeteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (my_path_id() != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785)) return;
+    if (my_path().id != PATH_AVATAR_OF_SNEAKY_PETE || !mafiaIsPastRevision(13785)) return;
     
     
     if (true)

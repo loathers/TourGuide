@@ -70,7 +70,7 @@ void IOTMCombatLoversLocketGenerateResource(ChecklistEntry [int] resource_entrie
 		else {
 			if (monstersReminisced > 0) 
 			{
-				if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE) {
+				if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE) {
 					options.listAppend(HTMLGenerateSpanOfClass("Fax replacements", "r_bold") + "");
 					options.listAppend("Black crayon scalers, any phylum");
 					options.listAppend("Frat warrior outfit, if no numberology");

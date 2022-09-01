@@ -26,12 +26,12 @@ void QLevel11Init()
 	{
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11MacGuffin");
-    	if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 		state.quest_name = "MacGuffin Quest";
 		state.image_name = "MacGuffin";
 		state.council_quest = true;
         
-		if (my_level() >= 11 || my_path_id() == PATH_EXPLOSIONS)
+		if (my_level() >= 11 || my_path().id == PATH_EXPLOSIONS)
 			state.startable = true;
         
         state.state_boolean["have diary"] = state.mafia_internal_step >= 3;
@@ -102,7 +102,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         boolean [familiar] relevant_familiars = $familiars[reassembled blackbird,reconstituted crow];
         familiar bird_needed_familiar;
         item bird_needed;
-        if (my_path_id() == PATH_BEES_HATE_YOU)
+        if (my_path().id == PATH_BEES_HATE_YOU)
         {
             bird_needed_familiar = $familiar[reconstituted crow];
             bird_needed = $item[reconstituted crow];
@@ -184,7 +184,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
                 subentry.header = "Vacation at the shore";
                 image_name = "__item your father's MacGuffin diary";
                 string diary_owner = "your father's";
-                if (my_path_id() == PATH_GELATINOUS_NOOB)
+                if (my_path().id == PATH_GELATINOUS_NOOB)
                     diary_owner = "an archeologist's";
                 subentry.entries.listAppend("To acquire " + diary_owner + " diary.");
             }
@@ -217,7 +217,7 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 
 void QLevel11GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (my_path_id() == PATH_COMMUNITY_SERVICE)
+    if (my_path().id == PATH_COMMUNITY_SERVICE)
         return;
     QLevel11RonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QLevel11ShenGenerateTasks(task_entries, optional_task_entries, future_task_entries);

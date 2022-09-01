@@ -77,7 +77,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         if (ghost_location == $location[the skeleton store] && !ghost_location.locationAvailable())
         {
             //bone with a price tag on it
-            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            if (my_path().id == PATH_NUCLEAR_AUTUMN)
             {
                 if ($item[bone with a price tag on it].available_amount() > 0)
                 {
@@ -94,7 +94,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         if (ghost_location == $location[The Overgrown Lot] && !ghost_location.locationAvailable())
         {
             //bone with a price tag on it
-            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            if (my_path().id == PATH_NUCLEAR_AUTUMN)
             {
                 if ($item[map to a hidden booze cache].available_amount() > 0)
                 {
@@ -111,7 +111,7 @@ void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries,
         if (ghost_location == $location[Madness Bakery] && !ghost_location.locationAvailable())
         {
             //bone with a price tag on it
-            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            if (my_path().id == PATH_NUCLEAR_AUTUMN)
             {
                 if ($item[hypnotic breadcrumbs].available_amount() > 0)
                 {
@@ -158,7 +158,7 @@ void IOTMProtonicAcceleratorPackGenerateResource(ChecklistEntry [int] resource_e
 {
     if (!__iotms_usable[$item[protonic accelerator pack]]) return;
     
-    if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085) && my_path_id() != PATH_G_LOVER)
+    if (!get_property_boolean("_streamsCrossed") &&__misc_state["in run"] && mafiaIsPastRevision(17085) && my_path().id != PATH_G_LOVER)
     {
         string [int] description;
         string url = "showplayer.php?who=2807390"; //ProtonicBot is a real bot that will steal your turtle mechs at the first sign of defiance.

@@ -40,7 +40,7 @@ boolean PathJarlsbergGenerateStaff(ChecklistEntry entry, item staff, string prop
 RegisterResourceGenerationFunction("PathJarlsbergGenerateResource");
 void PathJarlsbergGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (my_path_id() != PATH_AVATAR_OF_JARLSBERG) return;
+    if (my_path().id != PATH_AVATAR_OF_JARLSBERG) return;
     
     ChecklistEntry entry;
     entry.tags.id = "Jarlsberg path staff resource";

@@ -20,7 +20,7 @@ void IOTMComprehensiveCartographyGenerateResource(ChecklistEntry [int] resource_
 	{
 		description.listAppend("Map the monsters you want to fight!");
 		
-		if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE)
+		if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE)
 		{
 			description.listAppend("This IotM also gives you a special noncom in the following zones:");
 			if (!__quest_state["cc_spookyravennecklace"].finished)
