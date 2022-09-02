@@ -55,7 +55,7 @@ static {
 float numeric_modifier_replacement(item it, string modifier) {
     string modifier_lowercase = modifier.to_lower_case();
     float additional = 0;
-    if (my_path_id() == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
+    if (my_path().id == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
     	return 0.0;
     if (it == $item[your cowboy boots])
     {
@@ -269,7 +269,7 @@ location [int] shenAssignmentsJoinLocations(item [int] assignments) {
 }
 location [int] getFutureShenAssignments(int [string] level_11_state_ints) { //QuestState's haven't been set yet, so instead, pass the whole __quest_state["Level 11 Shen"].state_int to the function (this is sooooo stupid, I know, but still simpler than passing the two values every single call)
     item [int] assignments;
-    if (my_path_id() == PATH_KINGDOM_OF_EXPLOATHING)
+    if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING)
         assignments = __shen_exploathing_assignments;
     else
         assignments = __shen_start_day_to_assignments[level_11_state_ints["Shen initiation day"]];
@@ -318,7 +318,7 @@ static
     };
 
     Key [int] LKS_keys;
-    if (my_path_id() == PATH_LOW_KEY_SUMMER) {
+    if (my_path().id == PATH_LOW_KEY_SUMMER) {
         Key KeyMake(string name, location zone, string enchantment, string condition_for_unlock, string pre_unlock_url) {
             Key result;
             result.it = name.to_item();

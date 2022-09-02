@@ -186,7 +186,7 @@ int [string] activeBanishNameCountsForLocation(location l)
     foreach key, m in l.get_monsters() {
         if (names contains m)
             banish_name_counts[names[m]] += 1;
-        if (my_path_id() == PATH_ONE_CRAZY_RANDOM_SUMMER) {
+        if (my_path().id == PATH_ONE_CRAZY_RANDOM_SUMMER) {
             foreach m2 in names {
                 if (m2.to_string().to_lower_case().contains_text(m.to_string().to_lower_case())) //FIXME complete hack, wrong, substrings, 1337, etc
                     banish_name_counts[names[m2]] += 1;

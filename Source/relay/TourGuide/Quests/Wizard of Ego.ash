@@ -10,7 +10,7 @@ void QWizardOfEgoInit()
 	QuestState state;
 	
 	QuestStateParseMafiaQuestProperty(state, "questG03Ego");
-    if (my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     
     if (!state.finished)
     {

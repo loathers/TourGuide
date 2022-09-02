@@ -90,7 +90,7 @@ void generateDailyResources(Checklist [int] checklists)
         description.listAppend("Or +10% item, +50% init. (stylishly)");
         resource_entries.listAppend(ChecklistEntryMake("__item pool cue", "clan_viplounge.php?action=pooltable", ChecklistSubentryMake(pluralise(games_available, "pool table game", "pool table games"), "10 turns", description), 5).ChecklistEntrySetIDTag("VIP table pool resource"));
     }
-    if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived") && my_path_id() != PATH_COMMUNITY_SERVICE && !__misc_state["in CS aftercore"]) {
+    if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived") && my_path().id != PATH_COMMUNITY_SERVICE && !__misc_state["in CS aftercore"]) {
         string [int] description;
         if (!__misc_state["familiars temporarily blocked"]) {
             description.listAppend("+Familiar experience.");
@@ -120,7 +120,7 @@ void generateDailyResources(Checklist [int] checklists)
     if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"] && $item[Clan looking glass].is_unrestricted() && $item[&quot;DRINK ME&quot; potion].item_is_usable()){
         string [int] description;
         string line = "Various effects.";
-        if (__misc_state["in run"] && my_path_id() != PATH_ZOMBIE_SLAYER && $item[pail].available_amount() > 0) {
+        if (__misc_state["in run"] && my_path().id != PATH_ZOMBIE_SLAYER && $item[pail].available_amount() > 0) {
             line = "+20ML";
             line += "|Or various effects.";
         }
@@ -329,7 +329,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
 
     //Not sure how I feel about this. It's kind of extraneous?
-    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path_id() != PATH_NUCLEAR_AUTUMN) {
+    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path().id != PATH_NUCLEAR_AUTUMN) {
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
         description.listAppend("+" + (percentage == 25 ? "35% or +25" : percentage) + "% to all attributes. (10 turns)");
@@ -374,7 +374,7 @@ void generateDailyResources(Checklist [int] checklists)
                         nightstand_stat = $stat[moxie];
 
                     string nightstand_message;
-                    if (nightstand_stat != $stat[none] && my_path_id() != PATH_THE_SOURCE) {
+                    if (nightstand_stat != $stat[none] && my_path().id != PATH_THE_SOURCE) {
                         float experience_multiplier = (100 + numeric_modifier(nightstand_stat + " Experience Percent")) / 100;
                         int nightstand_statgain = clampi(12 * my_level(), 0, 100) * experience_multiplier;
                         nightstand_message = ", " + nightstand_statgain + " " + nightstand_stat + " stats";
@@ -382,7 +382,7 @@ void generateDailyResources(Checklist [int] checklists)
 
                     subentry.entries.listAppend("250 HP, 125 MP" + nightstand_message + ".");
                     
-                    if (my_level() < 9 && my_path_id() != PATH_THE_SOURCE)
+                    if (my_level() < 9 && my_path().id != PATH_THE_SOURCE)
                         subentry.entries.listAppend("May want to wait until level 9(?) for more stats from resting.");
                     
                     item [int] items_equipping = generateEquipmentToEquipForExtraExperienceOnStat(nightstand_stat);
@@ -558,7 +558,7 @@ void generateDailyResources(Checklist [int] checklists)
         }
     }
     
-    if (my_path_id() != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["in aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"])) {
+    if (my_path().id != PATH_BEES_HATE_YOU && !get_property_boolean("guyMadeOfBeesDefeated") && get_property_int("guyMadeOfBeesCount") > 0 && (__misc_state["in aftercore"] || !__quest_state["Level 12"].state_boolean["Arena Finished"])) {
         //Not really worthwhile? But I suppose we can track it if they've started it, and are either in aftercore or haven't flyered yet.
         //For flyering, it's 20 turns at -25%, 25 turns at -15%. 33 turns at -5%. Not worthwhile?
         int summon_count = get_property_int("guyMadeOfBeesCount");
@@ -578,7 +578,7 @@ void generateDailyResources(Checklist [int] checklists)
     if (stills_available() > 0) {
         string [int] description;
         string [int] mixables;
-        if (__misc_state["can drink just about anything"] && my_path_id() != PATH_SLOW_AND_STEADY) {
+        if (__misc_state["can drink just about anything"] && my_path().id != PATH_SLOW_AND_STEADY) {
             mixables.listAppend("neuromancer-level drinks");
         }
         mixables.listAppend("~40MP from tonic water");
@@ -606,7 +606,7 @@ void generateDailyResources(Checklist [int] checklists)
         //_deluxeKlawSummons?
         //_crimboTree?
         int soaks_remaining = __misc_state_int["hot tub soaks remaining"];
-        if (__misc_state["in run"] && soaks_remaining > 0 && my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING && my_path_id() != PATH_VAMPIRE) {
+        if (__misc_state["in run"] && soaks_remaining > 0 && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && my_path().id != PATH_VAMPIRE) {
             string description = "Restore all HP, removes most bad effects.";
             resource_entries.listAppend(ChecklistEntryMake("__effect blessing of squirtlcthulli", "clan_viplounge.php", ChecklistSubentryMake(pluralise(soaks_remaining, "hot tub soak", "hot tub soaks"), "", description), 8).ChecklistEntrySetIDTag("VIP hot tub soaks resource"));
         }
@@ -645,7 +645,7 @@ void generateDailyResources(Checklist [int] checklists)
         resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8).ChecklistEntrySetIDTag("Chateau Mantegna desk resource"));
     }
 
-    if (!get_property_boolean("_lyleFavored") && my_path_id() != PATH_G_LOVER) {
+    if (!get_property_boolean("_lyleFavored") && my_path().id != PATH_G_LOVER) {
         string image_name = "__effect favored by lyle";
         string description = $effect[Favored by Lyle].have_effect() > 0 ? "Increases duration of Favored by Lyle." : "+10% all attributes.";
         resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=monorail", ChecklistSubentryMake("Visit Lyle", "10 turns", description), 10).ChecklistEntrySetIDTag("Lyle favored resource"));

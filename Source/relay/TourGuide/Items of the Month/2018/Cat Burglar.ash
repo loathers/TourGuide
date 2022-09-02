@@ -30,7 +30,7 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
 			description.listAppend("" + burglar_progress + "/10 charges today for 1st heist.");
 			
         string [int] options;
-        if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE) {
+        if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE) {
             int bowling_progress = get_property_int("hiddenBowlingAlleyProgress");
             if (bowling_progress < 7) {
                 int balls_needed = 6 - bowling_progress - $item[bowling ball].available_amount();

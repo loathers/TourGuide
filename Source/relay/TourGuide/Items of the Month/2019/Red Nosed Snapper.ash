@@ -67,7 +67,7 @@ void IOTMRedNosedSnapperResource(ChecklistEntry [int] resource_entries)
     //undead = +5 spooky res
     //weird = +50% myst stats (spleen) (way too rare in-run to recommend)
 
-    boolean going_in_Degrassi_Knoll = !knoll_available() && my_path_id() != PATH_NUCLEAR_AUTUMN && !__misc_state["desert beach available"] && __misc_state["guild open"];
+    boolean going_in_Degrassi_Knoll = !knoll_available() && my_path().id != PATH_NUCLEAR_AUTUMN && !__misc_state["desert beach available"] && __misc_state["guild open"];
     boolean making_Junk_Junk = !__misc_state["mysterious island available"] && __quest_state["Old Landfill"].in_progress;
     boolean Azazel_quest_is_in_progress = __quest_state["Azazel"].in_progress && !in_bad_moon() && $locations[The Laugh Floor, Infernal Rackets Backstage].turnsAttemptedInLocation() > 0;
     boolean nemesis_quest_at_clown_house = __quest_state["Nemesis"].mafia_internal_step == 6;
@@ -76,10 +76,10 @@ void IOTMRedNosedSnapperResource(ChecklistEntry [int] resource_entries)
     boolean at_chasm_bridge = __quest_state["Highland Lord"].mafia_internal_step == 1;
     boolean past_chasm_bridge = __quest_state["Highland Lord"].mafia_internal_step > 1;
     boolean want_more_rusty_hedge_trimmers = __quest_state["Highland Lord"].state_boolean["can complete twin peaks quest quickly"] && __quest_state["Highland Lord"].state_int["twin peak progress"] < 15 && $item[rusty hedge trimmers].available_amount() < __quest_state["Highland Lord"].state_int["peak tests remaining"];
-    boolean looking_for_mining_gear = __quest_state["Trapper"].in_progress && !__quest_state["Trapper"].state_boolean["Past mine"] && __quest_state["Trapper"].state_string["ore needed"].to_item().available_amount() < 3 && !have_outfit_components("Mining Gear") && my_path_id() != PATH_AVATAR_OF_BORIS && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST;
+    boolean looking_for_mining_gear = __quest_state["Trapper"].in_progress && !__quest_state["Trapper"].state_boolean["Past mine"] && __quest_state["Trapper"].state_string["ore needed"].to_item().available_amount() < 3 && !have_outfit_components("Mining Gear") && my_path().id != PATH_AVATAR_OF_BORIS && my_path().id != PATH_WAY_OF_THE_SURPRISING_FIST;
     boolean they_may_be_ninjas = __quest_state["Trapper"].state_boolean["Past mine"] && ($location[lair of the ninja snowmen].turns_spent > 0 || $location[the extreme slope].turns_spent == 0);
     boolean have_some_pirating_to_do = __misc_state["mysterious island available"] && __quest_state["Pirate Quest"].state_boolean["valid"] && !__quest_state["Island War"].state_boolean["War in progress"];
-    boolean have_access_to_giant_castle = $item[s.o.c.k.].available_amount() > 0 || my_path_id() == PATH_EXPLOSION;
+    boolean have_access_to_giant_castle = $item[s.o.c.k.].available_amount() > 0 || my_path().id == PATH_EXPLOSION;
     boolean top_floor_done = __quest_state["Castle"].mafia_internal_step > 10 && $location[the hole in the sky].locationAvailable();
     boolean going_in_the_HITS = $location[the hole in the sky].locationAvailable() && $item[richard\'s star key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["Richard's star key used"];
     boolean exploring_desert = __quest_state["Level 11"].in_progress && !__quest_state["Level 11 Desert"].state_boolean["Desert Explored"];
@@ -87,8 +87,8 @@ void IOTMRedNosedSnapperResource(ChecklistEntry [int] resource_entries)
     boolean have_more_dense_lianas_to_fight = at_hidden_city && __quest_state["Level 11 Hidden City"].state_int["lianas left"] > 0;
     boolean making_wine_bomb = __quest_state["Level 11 Manor"].mafia_internal_step == 3 && get_property("spookyravenRecipeUsed") == "with_glasses";
     boolean helping_Yossarian = __quest_state["Island War"].state_boolean["War in progress"] && !__quest_state["Island War"].state_boolean["Junkyard Finished"];
-    boolean fighting_filthworms = __quest_state["Island War"].state_boolean["War in progress"] && !__quest_state["Island War"].state_boolean["Orchard Finished"] && my_path_id() != PATH_2CRS;
-    boolean CS_need_to_pass_hot_res_test = my_path_id() == PATH_COMMUNITY_SERVICE && !(get_property("csServicesPerformed").split_string_alternate(",").listInvert() contains "Clean Steam Tunnels");
+    boolean fighting_filthworms = __quest_state["Island War"].state_boolean["War in progress"] && !__quest_state["Island War"].state_boolean["Orchard Finished"] && my_path().id != PATH_2CRS;
+    boolean CS_need_to_pass_hot_res_test = my_path().id == PATH_COMMUNITY_SERVICE && !(get_property("csServicesPerformed").split_string_alternate(",").listInvert() contains "Clean Steam Tunnels");
 
 
     string [int] currentlyReachableInstancesOfPhylum(phylum phyl) {
@@ -253,7 +253,7 @@ void IOTMRedNosedSnapperResource(ChecklistEntry [int] resource_entries)
         if (!__quest_state["Level 13"].state_boolean["Init race completed"] || cyrpt_modern_zmobies_are_appreciated)
             want_phylum_drop[$phylum[construct]] = true; //+150% initiative
 
-        if (my_path_id() != PATH_COMMUNITY_SERVICE && $item[Spookyraven billiards room key].available_amount() == 0 && get_property_int("manorDrawerCount") < 20) {
+        if (my_path().id != PATH_COMMUNITY_SERVICE && $item[Spookyraven billiards room key].available_amount() == 0 && get_property_int("manorDrawerCount") < 20) {
             if (numeric_modifier("hot resistance") < 7)
                 want_phylum_drop[$phylum[demon]] = true; //+5 hot res
             if (numeric_modifier("stench resistance") < 7)
@@ -285,7 +285,7 @@ void IOTMRedNosedSnapperResource(ChecklistEntry [int] resource_entries)
         want_phylum_drop[$phylum[mer-kin]] = true; //+30% underwater items (meh...)
     }
 
-    if (in_ronin() && my_path_id() != PATH_NUCLEAR_AUTUMN) {
+    if (in_ronin() && my_path().id != PATH_NUCLEAR_AUTUMN) {
         if (fullness_limit() >= 3)
             want_phylum_drop[$phylum[goblin]] = true; //size 3 awesome food
         if (inebriety_limit() >= 3)

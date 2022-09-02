@@ -7,7 +7,7 @@ void generateMissingItems(Checklist [int] checklists)
     
     if (!__misc_state["in run"])
         return;
-    if (my_path_id() == PATH_COMMUNITY_SERVICE)
+    if (my_path().id == PATH_COMMUNITY_SERVICE)
         return;
     
     //thought about using getClickableURLForLocationIfAvailable for these, but our location detection is very poor, and there are corner cases regardless
@@ -101,7 +101,7 @@ void generateMissingItems(Checklist [int] checklists)
         items_needed_entries.listAppend(entry);
     }
     
-    if (my_path_id() != PATH_LOW_KEY_SUMMER) //keys are in their own section in this path
+    if (my_path().id != PATH_LOW_KEY_SUMMER) //keys are in their own section in this path
         SLevel13DoorGenerateMissingItems(items_needed_entries);
     
     if ($item[lord spookyraven\'s spectacles].available_amount() == 0 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"] && !__quest_state["Level 11 Manor"].finished)
@@ -127,7 +127,7 @@ void generateMissingItems(Checklist [int] checklists)
         }
     }
     
-    if ($item[electric boning knife].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"] && my_path_id() != PATH_POCKET_FAMILIARS) {
+    if ($item[electric boning knife].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"] && my_path().id != PATH_POCKET_FAMILIARS) {
         string [int] description;
         description.listAppend("Found from an NC on the ground floor of the castle in the clouds in the sky.");
         boolean can_towerkill = false;
@@ -140,7 +140,7 @@ void generateMissingItems(Checklist [int] checklists)
             description.listAppend("Don't collect this right now; wait until you're at the wall of bones.|(probability of appearing increases)");
         items_needed_entries.listAppend(ChecklistEntryMake("__item electric boning knife", $location[the castle in the clouds in the sky (ground floor)].getClickableURLForLocation(), ChecklistSubentryMake("Electric boning knife", "-combat", description)).ChecklistEntrySetIDTag("Electric boning knife reminder"));
     }
-    if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"] && my_path_id() != PATH_POCKET_FAMILIARS) {
+    if ($item[beehive].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of skin will need to be defeated"] && my_path().id != PATH_POCKET_FAMILIARS) {
         string [int] description;
         
         description.listAppend("Found from an NC in the black forest.");

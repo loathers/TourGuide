@@ -1,7 +1,7 @@
 string [int] SSkillsPotentialCraftingOptions()
 {
     string [int] potential_options;
-    if ($item[knob cake].available_amount() == 0 && !__quest_state["Level 6"].finished && my_path_id() != PATH_COMMUNITY_SERVICE)
+    if ($item[knob cake].available_amount() == 0 && !__quest_state["Level 6"].finished && my_path().id != PATH_COMMUNITY_SERVICE)
         potential_options.listAppend("knob cake");
     if (__misc_state["can eat just about anything"])
         potential_options.listAppend("food");
@@ -126,7 +126,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     
     
     
-    if (my_path_id() == PATH_AVATAR_OF_SNEAKY_PETE) {
+    if (my_path().id == PATH_AVATAR_OF_SNEAKY_PETE) {
         property_summons_to_skills["_petePartyThrown"] = listMake($skill[Throw Party]);
         property_summons_to_skills["_peteRiotIncited"] = listMake($skill[Incite Riot]);
         
@@ -147,7 +147,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         else
             skills_to_details[$skill[Incite Riot]] = "This fire is out of control";
     }
-    if (my_path_id() == PATH_AVATAR_OF_JARLSBERG) {
+    if (my_path().id == PATH_AVATAR_OF_JARLSBERG) {
         property_summons_to_skills["_jarlsCreamSummoned"] = listMake($skill[Conjure Cream]);
         property_summons_to_skills["_jarlsEggsSummoned"] = listMake($skill[Conjure Eggs]);
         property_summons_to_skills["_jarlsDoughSummoned"] = listMake($skill[Conjure Dough]);
@@ -157,7 +157,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         property_summons_to_skills["_jarlsMeatSummoned"] = listMake($skill[Conjure Meat Product]);
         property_summons_to_skills["_jarlsFruitSummoned"] = listMake($skill[Conjure Fruit]);
     }
-    if (my_path_id() == PATH_AVATAR_OF_BORIS) {
+    if (my_path().id == PATH_AVATAR_OF_BORIS) {
         property_summons_to_skills["_demandSandwich"] = listMake($skill[Demand Sandwich]);
         property_summon_limits["_demandSandwich"] = 3;
     }
@@ -249,7 +249,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     if (lookupSkill("Evoke Eldritch Horror").skill_is_usable() && !get_property_boolean("_eldritchHorrorEvoked")) {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Evoke eldritch horror skill free fight"));
     }
-    if (!get_property_boolean("_eldritchTentacleFought") && my_path_id() != PATH_EXPLOSIONS) {
+    if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS) {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Daily forest tentacle free fight"));
     }
     

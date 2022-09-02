@@ -10,7 +10,7 @@ void QLevel4Init()
     //step3 -> 3 areas unlocked
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL04Bat");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	
 	state.quest_name = "Boss Bat Quest";
 	state.image_name = "Boss Bat";
@@ -32,7 +32,7 @@ void QLevel4Init()
 		state.state_int["areas unlocked"] = 3;
 	}
 	
-	if (my_level() >= 4 || my_path_id() == PATH_EXPLOSIONS)
+	if (my_level() >= 4 || my_path().id == PATH_EXPLOSIONS)
 		state.startable = true;
 		
 	__quest_state["Level 4"] = state;
