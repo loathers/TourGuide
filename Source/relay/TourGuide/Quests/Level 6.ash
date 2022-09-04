@@ -4,12 +4,12 @@ void QLevel6Init()
 	//questL06Friar
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL06Friar");
-    if (my_path_id() == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Deep Fat Friars' Quest";
 	state.image_name = "forest friars";
 	state.council_quest = true;
 	
-	if (my_level() >= 6 || my_path_id() == PATH_EXPLOSIONS)
+	if (my_level() >= 6 || my_path().id == PATH_EXPLOSIONS)
 		state.startable = true;
 	
     state.state_int["dark neck turns on last nc"] = 0;
@@ -43,6 +43,7 @@ float QLevel6TurnsToCompleteArea(location place)
         foreach key, s in location_ncs
         {
             if (area_known_ncs contains s)
+                {
                 if (place == $location[the dark neck of the woods])
                     base_quest_state.state_int["dark neck turns on last nc"] = turns_spent_in_zone;
                 if (place == $location[the dark heart of the woods])
@@ -50,11 +51,15 @@ float QLevel6TurnsToCompleteArea(location place)
                 if (place == $location[the dark elbow of the woods])
                     base_quest_state.state_int["dark elbow turns on last nc"] = turns_spent_in_zone;
                 ncs_found += 1;
+                }
         }
     }
+
     if (ncs_found == 4)
+    {
         return 0.0;
-    
+    }
+
     float turns_remaining = 0.0;
     int ncs_remaining = MAX(0, 4 - ncs_found);
     
@@ -84,7 +89,7 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 	boolean want_hell_ramen = false;
 	if ($skill[pastamastery].skill_is_usable() && $skill[Advanced Saucecrafting].skill_is_usable())
 		want_hell_ramen = true;
-    if (my_path_id() == PATH_SLOW_AND_STEADY)
+    if (my_path().id == PATH_SLOW_AND_STEADY)
         want_hell_ramen = false;
     want_hell_ramen = false; //this needs rethinking
     

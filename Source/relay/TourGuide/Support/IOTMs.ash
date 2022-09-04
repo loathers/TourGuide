@@ -9,7 +9,7 @@ void initialiseIOTMsUsable()
     if (in_bad_moon())
         return;
     
-    if (my_path_id() != PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path().id != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         //Campground items:
         foreach it in $items[source terminal, haunted doghouse, Witchess Set, potted tea tree, portable mayo clinic, Little Geneticist DNA-Splicing Lab, cornucopia]
@@ -115,7 +115,7 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[clan floundry]] = true;
     }
     //Can't use many things in G-Lover
-    if (my_path_id() == PATH_G_LOVER) //Path 33
+    if (my_path().id == PATH_G_LOVER) //Path 33
     {
         __iotms_usable[lookupItem("Bird-a-Day calendar")] = false;
         __iotms_usable[lookupItem("Deck of Every Card")] = false;
@@ -129,7 +129,7 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("unwrapped knock-off retro superhero cape")] = false;        
         __iotms_usable[lookupItem("vampyric cloake")] = false;
     }
-    if (my_path_id() == PATH_EXPLOSIONS) //Path 37
+    if (my_path().id == PATH_EXPLOSIONS) //Path 37
     {
         __iotms_usable[lookupItem("Spacegate access badge")] = false;
     }

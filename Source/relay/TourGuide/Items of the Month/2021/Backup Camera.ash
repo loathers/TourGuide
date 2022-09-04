@@ -11,7 +11,7 @@ void IOTMBackupCameraGenerateResource(ChecklistEntry [int] resource_entries)
 		// Entries
 		int backup_camera_snapsUsed = get_property_int("_backUpUses");
         int totalBackupCameras = 11;
-        if (my_path_id() == PATH_YOU_ROBOT) {
+        if (my_path().id == PATH_YOU_ROBOT) {
             totalBackupCameras = 16;
 			//for whatever awful reason, this is buggy and will miscount when you break prism until you relog
         }

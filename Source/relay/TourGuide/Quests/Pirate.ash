@@ -11,7 +11,7 @@ void QPirateInit()
     
     state.state_boolean["valid"] = false; // now invalid by default since the 2020 change
     
-    if (my_path_id() == PATH_LOW_KEY_SUMMER)
+    if (my_path().id == PATH_LOW_KEY_SUMMER)
         state.state_boolean["valid"] = true;
     
     if (__misc_state["mysterious island available"] && state.state_boolean["valid"]) {
@@ -80,7 +80,7 @@ void QPirateCoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     boolean delay_for_future = false;
     boolean can_acquire_cocktail_napkins = false;
     
-    if (in_ronin() && $item[Talisman o\' Namsilat].available_amount() == 0 && my_path_id() != PATH_LOW_KEY_SUMMER)
+    if (in_ronin() && $item[Talisman o\' Namsilat].available_amount() == 0 && my_path().id != PATH_LOW_KEY_SUMMER)
         subentry.entries.listAppend(HTMLGenerateSpanFont("Pirates won't help you in-run anymore.", "red"));
     
     if (!have_outfit) {
@@ -246,7 +246,7 @@ void QPirateCoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         } else if (base_quest_state.mafia_internal_step == 7) {
             //The Poop Deck
             if (__quest_state["Level 11"].mafia_internal_step < 3) {
-                if (my_path_id() == PATH_COMMUNITY_SERVICE || __quest_state["Level 11"].mafia_internal_step == 0 && get_property_int("lastCouncilVisit") >= 11) { //They CANNOT get the password, and are only here for the zone itself
+                if (my_path().id == PATH_COMMUNITY_SERVICE || __quest_state["Level 11"].mafia_internal_step == 0 && get_property_int("lastCouncilVisit") >= 11) { //They CANNOT get the password, and are only here for the zone itself
                     QuestStateParseMafiaQuestPropertyValue(base_quest_state, "finished");
                     subentry.entries.listAppend("Watch out for that recurring non-combat...");
                 } else

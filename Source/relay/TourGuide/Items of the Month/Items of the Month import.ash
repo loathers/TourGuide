@@ -109,7 +109,7 @@ import "relay/TourGuide/Items of the Month/2021/Familiar Scrapbook.ash";
 import "relay/TourGuide/Items of the Month/2021/Underground Fireworks Shop.ash";
 // Missing: Candles
 import "relay/TourGuide/Items of the Month/2021/Industrial Fire Extinguisher.ash";
-// Missing: Vampire Vintner
+import "relay/TourGuide/Items of the Month/2021/Vampire Vintner.ash";
 import "relay/TourGuide/Items of the Month/2021/Daylight Shavings Helmet.ash";
 import "relay/TourGuide/Items of the Month/2021/Cold Medicine Cabinet.ash";
 
@@ -119,4 +119,7 @@ import "relay/TourGuide/Items of the Month/2022/Cosmic Bowling Ball.ash";
 import "relay/TourGuide/Items of the Month/2022/Combat Lover Locket.ash";
 import "relay/TourGuide/Items of the Month/2022/Grey Goose.ash";
 import "relay/TourGuide/Items of the Month/2022/Unbreakable Umbrella.ash";
-// Missing: MayDay Package. Simple tile, just need to make it lol.
+import "relay/TourGuide/Items of the Month/2022/Mayday Supply Package.ash";
+import "relay/TourGuide/Items of the Month/2022/June Cleaver.ash";
+import "relay/TourGuide/Items of the Month/2022/Designer Sweatpants.ash";
+import "relay/TourGuide/Items of the Month/2022/Tiny Stillsuit.ash";

@@ -26,7 +26,7 @@ void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [in
 {
     if (!__misc_state["in run"] || !$item[Powerful Glove].have() || $item[Powerful Glove].have_equipped()) return;
 
-    boolean is_plumber = my_path_id() == PATH_OF_THE_PLUMBER;
+    boolean is_plumber = my_path().id == PATH_OF_THE_PLUMBER;
 
     string [int] glove_drops;
 

@@ -2,7 +2,7 @@
 RegisterLowKeyGenerationFunction("PathLowKeyGenerateKeys");
 void PathLowKeyGenerateKeys(ChecklistEntry [int] low_key_entries) {
 
-    if (my_path_id() != PATH_LOW_KEY_SUMMER) return;
+    if (my_path().id != PATH_LOW_KEY_SUMMER) return;
     if (__quest_state["Lair"].state_boolean["past keys"]) return;
 
     //LKS-specific keys

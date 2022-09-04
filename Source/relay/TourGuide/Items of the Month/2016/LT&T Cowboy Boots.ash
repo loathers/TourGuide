@@ -1,5 +1,3 @@
-import "relay/TourGuide/Support/Location Choice.ash";
-
 RegisterTaskGenerationFunction("IOTMTelegraphOfficeGenerateTasks");
 void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -68,11 +66,8 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         description.listAppend(pluraliseWordy(turns_remaining, "more turn", "more turns").capitaliseFirstLetter() + " until the boss.");
     if (turns_remaining == 0 || ltt_quest.mafia_internal_step == 5)
     {
-        monster boss = boss_for_quest[quest_name];
-        if (boss == $monster[none])
-            description.listAppend("Defeat the boss.");
-        else
-            description.listAppend("Defeat " + boss + ".");
+        string url = "inventory.php?ftext=plaintive+telegram";
+		monster boss = boss_for_quest[quest_name];
         boolean frigidalmatian_eligible = false;
         if (boss == $monster[Clara])
         {
@@ -125,7 +120,8 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             description.listAppend("Acquire passive damage (glowing syringes?), attack repeatedly.");
             frigidalmatian_eligible = true;
         }
-        
+        string image_name = "__monster " + boss;
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake("Defeat " + boss + "!", modifiers, description), -11));
         if (frigidalmatian_eligible)
         {
             string [int] tasks;
@@ -137,7 +133,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
                 frigidalmatian_obtainable = true;
                 tasks.listAppend("cast frigidalmatian");
             }
-            if (frigidalmatian_obtainable && $items[rain-doh green lantern,snow mobile].equipped_amount() == 0)
+            if (frigidalmatian_obtainable && $items[rain-doh green lantern,snow mobile,meteorb].equipped_amount() == 0)
             {
                 if ($item[rain-doh green lantern].available_amount() > 0)
                 {

@@ -10,7 +10,7 @@ void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 	// Entries
 	int extinguisher_charge = get_property_int("_fireExtinguisherCharge");
 	boolean extinguisher_refill = get_property_boolean("_fireExtinguisherRefilled");
-	boolean is_on_fire = my_path_id() == 43; // Path 43 is Wildfire.
+	boolean is_on_fire = my_path().id == 43; // Path 43 is Wildfire.
 
 	string url = "inventory.php?ftext=industrial+fire+extinguisher";
 	description.listAppend("Extinguish the fires in your life!");
@@ -33,7 +33,7 @@ void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!lookupItem("industrial fire extinguisher").equipped())
 		description.listAppend(HTMLGenerateSpanFont("Equip the fire extinguisher first.", "red"));
 
-	if (__misc_state["in run"] && my_path_id() != 25 && extinguisher_charge >= 20) // Path 25 is Community Service.
+	if (__misc_state["in run"] && my_path().id != 25 && extinguisher_charge >= 20) // Path 25 is Community Service.
 	{
 		if (!get_property_boolean("fireExtinguisherBatHoleUsed") && !__quest_state["Level 4"].finished)
 		{

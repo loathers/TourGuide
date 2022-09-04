@@ -32,7 +32,7 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         boolean have_reason = false;
         //Try not to annoy anyone that doesn't currently have a reason to stasis:
-        if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING) //to always trigger the underworld
+        if (my_path().id == PATH_ACTUALLY_ED_THE_UNDYING) //to always trigger the underworld
             have_reason = true;
         if ($effect[everything looks yellow].have_effect() == 0 && $familiar[he-boulder].familiar_is_usable()) //to reach the correct eye
             have_reason = true;
@@ -60,7 +60,7 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             } else {
                 try_for_seal_tooth = true;
             }
-            if (my_path_id() == PATH_NUCLEAR_AUTUMN)
+            if (my_path().id == PATH_NUCLEAR_AUTUMN)
                 try_for_seal_tooth = false;
             
             if (try_for_seal_tooth) {
@@ -278,7 +278,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         resolution_descriptions[$item[resolution: be kinder]] = "+5 familiar weight (20 turns)";
         resolution_descriptions[$item[resolution: be luckier]] = "+5% item, +5% meat, +10% init, others (20 turns)"; //???
-        if (my_path_id() != PATH_SLOW_AND_STEADY)
+        if (my_path().id != PATH_SLOW_AND_STEADY)
             resolution_descriptions[$item[resolution: be more adventurous]] = "+2 adventures at rollover";
         resolution_descriptions[$item[resolution: be wealthier]] = "+30% meat";
         
@@ -388,9 +388,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice a day on monsters for good-level food."), 6).ChecklistEntrySetIDTag("Pigification wand resource"));
     }
         
-    int clovers_available = $items[disassembled clover,ten-leaf clover].available_amount() + $item[disassembled clover].closet_amount() + $item[ten-leaf clover].closet_amount();
+    int clovers_available = $items[11-leaf clover].available_amount() + $item[11-leaf clover].closet_amount();
     // Removing clover code and swapping to lucky code like TES has.
-    // if (my_path_id() == PATH_BEES_HATE_YOU || my_path_id() == PATH_G_LOVER)
+    // if (my_path().id == PATH_BEES_HATE_YOU || my_path().id == PATH_G_LOVER)
     //     clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
     // if (clovers_available > 0 && in_run) {
     //     ChecklistSubentry subentry;
@@ -399,7 +399,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
     //     if (!__quest_state["Level 9"].state_boolean["bridge complete"])
     //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building. (3/3)", $location[the smut orc logging camp]));
-    //     if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && my_path_id() != PATH_G_LOVER)
+    //     if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && my_path().id != PATH_G_LOVER)
     //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues. (2)", $location[a-boo peak]));
     //     if (__misc_state["wand of nagamar needed"] && $item[wand of nagamar].creatable_amount() == 0)
     //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
@@ -470,7 +470,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(quest_needed + " to unlock hidden city.");
         if (__misc_state["need to level"])
             description.listAppend("Cave bar.");
-        if (!get_property_ascension("lastTempleAdventures") && my_path_id() != PATH_SLOW_AND_STEADY) {
+        if (!get_property_ascension("lastTempleAdventures") && my_path().id != PATH_SLOW_AND_STEADY) {
             string line = "+3 adventures, +3 duration to ten effects. (once/ascension)";
             if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
                 line += "|Can use to extend effects at nuns.";
@@ -556,13 +556,13 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[synthetic dog hair pill].available_amount() > 0 && !get_property_boolean("_syntheticDogHairPillUsed") && in_run) {
         resource_entries.listAppend(ChecklistEntryMake("__item synthetic dog hair pill", "inventory.php?ftext=synthetic+dog+hair+pill", ChecklistSubentryMake(pluralise($item[synthetic dog hair pill]), "", "Adds one extra drunkenness.|Once/day."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Dog hair pill resource"));
     }
-    if ($item[the lost pill bottle].available_amount() > 0 && in_run && my_path_id() != PATH_BEES_HATE_YOU) {
+    if ($item[the lost pill bottle].available_amount() > 0 && in_run && my_path().id != PATH_BEES_HATE_YOU) {
         string header = pluralise($item[the lost pill bottle]);
         if ($item[the lost pill bottle].available_amount() == 1)
             header = $item[the lost pill bottle];
         resource_entries.listAppend(ChecklistEntryMake("__item the lost pill bottle", "inventory.php?ftext=the+lost+pill+bottle", ChecklistSubentryMake(header, "", "Open it."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Lost pill bottle"));
     }
-    if ($item[Boozehounds Anonymous token].available_amount() > 0 && in_run && (__quest_state["White Citadel"].started || (__quest_state["Spooky Forest"].started && my_path_id() != PATH_COMMUNITY_SERVICE))) {
+    if ($item[Boozehounds Anonymous token].available_amount() > 0 && in_run && (__quest_state["White Citadel"].started || (__quest_state["Spooky Forest"].started && my_path().id != PATH_COMMUNITY_SERVICE))) {
         resource_entries.listAppend(ChecklistEntryMake("__item Boozehounds Anonymous token", invSearch($item[Boozehounds Anonymous token]), ChecklistSubentryMake($item[Boozehounds Anonymous token].pluralise(), "free booze", ""), importance_level_unimportant_item).ChecklistEntrySetIDTag("Boozehound token resource"));
     }
     if (__misc_state["need to level"] && in_ronin()) {
@@ -579,7 +579,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake("__item desktop zen garden", "", ChecklistSubentryMake(pluralise($item[desktop zen garden]), "", "+20% to mysticality gains. (10 turns)"), importance_level_unimportant_item).ChecklistEntrySetIDTag("Desktop zen garden resource"));
         }
     }
-    if ($item[munchies pill].available_amount() > 0 && fullness_limit() > 0 && in_run && my_path_id() != PATH_SLOW_AND_STEADY) {
+    if ($item[munchies pill].available_amount() > 0 && fullness_limit() > 0 && in_run && my_path().id != PATH_SLOW_AND_STEADY) {
         resource_entries.listAppend(ChecklistEntryMake("__item munchies pill", "", ChecklistSubentryMake(pluralise($item[munchies pill]), "", "+3 turns from fortune cookies and other low-fullness foods."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Munchies pill resource"));
     }
     if ($item[snow cleats].available_amount() > 0 && in_run)
@@ -719,10 +719,13 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item " + $item[rusty hedge trimmers], "inventory.php?ftext=rusty+hedge+trimmers", ChecklistSubentryMake(pluralise($item[rusty hedge trimmers]), "", description), importance_level_unimportant_item).ChecklistEntrySetIDTag("Rusty hedge trimmers"));
     }
     
-    if (in_run && my_path_id() != PATH_WAY_OF_THE_SURPRISING_FIST) {
+    if (in_run && my_path().id != PATH_WAY_OF_THE_SURPRISING_FIST) {
         string image_name = "";
         string [int] autosell_list;
         boolean [item] autosellable_items = $items[meat stack, dense meat stack, really dense meat stack, solid gold bowling ball, fancy seashell necklace, commemorative war stein,huge gold coin].makeConstantItemArrayMutable();
+        if (!__iotms_usable[lookupItem("diabolic pizza cube")])
+            autosellable_items[$item[space blanket]] = true;
+            autosellable_items[$item[1952 Mickey Mantle card]] = true;
         if ($item[pixel coin] != $item[none])
             autosellable_items[$item[pixel coin]] = true;
         foreach it in autosellable_items {
@@ -816,7 +819,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item very overdue library book", "inventory.php?ftext=very+overdue+library+book", ChecklistSubentryMake("Very overdue library book", "", "Open for 63 moxie/mysticality/muscle."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Overdue book resource"));
     }
     
-    if ($item[chest of the Bonerdagon].available_amount() > 0 && in_run && my_path_id() != PATH_BEES_HATE_YOU) {
+    if ($item[chest of the Bonerdagon].available_amount() > 0 && in_run && my_path().id != PATH_BEES_HATE_YOU) {
         string description = "Open for 150 muscle/mysticality/moxie and 3k meat.";
         if (!$familiar[ninja pirate zombie robot].have_familiar())
             description += "|Unless you want to make an NPZR this ascension.";
@@ -994,11 +997,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item BittyCar MeatCar", "inventory.php?ftext=bittycar", ChecklistSubentryMake("BittyCar " + available_items.listJoinComponents(", ", "or") + " usable", "", description), importance_level_unimportant_item).ChecklistEntrySetIDTag("Bittycars resource"));
     }
     
-    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "mysticality" && !get_property_ascension("lastGoofballBuy") && __quest_state["Level 3"].started && my_path_id() != PATH_ZOMBIE_SLAYER) {
+    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "mysticality" && !get_property_ascension("lastGoofballBuy") && __quest_state["Level 3"].started && my_path().id != PATH_ZOMBIE_SLAYER) {
         resource_entries.listAppend(ChecklistEntryMake("__item bottle of goofballs", "tavern.php?place=susguy", ChecklistSubentryMake("Bottle of goofballs obtainable", "", "For the lair stat test.|Costs nothing, but be careful..."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Goofballs resource"));
     }
     
-    if ($item[tonic djinn].available_amount() > 0 && in_ronin() && in_run && !get_property_boolean("_tonicDjinn") && my_path_id() != PATH_G_LOVER) {
+    if ($item[tonic djinn].available_amount() > 0 && in_ronin() && in_run && !get_property_boolean("_tonicDjinn") && my_path().id != PATH_G_LOVER) {
         string [int] possibilities;
         possibilities.listAppend("~450 meat (Wealth!)");
         if (__misc_state["need to level"]) {

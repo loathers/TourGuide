@@ -108,7 +108,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 				else
                 {
 					delay_daily_dungeon_reason = "Acquire a skeleton key first. (from defiled nook)";
-                    if (!in_bad_moon() && my_path_id() != PATH_OXYGENARIAN) //FIXME state track this elsewhere
+                    if (!in_bad_moon() && my_path().id != PATH_OXYGENARIAN) //FIXME state track this elsewhere
                         delay_daily_dungeon_reason += "|Unless you can't reach that by the end of today.";
                 }
 					
@@ -225,7 +225,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 void SDailyDungeonGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 {
     string url = "da.php";
-    if (my_path_id() == PATH_KINGDOM_OF_EXPLOATHING)
+    if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING)
         url = "shop.php?whichshop=exploathing";
     
     string from_daily_dungeon_string = "From daily dungeon";

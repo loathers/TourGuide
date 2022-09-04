@@ -9,7 +9,7 @@ void IOTMCargoCultistShortsGenerateResource(ChecklistEntry [int] resource_entrie
 		string [int] options;
 		string [int] description;
         description.listAppend("Pick a pocket for something useful! Too many to list!");
-        if (__misc_state["in run"] && my_path_id() != PATH_COMMUNITY_SERVICE)
+        if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE)
 		{
         	if (locationAvailable($location[The royal guard Chamber]) == true)
             {

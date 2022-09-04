@@ -33,7 +33,7 @@ void LuckyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
     if ($effect[lucky!].have_effect() > 0) {
         string [int] description;
 		string main_title = HTMLGenerateSpanFont("You feel lucky, punk!", "green") + "";
-		if (__misc_state["in run"] && my_path_id() == 44) {
+		if (__misc_state["in run"] && my_path().id == 44) {
 			description.listAppend("1x ore, 1x freezerburned ice cube, 1x full-length mirror.");
 		}
 		else if (__misc_state["in run"]) {
