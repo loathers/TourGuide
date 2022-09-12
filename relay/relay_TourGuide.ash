@@ -20079,7 +20079,7 @@ void QSeaInit()
 
 void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name, QuestState temple_quest_state)
 {
-    string path = temple_quest_state.state_string["path"];
+    string temple_path = temple_quest_state.state_string["path"];
     boolean can_fight_dad_sea_monkee = temple_quest_state.state_boolean["can fight dad sea monkee"];
     boolean have_any_outfit = temple_quest_state.state_boolean["have one outfit"] || temple_quest_state.state_boolean["can fight dad sea monkee"];
     
@@ -20091,10 +20091,10 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
     boolean at_boss = false;
     boolean at_gladiator_boss = false;
     boolean at_scholar_boss = false;
-    if (path == "gladiator") {
+    if (temple_path == "gladiator") {
         image_name.s = "Shub-Jigguwatt";
         at_gladiator_boss = true;
-    } else if (path == "scholar") {
+    } else if (temple_path == "scholar") {
         image_name.s = "Yog-Urt";
         at_scholar_boss = true;
     }
