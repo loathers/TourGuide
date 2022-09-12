@@ -19,8 +19,8 @@ void QSeaInit()
     if (true) {
         QuestState state;
         
-        state.state_string["path"] = get_property("merkinQuestPath");
-        if (state.state_string["path"] == "done")
+        state.state_string["temple_path"] = get_property("merkinQuestPath");
+        if (state.state_string["temple_path"] == "done")
             QuestStateParseMafiaQuestPropertyValue(state, "finished");
         else
             QuestStateParseMafiaQuestPropertyValue(state, "started");
@@ -53,7 +53,7 @@ void QSeaInit()
 
 void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name, QuestState temple_quest_state)
 {
-    string temple_path = temple_quest_state.state_string["path"];
+    string temple_path = temple_quest_state.state_string["temple_path"];
     boolean can_fight_dad_sea_monkee = temple_quest_state.state_boolean["can fight dad sea monkee"];
     boolean have_any_outfit = temple_quest_state.state_boolean["have one outfit"] || temple_quest_state.state_boolean["can fight dad sea monkee"];
     
