@@ -267,7 +267,7 @@ void generatePullList(Checklist [int] checklists)
         {
         	pullable_item_list.listAppend(GPItemMake($item[amulet of extreme plot significance], "Speeds up castle basement.", 1));
         }
-        if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0)
+        if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0 && (!lookupSkill("Comprehensive Cartography").skill_is_usable() || $item[model airship].available_amount() == 0))
         {
             pullable_item_list.listAppend(GPItemMake($item[mohawk wig], "Speeds up top floor of castle.", 1));
         }

@@ -1,10 +1,9 @@
-
 void QLevel10Init()
 {
 	//questL10Garbage
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL10Garbage");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path_id() == PATH_COMMUNITY_SERVICE || my_path_id() == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 	state.quest_name = "Castle Quest";
 	state.image_name = "castle";
 	state.council_quest = true;
@@ -21,10 +20,10 @@ void QLevel10Init()
         beanstalk_grown = true;
     
     state.state_boolean["beanstalk grown"] = beanstalk_grown;
-    if (my_path().id == PATH_ACTUALLY_ED_THE_UNDYING)
+    if (my_path_id() == PATH_ACTUALLY_ED_THE_UNDYING)
         state.state_boolean["beanstalk grown"] = true;
 	
-	if (my_level() >= 10 || my_path().id == PATH_EXPLOSIONS)
+	if (my_level() >= 10 || my_path_id() == PATH_EXPLOSIONS)
 		state.startable = true;
     
 	__quest_state["Level 10"] = state;
@@ -43,7 +42,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     string url = "place.php?whichplace=beanstalk";
 	
     boolean add_as_future_task = false;
-	if ($item[s.o.c.k.].available_amount() == 0 && my_path().id != PATH_EXPLOSION)
+	if ($item[s.o.c.k.].available_amount() == 0 && my_path_id() != PATH_EXPLOSION)
 	{
         //FIXME delay if ballroom song not set
         image_name = "penultimate fantasy airship";
@@ -169,7 +168,12 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 subentry.modifiers.listAppend("slimeling?");
             
             if ($item[model airship].available_amount() == 0)
-                subentry.entries.listAppend("Acquire model airship from non-combat. (speeds up quest)");
+            {
+                if (lookupSkill("Comprehensive Cartography").skill_is_usable() && $item[mohawk wig].available_amount() > 0)
+                    subentry.entries.listAppend("Optionally acquire model airship from non-combat, but already have mohawk wig to wear for first top floor noncombat pick.");
+                else
+                    subentry.entries.listAppend("Acquire model airship from non-combat. (speeds up quest)");
+            }
             if ($item[amulet of extreme plot significance].available_amount() == 0)
             {
                 things_we_want_item_for.listAppend("amulet of extreme plot significance");
@@ -178,7 +182,10 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if ($item[mohawk wig].available_amount() == 0)
             {
                 things_we_want_item_for.listAppend("Mohawk wig");
-                subentry.entries.listAppend("Acquire mohawk wig (Burly Sidekick, 10% drop) to speed up top floor.");
+                if (lookupSkill("Comprehensive Cartography").skill_is_usable() && $item[model airship].available_amount() >= 1)
+                    subentry.entries.listAppend("Optionally acquire mohawk wig (Burly Sidekick, 10% drop), but can already use model airship on first top floor noncombat pick.");
+                else
+                    subentry.entries.listAppend("Acquire mohawk wig (Burly Sidekick, 10% drop) to speed up top floor.");
             }
             if (things_we_want_item_for.count() > 0)
             {
@@ -206,28 +213,40 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
 			subentry.modifiers.listAppend("-combat");
 			subentry.entries.listAppend("Top floor. Run -combat.");
-            if ($item[mohawk wig].equipped_amount() == 0 && $item[mohawk wig].available_amount() > 0)
-            {
-                string line = "Wear your mohawk wig";
-                if (!$item[mohawk wig].can_equip())
-                {
-                    add_as_future_task = true;
-                    line += ", once you can equip it";
-                }
-                line += ".";
-                subentry.entries.listAppend(HTMLGenerateSpanFont(line, "red"));
-            }
-            if ($item[mohawk wig].available_amount() == 0 && !in_hardcore())
-                subentry.entries.listAppend("Potentially pull and wear a mohawk wig.");
-            if ($item[model airship].available_amount() == 0 && my_path().id != PATH_EXPLOSIONS)
-            {
-                if ($item[mohawk wig].available_amount() == 0) //no wig, no airship
-                    subentry.entries.listAppend("Backfarm for a model airship in the fantasy airship. (non-combat option, run -combat)");
+            if (lookupSkill("Comprehensive Cartography").skill_is_usable() && $item[model airship].available_amount() >= 1 && !$location[the hole in the sky].locationAvailable())
+            {   // no need to equip a mohawk wig with Cartography - unless Here There Be Giants gets used to open the Hole in the Sky first for some reason
+                subentry.entries.listAppend("Go where there be Steampunk Giants in the one-time first noncombat.");
+                if ($item[mohawk wig].available_amount() == 0)
+                    subentry.entries.listAppend("Otherwise quest completion not guaranteed in later noncombats (no mohawk wig).");
                 else
-                    subentry.entries.listAppend("Potentially backfarm for a model airship in the fantasy airship. (non-combat option, run -combat)"); //always suggest this - backfarming for model airship is faster than spending time in top floor, I think
+                    subentry.entries.listAppend("Or you can wear your mohawk wig if that first noncombat is used for something else.");
+            }    
+            else
+            {
+                if ($item[mohawk wig].equipped_amount() == 0 && $item[mohawk wig].available_amount() > 0)
+                {
+                    string line = "Wear your mohawk wig";
+                    if (!$item[mohawk wig].can_equip())
+                    {
+                        add_as_future_task = true;
+                        line += ", once you can equip it";
+                    }
+                    line += ".";
+                    subentry.entries.listAppend(HTMLGenerateSpanFont(line, "red"));
+                }
+                if ($item[mohawk wig].available_amount() == 0 && !in_hardcore())
+                    subentry.entries.listAppend("Potentially pull and wear a mohawk wig.");
+                if ($item[model airship].available_amount() == 0 && my_path_id() != PATH_EXPLOSIONS)
+            {
+                    if ($item[mohawk wig].available_amount() == 0) //no wig, no airship
+                        subentry.entries.listAppend("Backfarm for a model airship in the fantasy airship. (non-combat option, run -combat)");
+                    else if (lookupSkill("Comprehensive Cartography").skill_is_usable())
+                        subentry.entries.listAppend("Go where there be Punk Rock Giants in the one-time first noncombat. Otherwise quest completion not guaranteed in later noncombats (no model airship).");
+                    else
+                        subentry.entries.listAppend("Potentially backfarm for a model airship in the fantasy airship. (non-combat option, run -combat)"); //always suggest this - backfarming for model airship is faster than spending time in top floor, I think
             }
             
-            if ($item[mohawk wig].available_amount() > 0 && $item[model airship].available_amount() > 0)
+            if ($item[model airship].available_amount() > 0 && ($item[mohawk wig].available_amount() > 0 || lookupSkill("Comprehensive Cartography").skill_is_usable()))
             {
                 if (non_combat_rate != 0.0)
                     turn_estimation = 1.0 / non_combat_rate;
