@@ -24,6 +24,7 @@ import "relay/TourGuide/Items of the Month/2013/Psychoanalytic.ash";
 import "relay/TourGuide/Items of the Month/2014/DNA.ash";
 import "relay/TourGuide/Items of the Month/2014/Grimstone.ash";
 import "relay/TourGuide/Items of the Month/2014/Speakeasy.ash";
+import "relay/TourGuide/Items of the Month/2014/SpringBreakBeach.ash";
 
 // 2015
 import "relay/TourGuide/Items of the Month/2015/Barrel God.ash";
