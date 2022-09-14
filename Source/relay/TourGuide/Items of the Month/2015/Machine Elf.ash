@@ -14,6 +14,22 @@ static
     machineElfAbstractionDescriptionsInit();
 }
 
+//Machine Elf DMT Alert
+RegisterTaskGenerationFunction("IOTMMachineElfGenerateTasks");
+void IOTMMachineElfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	string [int] description;
+	string url = "place.php?whichplace=dmt";
+	int DMTDuplicationAscension = get_property_int("lastDMTDuplication");
+	int DMTTimer = get_property_int("encountersUntilDMTChoice");
+	if (DMTTimer == 0 && my_ascensions() > DMTDuplicationAscension) 
+	{
+		description.listAppend("" + HTMLGenerateSpanFont("Item duplication available!", "blue") + "");
+		description.listAppend("Copy a PVPable potion, food, drink, or spleen item.");
+		task_entries.listAppend(ChecklistEntryMake("__item abstraction: comprehension", url, ChecklistSubentryMake("Deep Machine Tunnels noncom ready!", "", description), -11));
+	}
+}
+
 RegisterResourceGenerationFunction("IOTMMachineElfFamiliarGenerateResource");
 void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entries)
 {
