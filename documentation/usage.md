@@ -70,4 +70,4 @@ Many people like using the KoL Chat while ascending. TourGuide supports generati
 
 Alternatively, you can also pop TourGuide out into its own window, using the double-square box next to the described arrow.
 
-![image](https://user-images.githubusercontent.com/8014761/192012845-a7797807-b05e-496d-b365-5ff352cc4bf5.png)
+<img src="https://user-images.githubusercontent.com/8014761/192012845-a7797807-b05e-496d-b365-5ff352cc4bf5.png" alt="tourguide windowed" style="width: 25%;">
