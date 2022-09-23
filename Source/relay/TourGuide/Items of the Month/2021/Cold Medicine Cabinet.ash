@@ -110,6 +110,7 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
 	if (CMC_consults > 0) 
 	{
+		// Tracking tile; gives the user information about the last turn-taking combats per the pref.
 		int next_CMC_Turn = get_property_int("_nextColdMedicineConsult");
 		int next_CMC_Timer = (next_CMC_Turn - total_turns_played());
         int fleshazoleMeat = clampi(my_level(),0,11)*1000;
@@ -136,32 +137,28 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		string [int] description;
 		string url = "campground.php?action=workshed";
 			
-		if (next_CMC_Turn > total_turns_played())
-		{
-			// description.listAppend("" + HTMLGenerateSpanOfClass(next_CMC_Timer, "r_bold") + " adventures until your next consultation.");
-			description.listAppend(HTMLGenerateSpanFont("Route turn-taking combats into the correct environments for a helpful spleen item!", "blue"));
+		description.listAppend(HTMLGenerateSpanFont("Route turn-taking combats into the correct environments for a helpful spleen item!", "blue"));
             
-            string uFormat = uTurns > 10 ? "black" : "grey";
-            string iFormat = iTurns > 10 ? "black" : "grey";
-            string oFormat = oTurns > 10 ? "black" : "grey";
+        string uFormat = uTurns > 10 ? "black" : "grey";
+        string iFormat = iTurns > 10 ? "black" : "grey";
+        string oFormat = oTurns > 10 ? "black" : "grey";
 
-            string [int] currentState;
-            currentState.listAppend(HTMLGenerateSpanOfClass("Currently Expected Spleener: ", "r_bold")+ expectedSpleenItem);
-            currentState.listAppend(HTMLGenerateSpanFont(uTurns.to_string() + " Underground turns", uFormat));
-            currentState.listAppend(HTMLGenerateSpanFont(iTurns.to_string() + " Indoor turns", iFormat));
-            currentState.listAppend(HTMLGenerateSpanFont(oTurns.to_string() + " Outdoor turns", oFormat));
-            description.listAppend(currentState.listJoinComponents("|*"));
+        string [int] currentState;
+        currentState.listAppend(HTMLGenerateSpanOfClass("Currently Expected Spleener: ", "r_bold")+ expectedSpleenItem);
+        currentState.listAppend(HTMLGenerateSpanFont(uTurns.to_string() + " Underground turns", uFormat));
+        currentState.listAppend(HTMLGenerateSpanFont(iTurns.to_string() + " Indoor turns", iFormat));
+        currentState.listAppend(HTMLGenerateSpanFont(oTurns.to_string() + " Outdoor turns", oFormat));
+        description.listAppend(currentState.listJoinComponents("|*"));
 
-            string [int][int] spleeners;
-            // Generates a reference table for the user of the spleener effects.
-            spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
-            spleeners.listAppend(listMake("Extrovermectin","Indoors","+3 Wandering Monsters"));
-            spleeners.listAppend(listMake("Breathitin","Underground","+5 Outdoor Free Kills"));
-            spleeners.listAppend(listMake("Homebodyl","Outdoors","+11 Free Crafts"));
-            spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
-            description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
+        string [int][int] spleeners;
+        // Generates a reference table for the user of the spleener effects.
+        spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
+        spleeners.listAppend(listMake("Extrovermectin","Indoors","+3 Wandering Monsters"));
+        spleeners.listAppend(listMake("Breathitin","Underground","+5 Outdoor Free Kills"));
+        spleeners.listAppend(listMake("Homebodyl","Outdoors","+11 Free Crafts"));
+        spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
+        description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
 
-            resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake(CMC_consults.pluralise("CMC consultation", "CMC consultations" + " remaining"), "", description)).ChecklistEntrySetIDTag("cold medicine cabinet resource")); 
-		}	
+        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake(CMC_consults.pluralise("CMC consultation", "CMC consultations" + " remaining"), "", description)).ChecklistEntrySetIDTag("cold medicine cabinet resource")); 
 	}
 }
