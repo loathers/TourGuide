@@ -56,15 +56,63 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Will get: " + (my_sign() == buffCycle [todaysCycleNumber] ["name"] ? "Big " : "") + "Smile of the " + buffCycle [todaysCycleNumber] ["name"] + " (" + buffCycle [todaysCycleNumber] ["effect"] + ")");
 		
 		string [int][int] tooltip_table;
-		tooltip_table.listAppend(listMake("Mongoose", "+10/20% Crit chance"));
-		tooltip_table.listAppend(listMake("Wallaby", "+10/20% Spell Crit"));
-		tooltip_table.listAppend(listMake("Vole", "+10/20 HP regen"));
-		tooltip_table.listAppend(listMake("Platypus", "+3/5 fam xp"));
-		tooltip_table.listAppend(listMake("Opossum", "+50/100% Candy drop"));
-		tooltip_table.listAppend(listMake("Marmot", "+5/10 MP regen"));
-		tooltip_table.listAppend(listMake("Wombat", "+50/100 DA"));
-		tooltip_table.listAppend(listMake("Blender", "+25/50% Booze drop"));
-		tooltip_table.listAppend(listMake("Packrat", "+25/50% Meat drop"));
+
+        // Making today's buff name its own variable 
+        string todaysBuff = buffCycle [todaysCycleNumber] ["name"];
+
+        // These are the given enchantments for each moonsign day
+        static string[string] smileEnchantments = {
+            "Mongoose":"% crit chance",
+            "Wallaby":"% spell crit",
+            "Vole":" HP regen",
+            "Platypus":" familiar XP",
+            "Opossum":"% candy drop",
+            "Marmot":" MP regen",
+            "Wombat":" DA",
+            "Blender":"% booze drop",
+            "Packrat":"% meat drop",};
+
+        // Doing a foreach through the enchantment list
+        foreach sign, enchantment in smileEnchantments {
+            // You get a "big smile" for extra bonus enchants for your given moonsign
+            boolean bigSmile = my_sign() == sign;
+
+            string enchantAmount = "";
+
+            // There's clearly a better way to do this, but this works. It checks for big smile status
+            //   then gives the correct enchant amount for the final list item.
+            if ($strings[Mongoose,Wallaby,Vole] contains sign) {
+                enchantAmount = bigSmile ? "20" : "10";
+            } 
+            if ($strings[Blender, Packrat] contains sign) {
+                enchantAmount = bigSmile ? "50" : "25";
+            }
+            if (sign == "Platypus") {
+                enchantAmount = bigSmile ? "5" : "3";
+            } 
+            if ($strings[Opossum, Wombat] contains sign) {
+                enchantAmount = bigSmile ? "100" : "50";
+            }
+            if (sign == "Marmot") {
+                enchantAmount = bigSmile ? "10" : "5" ;
+            }
+
+            // Highlight today's buff in red.
+            string signColor = todaysBuff == sign ? "red" : "black";
+
+            // Add the sign to the tooltip table.
+            tooltip_table.listAppend(listMake(sign, HTMLGenerateSpanFont("+" + enchantAmount + enchantment, signColor)));
+        }
+
+		// tooltip_table.listAppend(listMake("Mongoose", HTMLGenerateSpanFont("+10/20% Crit chance",todaysBuff == ));
+		// tooltip_table.listAppend(listMake("Wallaby", HTMLGenerateSpanFont("+10/20% Spell Crit"));
+		// tooltip_table.listAppend(listMake("Vole", HTMLGenerateSpanFont("+10/20 HP regen"));
+		// tooltip_table.listAppend(listMake("Platypus", HTMLGenerateSpanFont("+3/5 fam xp"));
+		// tooltip_table.listAppend(listMake("Opossum", HTMLGenerateSpanFont("+50/100% Candy drop"));
+		// tooltip_table.listAppend(listMake("Marmot", HTMLGenerateSpanFont("+5/10 MP regen"));
+		// tooltip_table.listAppend(listMake("Wombat", HTMLGenerateSpanFont("+50/100 DA"));
+		// tooltip_table.listAppend(listMake("Blender", HTMLGenerateSpanFont("+25/50% Booze drop"));
+		// tooltip_table.listAppend(listMake("Packrat", HTMLGenerateSpanFont("+25/50% Meat drop"));
 		
 		buffer tooltip_text;
 		tooltip_text.append(HTMLGenerateTagWrap("div", "Campfire Smile cycle", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
