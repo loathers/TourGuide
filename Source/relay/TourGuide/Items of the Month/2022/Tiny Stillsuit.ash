@@ -140,29 +140,30 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
 	} else {
 		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
     }
+
 	title = HTMLGenerateSpanFont(fam_sweat_o_meter + "/" + sweatCalcSweat + " drams of stillsuit sweat", "purple");
 	
 	//sweat chart
-		string [int][int] tooltip_table; 
+	string [int][int] tooltip_table; 
 
     // These are the mappings for drams needed for certain adv thresholds.
-    static string[string] advDramsTable = {
-        "3":"10",
-        "4":"23",
-        "5":"43",
-        "6":"71",
-        "7":"108",
-        "8":"155",
-        "9":"211",
-        "10":"279",
-        "11":"358",
-        "12":"449",
-        "13":"553",};
+    static string[int] advDramsTable = {
+        3:"10",
+        4:"23",
+        5:"43",
+        6:"71",
+        7:"108",
+        8:"155",
+        9:"211",
+        10:"279",
+        11:"358",
+        12:"449",
+        13:"553",};
 
     foreach advs, drams in advDramsTable {
       // Only append it if the user hasn't yet reached that # of drams
       if (drams.to_int() > fam_sweat_o_meter) {
-        tooltip_table.listAppend(listMake(advs, drams+" drams (" + (drams.to_int() - fam_sweat_o_meter) + " more sweat)" ));
+        tooltip_table.listAppend(listMake(advs.to_string(), drams+" drams (" + (drams.to_int() - fam_sweat_o_meter) + " more sweat)" ));
       }
     }
 
@@ -170,24 +171,24 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
       tooltip_table.listAppend(listMake("> 13", "... yknow, you should probably just drink it, buddy"));
     }
 		
-		buffer tooltip_text;
-		tooltip_text.append(HTMLGenerateTagWrap("div", "Sweat to Advs Conversion Table", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
-		tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
+	buffer tooltip_text;
+	tooltip_text.append(HTMLGenerateTagWrap("div", "Sweat to Advs Conversion Table", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+	tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
 		
-		string stillSweatTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Sweat/Advs conversion", "r_tooltip_outer_class");
-		description.listAppend(stillSweatTooltip);
+	string stillSweatTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Sweat/Advs conversion", "r_tooltip_outer_class");
+	description.listAppend(stillSweatTooltip);
 		
 	//famtype chart
-		string [int][int] tooltip_table2;
-		tooltip_table2.listAppend(listMake("Cubeling / Stomping Boots", "+item"));
-		tooltip_table2.listAppend(listMake("Levitating Potato / Candy Carnie / Flan", "+item and +food"));
-		tooltip_table2.listAppend(listMake("Star Starfish / Emilio / Globmule / Waifuton", "+item and +sleaze"));
+	string [int][int] tooltip_table2;
+	tooltip_table2.listAppend(listMake("Cubeling / Stomping Boots", "+item"));
+	tooltip_table2.listAppend(listMake("Levitating Potato / Candy Carnie / Flan", "+item and +food"));
+	tooltip_table2.listAppend(listMake("Star Starfish / Emilio / Globmule / Waifuton", "+item and +sleaze"));
 		
-		buffer tooltip_text2;
-		tooltip_text2.append(HTMLGenerateTagWrap("div", "Stillsuit buff target", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
-		tooltip_text2.append(HTMLGenerateSimpleTableLines(tooltip_table2));
+	buffer tooltip_text2;
+	tooltip_text2.append(HTMLGenerateTagWrap("div", "Stillsuit buff target", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+	tooltip_text2.append(HTMLGenerateSimpleTableLines(tooltip_table2));
 		
-		string stillSweatTypeTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Suggested Stillsuit Familiars", "r_tooltip_outer_class");
-		description.listAppend(stillSweatTypeTooltip);
+	string stillSweatTypeTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Suggested Stillsuit Familiars", "r_tooltip_outer_class");
+	description.listAppend(stillSweatTypeTooltip);
     resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
 }
