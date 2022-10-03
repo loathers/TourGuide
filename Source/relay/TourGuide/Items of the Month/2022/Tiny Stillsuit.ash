@@ -161,13 +161,13 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
 
     foreach advs, drams in advDramsTable {
       // Only append it if the user hasn't yet reached that # of drams
-      if drams.to_int() > fam_sweat_o_meter {
-        tooltip_table.listAppend(listMake(advs, drams+" drams (" + (drams.to_int() - fam_sweat_o_meter) + " more sweat)" ))
+      if (drams.to_int() > fam_sweat_o_meter) {
+        tooltip_table.listAppend(listMake(advs, drams+" drams (" + (drams.to_int() - fam_sweat_o_meter) + " more sweat)" ));
       }
     }
 
-    if fam_sweat_o_meter > 553 {
-      tooltip_table.listAppend(listMake("> 13", "... yknow, you should probably just drink it, buddy"))
+    if (fam_sweat_o_meter > 553) {
+      tooltip_table.listAppend(listMake("> 13", "... yknow, you should probably just drink it, buddy"));
     }
 		
 		buffer tooltip_text;
