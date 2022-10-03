@@ -1,4 +1,4 @@
-
+//Getaway Camp
 RegisterResourceGenerationFunction("IOTMGetawayCampsiteGenerateResource");
 void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -54,7 +54,25 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         int todaysCycleNumber = todaysArbitraryNumber % 9;
         
         description.listAppend("Will get: " + (my_sign() == buffCycle [todaysCycleNumber] ["name"] ? "Big " : "") + "Smile of the " + buffCycle [todaysCycleNumber] ["name"] + " (" + buffCycle [todaysCycleNumber] ["effect"] + ")");
-
+		
+		string [int][int] tooltip_table;
+		tooltip_table.listAppend(listMake("Mongoose", "+10/20% Crit chance"));
+		tooltip_table.listAppend(listMake("Wallaby", "+10/20% Spell Crit"));
+		tooltip_table.listAppend(listMake("Vole", "+10/20 HP regen"));
+		tooltip_table.listAppend(listMake("Platypus", "+3/5 fam xp"));
+		tooltip_table.listAppend(listMake("Opossum", "+50/100% Candy drop"));
+		tooltip_table.listAppend(listMake("Marmot", "+5/10 MP regen"));
+		tooltip_table.listAppend(listMake("Wombat", "+50/100 DA"));
+		tooltip_table.listAppend(listMake("Blender", "+25/50% Booze drop"));
+		tooltip_table.listAppend(listMake("Packrat", "+25/50% Meat drop"));
+		
+		buffer tooltip_text;
+		tooltip_text.append(HTMLGenerateTagWrap("div", "Campfire Smile cycle", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+		tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
+		
+		string campSmileCycleList = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Campfire Smile cycle", "r_tooltip_outer_class");
+		description.listAppend(campSmileCycleList);
+		
         resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake(pluralise(smile_buffs_left, "smile buff", "smile buffs") + " obtainable", "20 turns", description), 5).ChecklistEntrySetCombinationTag("getaway campsite resources").ChecklistEntrySetIDTag("Getaway campsite sign smiles"));
     }
     if (firewood.have() && __misc_state["in run"]) {
