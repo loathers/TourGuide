@@ -95,6 +95,7 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         description.listAppend("Outdoor fights become free.");
         resource_entries.listAppend(ChecklistEntryMake("__item beefy pill", "", ChecklistSubentryMake(pluralise(breaths_remaining, "breathitin breath", "breathitin breaths"), "", description), -2));
     }
+
 	//homebodyl
 	int homebodyls_remaining = get_property_int("homebodylCharges");
 	if (homebodyls_remaining > 0) 
@@ -106,9 +107,8 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
     }
 	
 	//consultation counter
-	if (!__iotms_usable[lookupItem("cold medicine cabinet")]) return;
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
-	if (CMC_consults > 0) 
+	if (CMC_consults > 0 && __misc_state["in run"] && __iotms_usable[lookupItem("cold medicine cabinet")]) 
 	{
 		// Tracking tile; gives the user information about the last turn-taking combats per the pref.
 		int next_CMC_Turn = get_property_int("_nextColdMedicineConsult");
