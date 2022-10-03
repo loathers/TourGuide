@@ -62,7 +62,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
     
     // if (!duplication_nc_probably_visited && $location[the deep machine tunnels].turns_spent >= 5)
     // Checks that the DMT choice is up and you haven't gotten one this run
-    if (encountersUntilDMTChoice = 0 && lastDMTDuplication < my_ascensions())
+    if (encountersUntilDMTChoice == 0 && lastDMTDuplication < my_ascensions())
     {
         string [int] description;
         description.listAppend("Next turn in the DMT. Costs a turn.");
