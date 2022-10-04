@@ -18,7 +18,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 			potential_targets.listAppend("Anything on the fax list.");
 		}
 		
-		if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0)
+		if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0 && (!lookupSkill("Comprehensive Cartography").skill_is_usable() || $item[model airship].available_amount() == 0) )
 			potential_targets.listAppend("Burly Sidekick (Mohawk wig) - speed up top floor of castle.");
 		if (!__quest_state["Level 12"].state_boolean["Orchard Finished"])
 			potential_targets.listAppend("Filthworms.");

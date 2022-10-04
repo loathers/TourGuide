@@ -4,7 +4,7 @@ void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entri
 {
     item unbrella = lookupItem("unbreakable umbrella");
     if (!unbrella.have()) return;
-    if (!__misc_state["in run"]) return; 
+    if (!__misc_state["in run"] && $item[unbreakable umbrella].equipped_amount() == 0) return; 
     string url;
 	string unbrellaMode = get_property("umbrellaState");
 	string unbrellaEnchant;
@@ -14,21 +14,21 @@ void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entri
         string main_title = "Umbrella machine " + HTMLGenerateSpanFont("B", "red") + "roke";
         description.listAppend("Understanda" + HTMLGenerateSpanFont("B", "red") + "le have a nice day.");
 		
-		switch (unbrellaMode)			
+		switch (get_property("umbrellaState"))
 		{
 			case "broken":
 				int modifiedML = round(numeric_modifier("monster level") * 1.25,0);
-				unbrellaEnchant = "+25% ML. Unbrella-boosted ML will be " + modifiedML + ".";
+				unbrellaEnchant = "+25% ML. Unbrella-boosted ML will be " + modifiedML + "."; break;
 			case "forward-facing":
-				unbrellaEnchant = "+25 DR shield";
+				unbrellaEnchant = "+25 DR shield"; break;
 			case "bucket style":
-				unbrellaEnchant = "+25% item drops";
+				unbrellaEnchant = "+25% item drops"; break;
 			case "pitchfork style":
-				unbrellaEnchant = "+25 Weapon Damage";
+				unbrellaEnchant = "+25 Weapon Damage"; break;
 			case "constantly twirling":
-				unbrellaEnchant = "+25 Spell Damage";
+				unbrellaEnchant = "+25 Spell Damage"; break;
 			case "cocoon":
-				unbrellaEnchant = "-10% Combat Frequency";
+				unbrellaEnchant = "-10% Combat Frequency"; break;
 		}
 		description.listAppend(HTMLGenerateSpanOfClass("Current enchantment: ", "r_bold") + unbrellaMode);
 		description.listAppend(HTMLGenerateSpanFont(unbrellaEnchant, "blue") + "");

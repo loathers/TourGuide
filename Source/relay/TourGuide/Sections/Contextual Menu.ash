@@ -71,8 +71,6 @@ buffer generateContextualMenu()
         help_text.append("<br>- Everything is saved in LocalStorage. To access it, right-click anywhere => inspect element => Storage => Local Storage (Firefox), or right-click anywhere => inspect => Application => Storage => Local Storage (Edge/Chrome).");
         help_text.append("<br>- If you're actually relying on this feature, make sure you note its value every once in a while; if there's ever a release that changes their syntax, they'll get erased!.");
         help_text.append("<br>- Deleting your browser's cache will also wipe out everything.");
-        help_text.append("<br><br>- Where do you think this feature should be headed next? Let me know!");
-        help_text.append("<br><br>&hearts; -- " + HTMLGenerateTagWrap("a", "fredg1", generateMainLinkMap("showplayer.php?who=3041087")));
         guide_contextual_menu.append(HTMLGenerateTagWrap("div", help_text, string [string] {"id":"ct_menu_help", "style":"display:none;"}));
     }
 

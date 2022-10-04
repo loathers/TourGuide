@@ -1,4 +1,4 @@
-
+//Getaway Camp
 RegisterResourceGenerationFunction("IOTMGetawayCampsiteGenerateResource");
 void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -26,7 +26,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
             buffCycle [2] ["name"] = "Mongoose";
             buffCycle [3] ["effect"] = my_sign() == "Wallaby" ? "+20% spell critical hit" : "+10% spell critical hit" ;
             buffCycle [3] ["name"] = "Wallaby";
-            buffCycle [4] ["effect"] = my_sign() == "Vole" ? "+10~30 HP/adventure" : "+5~15 HP/adventure" ;
+            buffCycle [4] ["effect"] = my_sign() == "Vole" ? "+10-30 HP/adventure" : "+5-15 HP/adventure" ;
             buffCycle [4] ["name"] = "Vole";
             buffCycle [5] ["effect"] = my_sign() == "Platypus" ? "+5 familiar experience" : "+3 familiar experience" ;
             buffCycle [5] ["name"] = "Platypus";
@@ -54,7 +54,65 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         int todaysCycleNumber = todaysArbitraryNumber % 9;
         
         description.listAppend("Will get: " + (my_sign() == buffCycle [todaysCycleNumber] ["name"] ? "Big " : "") + "Smile of the " + buffCycle [todaysCycleNumber] ["name"] + " (" + buffCycle [todaysCycleNumber] ["effect"] + ")");
+		
+		string [int][int] tooltip_table;
 
+        // Making today's buff name its own variable 
+        string todaysBuff = buffCycle [todaysCycleNumber] ["name"];
+
+        // These are the given enchantments for each moonsign day
+        static string[string] smileEnchantments = {
+            "Mongoose":"% crit chance",
+            "Wallaby":"% spell crit",
+            "Vole":" HP regen",
+            "Platypus":" familiar XP",
+            "Opossum":"% candy drop",
+            "Marmot":" MP regen",
+            "Wombat":" DA",
+            "Blender":"% booze drop",
+            "Packrat":"% meat drop",};
+
+        // Doing a foreach through the enchantment list
+        foreach sign, enchantment in smileEnchantments {
+            // You get a "big smile" for extra bonus enchants for your given moonsign
+            boolean bigSmile = my_sign() == sign;
+
+            string enchantAmount = "";
+
+            // There's clearly a better way to do this, but this works. It checks for big smile status
+            //   then gives the correct enchant amount for the final list item.
+            if ($strings[Mongoose,Wallaby,Vole] contains sign) {
+                enchantAmount = bigSmile ? "20" : "10";
+            } 
+            if ($strings[Blender, Packrat] contains sign) {
+                enchantAmount = bigSmile ? "50" : "25";
+            }
+            if (sign == "Platypus") {
+                enchantAmount = bigSmile ? "5" : "3";
+            } 
+            if ($strings[Opossum, Wombat] contains sign) {
+                enchantAmount = bigSmile ? "100" : "50";
+            }
+            if (sign == "Marmot") {
+                enchantAmount = bigSmile ? "10" : "5" ;
+            }
+
+            // UPDATE: ... I could've used what fred coded above I'm a big idiot ack
+
+            // Highlight today's buff in red.
+            string signColor = todaysBuff == sign ? "blue" : "black";
+
+            // Add the sign to the tooltip table.
+            tooltip_table.listAppend(listMake(HTMLGenerateSpanFont(sign, signColor), HTMLGenerateSpanFont("+" + enchantAmount + enchantment, signColor)));
+        }
+		
+		buffer tooltip_text;
+		tooltip_text.append(HTMLGenerateTagWrap("div", "Campfire Smile cycle", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+		tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
+		
+		string campSmileCycleList = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Campfire Smile cycle", "r_tooltip_outer_class");
+		description.listAppend(campSmileCycleList);
+		
         resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake(pluralise(smile_buffs_left, "smile buff", "smile buffs") + " obtainable", "20 turns", description), 5).ChecklistEntrySetCombinationTag("getaway campsite resources").ChecklistEntrySetIDTag("Getaway campsite sign smiles"));
     }
     if (firewood.have() && __misc_state["in run"]) {

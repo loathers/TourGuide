@@ -124,7 +124,7 @@ void generateRandomMessageFamiliar(string [int] random_messages)
         case $familiar[Snowhitman]:
         case $familiar[Vampire Bat]:
         case $familiar[Worm Doctor]:
-            message = "hacker"; break;
+            message = "hacker, or a QT, who could know"; break;
         case $familiar[adorable space buddy]:
             message = "far beyond the stars"; break;
         case $familiar[happy medium]:
@@ -206,6 +206,22 @@ void generateRandomMessageFamiliar(string [int] random_messages)
             break;
         case $familiar[bad vibe]:
             message = "<i>it's all your fault</i>"; break;
+        case $familiar[pocket professor]:
+            message = "when your professor's in your pocket, you can profess anytime"; break;
+        case $familiar[god lobster]:
+            message = "god save the lobster"; break;
+        case $familiar[cat burglar]:
+            message = "cat got your tongue?"; break;
+        case $familiar[elf operative]:
+            message = "your mission, if you choose to accept it, is to use a better familiar"; break;
+        case $familiar[red-nosed snapper]:
+            message = "dude, where's my fish"; break;
+        case $familiar[melodramedary]:
+            message = "<i>schlurrrrrk!</i>"; break;
+        case $familiar[vampire vintner]:
+            message = "he doesn't drink... wine"; break;
+        case $familiar[grey goose]:
+            message = "gooso is lit"; break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -288,7 +304,7 @@ string generateRandomMessage()
     //random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play alice's army", generateMainLinkMap("aagame.php")));
     random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play witchess", generateMainLinkMap("playwitchess.php?action=another")));
 	random_messages.listAppend("consider your mistakes creative spading");
-    random_messages.listAppend(HTMLGenerateTagWrap("a", "Found inaccurate/questionable information?<br>Have a question/suggestion? Click here!", string [string] {"href":"https://github.com/cdrock/TourGuide/discussions", "target":"_blank", "class":"r_a_undecorated"}));
+    random_messages.listAppend(HTMLGenerateTagWrap("a", "Found inaccurate/questionable information?<br>Have a question/suggestion? Click here!", string [string] {"href":"https://github.com/loathers/TourGuide/", "target":"_blank", "class":"r_a_undecorated"}));
     
     if (hippy_stone_broken())
         random_messages.listAppend(HTMLGenerateTagWrap("a", "it's not easy having yourself a good time", generateMainLinkMap("peevpee.php")));
@@ -315,7 +331,12 @@ string generateRandomMessage()
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
         equipment_messages[it] = "don't panic";
     equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\"><strong> oh, better far to live and die, under the brave black flag I fly! </strong><img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\">";
-    
+
+    equipment_messages[$item[guzzlr tablet]] = "looking for booze, eh?";
+    equipment_messages[$item[retrospecs]] = "cleesh is love, cleesh is life";
+    equipment_messages[$item[tiny stillsuit]] = "it's called fashion sweaty";
+    equipment_messages[$item[jurassic parka]] = "so preoccupied with whether you could, never stopped to think if you should";
+
     foreach it in equipment_messages
     {
         if (it.equipped_amount() > 0)
@@ -680,11 +701,16 @@ string generateRandomMessage()
         monster_messages[$monster[Lavalos]] = "good morning, " + lowercase_player_name + "!";
     else
         monster_messages[$monster[Lavalos]] = "all life begins with nu and ends with nu";
-    monster_messages[$monster[sk8 gnome]] = "he was a sk8 gnome she said see u l8 gnome";
+    monster_messages[$monster[sk8 gnome]] = "he was a sk8r gnome she said see u l8r gnome";
     monster_messages[$monster[The Inquisitor]] = "nothing is up";
     monster_messages[$monster[Doc Clock]] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
     monster_messages[lookupMonster("God Lobster")] = "what a grand and intoxicating innocence"; //how can you kill a god? equip the heart of the volcano?
     monster_messages[lookupMonster("cockroach")] = "are bug exterminators professional assassins?"; 
+    monster_messages[lookupMonster("Mountain Man")] = "it's ok, TPTB don't like mining either"; 
+    monster_messages[lookupMonster("Smut Orc Pervert")] = "remember, gooso is lit"; 
+    monster_messages[lookupMonster("void slab")] = "return the slab, or suffer my curse"; 
+    monster_messages[lookupMonster("Astrologer of Shub-Jigguwatt")] = "gettin' jiggu watt it"; 
+    monster_messages[lookupMonster("party skelteon")] = "when it's time to party we will party hard"; 
     
     string day_cycle;
     if (current_hour >= 5 && current_hour <= 11)
@@ -858,6 +884,8 @@ string generateRandomMessage()
                 random_messages.listAppend(lowercase_player_name + "! now is not the time to use that!"); break;
             case PATH_G_LOVER:
                 random_messages.listAppend("the Gs will continue until morale improves"); break;
+            case 46: // Fall of the Dinosaurs
+                random_messages.listAppend("watch out for velociraptors"); break;
             default:
                 random_messages.listAppend("ow"); break;
         }
@@ -892,6 +920,25 @@ string generateRandomMessage()
         random_messages.listAppend("a superstitious, cowardly lot");
     }
     
+    // There's no way I could determine for mafia to tell that you -just- cast Feel Disappointed.
+    //   Therefore, for this silly set of disappointment messages, they only show in the pool if 
+    //   you've cast it exactly two times. This is silly, but I think it's fine.
+
+    if (get_property("_feelDisappointedUsed") == 2) 
+    {
+        random_messages.listAppend("zapdos ran away! aww...");
+        random_messages.listAppend("mentally simulate a 1-day HC Grey You ascension");
+        random_messages.listAppend("manifesting a 40 turn friars");
+        random_messages.listAppend("agriculture will become impossible in our lifetime");
+        random_messages.listAppend("we will never get the cruelest moth");
+        random_messages.listAppend("gaze upon this display case and despair");
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "gaze upon this display case and despair", generateMainLinkMap("displaycollection.php?who=252058")));
+        random_messages.listAppend("home depot is out of 12-foot skeletons");
+        random_messages.listAppend("imagine being a Sacramento Kings fan, tho");
+        random_messages.listAppend("are you SURE you took the crystal ball off?");
+        random_messages.listAppend("does king ralph really care about us?");
+    }
+
     if (format_today_to_string("yyyyMMdd") == "20151021") //october 21st, 2015
     {
         //kept active for any time travelers

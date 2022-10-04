@@ -14,6 +14,22 @@ static
     machineElfAbstractionDescriptionsInit();
 }
 
+//Machine Elf DMT Alert
+RegisterTaskGenerationFunction("IOTMMachineElfGenerateTasks");
+void IOTMMachineElfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	string [int] description;
+	string url = "place.php?whichplace=dmt";
+	int DMTDuplicationAscension = get_property_int("lastDMTDuplication");
+	int DMTTimer = get_property_int("encountersUntilDMTChoice");
+	if (DMTTimer == 0 && my_ascensions() > DMTDuplicationAscension) 
+	{
+		description.listAppend("" + HTMLGenerateSpanFont("Item duplication available!", "blue") + "");
+		description.listAppend("Copy a PVPable potion, food, drink, or spleen item.");
+		task_entries.listAppend(ChecklistEntryMake("__item abstraction: comprehension", url, ChecklistSubentryMake("Deep Machine Tunnels noncom ready!", "", description), -11));
+	}
+}
+
 RegisterResourceGenerationFunction("IOTMMachineElfFamiliarGenerateResource");
 void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -35,36 +51,21 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
     if (__last_adventure_location == $location[the deep machine tunnels])
         entry.should_highlight = true;
     
+    // Using prefs for this now! Whoo!
+    int lastDMTDuplication = get_property_int("lastDMTDuplication");
+    int encountersUntilDMTChoice = get_property_int("encountersUntilDMTChoice");
+
+    // Starts every ascension at 5, but is every 50 turns after that first turn #6 dupe. Given
+    //   how long ascensions take and how many turns are likely used in the DMT (read: not many),
+    //   this feels like pretty safe logic as long as we keep the in_run checks in this code.
+    boolean duplication_nc_probably_visited = encountersUntilDMTChoice > 6 ? true : false;
     
-    
-    
-    //This test is incredibly inaccurate, because all sorts of things end up in the NC queue. (We All Wear Masks, Approach the Jellyfish, The Mad Tea Party)
-    boolean duplication_nc_probably_visited = true;
-    if ($location[the deep machine tunnels].noncombat_queue == "")
-        duplication_nc_probably_visited = false;
-    else if ($location[the deep machine tunnels].noncombatTurnsAttemptedInLocation() >= 5)
-    {
-        duplication_nc_probably_visited = true;
-    }
-    else
-    {
-        duplication_nc_probably_visited = false;
-        //Look for known strings for the second part of the NC name:
-        //The full list I've seen is:
-        //Across The Universe,Backwards In Time,Forwards In Time,Into The 4th Dimension,Into The 5th Dimension,Into The 6th Dimension,Into The 7th Dimension,Into The 8th Dimension,Into The 9th Dimension,Into The Ether,Into Your Body,Into Your Consciousness,Into Your Courage,Into Your Dreams,Into Your Experience,Into Your Eye,Into Your Heart,Into Your Life,Into Your Liver,Into Your Memories,Into Your Mind,Into Your Pineal Gland,Into Your Regrets,Into Your Soul,Into Your Third Ear,Into Your Third Eye,Into Your Thoughts,Into Your Timeline,Into Your Voice,Sideways In Time
-        foreach s in $strings[Across The Universe,Backwards In Time,Forwards In Time,Sideways In Time,Into The ,Into Your ]
-        {
-            if ($location[the deep machine tunnels].noncombat_queue.contains_text(s))
-            {
-                duplication_nc_probably_visited = true;
-                break;
-            }
-        }
-    }
-    if (!duplication_nc_probably_visited && $location[the deep machine tunnels].turns_spent >= 5)
+    // if (!duplication_nc_probably_visited && $location[the deep machine tunnels].turns_spent >= 5)
+    // Checks that the DMT choice is up and you haven't gotten one this run
+    if (encountersUntilDMTChoice == 0 && lastDMTDuplication < my_ascensions())
     {
         string [int] description;
-        description.listAppend("Next" + ($location[the deep machine tunnels].turns_spent > 5 ? "(?)" : "") + " turn in the DMT. Costs a turn.");
+        description.listAppend("Next turn in the DMT. Costs a turn.");
         description.listAppend("Copy a PVPable potion, food, drink, or spleen item.");
         item [int] suggested_items;
         if (suggested_items.count() > 0)

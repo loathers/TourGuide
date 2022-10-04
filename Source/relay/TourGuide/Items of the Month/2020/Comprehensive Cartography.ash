@@ -1,3 +1,4 @@
+//comprehensive cartography
 RegisterTaskGenerationFunction("IOTMComprehensiveCartographyGenerateTasks");
 void IOTMComprehensiveCartographyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -22,31 +23,48 @@ void IOTMComprehensiveCartographyGenerateResource(ChecklistEntry [int] resource_
 		
 		if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE)
 		{
+			//automatic carto NCs
 			description.listAppend("This IotM also gives you a special noncom in the following zones:");
-			if (!__quest_state["cc_spookyravennecklace"].finished)
-				{
-					options.listAppend("The Haunted Billiards Room");
-				}
-			if (!__quest_state["cc_friars"].finished)
-				{
-					options.listAppend("The Dark Neck of the Woods");
-				}
-			if (get_property_int("cyrptNookEvilness") > 25)
-				{
-					options.listAppend("The Defiled Nook");
-				}
-			if (get_property_int("twinPeakProgress") != 15)
-				{
-					options.listAppend(HTMLGenerateSpanOfClass("First adv", "r_bold") + " A-Boo Peak: gives Twin Peak noncom");
-				}
-			if (!__quest_state["cc_castletop"].finished)
-					{
-						options.listAppend("Castle Top Floor");
-					}
-			if (!__quest_state["warProgress"].started)
-					{
-						options.listAppend("The Hippy Camp (Verge of War)");
-					}			
+			int cartoAbooAscension = get_property_int("lastCartographyBooPeak");
+			if (my_ascensions() > cartoAbooAscension) {
+				options.listAppend(HTMLGenerateSpanOfClass("First adv", "r_bold") + " A-Boo Peak: free A-boo clue");
+			}
+			int cartoCastleAscension = get_property_int("lastCartographyCastleTop");
+			if (my_ascensions() > cartoCastleAscension) {
+				options.listAppend("Castle Top: finish quest");
+			}
+			int cartoDarkNeckAscension = get_property_int("lastCartographyDarkNeck");
+			if (my_ascensions() > cartoDarkNeckAscension) {
+				options.listAppend("The Dark Neck of the Woods: +2 progress");
+			}
+			int cartoNookAscension = get_property_int("lastCartographyDefiledNook");
+			if (my_ascensions() > cartoNookAscension) {
+				options.listAppend("The Defiled Nook: +2 Evil Eyes");
+			}
+			int cartoFratAscension = get_property_int("lastCartographyFratHouse");
+			if (my_ascensions() > cartoFratAscension) {
+				options.listAppend(HTMLGenerateSpanOfClass("First adv", "r_bold") + " Orcish Frat House: free garbage");
+			}
+			int cartoGuanoAscension = get_property_int("lastCartographyGuanoJunction");
+			if (my_ascensions() > cartoGuanoAscension) {
+				options.listAppend(HTMLGenerateSpanOfClass("First adv", "r_bold") + " Guano Junction: Screambat");
+			}
+			int cartoBilliardsAscension = get_property_int("lastCartographyHauntedBilliards");
+			if (my_ascensions() > cartoBilliardsAscension) {
+				options.listAppend("Haunted Billiards: play pool immediately");
+			}
+			int cartoProtestersAscension = get_property_int("lastCartographyZeppelinProtesters");
+			if (my_ascensions() > cartoProtestersAscension) {
+				options.listAppend("Mob of Zeppelin Protesters: pick any NC");
+			}
+			int cartoWarFratAscension = get_property_int("lastCartographyFratHouseVerge");
+			if (my_ascensions() > cartoWarFratAscension) {
+				options.listAppend("Wartime Frat House: pick any NC");
+			}
+			int cartoWarHippyAscension = get_property_int("lastCartographyHippyCampVerge");
+			if (my_ascensions() > cartoWarHippyAscension) {
+				options.listAppend("Wartime Hippy Camp: pick any NC");
+			}	
 			//monstermap options
 			if (!__quest_state["Level 11 Ron"].finished)
 			{
@@ -73,9 +91,9 @@ void IOTMComprehensiveCartographyGenerateResource(ChecklistEntry [int] resource_
 				monsterMaps.listAppend("Green Ops Soldier. Combine with Olfaction/Use the Force and Spit and Explodinal pills.");
 			}
 			if (options.count() > 0)
-				description.listAppend("Noncoms of interest:|*" + options.listJoinComponents("|*"));
+				description.listAppend(HTMLGenerateSpanOfClass("Noncoms of interest:", "r_bold") + "|*-" + options.listJoinComponents("|*-"));
 			if (monsterMaps.count() > 0)
-				description.listAppend("Monsters to map:|*-" + monsterMaps.listJoinComponents("|*-"));
+				description.listAppend(HTMLGenerateSpanOfClass("Monsters to map:", "r_bold") + "|*-" + monsterMaps.listJoinComponents("|*-"));
 		}
 		resource_entries.listAppend(ChecklistEntryMake("__item Comprehensive Cartographic Compendium", "", ChecklistSubentryMake(pluralise(maps_left, "Cartography skill use", "Cartography skill uses"), "", description), 5).ChecklistEntrySetIDTag("Cartography skills resource"));
 	}

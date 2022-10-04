@@ -13,6 +13,26 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, "url", ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
     }
 	if (!__iotms_usable[lookupItem("cold medicine cabinet")]) return;
+
+	// Parsing the lastCombatEnvironments for a count of CMC combats.
+	string cmcCombatString = get_property("lastCombatEnvironments");
+	string[int] splitCMC = split_string(cmcCombatString, "");
+    int uTurns;
+	int iTurns;
+	int oTurns;
+
+	foreach turn in splitCMC {
+		if (splitCMC[turn] == "i") {iTurns +=1;}
+		if (splitCMC[turn] == "u") {uTurns +=1;}
+		if (splitCMC[turn] == "o") {oTurns +=1;}
+	}
+
+	string expectedSpleenItem = "Fleshazole";
+
+	if (uTurns > 10) expectedSpleenItem = "Breathitin";
+	if (iTurns > 10) expectedSpleenItem = "Extrovermectin";
+	if (oTurns > 10) expectedSpleenItem = "Homebodyl";
+
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
 	if (CMC_consults > 0) 
 	{
@@ -24,12 +44,14 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 		if (next_CMC_Turn -1 == total_turns_played())
 		{
 			description.listAppend(HTMLGenerateSpanFont("Consultation ready next turn!", "red"));
+			description.listAppend("You'll be prescribed " + HTMLGenerateSpanOfClass(expectedSpleenItem, "r_bold"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
 			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
 		}
 		else if (next_CMC_Turn <= total_turns_played())
 		{
 			description.listAppend(HTMLGenerateSpanFont("Just what the doctor ordered!", "blue"));
+			description.listAppend("You'll be prescribed " + HTMLGenerateSpanOfClass(expectedSpleenItem, "r_bold"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
 			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
 		}
@@ -51,7 +73,7 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
             string [int] description;
             description.listAppend("Be gregarious in combat, which lets you turn foes into friends!");
 			string [int] gregfriends;
-			gregfriends.listAppend("Bob Racecar or his brother Racecar Bob");
+			gregfriends.listAppend("Bob Racecar, or his brother Racecar Bob");
 			gregfriends.listAppend("dirty old lihc (cyrpt progress)");
 			gregfriends.listAppend("lobsterfrogman (gunpowder)");
 			gregfriends.listAppend("modern zmobie (cyrpt progress)");
@@ -73,6 +95,7 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         description.listAppend("Outdoor fights become free.");
         resource_entries.listAppend(ChecklistEntryMake("__item beefy pill", "", ChecklistSubentryMake(pluralise(breaths_remaining, "breathitin breath", "breathitin breaths"), "", description), -2));
     }
+
 	//homebodyl
 	int homebodyls_remaining = get_property_int("homebodylCharges");
 	if (homebodyls_remaining > 0) 
@@ -84,23 +107,58 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
     }
 	
 	//consultation counter
-	if (!__iotms_usable[lookupItem("cold medicine cabinet")]) return;
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
-	if (CMC_consults > 0) 
+	if (CMC_consults > 0 && __misc_state["in run"] && __iotms_usable[lookupItem("cold medicine cabinet")]) 
 	{
+		// Tracking tile; gives the user information about the last turn-taking combats per the pref.
 		int next_CMC_Turn = get_property_int("_nextColdMedicineConsult");
 		int next_CMC_Timer = (next_CMC_Turn - total_turns_played());
+        int fleshazoleMeat = clampi(my_level(),0,11)*1000;
+       
+        // Parsing the lastCombatEnvironments for a count of CMC combats.
+        string cmcCombatString = get_property("lastCombatEnvironments");
+        string[int] splitCMC = split_string(cmcCombatString, "");
+        int uTurns;
+        int iTurns;
+        int oTurns;
+
+        foreach turn in splitCMC {
+            if (splitCMC[turn] == "i") {iTurns +=1;}
+            if (splitCMC[turn] == "u") {uTurns +=1;}
+            if (splitCMC[turn] == "o") {oTurns +=1;}
+        }
+        
+    	string expectedSpleenItem = "Fleshazole";
+
+    	if (uTurns > 10) expectedSpleenItem = "Breathitin";
+    	if (iTurns > 10) expectedSpleenItem = "Extrovermectin";
+    	if (oTurns > 10) expectedSpleenItem = "Homebodyl";
+
 		string [int] description;
 		string url = "campground.php?action=workshed";
 			
-		if (next_CMC_Turn > total_turns_played())
-		{
-			description.listAppend("" + HTMLGenerateSpanOfClass(next_CMC_Timer, "r_bold") + " adventures until your next consultation.");
-			description.listAppend(HTMLGenerateSpanFont("Diagnosis: dickstabbing", "blue"));
-			description.listAppend("Do 11+ combats in underground zones for 5 free kills.");
-			description.listAppend("Do 11+ combats in indoor zones for a wanderer.");
-			description.listAppend("Do 11+ combats in outdoor zones for 11 free crafts.");
-			resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake(CMC_consults.pluralise("Cold medicine cabinet consultation", "Cold medicine cabinet consultations" + " remaining"), "", description)).ChecklistEntrySetIDTag("cold medicine cabinet resource")); 
-		}	
+		description.listAppend(HTMLGenerateSpanFont("Route turn-taking combats into the correct environments for a helpful spleen item!", "blue"));
+            
+        string uFormat = uTurns > 10 ? "black" : "grey";
+        string iFormat = iTurns > 10 ? "black" : "grey";
+        string oFormat = oTurns > 10 ? "black" : "grey";
+
+        string [int] currentState;
+        currentState.listAppend(HTMLGenerateSpanOfClass("Currently Expected Spleener: ", "r_bold")+ expectedSpleenItem);
+        currentState.listAppend(HTMLGenerateSpanFont(uTurns.to_string() + " Underground turns", uFormat));
+        currentState.listAppend(HTMLGenerateSpanFont(iTurns.to_string() + " Indoor turns", iFormat));
+        currentState.listAppend(HTMLGenerateSpanFont(oTurns.to_string() + " Outdoor turns", oFormat));
+        description.listAppend(currentState.listJoinComponents("|*"));
+
+        string [int][int] spleeners;
+        // Generates a reference table for the user of the spleener effects.
+        spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
+        spleeners.listAppend(listMake("Extrovermectin","Indoors","+3 Wandering Monsters"));
+        spleeners.listAppend(listMake("Breathitin","Underground","+5 Outdoor Free Kills"));
+        spleeners.listAppend(listMake("Homebodyl","Outdoors","+11 Free Crafts"));
+        spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
+        description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
+
+        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake(CMC_consults.pluralise("CMC consultation", "CMC consultations" + " remaining"), "", description)).ChecklistEntrySetIDTag("cold medicine cabinet resource")); 
 	}
 }

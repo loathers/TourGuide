@@ -1,61 +1,30 @@
-# TourGuide
+<img src="https://user-images.githubusercontent.com/8014761/190516106-6e8c948c-9302-47e0-b09e-114a5456301d.png" alt="tourguide logo" style="width: 50%;">
 
-### Installation
+**TourGuide** is a script meant to help [Kingdom of Loathing](https://www.kingdomofloathing.com/) players efficiently play through an ascension. It will give you advice on getting through your active quests, tips on how to efficiently use your resources, and reminders on using time-limited resources. 
 
-```
-git checkout https://github.com/Loathing-Associates-Scripting-Society/TourGuide.git Release
-```
+To install, run the following command on an up-to-date [KolMafia](https://github.com/kolmafia/kolmafia) version:
 
-### Updating
+> `git checkout loathers/tourguide release`
 
-```
-git update
-```
+To update, run `git update` or check the "Update installed Git projects on login" box within Mafia preferences.
 
-### Migrating from SVN to Git
+## Running TourGuide
+Once TourGuide is installed, look at the top bar within your relay browser. In the upper right, underneath the moon state and the bug report button, there will be a drop-down menu. Select TourGuide from this menu, and the script will dock to the right side of your window.
 
-With Mafia support now implemented for git you can now remove the old SVN repo and convert to git.
+![image](https://user-images.githubusercontent.com/8014761/190516930-c70cf5b7-e93b-4b6a-a3a8-31f2839e6ed2.png)
 
-```
-svn delete Loathing-Associates-Scripting-Society-TourGuide-branches-Release
-```
+## Using TourGuide
+At its core, TourGuide is like Clippy, Microsoft's wildly unsuccessful advice daemon from Microsoft Word 1997. You can use it as actively or as minimally as you want. TourGuide aims to inform you of the many resources a KoL player has -- things like free runaways, banishes, free kills, et cetera -- and give you ideas on what to use them on. TourGuide aims to give users a heads up on the many arcane speedster strats used to complete ascensions in the minimum possible turns. KoL is a complicated game, and TourGuide is the little parrot that sits on your shoulder and pecks at you to remind you not to lose track of your resources. 
 
-Then install TourGuide as normal.
+Some people use TourGuide on every quest, referring back to it like a treasured family accountant. Others open it at the end of a KoL day to see what resources they may have forgotten to use. Others still use it, but minimize every tab except for Guzzlr, because they love Guzzlr so much that the entire game is just endless Guzzlr parties. There are many ways to use TourGuide.
 
-### How do I use it?
-Once it's installed, look in the relay browser. In the upper-right, there will be a **"run script"** menu. Select TourGuide and it will dock to the side of your window.
+For samples of TourGuide output (and general notes on how to read and use the tool), please visit our [TourGuide Usage Documentation](documentation/usage.md) page.
 
-![Instructions](/Images/Instructions.png)
+## Development & History
+TourGuide is open source and contributions are encouraged. This script, as well as its support scripts, are in the public domain.
 
-
-### What does it do?
-TourGuide is a relay script which will give advice on playing [Kingdom of Loathing](http://www.kingdomofloathing.com) within [KoLmafia](http://kolmafia.sourceforge.net). It details how to complete quests you're on, and what resources you have available.
-
-It keeps track of your quests and resources and helps you complete ascensions as fast as possible.
-
-#### Quest advice:
-
-![Quest Example 1](/Images/Quest_1.JPG)
-
-![Quest Example 2](/Images/Quest_2.JPG)
-
-#### Resources:
-
-![Resource 1](/Images/Resource_1.png)
-
-![Resource 2](/Images/Resource_2.png)
-
-The script will inform you of many resources you have - free runaways, banishes, semi-rares, etc. - and ideas on what to use them on.
-
-**Quests supported**: All council quests, azazel, pretentious artist, untinker, legendary beat, most of the sea, unlocking the manor, the nemesis quest, pirate quest, repairing the shield generator in outer space, white citadel, the old level 9 quest, jung man's psychoses jars, and the wizard of ego.
-
-### Development guidelines
-TourGuide is open source and contributions are encouraged!
-
-The release above is a compiled version of the development version, which can be found by checking out https://github.com/Loathing-Associates-Scripting-Society/TourGuide. The release is compiled via Compile ASH script.rb, which collects many scripts into one for ease of release.
-
-This script, as well as its support scripts, are in the public domain.
-
-This is a fork of https://github.com/cdrock/TourGuide, which is in turn a fork of Ezandora's Guide.
+- For an overview on how to develop for TourGuide and create PRs, [click here](documentation/develop.md).
+- For more information about TourGuide's scope and the limitations of the tool, [click here](documentation/scope.md).
+- For more information about TourGuide's history, [click here](documentation/history.md).
 
 For support, questions, and comments visit the Ascension Speed Society discord channel.
