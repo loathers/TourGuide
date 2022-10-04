@@ -26,7 +26,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
             buffCycle [2] ["name"] = "Mongoose";
             buffCycle [3] ["effect"] = my_sign() == "Wallaby" ? "+20% spell critical hit" : "+10% spell critical hit" ;
             buffCycle [3] ["name"] = "Wallaby";
-            buffCycle [4] ["effect"] = my_sign() == "Vole" ? "+10~30 HP/adventure" : "+5~15 HP/adventure" ;
+            buffCycle [4] ["effect"] = my_sign() == "Vole" ? "+10-30 HP/adventure" : "+5-15 HP/adventure" ;
             buffCycle [4] ["name"] = "Vole";
             buffCycle [5] ["effect"] = my_sign() == "Platypus" ? "+5 familiar experience" : "+3 familiar experience" ;
             buffCycle [5] ["name"] = "Platypus";
@@ -97,22 +97,14 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
                 enchantAmount = bigSmile ? "10" : "5" ;
             }
 
+            // UPDATE: ... I could've used what fred coded above I'm a big idiot ack
+
             // Highlight today's buff in red.
-            string signColor = todaysBuff == sign ? "red" : "black";
+            string signColor = todaysBuff == sign ? "blue" : "black";
 
             // Add the sign to the tooltip table.
-            tooltip_table.listAppend(listMake(sign, HTMLGenerateSpanFont("+" + enchantAmount + enchantment, signColor)));
+            tooltip_table.listAppend(listMake(HTMLGenerateSpanFont(sign, signColor), HTMLGenerateSpanFont("+" + enchantAmount + enchantment, signColor)));
         }
-
-		// tooltip_table.listAppend(listMake("Mongoose", HTMLGenerateSpanFont("+10/20% Crit chance",todaysBuff == ));
-		// tooltip_table.listAppend(listMake("Wallaby", HTMLGenerateSpanFont("+10/20% Spell Crit"));
-		// tooltip_table.listAppend(listMake("Vole", HTMLGenerateSpanFont("+10/20 HP regen"));
-		// tooltip_table.listAppend(listMake("Platypus", HTMLGenerateSpanFont("+3/5 fam xp"));
-		// tooltip_table.listAppend(listMake("Opossum", HTMLGenerateSpanFont("+50/100% Candy drop"));
-		// tooltip_table.listAppend(listMake("Marmot", HTMLGenerateSpanFont("+5/10 MP regen"));
-		// tooltip_table.listAppend(listMake("Wombat", HTMLGenerateSpanFont("+50/100 DA"));
-		// tooltip_table.listAppend(listMake("Blender", HTMLGenerateSpanFont("+25/50% Booze drop"));
-		// tooltip_table.listAppend(listMake("Packrat", HTMLGenerateSpanFont("+25/50% Meat drop"));
 		
 		buffer tooltip_text;
 		tooltip_text.append(HTMLGenerateTagWrap("div", "Campfire Smile cycle", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
