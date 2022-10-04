@@ -2,7 +2,7 @@
 
 since r26713; // $path update
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.2";
+string __version = "2.0.4";
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -12839,7 +12839,6 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     else
         task_entries.listAppend(entry);
 }
-
 //Our strategy for the copperhead quest is probably not very good. Largely because it looks complicated and I (Ezandora) made a few guesses.
 
 void QLevel11CopperheadInit()
@@ -14662,7 +14661,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                 
                 int totalTurnsSpent = $location[the hidden office building].turns_spent;
                 
-                int delayForNextNoncombat = 4 - (totalTurnsSpent - 1) % 5;
+                int delayForNextNoncombat = (totalTurnsSpent == 0) ? 5 : (4 - (totalTurnsSpent - 1) % 5);
 
                 if (!hasMcCluskyFile && numberOfFilesLeft > 0) {
                     subentry.entries.listAppend("Kill " + pluralise(numberOfFilesLeft, "more pygmy witch accountant", "more pygmy witch accountants") + " for their files.");
@@ -27858,6 +27857,19 @@ void S8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
     }
 }
 
+//Lock Picking
+RegisterTaskGenerationFunction("LockPickingGenerateTasks");
+void LockPickingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	if (get_property_boolean("lockPicked") == true || !lookupSkill("Lock Picking").have_skill())
+		return;
+	{
+		string [int] description;
+		string main_title = "Pick a lock!";
+		description.listAppend("Grab your mainstat key, probably.");
+		task_entries.listAppend(ChecklistEntryMake("__skill lock picking", "skillz.php", ChecklistSubentryMake(main_title, "", description), -11));
+	}
+}
 
 void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -32182,7 +32194,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 			potential_targets.listAppend("Anything on the fax list.");
 		}
 		
-		if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0)
+		if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0 && (!lookupSkill("Comprehensive Cartography").skill_is_usable() || $item[model airship].available_amount() == 0) )
 			potential_targets.listAppend("Burly Sidekick (Mohawk wig) - speed up top floor of castle.");
 		if (!__quest_state["Level 12"].state_boolean["Orchard Finished"])
 			potential_targets.listAppend("Filthworms.");
@@ -33208,7 +33220,7 @@ void generatePullList(Checklist [int] checklists)
         {
         	pullable_item_list.listAppend(GPItemMake($item[amulet of extreme plot significance], "Speeds up castle basement.", 1));
         }
-        if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0)
+        if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0 && (!lookupSkill("Comprehensive Cartography").skill_is_usable() || $item[model airship].available_amount() == 0))
         {
             pullable_item_list.listAppend(GPItemMake($item[mohawk wig], "Speeds up top floor of castle.", 1));
         }
@@ -36609,7 +36621,7 @@ void generateRandomMessageFamiliar(string [int] random_messages)
         case $familiar[Snowhitman]:
         case $familiar[Vampire Bat]:
         case $familiar[Worm Doctor]:
-            message = "hacker"; break;
+            message = "hacker, or a QT, who could know"; break;
         case $familiar[adorable space buddy]:
             message = "far beyond the stars"; break;
         case $familiar[happy medium]:
@@ -36691,6 +36703,22 @@ void generateRandomMessageFamiliar(string [int] random_messages)
             break;
         case $familiar[bad vibe]:
             message = "<i>it's all your fault</i>"; break;
+        case $familiar[pocket professor]:
+            message = "when your professor's in your pocket, you can profess anytime"; break;
+        case $familiar[god lobster]:
+            message = "god save the lobster"; break;
+        case $familiar[cat burglar]:
+            message = "cat got your tongue?"; break;
+        case $familiar[elf operative]:
+            message = "your mission, if you choose to accept it, is to use a better familiar"; break;
+        case $familiar[red-nosed snapper]:
+            message = "dude, where's my fish"; break;
+        case $familiar[melodramedary]:
+            message = "<i>schlurrrrrk!</i>"; break;
+        case $familiar[vampire vintner]:
+            message = "he doesn't drink... wine"; break;
+        case $familiar[grey goose]:
+            message = "gooso is lit"; break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -36773,7 +36801,7 @@ string generateRandomMessage()
     //random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play alice's army", generateMainLinkMap("aagame.php")));
     random_messages.listAppend(HTMLGenerateTagWrap("a", "if you're feeling stressed, play witchess", generateMainLinkMap("playwitchess.php?action=another")));
 	random_messages.listAppend("consider your mistakes creative spading");
-    random_messages.listAppend(HTMLGenerateTagWrap("a", "Found inaccurate/questionable information?<br>Have a question/suggestion? Click here!", string [string] {"href":"https://github.com/cdrock/TourGuide/discussions", "target":"_blank", "class":"r_a_undecorated"}));
+    random_messages.listAppend(HTMLGenerateTagWrap("a", "Found inaccurate/questionable information?<br>Have a question/suggestion? Click here!", string [string] {"href":"https://github.com/loathers/TourGuide/", "target":"_blank", "class":"r_a_undecorated"}));
     
     if (hippy_stone_broken())
         random_messages.listAppend(HTMLGenerateTagWrap("a", "it's not easy having yourself a good time", generateMainLinkMap("peevpee.php")));
@@ -36800,7 +36828,12 @@ string generateRandomMessage()
     foreach it in $items[twisted-up wet towel,sommelier's towel,time bandit time towel]
         equipment_messages[it] = "don't panic";
     equipment_messages[$item[pirate fledges]] = "<img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\"><strong> oh, better far to live and die, under the brave black flag I fly! </strong><img src=\"images/otherimages/12x12skull.gif\" style=\"mix-blend-mode:multiply;\">";
-    
+
+    equipment_messages[$item[guzzlr tablet]] = "looking for booze, eh?";
+    equipment_messages[$item[retrospecs]] = "cleesh is love, cleesh is life";
+    equipment_messages[$item[tiny stillsuit]] = "it's called fashion sweaty";
+    equipment_messages[$item[jurassic parka]] = "so preoccupied with whether you could, never stopped to think if you should";
+
     foreach it in equipment_messages
     {
         if (it.equipped_amount() > 0)
@@ -37165,11 +37198,16 @@ string generateRandomMessage()
         monster_messages[$monster[Lavalos]] = "good morning, " + lowercase_player_name + "!";
     else
         monster_messages[$monster[Lavalos]] = "all life begins with nu and ends with nu";
-    monster_messages[$monster[sk8 gnome]] = "he was a sk8 gnome she said see u l8 gnome";
+    monster_messages[$monster[sk8 gnome]] = "he was a sk8r gnome she said see u l8r gnome";
     monster_messages[$monster[The Inquisitor]] = "nothing is up";
     monster_messages[$monster[Doc Clock]] = "your defeat will happen at " + (current_hour > 12 ? current_hour - 12 : current_hour) + ":" + current_minute + " precisely"; // + (current_hour >= 12 ? " PM" : " AM")
     monster_messages[lookupMonster("God Lobster")] = "what a grand and intoxicating innocence"; //how can you kill a god? equip the heart of the volcano?
     monster_messages[lookupMonster("cockroach")] = "are bug exterminators professional assassins?"; 
+    monster_messages[lookupMonster("Mountain Man")] = "it's ok, TPTB don't like mining either"; 
+    monster_messages[lookupMonster("Smut Orc Pervert")] = "remember, gooso is lit"; 
+    monster_messages[lookupMonster("void slab")] = "return the slab, or suffer my curse"; 
+    monster_messages[lookupMonster("Astrologer of Shub-Jigguwatt")] = "gettin' jiggu watt it"; 
+    monster_messages[lookupMonster("party skelteon")] = "when it's time to party we will party hard"; 
     
     string day_cycle;
     if (current_hour >= 5 && current_hour <= 11)
@@ -37343,6 +37381,8 @@ string generateRandomMessage()
                 random_messages.listAppend(lowercase_player_name + "! now is not the time to use that!"); break;
             case PATH_G_LOVER:
                 random_messages.listAppend("the Gs will continue until morale improves"); break;
+            case 46: // Fall of the Dinosaurs
+                random_messages.listAppend("watch out for velociraptors"); break;
             default:
                 random_messages.listAppend("ow"); break;
         }
@@ -37377,6 +37417,25 @@ string generateRandomMessage()
         random_messages.listAppend("a superstitious, cowardly lot");
     }
     
+    // There's no way I could determine for mafia to tell that you -just- cast Feel Disappointed.
+    //   Therefore, for this silly set of disappointment messages, they only show in the pool if 
+    //   you've cast it exactly two times. This is silly, but I think it's fine.
+
+    if (get_property("_feelDisappointedUsed") == 2) 
+    {
+        random_messages.listAppend("zapdos ran away! aww...");
+        random_messages.listAppend("mentally simulate a 1-day HC Grey You ascension");
+        random_messages.listAppend("manifesting a 40 turn friars");
+        random_messages.listAppend("agriculture will become impossible in our lifetime");
+        random_messages.listAppend("we will never get the cruelest moth");
+        random_messages.listAppend("gaze upon this display case and despair");
+        random_messages.listAppend(HTMLGenerateTagWrap("a", "gaze upon this display case and despair", generateMainLinkMap("displaycollection.php?who=252058")));
+        random_messages.listAppend("home depot is out of 12-foot skeletons");
+        random_messages.listAppend("imagine being a Sacramento Kings fan, tho");
+        random_messages.listAppend("are you SURE you took the crystal ball off?");
+        random_messages.listAppend("does king ralph really care about us?");
+    }
+
     if (format_today_to_string("yyyyMMdd") == "20151021") //october 21st, 2015
     {
         //kept active for any time travelers
@@ -41570,8 +41629,6 @@ buffer generateContextualMenu()
         help_text.append("<br>- Everything is saved in LocalStorage. To access it, right-click anywhere => inspect element => Storage => Local Storage (Firefox), or right-click anywhere => inspect => Application => Storage => Local Storage (Edge/Chrome).");
         help_text.append("<br>- If you're actually relying on this feature, make sure you note its value every once in a while; if there's ever a release that changes their syntax, they'll get erased!.");
         help_text.append("<br>- Deleting your browser's cache will also wipe out everything.");
-        help_text.append("<br><br>- Where do you think this feature should be headed next? Let me know!");
-        help_text.append("<br><br>&hearts; -- " + HTMLGenerateTagWrap("a", "fredg1", generateMainLinkMap("showplayer.php?who=3041087")));
         guide_contextual_menu.append(HTMLGenerateTagWrap("div", help_text, string [string] {"id":"ct_menu_help", "style":"display:none;"}));
     }
 
@@ -44249,6 +44306,26 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralise(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8).ChecklistEntrySetIDTag("Clan VIP speakeasy resource")); //the eyes of T.J. Eckleburg
     
 }
+//Spring Break Beach cash register
+RegisterTaskGenerationFunction("IOTMSpringBreakBeachGenerateTasks");
+void IOTMSpringBreakBeachGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!__misc_state["sleaze airport available"])
+        return;
+	int dinerBucksLeft = clampi(4 - get_property_int("_sloppyDinerBeachBucks"), 0, 4);
+	string url;
+	string [int] description;
+	if (dinerBucksLeft > 0)
+	{
+        string title = (dinerBucksLeft + " Sloppy Seconds Diner cash register raids");
+		url = "place.php?whichplace=airport_sleaze";
+		description.listAppend("Money money money money monay!");
+		if (!lookupSkill("sloppy secrets").have_skill()) {
+			description.listAppend("Learn Sloppy Secrets for more Beach Bucks.");
+		}
+		optional_task_entries.listAppend(ChecklistEntryMake("__item beach buck", url, ChecklistSubentryMake(title, "", description), 8));
+	}
+}
 
 // 2015
 
@@ -44692,6 +44769,22 @@ static
     machineElfAbstractionDescriptionsInit();
 }
 
+//Machine Elf DMT Alert
+RegisterTaskGenerationFunction("IOTMMachineElfGenerateTasks");
+void IOTMMachineElfGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	string [int] description;
+	string url = "place.php?whichplace=dmt";
+	int DMTDuplicationAscension = get_property_int("lastDMTDuplication");
+	int DMTTimer = get_property_int("encountersUntilDMTChoice");
+	if (DMTTimer == 0 && my_ascensions() > DMTDuplicationAscension) 
+	{
+		description.listAppend("" + HTMLGenerateSpanFont("Item duplication available!", "blue") + "");
+		description.listAppend("Copy a PVPable potion, food, drink, or spleen item.");
+		task_entries.listAppend(ChecklistEntryMake("__item abstraction: comprehension", url, ChecklistSubentryMake("Deep Machine Tunnels noncom ready!", "", description), -11));
+	}
+}
+
 RegisterResourceGenerationFunction("IOTMMachineElfFamiliarGenerateResource");
 void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -44713,36 +44806,21 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
     if (__last_adventure_location == $location[the deep machine tunnels])
         entry.should_highlight = true;
     
+    // Using prefs for this now! Whoo!
+    int lastDMTDuplication = get_property_int("lastDMTDuplication");
+    int encountersUntilDMTChoice = get_property_int("encountersUntilDMTChoice");
+
+    // Starts every ascension at 5, but is every 50 turns after that first turn #6 dupe. Given
+    //   how long ascensions take and how many turns are likely used in the DMT (read: not many),
+    //   this feels like pretty safe logic as long as we keep the in_run checks in this code.
+    boolean duplication_nc_probably_visited = encountersUntilDMTChoice > 6 ? true : false;
     
-    
-    
-    //This test is incredibly inaccurate, because all sorts of things end up in the NC queue. (We All Wear Masks, Approach the Jellyfish, The Mad Tea Party)
-    boolean duplication_nc_probably_visited = true;
-    if ($location[the deep machine tunnels].noncombat_queue == "")
-        duplication_nc_probably_visited = false;
-    else if ($location[the deep machine tunnels].noncombatTurnsAttemptedInLocation() >= 5)
-    {
-        duplication_nc_probably_visited = true;
-    }
-    else
-    {
-        duplication_nc_probably_visited = false;
-        //Look for known strings for the second part of the NC name:
-        //The full list I've seen is:
-        //Across The Universe,Backwards In Time,Forwards In Time,Into The 4th Dimension,Into The 5th Dimension,Into The 6th Dimension,Into The 7th Dimension,Into The 8th Dimension,Into The 9th Dimension,Into The Ether,Into Your Body,Into Your Consciousness,Into Your Courage,Into Your Dreams,Into Your Experience,Into Your Eye,Into Your Heart,Into Your Life,Into Your Liver,Into Your Memories,Into Your Mind,Into Your Pineal Gland,Into Your Regrets,Into Your Soul,Into Your Third Ear,Into Your Third Eye,Into Your Thoughts,Into Your Timeline,Into Your Voice,Sideways In Time
-        foreach s in $strings[Across The Universe,Backwards In Time,Forwards In Time,Sideways In Time,Into The ,Into Your ]
-        {
-            if ($location[the deep machine tunnels].noncombat_queue.contains_text(s))
-            {
-                duplication_nc_probably_visited = true;
-                break;
-            }
-        }
-    }
-    if (!duplication_nc_probably_visited && $location[the deep machine tunnels].turns_spent >= 5)
+    // if (!duplication_nc_probably_visited && $location[the deep machine tunnels].turns_spent >= 5)
+    // Checks that the DMT choice is up and you haven't gotten one this run
+    if (encountersUntilDMTChoice == 0 && lastDMTDuplication < my_ascensions())
     {
         string [int] description;
-        description.listAppend("Next" + ($location[the deep machine tunnels].turns_spent > 5 ? "(?)" : "") + " turn in the DMT. Costs a turn.");
+        description.listAppend("Next turn in the DMT. Costs a turn.");
         description.listAppend("Copy a PVPable potion, food, drink, or spleen item.");
         item [int] suggested_items;
         if (suggested_items.count() > 0)
@@ -47869,8 +47947,13 @@ void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
             if ($item[S.O.C.K.].available_amount() == 0) {
                 string [int] airship_stealables;
                 foreach it in $items[mohawk wig,amulet of extreme plot significance] {
-                    if (it.available_amount() == 0)
-                        airship_stealables.listAppend(it);
+                    if (it.available_amount() == 0) {
+                        if (it == $item[mohawk wig] && lookupSkill("Comprehensive Cartography").skill_is_usable() && $item[model airship].available_amount() >= 1) {
+                            //mohawk wig not needed with a model airship and Cartography
+                        }
+                        else
+                            airship_stealables.listAppend(it);
+                    }
                 }
                 if (airship_stealables.count() > 0)
                     options.listAppend(airship_stealables.listJoinComponents(", ", "and").capitaliseFirstLetter() + ", from the airship.");
@@ -48803,7 +48886,7 @@ void IOTMBeachCombGenerateResource(ChecklistEntry [int] resource_entries)
     resource_entries.listAppend(ChecklistEntryMake("__item beach comb", "main.php?comb=1", ChecklistSubentryMake(pluralise(free_walks_left, "beach comb", "beach combs"), "", description), 3).ChecklistEntrySetIDTag("Beach comb resource"));
 }
 
-
+//Getaway Camp
 RegisterResourceGenerationFunction("IOTMGetawayCampsiteGenerateResource");
 void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -48831,7 +48914,7 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
             buffCycle [2] ["name"] = "Mongoose";
             buffCycle [3] ["effect"] = my_sign() == "Wallaby" ? "+20% spell critical hit" : "+10% spell critical hit" ;
             buffCycle [3] ["name"] = "Wallaby";
-            buffCycle [4] ["effect"] = my_sign() == "Vole" ? "+10~30 HP/adventure" : "+5~15 HP/adventure" ;
+            buffCycle [4] ["effect"] = my_sign() == "Vole" ? "+10-30 HP/adventure" : "+5-15 HP/adventure" ;
             buffCycle [4] ["name"] = "Vole";
             buffCycle [5] ["effect"] = my_sign() == "Platypus" ? "+5 familiar experience" : "+3 familiar experience" ;
             buffCycle [5] ["name"] = "Platypus";
@@ -48859,7 +48942,65 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         int todaysCycleNumber = todaysArbitraryNumber % 9;
         
         description.listAppend("Will get: " + (my_sign() == buffCycle [todaysCycleNumber] ["name"] ? "Big " : "") + "Smile of the " + buffCycle [todaysCycleNumber] ["name"] + " (" + buffCycle [todaysCycleNumber] ["effect"] + ")");
+		
+		string [int][int] tooltip_table;
 
+        // Making today's buff name its own variable 
+        string todaysBuff = buffCycle [todaysCycleNumber] ["name"];
+
+        // These are the given enchantments for each moonsign day
+        static string[string] smileEnchantments = {
+            "Mongoose":"% crit chance",
+            "Wallaby":"% spell crit",
+            "Vole":" HP regen",
+            "Platypus":" familiar XP",
+            "Opossum":"% candy drop",
+            "Marmot":" MP regen",
+            "Wombat":" DA",
+            "Blender":"% booze drop",
+            "Packrat":"% meat drop",};
+
+        // Doing a foreach through the enchantment list
+        foreach sign, enchantment in smileEnchantments {
+            // You get a "big smile" for extra bonus enchants for your given moonsign
+            boolean bigSmile = my_sign() == sign;
+
+            string enchantAmount = "";
+
+            // There's clearly a better way to do this, but this works. It checks for big smile status
+            //   then gives the correct enchant amount for the final list item.
+            if ($strings[Mongoose,Wallaby,Vole] contains sign) {
+                enchantAmount = bigSmile ? "20" : "10";
+            } 
+            if ($strings[Blender, Packrat] contains sign) {
+                enchantAmount = bigSmile ? "50" : "25";
+            }
+            if (sign == "Platypus") {
+                enchantAmount = bigSmile ? "5" : "3";
+            } 
+            if ($strings[Opossum, Wombat] contains sign) {
+                enchantAmount = bigSmile ? "100" : "50";
+            }
+            if (sign == "Marmot") {
+                enchantAmount = bigSmile ? "10" : "5" ;
+            }
+
+            // UPDATE: ... I could've used what fred coded above I'm a big idiot ack
+
+            // Highlight today's buff in red.
+            string signColor = todaysBuff == sign ? "blue" : "black";
+
+            // Add the sign to the tooltip table.
+            tooltip_table.listAppend(listMake(HTMLGenerateSpanFont(sign, signColor), HTMLGenerateSpanFont("+" + enchantAmount + enchantment, signColor)));
+        }
+		
+		buffer tooltip_text;
+		tooltip_text.append(HTMLGenerateTagWrap("div", "Campfire Smile cycle", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+		tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
+		
+		string campSmileCycleList = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Campfire Smile cycle", "r_tooltip_outer_class");
+		description.listAppend(campSmileCycleList);
+		
         resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "place.php?whichplace=campaway", ChecklistSubentryMake(pluralise(smile_buffs_left, "smile buff", "smile buffs") + " obtainable", "20 turns", description), 5).ChecklistEntrySetCombinationTag("getaway campsite resources").ChecklistEntrySetIDTag("Getaway campsite sign smiles"));
     }
     if (firewood.have() && __misc_state["in run"]) {
@@ -48891,7 +49032,6 @@ void IOTMGetawayCampsiteGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item Newbiesport&trade; tent", "shop.php?whichshop=campfire", ChecklistSubentryMake(pluralise(firewood), "", description), 5).ChecklistEntrySetCombinationTag("getaway campsite resources").ChecklistEntrySetIDTag("Getaway campsite firewood"));
     }
 }
-
 RegisterResourceGenerationFunction("IOTMPocketProfessorResource");
 void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
 {
@@ -50088,6 +50228,7 @@ void IOTMCargoCultistShortsGenerateResource(ChecklistEntry [int] resource_entrie
         resource_entries.listAppend(ChecklistEntryMake("__item cargo cultist shorts", "inventory.php?action=pocket", ChecklistSubentryMake("Cargo shorts pocket openable", "", description), 1).ChecklistEntrySetIDTag("Cargo shorts resource"));
     }
 }
+//comprehensive cartography
 RegisterTaskGenerationFunction("IOTMComprehensiveCartographyGenerateTasks");
 void IOTMComprehensiveCartographyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -50112,31 +50253,48 @@ void IOTMComprehensiveCartographyGenerateResource(ChecklistEntry [int] resource_
 		
 		if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE)
 		{
+			//automatic carto NCs
 			description.listAppend("This IotM also gives you a special noncom in the following zones:");
-			if (!__quest_state["cc_spookyravennecklace"].finished)
-				{
-					options.listAppend("The Haunted Billiards Room");
-				}
-			if (!__quest_state["cc_friars"].finished)
-				{
-					options.listAppend("The Dark Neck of the Woods");
-				}
-			if (get_property_int("cyrptNookEvilness") > 25)
-				{
-					options.listAppend("The Defiled Nook");
-				}
-			if (get_property_int("twinPeakProgress") != 15)
-				{
-					options.listAppend(HTMLGenerateSpanOfClass("First adv", "r_bold") + " A-Boo Peak: gives Twin Peak noncom");
-				}
-			if (!__quest_state["cc_castletop"].finished)
-					{
-						options.listAppend("Castle Top Floor");
-					}
-			if (!__quest_state["warProgress"].started)
-					{
-						options.listAppend("The Hippy Camp (Verge of War)");
-					}			
+			int cartoAbooAscension = get_property_int("lastCartographyBooPeak");
+			if (my_ascensions() > cartoAbooAscension) {
+				options.listAppend(HTMLGenerateSpanOfClass("First adv", "r_bold") + " A-Boo Peak: free A-boo clue");
+			}
+			int cartoCastleAscension = get_property_int("lastCartographyCastleTop");
+			if (my_ascensions() > cartoCastleAscension) {
+				options.listAppend("Castle Top: finish quest");
+			}
+			int cartoDarkNeckAscension = get_property_int("lastCartographyDarkNeck");
+			if (my_ascensions() > cartoDarkNeckAscension) {
+				options.listAppend("The Dark Neck of the Woods: +2 progress");
+			}
+			int cartoNookAscension = get_property_int("lastCartographyDefiledNook");
+			if (my_ascensions() > cartoNookAscension) {
+				options.listAppend("The Defiled Nook: +2 Evil Eyes");
+			}
+			int cartoFratAscension = get_property_int("lastCartographyFratHouse");
+			if (my_ascensions() > cartoFratAscension) {
+				options.listAppend(HTMLGenerateSpanOfClass("First adv", "r_bold") + " Orcish Frat House: free garbage");
+			}
+			int cartoGuanoAscension = get_property_int("lastCartographyGuanoJunction");
+			if (my_ascensions() > cartoGuanoAscension) {
+				options.listAppend(HTMLGenerateSpanOfClass("First adv", "r_bold") + " Guano Junction: Screambat");
+			}
+			int cartoBilliardsAscension = get_property_int("lastCartographyHauntedBilliards");
+			if (my_ascensions() > cartoBilliardsAscension) {
+				options.listAppend("Haunted Billiards: play pool immediately");
+			}
+			int cartoProtestersAscension = get_property_int("lastCartographyZeppelinProtesters");
+			if (my_ascensions() > cartoProtestersAscension) {
+				options.listAppend("Mob of Zeppelin Protesters: pick any NC");
+			}
+			int cartoWarFratAscension = get_property_int("lastCartographyFratHouseVerge");
+			if (my_ascensions() > cartoWarFratAscension) {
+				options.listAppend("Wartime Frat House: pick any NC");
+			}
+			int cartoWarHippyAscension = get_property_int("lastCartographyHippyCampVerge");
+			if (my_ascensions() > cartoWarHippyAscension) {
+				options.listAppend("Wartime Hippy Camp: pick any NC");
+			}	
 			//monstermap options
 			if (!__quest_state["Level 11 Ron"].finished)
 			{
@@ -50163,9 +50321,9 @@ void IOTMComprehensiveCartographyGenerateResource(ChecklistEntry [int] resource_
 				monsterMaps.listAppend("Green Ops Soldier. Combine with Olfaction/Use the Force and Spit and Explodinal pills.");
 			}
 			if (options.count() > 0)
-				description.listAppend("Noncoms of interest:|*" + options.listJoinComponents("|*"));
+				description.listAppend(HTMLGenerateSpanOfClass("Noncoms of interest:", "r_bold") + "|*-" + options.listJoinComponents("|*-"));
 			if (monsterMaps.count() > 0)
-				description.listAppend("Monsters to map:|*-" + monsterMaps.listJoinComponents("|*-"));
+				description.listAppend(HTMLGenerateSpanOfClass("Monsters to map:", "r_bold") + "|*-" + monsterMaps.listJoinComponents("|*-"));
 		}
 		resource_entries.listAppend(ChecklistEntryMake("__item Comprehensive Cartographic Compendium", "", ChecklistSubentryMake(pluralise(maps_left, "Cartography skill use", "Cartography skill uses"), "", description), 5).ChecklistEntrySetIDTag("Cartography skills resource"));
 	}
@@ -50812,7 +50970,7 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 		string [int] description;
 		int beardBuff = get_property_int("lastBeardBuff");
 		string nextBeardBuffEffect;
-		int nextBeardBuff;
+		int nextBeardBuff = 0;
 		string url = "inventory.php?ftext=daylight+shavings+helmet";
 		description.listAppend("Shave turns off of your sanity!");
 		
@@ -50833,11 +50991,25 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 		{	
 			nextBeardBuff = ((((my_class().to_int() % 6 +1 + shavingBuffCounter) % 11)));
 		}	
+		
+		string [int][int] tooltip_table;
+		tooltip_table.listAppend(listMake("Toiletbrush", "+25 ML and +5 " + HTMLGenerateSpanFont("Stench", "green") + " resist"));
+		tooltip_table.listAppend(listMake("Barbell", "+25 Muscle and +50% Gear drops"));
+		tooltip_table.listAppend(listMake("Grizzly", "+25-50 MP regen and +5 " + HTMLGenerateSpanFont("Cold", "blue") + " resist"));
+		tooltip_table.listAppend(listMake("Surrealist", "+25 Mysticality and +50% Food drops"));
+		tooltip_table.listAppend(listMake("Musician", "+25 Moxie and +50% Booze drops"));
+		tooltip_table.listAppend(listMake("Gull-Wing", "+100% init and +5 " + HTMLGenerateSpanFont("Hot", "red") + " resist"));
+		tooltip_table.listAppend(listMake("Warlord", "+25 Weapon damage and +10% Crit"));
+		tooltip_table.listAppend(listMake("Wizard", "+25 Spell damage and +10% Spell Crit"));
+		tooltip_table.listAppend(listMake("Cowboy", "+25 Ranged damage and +50 maximum HP"));
+		tooltip_table.listAppend(listMake("Friendly", "+100% meat and +5 " + HTMLGenerateSpanFont("Sleaze", "purple") + " resist"));
+		tooltip_table.listAppend(listMake("Spectacle", "+50% item and +5 " + HTMLGenerateSpanFont("Spooky", "grey") + " resist"));
+			
 		// Map buff number to buff result
 		switch (nextBeardBuff)			
 		{
 			case 1:
-				nextBeardBuffEffect = "Toiletbrush, +25 ML and +5 " + HTMLGenerateSpanFont("Stench", "dark green") + " resist"; break;
+				nextBeardBuffEffect = "Toiletbrush, +25 ML and +5 " + HTMLGenerateSpanFont("Stench", "green") + " resist"; break;
 			case 2:
 				nextBeardBuffEffect = "Barbell, +25 Muscle and +50% Gear drops"; break;
 			case 3:
@@ -50859,16 +51031,25 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 			case 0:
 				nextBeardBuffEffect = "Spectacle, +50% item and +5 " + HTMLGenerateSpanFont("Spooky", "grey") + " resist"; break;
 		}
+
+		buffer tooltip_text;
+		tooltip_text.append(HTMLGenerateTagWrap("div", "DSH beard cycle", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+		tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
+			
+		string beardCycleList = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Full beard cycle", "r_tooltip_outer_class");
+		
 		if (!lookupItem("daylight shavings helmet").equipped())
 			description.listAppend(HTMLGenerateSpanFont("Equip the helmet first.", "red"));
 		else
 			description.listAppend(HTMLGenerateSpanFont("Your equipped helmet will buff you.", "blue"));
 	if ($effect[Toiletbrush Moustache].have_effect() < 2 && $effect[Barbell Moustache].have_effect() < 2 && $effect[Grizzly Beard].have_effect() < 2 && $effect[Surrealist's Moustache].have_effect() < 2 && $effect[Musician's Musician's Moustache].have_effect() < 2 && $effect[Gull-Wing Moustache].have_effect() < 2 && $effect[Space Warlord's Beard].have_effect() < 2 && $effect[Pointy Wizard Beard].have_effect() < 2 && $effect[Cowboy Stache].have_effect() < 2 && $effect[Friendly Chops].have_effect() < 2 && $effect[Spectacle Moustache].have_effect() < 2) {
 		description.listAppend(HTMLGenerateSpanOfClass("Next shavings effect: ", "r_bold") + nextBeardBuffEffect);
+		description.listAppend(beardCycleList);
 		task_entries.listAppend(ChecklistEntryMake("__item daylight shavings helmet", url, ChecklistSubentryMake("Daylight Shavings Helmet buff available", "", description), -11));
 	}
 	else {
 		description.listAppend(HTMLGenerateSpanOfClass("Next shavings effect: ", "r_bold") + nextBeardBuffEffect);
+		description.listAppend(beardCycleList);
 		optional_task_entries.listAppend(ChecklistEntryMake("__item daylight shavings helmet", url, ChecklistSubentryMake("Daylight Shavings Helmet buff charging", "", description), 8));
 	}
 }
@@ -50887,6 +51068,26 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + gregarious_monster, "url", ChecklistSubentryMake("Fight " + pluralise(fights_left, "more gregarious " + gregarious_monster, "more gregarious " + gregarious_monster + "s"), "", description), -1));
     }
 	if (!__iotms_usable[lookupItem("cold medicine cabinet")]) return;
+
+	// Parsing the lastCombatEnvironments for a count of CMC combats.
+	string cmcCombatString = get_property("lastCombatEnvironments");
+	string[int] splitCMC = split_string(cmcCombatString, "");
+    int uTurns;
+	int iTurns;
+	int oTurns;
+
+	foreach turn in splitCMC {
+		if (splitCMC[turn] == "i") {iTurns +=1;}
+		if (splitCMC[turn] == "u") {uTurns +=1;}
+		if (splitCMC[turn] == "o") {oTurns +=1;}
+	}
+
+	string expectedSpleenItem = "Fleshazole";
+
+	if (uTurns > 10) expectedSpleenItem = "Breathitin";
+	if (iTurns > 10) expectedSpleenItem = "Extrovermectin";
+	if (oTurns > 10) expectedSpleenItem = "Homebodyl";
+
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
 	if (CMC_consults > 0) 
 	{
@@ -50898,12 +51099,14 @@ void IOTMColdMedicineCabinetGenerateTasks(ChecklistEntry [int] task_entries, Che
 		if (next_CMC_Turn -1 == total_turns_played())
 		{
 			description.listAppend(HTMLGenerateSpanFont("Consultation ready next turn!", "red"));
+			description.listAppend("You'll be prescribed " + HTMLGenerateSpanOfClass(expectedSpleenItem, "r_bold"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
 			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is almost in session", "", description), -11));
 		}
 		else if (next_CMC_Turn <= total_turns_played())
 		{
 			description.listAppend(HTMLGenerateSpanFont("Just what the doctor ordered!", "blue"));
+			description.listAppend("You'll be prescribed " + HTMLGenerateSpanOfClass(expectedSpleenItem, "r_bold"));
 			description.listAppend("You have " + CMC_consults + " consultations remaining.");
 			task_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake("The cold medicine cabinet is in session", "", description), -11));
 		}
@@ -50925,7 +51128,7 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
             string [int] description;
             description.listAppend("Be gregarious in combat, which lets you turn foes into friends!");
 			string [int] gregfriends;
-			gregfriends.listAppend("Bob Racecar or his brother Racecar Bob");
+			gregfriends.listAppend("Bob Racecar, or his brother Racecar Bob");
 			gregfriends.listAppend("dirty old lihc (cyrpt progress)");
 			gregfriends.listAppend("lobsterfrogman (gunpowder)");
 			gregfriends.listAppend("modern zmobie (cyrpt progress)");
@@ -50947,6 +51150,7 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         description.listAppend("Outdoor fights become free.");
         resource_entries.listAppend(ChecklistEntryMake("__item beefy pill", "", ChecklistSubentryMake(pluralise(breaths_remaining, "breathitin breath", "breathitin breaths"), "", description), -2));
     }
+
 	//homebodyl
 	int homebodyls_remaining = get_property_int("homebodylCharges");
 	if (homebodyls_remaining > 0) 
@@ -50958,24 +51162,59 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
     }
 	
 	//consultation counter
-	if (!__iotms_usable[lookupItem("cold medicine cabinet")]) return;
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
-	if (CMC_consults > 0) 
+	if (CMC_consults > 0 && __misc_state["in run"] && __iotms_usable[lookupItem("cold medicine cabinet")]) 
 	{
+		// Tracking tile; gives the user information about the last turn-taking combats per the pref.
 		int next_CMC_Turn = get_property_int("_nextColdMedicineConsult");
 		int next_CMC_Timer = (next_CMC_Turn - total_turns_played());
+        int fleshazoleMeat = clampi(my_level(),0,11)*1000;
+       
+        // Parsing the lastCombatEnvironments for a count of CMC combats.
+        string cmcCombatString = get_property("lastCombatEnvironments");
+        string[int] splitCMC = split_string(cmcCombatString, "");
+        int uTurns;
+        int iTurns;
+        int oTurns;
+
+        foreach turn in splitCMC {
+            if (splitCMC[turn] == "i") {iTurns +=1;}
+            if (splitCMC[turn] == "u") {uTurns +=1;}
+            if (splitCMC[turn] == "o") {oTurns +=1;}
+        }
+        
+    	string expectedSpleenItem = "Fleshazole";
+
+    	if (uTurns > 10) expectedSpleenItem = "Breathitin";
+    	if (iTurns > 10) expectedSpleenItem = "Extrovermectin";
+    	if (oTurns > 10) expectedSpleenItem = "Homebodyl";
+
 		string [int] description;
 		string url = "campground.php?action=workshed";
 			
-		if (next_CMC_Turn > total_turns_played())
-		{
-			description.listAppend("" + HTMLGenerateSpanOfClass(next_CMC_Timer, "r_bold") + " adventures until your next consultation.");
-			description.listAppend(HTMLGenerateSpanFont("Diagnosis: dickstabbing", "blue"));
-			description.listAppend("Do 11+ combats in underground zones for 5 free kills.");
-			description.listAppend("Do 11+ combats in indoor zones for a wanderer.");
-			description.listAppend("Do 11+ combats in outdoor zones for 11 free crafts.");
-			resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake(CMC_consults.pluralise("Cold medicine cabinet consultation", "Cold medicine cabinet consultations" + " remaining"), "", description)).ChecklistEntrySetIDTag("cold medicine cabinet resource")); 
-		}	
+		description.listAppend(HTMLGenerateSpanFont("Route turn-taking combats into the correct environments for a helpful spleen item!", "blue"));
+            
+        string uFormat = uTurns > 10 ? "black" : "grey";
+        string iFormat = iTurns > 10 ? "black" : "grey";
+        string oFormat = oTurns > 10 ? "black" : "grey";
+
+        string [int] currentState;
+        currentState.listAppend(HTMLGenerateSpanOfClass("Currently Expected Spleener: ", "r_bold")+ expectedSpleenItem);
+        currentState.listAppend(HTMLGenerateSpanFont(uTurns.to_string() + " Underground turns", uFormat));
+        currentState.listAppend(HTMLGenerateSpanFont(iTurns.to_string() + " Indoor turns", iFormat));
+        currentState.listAppend(HTMLGenerateSpanFont(oTurns.to_string() + " Outdoor turns", oFormat));
+        description.listAppend(currentState.listJoinComponents("|*"));
+
+        string [int][int] spleeners;
+        // Generates a reference table for the user of the spleener effects.
+        spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
+        spleeners.listAppend(listMake("Extrovermectin","Indoors","+3 Wandering Monsters"));
+        spleeners.listAppend(listMake("Breathitin","Underground","+5 Outdoor Free Kills"));
+        spleeners.listAppend(listMake("Homebodyl","Outdoors","+11 Free Crafts"));
+        spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
+        description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
+
+        resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake(CMC_consults.pluralise("CMC consultation", "CMC consultations" + " remaining"), "", description)).ChecklistEntrySetIDTag("cold medicine cabinet resource")); 
 	}
 }
 
@@ -50990,6 +51229,10 @@ void IOTYCursedMagnifyingGlassGenerateTasks(ChecklistEntry [int] task_entries, C
 	int cursedGlassCounter = get_property_int("cursedMagnifyingGlassCount");
 	string url;
 	string [int] description;
+	if (lookupItem("cursed magnifying glass").equipped_amount() == 0) {
+		description.listAppend(HTMLGenerateSpanFont("Equip the cursed magnifying glass", "red"));
+		url = invSearch("cursed magnifying glass");
+	} 
 	{
 		if (cursedGlassCounter < 12)
 		{
@@ -51000,30 +51243,33 @@ void IOTYCursedMagnifyingGlassGenerateTasks(ChecklistEntry [int] task_entries, C
 		
 		if (cursedGlassCounter == 12)
 		{
-            if (lookupItem("cursed magnifying glass").equipped_amount() == 0) {
-            description.listAppend(HTMLGenerateSpanFont("Equip the cursed magnifying glass", "red"));
-            url = invSearch("cursed magnifying glass");
-			} 
 			description.listAppend(HTMLGenerateSpanFont("One more fight until you encounter a void.", "blue"));
 			task_entries.listAppend(ChecklistEntryMake("__item void stone", url, ChecklistSubentryMake("Cursed magnifying glass combat", "", description), -11));
         }	
 	
 		if (cursedGlassCounter == 13)
         {
-            if (lookupItem("cursed magnifying glass").equipped_amount() == 0) {
-            description.listAppend(HTMLGenerateSpanFont("Equip the cursed magnifying glass", "red"));
-            url = invSearch("cursed magnifying glass");
-			}  
-			description.listAppend(HTMLGenerateSpanFont("Void combat next adventure", "red"));
+            if (lookupItem("cursed magnifying glass").equipped_amount() == 0) 
+			{
 			task_entries.listAppend(ChecklistEntryMake("__item void stone", url, ChecklistSubentryMake("Cursed magnifying glass combat", "", description), -11));
+			}  
+			else 
+			{
+			description.listAppend(HTMLGenerateSpanFont("Void combat next adventure, ", "red") + HTMLGenerateSpanFont("magnifying glass equipped", "blue"));
+			task_entries.listAppend(ChecklistEntryMake("__item void stone", url, ChecklistSubentryMake("Cursed magnifying glass combat", "", description), -11));
+			}
         }
 		if (free_void_fights_left > 0)
 		{
             description.listAppend("" + free_void_fights_left + " free void fights remaining.");
         }	
+		else if (lookupSkill("Meteor Lore").have_skill() || lookupItem("powerful glove").available_amount() > 0) 
+		{
+			description.listAppend("No free void fights remaining, but you can replace them with lobsterfrogmen or something.");
+		}
 		else
 		{
-		    description.listAppend("No free void fights remaining, but you can replace them with lobsterfrogmen or something.");
+			description.listAppend("No free void fights remaining, but you can charge it up for tomorrow?");
 		}
 	}	
 }
@@ -51322,7 +51568,7 @@ void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entri
 {
     item unbrella = lookupItem("unbreakable umbrella");
     if (!unbrella.have()) return;
-    if (!__misc_state["in run"]) return; 
+    if (!__misc_state["in run"] && $item[unbreakable umbrella].equipped_amount() == 0) return; 
     string url;
 	string unbrellaMode = get_property("umbrellaState");
 	string unbrellaEnchant;
@@ -51332,21 +51578,21 @@ void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entri
         string main_title = "Umbrella machine " + HTMLGenerateSpanFont("B", "red") + "roke";
         description.listAppend("Understanda" + HTMLGenerateSpanFont("B", "red") + "le have a nice day.");
 		
-		switch (unbrellaMode)			
+		switch (get_property("umbrellaState"))
 		{
 			case "broken":
 				int modifiedML = round(numeric_modifier("monster level") * 1.25,0);
-				unbrellaEnchant = "+25% ML. Unbrella-boosted ML will be " + modifiedML + ".";
+				unbrellaEnchant = "+25% ML. Unbrella-boosted ML will be " + modifiedML + "."; break;
 			case "forward-facing":
-				unbrellaEnchant = "+25 DR shield";
+				unbrellaEnchant = "+25 DR shield"; break;
 			case "bucket style":
-				unbrellaEnchant = "+25% item drops";
+				unbrellaEnchant = "+25% item drops"; break;
 			case "pitchfork style":
-				unbrellaEnchant = "+25 Weapon Damage";
+				unbrellaEnchant = "+25 Weapon Damage"; break;
 			case "constantly twirling":
-				unbrellaEnchant = "+25 Spell Damage";
+				unbrellaEnchant = "+25 Spell Damage"; break;
 			case "cocoon":
-				unbrellaEnchant = "-10% Combat Frequency";
+				unbrellaEnchant = "-10% Combat Frequency"; break;
 		}
 		description.listAppend(HTMLGenerateSpanOfClass("Current enchantment: ", "r_bold") + unbrellaMode);
 		description.listAppend(HTMLGenerateSpanFont(unbrellaEnchant, "blue") + "");
@@ -51523,46 +51769,233 @@ void IOTMDesignerSweatpantsResource(ChecklistEntry [int] resource_entries)
     resource_entries.listAppend(ChecklistEntryMake("__item designer sweatpants", url, ChecklistSubentryMake(title, description), 1).ChecklistEntrySetIDTag("designer sweatpants resource"));
 }
 //Tiny stillsuit
-RegisterResourceGenerationFunction("IOTMTinyStillsuitResource");
-void IOTMTinyStillsuitResource(ChecklistEntry [int] resource_entries)
+RegisterTaskGenerationFunction("IOTMTinyStillsuitGenerateTasks");
+void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-  int fam_sweat_o_meter = get_property_int("familiarSweat");
+    if (!lookupItem("tiny stillsuit").have()) return;
+	int fam_sweat_o_meter = get_property_int("familiarSweat");
+	
+	string title;
+	string [int] description;
+	string url = "inventory.php?action=distill&pwd=" + my_hash();
+	int sweatCalcSweat;
+	int sweatAdvs = round(to_int(get_property("familiarSweat"))**0.4);
 
-  // Cannot drink the distillate until you have 10+ drams.
-  if (!lookupItem("tiny stillsuit").have() || fam_sweat_o_meter < 10 ) return;
-  
-  string title;
-  string [int] description;
-  string url = "inventory.php?action=distill&pwd=" + my_hash();
-  title = HTMLGenerateSpanFont(fam_sweat_o_meter + " drams of stillsuit sweat", "purple");
-  description.listAppend("Two gross tastes that taste horrible together.");
- 
-  if (fam_sweat_o_meter > 358 && __misc_state["in run"]) {
-    description.listAppend("" + HTMLGenerateSpanOfClass("11", "r_bold") + " advs when guzzling now (costs 1 liver).");
-    description.listAppend("You should probably guzzle your sweat now.");
-  }
-  else
-  {
-    int sweatAdvs = round(fam_sweat_o_meter ** 0.4);
-    int nextSweatDrams = ceil((sweatAdvs + 1) ** 2.5);
-    description.listAppend("" + HTMLGenerateSpanOfClass(sweatAdvs, "r_bold") + " advs when guzzling now (costs 1 liver).");
-    description.listAppend("" + HTMLGenerateSpanOfClass(nextSweatDrams - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + ceil(nextSweatDrams - fam_sweat_o_meter)/3 + " combats on current familiar)");
-  }
-  
-  if ($item[tiny stillsuit].item_amount() == 1) {
-    description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
-    url = "familiar.php";
-  } 
-  else if ($item[tiny stillsuit].equipped_amount() == 1)
-  {
-    description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat from current familiar!", "purple") + "");
-  }
-  else
-  {
-    description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
-  }
-    
-  resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
+	if (fam_sweat_o_meter >= 358) {
+		sweatCalcSweat = 449;
+	}
+	else if (fam_sweat_o_meter >= 279) {
+		sweatCalcSweat = 358;
+	}
+	else if (fam_sweat_o_meter >= 211) {
+		sweatCalcSweat = 279;
+	}
+	else if (fam_sweat_o_meter >= 155) {
+		sweatCalcSweat = 211;
+	}
+	else if (fam_sweat_o_meter >= 108) {
+		sweatCalcSweat = 155;
+	}
+	else if (fam_sweat_o_meter >= 71) {
+		sweatCalcSweat = 108;
+	}
+	else if (fam_sweat_o_meter >= 43) {
+		sweatCalcSweat = 71;
+	}
+	else if (fam_sweat_o_meter >= 23) {
+		sweatCalcSweat = 43;
+	}
+	else if (fam_sweat_o_meter >= 10) {
+		sweatCalcSweat = 23;
+	}
+	else if (fam_sweat_o_meter < 10) {
+		sweatCalcSweat = 10;
+	}
+	
+	if (fam_sweat_o_meter > 449) {
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatAdvs, "r_bold") + " advs when guzzling now (costs 1 liver).");
+		description.listAppend("You should probably guzzle your sweat now.");
+	}
+	else {
+		description.listAppend(HTMLGenerateSpanOfClass(fam_sweat_o_meter + "/" + sweatCalcSweat, "r_bold") + " drams of stillsuit sweat for next adventure.");
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " combats on current familiar)");
+	}
+	
+	if ($item[tiny stillsuit].item_amount() == 1) {
+		title = HTMLGenerateSpanFont("Equip the stillsuit", "purple");
+		description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
+		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
+	}
+	else if ($item[tiny stillsuit].equipped_amount() == 1) {
+		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat from current familiar!", "purple") + "");
+	} else {
+		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
+    }	
+	title = HTMLGenerateSpanFont(sweatAdvs + " adv stillsuit sweat booze", "purple");
+	if (__misc_state["in run"] && sweatAdvs > 3) {
+		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
+	}
+	else if (!__misc_state["in run"] && sweatAdvs > 8) {
+		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
+	}
+}
+
+RegisterResourceGenerationFunction("IOTMTinyStillsuitGenerateResource");
+void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!lookupItem("tiny stillsuit").have()) return;
+
+    int fam_sweat_o_meter = get_property_int("familiarSweat");
+	int sweatAdvs = round(to_int(get_property("familiarSweat"))**0.4);
+#	int nextSweatDrams = (sweatAdvs+0.51) ** 2.5;# - fam_sweat_o_meter;
+	
+    string title;
+    string [int] description;
+    string url = "inventory.php?action=distill&pwd=" + my_hash();
+	int sweatCalcSweat;
+
+	description.listAppend("Two gross tastes that taste horrible together.");
+	//an amish paradise is as primitive as can be
+
+	if (fam_sweat_o_meter >= 358) {
+		sweatCalcSweat = 449;
+	}
+	else if (fam_sweat_o_meter >= 279) {
+		sweatCalcSweat = 358;
+	}
+	else if (fam_sweat_o_meter >= 211) {
+		sweatCalcSweat = 279;
+	}
+	else if (fam_sweat_o_meter >= 155) {
+		sweatCalcSweat = 211;
+	}
+	else if (fam_sweat_o_meter >= 108) {
+		sweatCalcSweat = 155;
+	}
+	else if (fam_sweat_o_meter >= 71) {
+		sweatCalcSweat = 108;
+	}
+	else if (fam_sweat_o_meter >= 43) {
+		sweatCalcSweat = 71;
+	}
+	else if (fam_sweat_o_meter >= 23) {
+		sweatCalcSweat = 43;
+	}
+	else if (fam_sweat_o_meter >= 10) {
+		sweatCalcSweat = 23;
+	}
+	else if (fam_sweat_o_meter < 10) {
+		sweatCalcSweat = 10;
+	}
+	
+	if (fam_sweat_o_meter > 358) {
+		description.listAppend("" + HTMLGenerateSpanOfClass("11", "r_bold") + " advs when guzzling now (costs 1 liver).");
+		description.listAppend("You should probably guzzle your sweat now.");
+	}
+	else if (fam_sweat_o_meter > 10) {
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatAdvs, "r_bold") + " advs when guzzling now (costs 1 liver).");
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " combats on current familiar)");
+	}
+	else {
+		description.listAppend("" + HTMLGenerateSpanFont("Not enough sweat to guzzle.", "red") + "");
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " combats on current familiar)");
+	}
+		
+    if ($item[tiny stillsuit].item_amount() == 1) {
+		description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
+		url = "familiar.php";
+	}
+	else if ($item[tiny stillsuit].equipped_amount() == 1) {
+		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat from current familiar!", "purple") + "");
+	} else {
+		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
+    }
+
+	title = HTMLGenerateSpanFont(fam_sweat_o_meter + "/" + sweatCalcSweat + " drams of stillsuit sweat", "purple");
+	
+	//sweat chart
+	string [int][int] tooltip_table; 
+
+    // These are the mappings for drams needed for certain adv thresholds.
+    static string[int] advDramsTable = {
+        3:"10",
+        4:"23",
+        5:"43",
+        6:"71",
+        7:"108",
+        8:"155",
+        9:"211",
+        10:"279",
+        11:"358",
+        12:"449",
+        13:"553",};
+
+    foreach advs, drams in advDramsTable {
+      // Only append it if the user hasn't yet reached that # of drams
+      if (drams.to_int() > fam_sweat_o_meter) {
+        tooltip_table.listAppend(listMake(advs.to_string(), drams+" drams (" + (drams.to_int() - fam_sweat_o_meter) + " more sweat)" ));
+      }
+    }
+
+    if (fam_sweat_o_meter > 553) {
+      tooltip_table.listAppend(listMake("> 13", "... yknow, you should probably just drink it, buddy"));
+    }
+		
+	buffer tooltip_text;
+	tooltip_text.append(HTMLGenerateTagWrap("div", "Sweat to Advs Conversion Table", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+	tooltip_text.append(HTMLGenerateSimpleTableLines(tooltip_table));
+		
+	string stillSweatTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Sweat/Advs conversion", "r_tooltip_outer_class");
+	description.listAppend(stillSweatTooltip);
+		
+	//famtype chart
+	string [int][int] tooltip_table2;
+	tooltip_table2.listAppend(listMake("Cubeling / Stomping Boots", "+item"));
+	tooltip_table2.listAppend(listMake("Levitating Potato / Candy Carnie / Flan", "+item and +food"));
+	tooltip_table2.listAppend(listMake("Star Starfish / Emilio / Globmule / Waifuton", "+item and +sleaze"));
+		
+	buffer tooltip_text2;
+	tooltip_text2.append(HTMLGenerateTagWrap("div", "Stillsuit buff target", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+	tooltip_text2.append(HTMLGenerateSimpleTableLines(tooltip_table2));
+		
+	string stillSweatTypeTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Suggested Stillsuit Familiars", "r_tooltip_outer_class");
+	description.listAppend(stillSweatTypeTooltip);
+    resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
+}
+//Jurassic parka
+RegisterResourceGenerationFunction("IOTMJurassicParkaGenerateResource");
+void IOTMJurassicParkaGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    item parka = lookupItem("jurassic parka");
+    if (!parka.have()) return;
+    if (!__misc_state["in run"]) return; 
+    string url;
+	string parkaMode = get_property("parkaMode");
+	string parkaEnchant;
+	string [int] description;
+    url = invSearch("jurassic parka");
+	int spikos_left = clampi(5 - get_property_int("_spikolodonSpikeUses"), 0, 5);
+    // Title
+        string main_title = "Jurassic Parka";
+        description.listAppend("You're the dinosaur now, dawg.");
+		
+		switch (get_property("parkaMode"))			
+		{
+			case "kachungasaur":
+				parkaEnchant = "+100% HP, +50% meat, +2 Cold res."; break;
+			case "dilophosaur":
+				parkaEnchant = "+20 Sleaze and Sleaze Spell, +2 Stench res, YR free kill."; break;
+			case "spikolodon":
+				parkaEnchant = "+ML, +2 Sleaze res, NC forcing ability."; break;
+			case "ghostasaurus":
+				parkaEnchant = "+10 DR, +50 MP, +2 Spooky res."; break;
+			case "pterodactyl":
+				parkaEnchant = "-5% Combat Frequency, +50% Initiative, +2 Hot res."; break;
+		}
+		description.listAppend(HTMLGenerateSpanOfClass("Current enchantment: ", "r_bold") + parkaMode);
+		description.listAppend(HTMLGenerateSpanFont(parkaEnchant, "blue") + "");
+		description.listAppend(HTMLGenerateSpanOfClass(spikos_left, "r_bold") + " spikolodon spikes available.");
+		resource_entries.listAppend(ChecklistEntryMake("__item jurassic parka", "inventory.php?action=jparka", ChecklistSubentryMake(main_title, "", description)));
 }
 
 
