@@ -1,5 +1,5 @@
 RegisterResourceGenerationFunction("PathDinoFallGenerateResource");
-void PathGLoverGenerateResource(ChecklistEntry [int] resource_entries)
+void PathDinoFallGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (my_path().id != PATH_FALL_OF_THE_DINOSAURS)
         return;
