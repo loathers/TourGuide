@@ -55,7 +55,7 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
             useful_digits_and_their_reasons[9] = "knob goblin perfume for boss fight";
         }
         if ($item[Vegetable of Jarlsberg].available_amount() > 0)
-            useful_digits_and_their_reasons[16] = "magicalness-in-a-can for Jarlsberg's vegetable soup"
+            useful_digits_and_their_reasons[16] = "magicalness-in-a-can for Jarlsberg's vegetable soup";
     }
     if (my_level() < 13)
     {
