@@ -52,3 +52,22 @@ void IOTYCursedMagnifyingGlassGenerateTasks(ChecklistEntry [int] task_entries, C
 		}
 	}	
 }
+
+RegisterResourceGenerationFunction("IOTYCursedMagnifyingGlassGenerateResource");
+void IOTYCursedMagnifyingGlassGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (lookupItem("cursed magnifying glass").available_amount() == 0) return;
+    
+    int free_void_fights_left = clampi(5 - get_property_int("_voidFreeFights"), 0, 5);
+	int cursedGlassCounter = get_property_int("cursedMagnifyingGlassCount");
+	string url;
+	string [int] description;
+
+    if (get_property_int("_voidFreeFights") < 5) {
+        int cursedGlassCounter = get_property_int("cursedMagnifyingGlassCount");
+        url = invSearch("cursed magnifying glass");
+		description.listAppend((13 - cursedGlassCounter).pluralise("combat", "combats") + " until next void fight.");
+		
+		resource_entries.listAppend(ChecklistEntryMake("__item void stone", "", ChecklistSubentryMake(pluralise(free_void_fights_left, "void glass monster", "void glass monsters"), "", description), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Cursed magnifying glass free fight"));
+    }
+}
