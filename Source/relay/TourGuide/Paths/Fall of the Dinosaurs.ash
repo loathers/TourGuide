@@ -13,9 +13,9 @@ void PathDinoFallGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;
         if (lookupItem("10941").available_amount() == 0)
-            description.listAppend("Dino DNAde™: +300% to all stats, good for survival & the tower");
+            description.listAppend("Dino DNAde&trade;: +300% to all stats, good for survival & the tower");
          
         description.listAppend("Dinosaur Repellent: You can purchase " + repellantsAvailable.to_string() + " freeruns!");
-        resource_entries.listAppend(ChecklistEntryMake("__item g", "shop.php?whichshop=dino", ChecklistSubentryMake(pluralise(dd) + " available", "", description), 3).ChecklistEntrySetIDTag("The Dinostaur"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Dinodollar", "shop.php?whichshop=dino", ChecklistSubentryMake(pluralise(dd) + " available", "", description), 3).ChecklistEntrySetIDTag("The Dinostaur"));
     }
 }
