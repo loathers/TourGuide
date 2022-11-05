@@ -126,3 +126,4 @@ import "relay/TourGuide/Items of the Month/2022/Designer Sweatpants.ash";
 import "relay/TourGuide/Items of the Month/2022/Tiny Stillsuit.ash";
 import "relay/TourGuide/Items of the Month/2022/Jurassic Parka.ash";
 import "relay/TourGuide/Items of the Month/2022/Autumnaton.ash";
+import "relay/TourGuide/Items of the Month/2022/Cookbookbat.ash";
