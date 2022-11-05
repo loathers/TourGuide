@@ -1,4 +1,3 @@
-
 RegisterResourceGenerationFunction("IOTMCookbookbatGenerateResource");
 void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -17,10 +16,15 @@ void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 	description.listAppend("Follow the old bat's wise counsel and craft legendary gluten bombs!");
     description.listAppend("You currently have "+wheys.to_string()+" whey, "+vegs.to_string()+" veg, and "+yeasts.to_string()+" yeast.");
 
+    // How many can we make of each food item?
+    int borisBreadCraftable = floor(yeasts/2);
+    int roastedVegCraftable = floor(vegs/2);
+    int focacciaCraftable = roastedVegCraftable > 0 && borisBreadCraftable > 0 ? min(borisBreadCraftable, roastedVegCraftable) : 0;
+
     // Generating strings for the three most important food items
-    string borisBread = "Boris's Bread: +100% meat; yeast + yeast";
-    string roastedVeg = "Roasted Vegetable of Jarlsberg: +100% item; veg + veg";
-    string focaccia = "Roasted Vegetable Focaccia: +10 Fam XP; bread + roast veg";
+    string borisBread = "<strong>"+borisBreadCraftable+"x Boris's Bread:</strong> +100% meat"; // yeast + yeast 
+    string roastedVeg = "<strong>"+roastedVegCraftable+"x Roasted Vegetable of Jarlsberg:</strong> +100% item"; // veg + veg";
+    string focaccia = "<strong>"+focacciaCraftable+"x Roasted Vegetable Focaccia:</strong> +10 Fam XP"; // bread + roast veg";
 
     // Here, we're generating a list of what you can make with your loadout.
     string [int] pizzaParlorMenu;
@@ -30,5 +34,16 @@ void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
     pizzaParlorMenu.listAppend(focaccia);
     description.listAppend(pizzaParlorMenu.listJoinComponents("|*"));
 
-    resource_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", url, ChecklistSubentryMake("Pizza Party with Mr. Cookbookbat!", "", description)).ChecklistEntrySetIDTag("Cookbookbat Resource"));
+    string [int][int] pizzaParlorRecipes;
+	pizzaParlorRecipes.listAppend(listMake("Boris's Bread = yeast + yeast"));
+	pizzaParlorRecipes.listAppend(listMake("Roasted Vegetable of Jarlsberg = veg + veg"));
+	pizzaParlorRecipes.listAppend(listMake("Roasted Vegetable Focaccia = bread + roastveg"));
+
+    buffer tooltip_text;
+	tooltip_text.append(HTMLGenerateTagWrap("div", "Cookbookbat Recipes!", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+	tooltip_text.append(HTMLGenerateSimpleTableLines(pizzaParlorRecipes));
+			
+	description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Important Recipes", "r_tooltip_outer_class"));
+
+    resource_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", url, ChecklistSubentryMake("Pizza party with the Cookbookbat!", "", description)).ChecklistEntrySetIDTag("Cookbookbat Resource"));
 }
