@@ -23,7 +23,7 @@ string [string] getNthClassBuff(int n) {
 	}
 	else if (classInt > 6)
 	{
-		buffIndex = ((((classInt % 6 + 1) % 11)));
+		buffIndex = ((((classInt % 6 + 1) * n) % 11));
 	}
 	return dshBuffOrder[buffIndex];
 }
