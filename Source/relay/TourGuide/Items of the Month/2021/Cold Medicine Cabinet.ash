@@ -121,11 +121,12 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         int uTurns;
         int iTurns;
         int oTurns;
+		string dotMatrix = '';
 
         foreach turn in splitCMC {
-            if (splitCMC[turn] == "i") {iTurns +=1;}
-            if (splitCMC[turn] == "u") {uTurns +=1;}
-            if (splitCMC[turn] == "o") {oTurns +=1;}
+            if (splitCMC[turn] == "i") {iTurns +=1; dotMatrix = dotMatrix+'<span style="color:Salmon">•</span>'}
+            if (splitCMC[turn] == "u") {uTurns +=1; dotMatrix = dotMatrix+'<span style="color:Indigo">•</span>'}
+            if (splitCMC[turn] == "o") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:Wheat">•</span>'}
         }
         
     	string expectedSpleenItem = "Fleshazole";
@@ -138,6 +139,7 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		string url = "campground.php?action=workshed";
 			
 		description.listAppend(HTMLGenerateSpanFont("Route turn-taking combats into the correct environments for a helpful spleen item!", "blue"));
+		description.listAppend(dotMatrix);
             
         string uFormat = uTurns > 10 ? "black" : "grey";
         string iFormat = iTurns > 10 ? "black" : "grey";
