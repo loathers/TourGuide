@@ -5,15 +5,15 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     #if (!__misc_state["in run"]) return; 
 	if (!get_property_boolean("hasAutumnaton")) return;
 	int autobotsToday = get_property_int("_autumnatonQuests");
-	int autobotsReturnTime = autobotsToday * 11;
+	int autobotsReturnTime = MIN(11, autobotsToday * 11);
 	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");
 	
-/*	if (get_property("autumnatonUpgrades").contains_text("leftleg1")) {
-		autobotsReturnTime =- 11;
+	if (get_property("autumnatonUpgrades").contains_text("leftleg1")) {
+		autobotsToday -= 1;
 	} 
-	else if (get_property("autumnatonUpgrades").contains_text("leftleg1") && get_property("autumnatonUpgrades").contains_text("rightleg1")) {
-		autobotsReturnTime =- 22;
-	} */	
+	if (get_property("autumnatonUpgrades").contains_text("rightleg1")) {
+		autobotsToday -= 1;
+	} 	
 	
     string url;
 	string [int] description;
@@ -22,13 +22,11 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	description.listAppend("Autobot grabs items from a zone you've previously visited.");
 	
 	// Autobot on expedition
-	if (turncountWhereAutobotReturns -1 == total_turns_played()) 
+	if (lookupItem("autumn-aton").available_amount() > 0)
 	{
-        string main_title = "Autumn-aton returns next adventure";
-		string autobotZone = get_property("autumnatonQuestLocation");
-        description.listAppend("Next mission takes " + HTMLGenerateSpanOfClass(autobotsReturnTime, "r_bold") + " adventures.");
-		description.listAppend(HTMLGenerateSpanOfClass("Currently exploring: ", "r_bold") + autobotZone);
-		task_entries.listAppend(ChecklistEntryMake("__item autumn-aton", url, ChecklistSubentryMake(main_title, description), -11));
+        string main_title = "Use your autumn-aton";
+        description.listAppend("Next use will take " + HTMLGenerateSpanOfClass(autobotsReturnTime, "r_bold") + " adventures.");
+		task_entries.listAppend(ChecklistEntryMake("__item autumn-aton", "inv_use.php?pwd=" + my_hash() + "&whichitem=10954", ChecklistSubentryMake(main_title, "", description), -11));
 	}
 	else if (turncountWhereAutobotReturns > total_turns_played()) 
 	{
@@ -38,12 +36,14 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		description.listAppend(HTMLGenerateSpanOfClass("Currently exploring: ", "r_bold") + autobotZone);
 		optional_task_entries.listAppend(ChecklistEntryMake("__item autumn-aton", url, ChecklistSubentryMake("Autumn-aton on a mission", description), 8));
 	}
-	else if (lookupItem("autumn-aton").available_amount() > 0)
+	else if (turncountWhereAutobotReturns <= total_turns_played()) 
 	{
-        string main_title = "Use your autumn-aton";
-        description.listAppend("Next use will take " + HTMLGenerateSpanOfClass(autobotsReturnTime, "r_bold") + " adventures.");
-		task_entries.listAppend(ChecklistEntryMake("__item autumn-aton", "inv_use.php?pwd=" + my_hash() + "&whichitem=10954", ChecklistSubentryMake(main_title, "", description), -11));
-	}
+        string main_title = "Autumn-aton returns next adventure";
+		string autobotZone = get_property("autumnatonQuestLocation");
+        description.listAppend("Next mission takes " + HTMLGenerateSpanOfClass(autobotsReturnTime, "r_bold") + " adventures.");
+		description.listAppend(HTMLGenerateSpanOfClass("Currently exploring: ", "r_bold") + autobotZone);
+		task_entries.listAppend(ChecklistEntryMake("__item autumn-aton", url, ChecklistSubentryMake(main_title, description), -11));
+	} 
 
 	if (!get_property("autumnatonUpgrades").contains_text("cowcatcher")) {
 		description.listAppend("Visit mid underground for +1 autumn item (Cyrpt zone, Daily Dungeon?)");
