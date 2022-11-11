@@ -1,31 +1,44 @@
 //Daylight Shavings Helmet
 
 string [int, string] dshBuffOrder = {
-	{"Spectacle": "+50% item and +5 " + HTMLGenerateSpanFont("Spooky", "grey") + " resist"},
-	{"Toiletbrush": "+25 ML and +5 " + HTMLGenerateSpanFont("Stench", "green") + " resist"},
-	{"Barbell": "+25 Muscle and +50% Gear drops"},
-	{"Grizzly": "+25-50 MP regen and +5 " + HTMLGenerateSpanFont("Cold", "blue") + " resist"},
-	{"Surrealist": "+25 Mysticality and +50% Food drops"},
-	{"Musician": "+25 Moxie and +50% Booze drops"},
-	{"Gull-Wing": "+100% init and +5 " + HTMLGenerateSpanFont("Hot", "red") + " resist"},
-	{"Warlord": "+25 Weapon damage and +10% Crit"},
-	{"Wizard": "+25 Spell damage and +10% Spell Crit"},
-	{"Cowboy": "+25 Ranged damage and +50 maximum HP"},
-	{"Friendly": "+100% meat and +5 " + HTMLGenerateSpanFont("Sleaze", "purple") + " resist"}
+	{"Spectacle Moustache": "+50% item and +5 " + HTMLGenerateSpanFont("Spooky", "grey") + " resist"},
+	{"Toiletbrush Moustache": "+25 ML and +5 " + HTMLGenerateSpanFont("Stench", "green") + " resist"},
+	{"Barbell Moustache": "+25 Muscle and +50% Gear drops"},
+	{"Grizzly Beard": "+25-50 MP regen and +5 " + HTMLGenerateSpanFont("Cold", "blue") + " resist"},
+	{"Surrealist's Moustache": "+25 Mysticality and +50% Food drops"},
+	{"Musician's Musician's Moustache": "+25 Moxie and +50% Booze drops"},
+	{"Gull-Wing Moustache": "+100% init and +5 " + HTMLGenerateSpanFont("Hot", "red") + " resist"},
+	{"Space Warlord's Beard": "+25 Weapon damage and +10% Crit"},
+	{"Pointy Wizard Beard": "+25 Spell damage and +10% Spell Crit"},
+	{"Cowboy Stache": "+25 Ranged damage and +50 maximum HP"},
+	{"Friendly Chops": "+100% meat and +5 " + HTMLGenerateSpanFont("Sleaze", "purple") + " resist"}
 };
 
-string [string] getNthClassBuff(int n) {
-	int classInt = my_class().to_int();
-	int buffIndex;
-	if (classInt < 7)
-	{
-		buffIndex = ((classInt * n) % 11);
+// Reorder the default list based on our class
+string [int, string] currentClassBuffOrder() {
+	string [int, string] beardOrder;
+	int classId = my_class().to_int();
+	int classIdMod = (classId <= 6) ? classId : (classId % 6 + 1);
+	for i from 0 to 10 {
+		int nextBeard = (classIdMod * i) % 11;
+		beardOrder[i] = dshBuffOrder[nextBeard];
 	}
-	else if (classInt > 6)
-	{
-		buffIndex = ((((classInt % 6 + 1) % 11)));
+	return beardOrder;
+}
+
+// Get our last beard buff and map it into the order for our class
+int lastBeardIndex() {
+	string lastBeardBuffName = get_property_int("lastBeardBuff").to_effect().name;
+	if (lastBeardBuffName == "") {
+		return 0;
 	}
-	return dshBuffOrder[buffIndex];
+
+	foreach i, name in currentClassBuffOrder() {
+		if (name == lastBeardBuffName) {
+			return i;
+		}
+	}
+	return 0;
 }
 
 RegisterTaskGenerationFunction("IOTMDaylightShavingsHelmetGenerateTasks");
@@ -39,18 +52,10 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 	description.listAppend("Shave turns off of your sanity!");
 
 	int beardBuff = get_property_int("lastBeardBuff");
-	int shavingBuffCounter;
-	if (beardBuff == 0)
-	{
-		shavingBuffCounter = 0;
-	}
-	else {
-		shavingBuffCounter = beardBuff - 2665;
-	}
 
 	// Shaving buff prediction
-	string [string] nextBeardBuff = getNthClassBuff(shavingBuffCounter + 1);
-
+	string [int, string] buffOrder = currentClassBuffOrder();
+	string [string] nextBeardBuff = buffOrder[(lastBeardIndex() + 1) % 11];
 	string nextBeardBuffDescription;
 	string nextBeardBuffEffect;
 	foreach nextBeardBuffName in nextBeardBuff {
@@ -60,8 +65,8 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 	description.listAppend(HTMLGenerateSpanOfClass("Next shavings effect: ", "r_bold") + nextBeardBuffEffect);
 
 	string [int][int] tooltip_table;
-	for i from shavingBuffCounter + 1 to shavingBuffCounter + 11 {
-		string [string] buff = getNthClassBuff(i);
+	for i from lastBeardIndex() + 1 to lastBeardIndex() + 11 {
+		string [string] buff = currentClassBuffOrder()[i % 11];
 		string buffDescription;
 		foreach buffName in buff {
 			buffDescription = buff[buffName];
