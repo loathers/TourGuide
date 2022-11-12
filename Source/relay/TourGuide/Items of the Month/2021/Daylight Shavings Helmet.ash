@@ -41,6 +41,22 @@ int lastBeardIndex() {
 	return 0;
 }
 
+boolean isValuableBeard(string beardName) {
+	return listContainsValue(listMake(
+		"Spectacle Moustache",
+		"Toiletbrush Moustache",
+		"Gull-Wing Moustache",
+		"Friendly Chops",
+		"Surrealist's Moustache"
+	), beardName);
+}
+
+buffer boldIfValuable(string beardName) {
+	return isValuableBeard(beardName) ?
+		HTMLGenerateSpanOfClass(beardName, "r_bold") :
+		to_buffer(beardName);
+}
+
 RegisterTaskGenerationFunction("IOTMDaylightShavingsHelmetGenerateTasks");
 void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -60,9 +76,9 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 	string nextBeardBuffEffect;
 	foreach nextBeardBuffName in nextBeardBuff {
 		nextBeardBuffDescription = nextBeardBuff[nextBeardBuffName];
-		nextBeardBuffEffect = nextBeardBuffName + ", " + nextBeardBuffDescription;
+		nextBeardBuffEffect = boldIfValuable(nextBeardBuffName) + ", " + to_buffer(nextBeardBuffDescription);
 	}
-	description.listAppend(HTMLGenerateSpanOfClass("Next shavings effect: ", "r_bold") + nextBeardBuffEffect);
+	description.listAppend("Next shavings effect: <br>" + nextBeardBuffEffect);
 
 	string [int][int] tooltip_table;
 	for i from lastBeardIndex() + 1 to lastBeardIndex() + 11 {
@@ -70,7 +86,7 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 		string buffDescription;
 		foreach buffName in buff {
 			buffDescription = buff[buffName];
-			tooltip_table.listAppend(listMake(buffName, buffDescription));
+			tooltip_table.listAppend(listMake(boldIfValuable(buffName), buffDescription));
 		}
 	}
 
