@@ -2,7 +2,7 @@
 
 since r26713; // $path update
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.4";
+string __version = "2.0.5";
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -2502,6 +2502,11 @@ static {
     int PATH_LOW_KEY_SUMMER = 39;
     int PATH_GREY_GOO = 40;
     int PATH_YOU_ROBOT = 41;
+    int PATH_QUANTUM_TERRARIUM = 42;
+    int PATH_WILDFIRE = 43;
+    int PATH_GREY_YOU = 44;
+    int PATH_JOURNEYMAN = 45;
+    int PATH_FALL_OF_THE_DINOSAURS = 46;
 }
 
 float numeric_modifier_replacement(item it, string modifier) {
@@ -13005,6 +13010,8 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                 if ($effect[inigo's incantation of inspiration].have_effect() >= 5)
                     can_likely_freecraft = true;
                 if ($item[thor's pliers].available_amount() > 0 && get_property_int("_thorsPliersCrafting") < 10) //FIXME is _thorsPliersCrafting correct? suspect mafia tracks it incorrectly, I saw it at 9 after a run. smithing, probably
+                    can_likely_freecraft = true;
+                if (get_property_int("homebodylCharges") > 0)
                     can_likely_freecraft = true;
                 
                 //_legionJackhammerCrafting <3
@@ -30639,7 +30646,10 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
     {
         int universe_calculated = get_property_int("_universeCalculated");
         int limit = 1;
-        int skill_number = get_property_int("skillLevel144");
+
+        // As of August 2022, within run, you only get access to 3 calculates per day. This cuts the tile off in-run while letting 
+        //   it remain active out-of-run. 
+        int skill_number = __misc_state["in run"] ?  min(get_property_int("skillLevel144"),3) : get_property_int("skillLevel144");
         limit = max(skill_number, limit);
         if (universe_calculated >= limit)
             return;
@@ -30680,6 +30690,8 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         {
             useful_digits_and_their_reasons[9] = "knob goblin perfume for boss fight";
         }
+        if ($item[Vegetable of Jarlsberg].available_amount() > 0)
+            useful_digits_and_their_reasons[16] = "magicalness-in-a-can for Jarlsberg's vegetable soup";
     }
     if (my_level() < 13)
     {
@@ -33807,7 +33819,7 @@ void setUpState()
     }
 	
 	__misc_state["can eat just about anything"] = true;
-	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_ZOMBIE_SLAYER || fullness_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT)
+	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_ZOMBIE_SLAYER || fullness_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_GELATINOUS_NOOB)
 	{
 		__misc_state["can eat just about anything"] = false;
 	}
@@ -34169,7 +34181,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT)
+	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_FALL_OF_THE_DINOSAURS)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -50751,7 +50763,7 @@ void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries
 RegisterTaskGenerationFunction("IOTMUndergroundFireworksShopGenerateTasks");
 void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__misc_state["in run"] && my_path().id != PATH_G_LOVER && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean())
+	if (__misc_state["in run"] && __misc_state["can eat just about anything"] && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean())
 	{
 		if ($effect[Ready to Eat].have_effect() > 0) 
 		{
@@ -51194,11 +51206,12 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         int uTurns;
         int iTurns;
         int oTurns;
+		string dotMatrix = '';
 
         foreach turn in splitCMC {
-            if (splitCMC[turn] == "i") {iTurns +=1;}
-            if (splitCMC[turn] == "u") {uTurns +=1;}
-            if (splitCMC[turn] == "o") {oTurns +=1;}
+            if (splitCMC[turn] == "i") {iTurns +=1; dotMatrix = dotMatrix+'<span style="color:Salmon">• </span>';}
+            if (splitCMC[turn] == "u") {uTurns +=1; dotMatrix = dotMatrix+'<span style="color:Indigo">• </span>';}
+            if (splitCMC[turn] == "o") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:Wheat">• </span>';}
         }
         
     	string expectedSpleenItem = "Fleshazole";
@@ -51211,7 +51224,12 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		string url = "campground.php?action=workshed";
 			
 		description.listAppend(HTMLGenerateSpanFont("Route turn-taking combats into the correct environments for a helpful spleen item!", "blue"));
-            
+		
+		// Append the lil dot guy if it's useful.
+		if (length(dotMatrix) > 5) {
+			description.listAppend(dotMatrix);    
+		}
+
         string uFormat = uTurns > 10 ? "black" : "grey";
         string iFormat = iTurns > 10 ? "black" : "grey";
         string oFormat = oTurns > 10 ? "black" : "grey";
@@ -51226,9 +51244,9 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         string [int][int] spleeners;
         // Generates a reference table for the user of the spleener effects.
         spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
-        spleeners.listAppend(listMake("Extrovermectin","Indoors","+3 Wandering Monsters"));
-        spleeners.listAppend(listMake("Breathitin","Underground","+5 Outdoor Free Kills"));
-        spleeners.listAppend(listMake("Homebodyl","Outdoors","+11 Free Crafts"));
+        spleeners.listAppend(listMake("Extrovermectin","<span style=\"color:Salmon\">Indoors</span>","+3 Wandering Monsters"));
+        spleeners.listAppend(listMake("Breathitin","<span style=\"color:Indigo\">Underground</span>","+5 Outdoor Free Kills"));
+        spleeners.listAppend(listMake("Homebodyl","<span style=\"color:Wheat\">Outdoors</span>","+11 Free Crafts"));
         spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
         description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
 
@@ -51290,6 +51308,25 @@ void IOTYCursedMagnifyingGlassGenerateTasks(ChecklistEntry [int] task_entries, C
 			description.listAppend("No free void fights remaining, but you can charge it up for tomorrow?");
 		}
 	}	
+}
+
+RegisterResourceGenerationFunction("IOTYCursedMagnifyingGlassGenerateResource");
+void IOTYCursedMagnifyingGlassGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (lookupItem("cursed magnifying glass").available_amount() == 0) return;
+    
+    int free_void_fights_left = clampi(5 - get_property_int("_voidFreeFights"), 0, 5);
+	int cursedGlassCounter = get_property_int("cursedMagnifyingGlassCount");
+	string url;
+	string [int] description;
+
+    if (get_property_int("_voidFreeFights") < 5) {
+        int cursedGlassCounter = get_property_int("cursedMagnifyingGlassCount");
+        url = invSearch("cursed magnifying glass");
+		description.listAppend((13 - cursedGlassCounter).pluralise("combat", "combats") + " until next void fight.");
+		
+		resource_entries.listAppend(ChecklistEntryMake("__item void stone", "", ChecklistSubentryMake(pluralise(free_void_fights_left, "void glass monster", "void glass monsters"), "", description), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Cursed magnifying glass free fight"));
+    }
 }
 //Cosmic Bowling Ball
 RegisterTaskGenerationFunction("IOTMCosmicBowlingBallGenerateTasks");
@@ -51623,8 +51660,9 @@ void IOTMMayDayContractGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[MayDay&trade; supply package].available_amount() > 0) #&& in_ronin() && $item[MayDay&trade; supply package].item_is_usable())
     {
         string [int] description;
+	    string url = invSearch("MayDay");
 		description.listAppend("Use for 30 advs of +100% init as well as useful seeded drops (formerly ten bucks)");
-		resource_entries.listAppend(ChecklistEntryMake("__item MayDay&trade; supply package", "", ChecklistSubentryMake(pluralise($item[MayDay&trade; supply package]), "", description)));
+		resource_entries.listAppend(ChecklistEntryMake("__item MayDay&trade; supply package", url, ChecklistSubentryMake(pluralise($item[MayDay&trade; supply package]), "", description)));
     }
 }
 //June cleaver
@@ -51650,39 +51688,39 @@ void IOTMJuneCleaverGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 		string [int] possibleDreams;
 		if (!get_property("juneCleaverQueue").contains_text("1467")) 
 		{
-			possibleDreams.listAppend("Poetic Justice, +5 adv");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Poetic Justice", "r_bold") + ", +5 advs, +250 mox, +125 mys");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1468")) 
 		{
-			possibleDreams.listAppend("Aunts not Ants, exp or +exp buff");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Aunts not Ants", "r_bold") + ", +150 mox, +250 mus, or +exp buff");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1469")) 
 		{
-			possibleDreams.listAppend("Beware of Aligator, booze or 1500 meat");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Beware of Aligator", "r_bold") + ", +ML buff, booze, or 1500 meat");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1470")) 
 		{
-			possibleDreams.listAppend("Teacher's Pet, famxp accessory");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Teacher's Pet", "r_bold") + ", +famxp accessory or +250 mus");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1471")) 
 		{
-			possibleDreams.listAppend("Lost and Found, +meat potion");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Lost and Found", "r_bold") + ", +meat potion, +100 mus, +250 mys");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1472")) 
 		{
-			possibleDreams.listAppend("Summer Days, noncom potion or +mox");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Summer Days", "r_bold") + ", noncom potion or +250 mox");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1473")) 
 		{
-			possibleDreams.listAppend("Bath Time, +mus or resist buff");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Bath Time", "r_bold") + ", +150 mus or resist buff");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1474")) 
 		{
-			possibleDreams.listAppend("Delicious Sprouts, big exp food");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Delicious Sprouts", "r_bold") + ", big exp food, +250 mys, +125 mus");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1475")) 
 		{
-			possibleDreams.listAppend("Hypnotic Master, +rest accessory");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Hypnotic Master", "r_bold") + ", +rest accessory or +250 mus");
 		}
 		if (possibleDreams.count() > 0)
 		description.listAppend(HTMLGenerateSpanOfClass("Possible dreams (not in any order):", "r_bold") + "|*" + possibleDreams.listJoinComponents("|*"));
@@ -51716,39 +51754,39 @@ void IOTMJuneCleaverGenerateResource(ChecklistEntry [int] resource_entries)
 	string [int] possibleDreams;
 		if (!get_property("juneCleaverQueue").contains_text("1467")) 
 		{
-			possibleDreams.listAppend("Poetic Justice, +5 adv");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Poetic Justice", "r_bold") + ", +5 advs, +250 mox, +125 mys");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1468")) 
 		{
-			possibleDreams.listAppend("Aunts not Ants, exp or +exp buff");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Aunts not Ants", "r_bold") + ", +150 mox, +250 mus, or +exp buff");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1469")) 
 		{
-			possibleDreams.listAppend("Beware of Aligator, booze or 1500 meat");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Beware of Aligator", "r_bold") + ", +ML buff, booze, or 1500 meat");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1470")) 
 		{
-			possibleDreams.listAppend("Teacher's Pet, famxp accessory");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Teacher's Pet", "r_bold") + ", +famxp accessory or +250 mus");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1471")) 
 		{
-			possibleDreams.listAppend("Lost and Found, +meat potion");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Lost and Found", "r_bold") + ", +meat potion, +100 mus, +250 mys");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1472")) 
 		{
-			possibleDreams.listAppend("Summer Days, noncom potion or +mox");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Summer Days", "r_bold") + ", noncom potion or +250 mox");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1473")) 
 		{
-			possibleDreams.listAppend("Bath Time, +mus or resist buff");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Bath Time", "r_bold") + ", +150 mus or resist buff");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1474")) 
 		{
-			possibleDreams.listAppend("Delicious Sprouts, big exp food");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Delicious Sprouts", "r_bold") + ", big exp food, +250 mys, +125 mus");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1475")) 
 		{
-			possibleDreams.listAppend("Hypnotic Master, +rest accessory");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Hypnotic Master", "r_bold") + ", +rest accessory or +250 mus");
 		}
 	if (possibleDreams.count() > 0)
 	description.listAppend(HTMLGenerateSpanOfClass("Possible dreams (not in any order):", "r_bold") + "|*" + possibleDreams.listJoinComponents("|*"));
@@ -52014,6 +52052,157 @@ void IOTMJurassicParkaGenerateResource(ChecklistEntry [int] resource_entries)
 		description.listAppend(HTMLGenerateSpanFont(parkaEnchant, "blue") + "");
 		description.listAppend(HTMLGenerateSpanOfClass(spikos_left, "r_bold") + " spikolodon spikes available.");
 		resource_entries.listAppend(ChecklistEntryMake("__item jurassic parka", "inventory.php?action=jparka", ChecklistSubentryMake(main_title, "", description)));
+}
+//Autumnaton
+RegisterTaskGenerationFunction("IOTMAutumnatonGenerateTasks");
+void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    #if (!__misc_state["in run"]) return; 
+	if (!get_property_boolean("hasAutumnaton")) return;
+	int autobotsToday = get_property_int("_autumnatonQuests");
+	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");
+	
+	if (get_property("autumnatonUpgrades").contains_text("leftleg1")) {
+		autobotsToday -= 1;
+	} 
+	if (get_property("autumnatonUpgrades").contains_text("rightleg1")) {
+		autobotsToday -= 1;
+	} 	
+    
+    int autobotsReturnTime = autobotsToday; 
+
+    if (autobotsToday * 11 < 11) { 
+        autobotsReturnTime = 11; 
+    } 
+	
+    string url;
+	string [int] description;
+	string [int] targets;
+    
+	description.listAppend("Autobot grabs items from a zone you've previously visited.");
+	
+	// Autobot on expedition
+	if (lookupItem("autumn-aton").available_amount() > 0)
+	{
+        string main_title = "Use your autumn-aton";
+        description.listAppend("Next use will take " + HTMLGenerateSpanOfClass(autobotsReturnTime, "r_bold") + " adventures.");
+		task_entries.listAppend(ChecklistEntryMake("__item autumn-aton", "inv_use.php?pwd=" + my_hash() + "&whichitem=10954", ChecklistSubentryMake(main_title, "", description), -11));
+	}
+	else if (turncountWhereAutobotReturns > total_turns_played()) 
+	{
+        string main_title = "Autumn-aton on a mission";
+		string autobotZone = get_property("autumnatonQuestLocation");
+        description.listAppend("Will return in " + HTMLGenerateSpanOfClass(turncountWhereAutobotReturns +1 - total_turns_played(), "r_bold") + " adventures.");
+		description.listAppend(HTMLGenerateSpanOfClass("Currently exploring: ", "r_bold") + autobotZone);
+		optional_task_entries.listAppend(ChecklistEntryMake("__item autumn-aton", url, ChecklistSubentryMake("Autumn-aton on a mission", description), 8));
+	}
+	else if (turncountWhereAutobotReturns <= total_turns_played()) 
+	{
+        string main_title = "Autumn-aton returns next adventure";
+		string autobotZone = get_property("autumnatonQuestLocation");
+        description.listAppend("Next mission takes " + HTMLGenerateSpanOfClass(autobotsReturnTime, "r_bold") + " adventures.");
+		description.listAppend(HTMLGenerateSpanOfClass("Currently exploring: ", "r_bold") + autobotZone);
+		task_entries.listAppend(ChecklistEntryMake("__item autumn-aton", url, ChecklistSubentryMake(main_title, description), -11));
+	} 
+
+	if (!get_property("autumnatonUpgrades").contains_text("cowcatcher")) {
+		description.listAppend("Visit mid underground for +1 autumn item (Cyrpt zone, Daily Dungeon?)");
+	} 
+	if (!get_property("autumnatonUpgrades").contains_text("leftarm1")) {
+		description.listAppend("Visit low indoor for +1 item (Haunted Kitchen?)");
+	} 
+	if (!get_property("autumnatonUpgrades").contains_text("rightarm1")) {
+		description.listAppend("Visit mid outdoor for +1 item (Smut Orc Camp?)");
+	} 
+	if (!get_property("autumnatonUpgrades").contains_text("leftleg1")) {
+		description.listAppend("Visit low underground for -11 cooldown (Ratbats?)");
+	} 
+	if (!get_property("autumnatonUpgrades").contains_text("rightleg1")) {
+		description.listAppend("Visit mid indoor for -11 cooldown (Haunted Library?)");
+	} 
+	
+	if (__misc_state["in run"] && my_path().id != 25)	
+	{
+		if (locationAvailable($location[sonofa beach]) == true && available_amount($item[barrel of gunpowder]) < 5)
+		{	
+			targets.listAppend("barrel of gunpowder");
+		}
+		if (locationAvailable($location[twin peak]) == false && get_property_int("chasmBridgeProgress") < 30)
+		{	
+			targets.listAppend("bridge parts");
+		}
+		if (get_property_int("hiddenBowlingAlleyProgress") < 6)
+		{	
+			targets.listAppend("bowling balls");
+		}
+		if (get_property_int("twinPeakProgress") < 14);
+		{	
+			targets.listAppend("bubblin' crude");
+		}
+		if (get_property_int("desertExploration") < 100);
+		{	
+			targets.listAppend("killing jar");
+		}
+		if (locationAvailable($location[the oasis]) == true && get_property_int("desertExploration") < 100);
+		{	
+			targets.listAppend("drum machine");
+		}
+		if (__quest_state["Level 11 Ron"].mafia_internal_step < 5)
+		{	
+			targets.listAppend("glark cables");
+		}
+		if (targets.count() > 0)
+			description.listAppend(HTMLGenerateSpanOfClass("Potential autobot targets:", "r_bold") + "|*-" + targets.listJoinComponents("|*-")); 
+	}
+}
+RegisterResourceGenerationFunction("IOTMCookbookbatGenerateResource");
+void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    // Look up amount for the three constituent items for the bookbat foods
+    int wheys  = lookupItem("10968").available_amount();
+    int vegs   = lookupItem("10969").available_amount();
+    int yeasts = lookupItem("10967").available_amount();
+
+    // Do not generate a tile if you can't eat stuff or don't have any constituent items
+    if (!__misc_state["can eat just about anything"] && (wheys + vegs + yeasts) < 1)
+        return;
+    
+	string [int] description;
+	string url = "craft.php?mode=cook";
+
+	description.listAppend("Follow the old bat's wise counsel and craft legendary gluten bombs!");
+    description.listAppend("You currently have "+wheys.to_string()+" whey, "+vegs.to_string()+" veg, and "+yeasts.to_string()+" yeast.");
+
+    // How many can we make of each food item?
+    int borisBreadCraftable = floor(yeasts/2);
+    int roastedVegCraftable = floor(vegs/2);
+    int focacciaCraftable = roastedVegCraftable > 0 && borisBreadCraftable > 0 ? min(borisBreadCraftable, roastedVegCraftable) : 0;
+
+    // Generating strings for the three most important food items
+    string borisBread = "<strong>"+borisBreadCraftable+"x Boris's Bread:</strong> +100% meat"; // yeast + yeast 
+    string roastedVeg = "<strong>"+roastedVegCraftable+"x Roasted Vegetable of Jarlsberg:</strong> +100% item"; // veg + veg";
+    string focaccia = "<strong>"+focacciaCraftable+"x Roasted Vegetable Focaccia:</strong> +10 Fam XP"; // bread + roast veg";
+
+    // Here, we're generating a list of what you can make with your loadout.
+    string [int] pizzaParlorMenu;
+    pizzaParlorMenu.listAppend("You can make...");
+    pizzaParlorMenu.listAppend(borisBread);
+    pizzaParlorMenu.listAppend(roastedVeg);
+    pizzaParlorMenu.listAppend(focaccia);
+    description.listAppend(pizzaParlorMenu.listJoinComponents("|*"));
+
+    string [int][int] pizzaParlorRecipes;
+	pizzaParlorRecipes.listAppend(listMake("Boris's Bread = yeast + yeast"));
+	pizzaParlorRecipes.listAppend(listMake("Roasted Vegetable of Jarlsberg = veg + veg"));
+	pizzaParlorRecipes.listAppend(listMake("Roasted Vegetable Focaccia = bread + roastveg"));
+
+    buffer tooltip_text;
+	tooltip_text.append(HTMLGenerateTagWrap("div", "Cookbookbat Recipes!", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+	tooltip_text.append(HTMLGenerateSimpleTableLines(pizzaParlorRecipes));
+			
+	description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Important Recipes", "r_tooltip_outer_class"));
+
+    resource_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", url, ChecklistSubentryMake("Pizza party with the Cookbookbat!", "", description)).ChecklistEntrySetIDTag("Cookbookbat Resource"));
 }
 
 
@@ -55168,6 +55357,28 @@ void PathGreyGooGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 
     if (my_daycount() >= 3) {
         task_entries.listAppend(ChecklistEntryMake("astral gash", "place.php?whichplace=greygoo", ChecklistSubentryMake("Ascend", "", "Prism appeared. Ascend whenever."),-10).ChecklistEntrySetIDTag("Grey goo path prism open"));
+    }
+}
+
+RegisterResourceGenerationFunction("PathDinoFallGenerateResource");
+void PathDinoFallGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (my_path().id != PATH_FALL_OF_THE_DINOSAURS)
+        return;
+    
+    // #10944 = Dinodollar, the currency in the Dinostaur (good joke!)
+    item dd = lookupItem("10944");
+
+    int repellantsAvailable = (dd.available_amount() - (dd.available_amount() % 5))/5;
+
+    if (dd.available_amount() > 0)
+    {
+        string [int] description;
+        if (lookupItem("10941").available_amount() == 0)
+            description.listAppend("Dino DNAde&trade;: +300% to all stats, good for survival & the tower");
+         
+        description.listAppend("Dinosaur Repellent: You can purchase " + repellantsAvailable.to_string() + " freeruns!");
+        resource_entries.listAppend(ChecklistEntryMake("__item Dinodollar", "shop.php?whichshop=dino", ChecklistSubentryMake(pluralise(dd) + " available", "", description), 3).ChecklistEntrySetIDTag("The Dinostaur"));
     }
 }
 
