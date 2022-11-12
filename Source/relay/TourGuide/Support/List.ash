@@ -1186,6 +1186,16 @@ boolean listContainsValue(monster [int] list, monster vo)
     return false;
 }
 
+boolean listContainsValue(string [int] list, string vo)
+{
+    foreach key, v2 in list
+    {
+        if (v2 == vo)
+            return true;
+    }
+    return false;
+}
+
 string [int] listInvert(boolean [string] list)
 {
     string [int] out;
