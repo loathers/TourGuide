@@ -5,7 +5,6 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     #if (!__misc_state["in run"]) return; 
 	if (!get_property_boolean("hasAutumnaton")) return;
 	int autobotsToday = get_property_int("_autumnatonQuests");
-	int autobotsReturnTime = MIN(11, autobotsToday * 11);
 	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");
 	
 	if (get_property("autumnatonUpgrades").contains_text("leftleg1")) {
@@ -14,6 +13,13 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	if (get_property("autumnatonUpgrades").contains_text("rightleg1")) {
 		autobotsToday -= 1;
 	} 	
+
+    if (autobotsToday * 11 < 11) { 
+        int autobotsReturnTime = 11; 
+    } 
+    else { 
+        int autobotsReturnTime = autobotsToday; 
+    }
 	
     string url;
 	string [int] description;
