@@ -50,6 +50,11 @@ static {
     int PATH_LOW_KEY_SUMMER = 39;
     int PATH_GREY_GOO = 40;
     int PATH_YOU_ROBOT = 41;
+    int PATH_QUANTUM_TERRARIUM = 42;
+    int PATH_WILDFIRE = 43;
+    int PATH_GREY_YOU = 44;
+    int PATH_JOURNEYMAN = 45;
+    int PATH_FALL_OF_THE_DINOSAURS = 46;
 }
 
 float numeric_modifier_replacement(item it, string modifier) {

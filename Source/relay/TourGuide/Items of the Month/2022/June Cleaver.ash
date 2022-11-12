@@ -21,39 +21,39 @@ void IOTMJuneCleaverGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 		string [int] possibleDreams;
 		if (!get_property("juneCleaverQueue").contains_text("1467")) 
 		{
-			possibleDreams.listAppend("Poetic Justice, +5 adv");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Poetic Justice", "r_bold") + ", +5 advs, +250 mox, +125 mys");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1468")) 
 		{
-			possibleDreams.listAppend("Aunts not Ants, exp or +exp buff");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Aunts not Ants", "r_bold") + ", +150 mox, +250 mus, or +exp buff");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1469")) 
 		{
-			possibleDreams.listAppend("Beware of Aligator, booze or 1500 meat");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Beware of Aligator", "r_bold") + ", +ML buff, booze, or 1500 meat");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1470")) 
 		{
-			possibleDreams.listAppend("Teacher's Pet, famxp accessory");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Teacher's Pet", "r_bold") + ", +famxp accessory or +250 mus");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1471")) 
 		{
-			possibleDreams.listAppend("Lost and Found, +meat potion");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Lost and Found", "r_bold") + ", +meat potion, +100 mus, +250 mys");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1472")) 
 		{
-			possibleDreams.listAppend("Summer Days, noncom potion or +mox");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Summer Days", "r_bold") + ", noncom potion or +250 mox");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1473")) 
 		{
-			possibleDreams.listAppend("Bath Time, +mus or resist buff");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Bath Time", "r_bold") + ", +150 mus or resist buff");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1474")) 
 		{
-			possibleDreams.listAppend("Delicious Sprouts, big exp food");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Delicious Sprouts", "r_bold") + ", big exp food, +250 mys, +125 mus");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1475")) 
 		{
-			possibleDreams.listAppend("Hypnotic Master, +rest accessory");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Hypnotic Master", "r_bold") + ", +rest accessory or +250 mus");
 		}
 		if (possibleDreams.count() > 0)
 		description.listAppend(HTMLGenerateSpanOfClass("Possible dreams (not in any order):", "r_bold") + "|*" + possibleDreams.listJoinComponents("|*"));
@@ -87,39 +87,39 @@ void IOTMJuneCleaverGenerateResource(ChecklistEntry [int] resource_entries)
 	string [int] possibleDreams;
 		if (!get_property("juneCleaverQueue").contains_text("1467")) 
 		{
-			possibleDreams.listAppend("Poetic Justice, +5 adv");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Poetic Justice", "r_bold") + ", +5 advs, +250 mox, +125 mys");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1468")) 
 		{
-			possibleDreams.listAppend("Aunts not Ants, exp or +exp buff");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Aunts not Ants", "r_bold") + ", +150 mox, +250 mus, or +exp buff");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1469")) 
 		{
-			possibleDreams.listAppend("Beware of Aligator, booze or 1500 meat");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Beware of Aligator", "r_bold") + ", +ML buff, booze, or 1500 meat");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1470")) 
 		{
-			possibleDreams.listAppend("Teacher's Pet, famxp accessory");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Teacher's Pet", "r_bold") + ", +famxp accessory or +250 mus");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1471")) 
 		{
-			possibleDreams.listAppend("Lost and Found, +meat potion");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Lost and Found", "r_bold") + ", +meat potion, +100 mus, +250 mys");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1472")) 
 		{
-			possibleDreams.listAppend("Summer Days, noncom potion or +mox");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Summer Days", "r_bold") + ", noncom potion or +250 mox");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1473")) 
 		{
-			possibleDreams.listAppend("Bath Time, +mus or resist buff");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Bath Time", "r_bold") + ", +150 mus or resist buff");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1474")) 
 		{
-			possibleDreams.listAppend("Delicious Sprouts, big exp food");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Delicious Sprouts", "r_bold") + ", big exp food, +250 mys, +125 mus");
 		}
 		if (!get_property("juneCleaverQueue").contains_text("1475")) 
 		{
-			possibleDreams.listAppend("Hypnotic Master, +rest accessory");
+			possibleDreams.listAppend(HTMLGenerateSpanOfClass("Hypnotic Master", "r_bold") + ", +rest accessory or +250 mus");
 		}
 	if (possibleDreams.count() > 0)
 	description.listAppend(HTMLGenerateSpanOfClass("Possible dreams (not in any order):", "r_bold") + "|*" + possibleDreams.listJoinComponents("|*"));

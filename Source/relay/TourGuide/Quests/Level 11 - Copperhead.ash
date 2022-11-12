@@ -165,6 +165,8 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
                     can_likely_freecraft = true;
                 if ($item[thor's pliers].available_amount() > 0 && get_property_int("_thorsPliersCrafting") < 10) //FIXME is _thorsPliersCrafting correct? suspect mafia tracks it incorrectly, I saw it at 9 after a run. smithing, probably
                     can_likely_freecraft = true;
+                if (get_property_int("homebodylCharges") > 0)
+                    can_likely_freecraft = true;
                 
                 //_legionJackhammerCrafting <3
                 if ($items[Loathing Legion abacus,Loathing Legion can opener,Loathing Legion chainsaw,Loathing Legion corkscrew,Loathing Legion defibrillator,Loathing Legion double prism,Loathing Legion electric knife,Loathing Legion flamethrower,Loathing Legion hammer,Loathing Legion helicopter,Loathing Legion jackhammer,Loathing Legion kitchen sink,Loathing Legion knife,Loathing Legion many-purpose hook,Loathing Legion moondial,Loathing Legion necktie,Loathing Legion pizza stone,Loathing Legion rollerblades,Loathing Legion tape measure,Loathing Legion tattoo needle,Loathing Legion universal screwdriver,Loathing Legion Knife].available_amount() > 0 && get_property_int("_legionJackhammerCrafting") < 3) {
