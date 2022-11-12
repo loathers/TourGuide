@@ -13,13 +13,12 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	if (get_property("autumnatonUpgrades").contains_text("rightleg1")) {
 		autobotsToday -= 1;
 	} 	
+    
+    int autobotsReturnTime = autobotsToday; 
 
     if (autobotsToday * 11 < 11) { 
-        int autobotsReturnTime = 11; 
+        autobotsReturnTime = 11; 
     } 
-    else { 
-        int autobotsReturnTime = autobotsToday; 
-    }
 	
     string url;
 	string [int] description;
