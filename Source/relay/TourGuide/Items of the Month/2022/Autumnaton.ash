@@ -16,9 +16,12 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     
     int autobotsReturnTime = autobotsToday; 
 
-    if (autobotsToday * 11 < 11) { 
-        autobotsReturnTime = 11; 
-    } 
+	if (autobotsToday < 1) {
+		autobotsReturnTime = 11;
+	}
+	else {
+		autobotsReturnTime = autobotsToday * 11;
+	}
 	
     string url;
 	string [int] description;
