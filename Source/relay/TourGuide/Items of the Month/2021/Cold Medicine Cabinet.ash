@@ -159,9 +159,9 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         string [int][int] spleeners;
         // Generates a reference table for the user of the spleener effects.
         spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
-        spleeners.listAppend(listMake("Extrovermectin","Indoors","+3 Wandering Monsters"));
-        spleeners.listAppend(listMake("Breathitin","Underground","+5 Outdoor Free Kills"));
-        spleeners.listAppend(listMake("Homebodyl","Outdoors","+11 Free Crafts"));
+        spleeners.listAppend(listMake("Extrovermectin","<span style=\"color:Salmon\">Indoors</span>","+3 Wandering Monsters"));
+        spleeners.listAppend(listMake("Breathitin","<span style=\"color:Indigo\">Underground</span>","+5 Outdoor Free Kills"));
+        spleeners.listAppend(listMake("Homebodyl","<span style=\"color:Wheat\">Outdoors</span>","+11 Free Crafts"));
         spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
         description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
 
