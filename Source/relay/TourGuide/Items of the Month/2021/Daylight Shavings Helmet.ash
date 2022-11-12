@@ -1,3 +1,5 @@
+import "relay/TourGuide/Support/List.ash"
+
 //Daylight Shavings Helmet
 
 string [int, string] dshBuffOrder = {
