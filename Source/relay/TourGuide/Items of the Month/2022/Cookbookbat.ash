@@ -1,6 +1,8 @@
 RegisterResourceGenerationFunction("IOTMCookbookbatGenerateResource");
 void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 {
+    if (!lookupFamiliar("Cookbookbat").familiar_is_usable()) return;
+
     // Look up amount for the three constituent items for the bookbat foods
     int wheys  = lookupItem("10968").available_amount();
     int vegs   = lookupItem("10969").available_amount();
