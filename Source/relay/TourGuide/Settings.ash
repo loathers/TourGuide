@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.4";
+string __version = "2.0.5";
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
