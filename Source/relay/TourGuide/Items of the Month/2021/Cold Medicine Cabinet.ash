@@ -121,11 +121,12 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         int uTurns;
         int iTurns;
         int oTurns;
+		string dotMatrix = '';
 
         foreach turn in splitCMC {
-            if (splitCMC[turn] == "i") {iTurns +=1;}
-            if (splitCMC[turn] == "u") {uTurns +=1;}
-            if (splitCMC[turn] == "o") {oTurns +=1;}
+            if (splitCMC[turn] == "i") {iTurns +=1; dotMatrix = dotMatrix+'<span style="color:Salmon">• </span>';}
+            if (splitCMC[turn] == "u") {uTurns +=1; dotMatrix = dotMatrix+'<span style="color:Indigo">• </span>';}
+            if (splitCMC[turn] == "o") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:Wheat">• </span>';}
         }
         
     	string expectedSpleenItem = "Fleshazole";
@@ -138,7 +139,12 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		string url = "campground.php?action=workshed";
 			
 		description.listAppend(HTMLGenerateSpanFont("Route turn-taking combats into the correct environments for a helpful spleen item!", "blue"));
-            
+		
+		// Append the lil dot guy if it's useful.
+		if (length(dotMatrix) > 5) {
+			description.listAppend(dotMatrix);    
+		}
+
         string uFormat = uTurns > 10 ? "black" : "grey";
         string iFormat = iTurns > 10 ? "black" : "grey";
         string oFormat = oTurns > 10 ? "black" : "grey";
@@ -153,9 +159,9 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         string [int][int] spleeners;
         // Generates a reference table for the user of the spleener effects.
         spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
-        spleeners.listAppend(listMake("Extrovermectin","Indoors","+3 Wandering Monsters"));
-        spleeners.listAppend(listMake("Breathitin","Underground","+5 Outdoor Free Kills"));
-        spleeners.listAppend(listMake("Homebodyl","Outdoors","+11 Free Crafts"));
+        spleeners.listAppend(listMake("Extrovermectin","<span style=\"color:Salmon\">Indoors</span>","+3 Wandering Monsters"));
+        spleeners.listAppend(listMake("Breathitin","<span style=\"color:Indigo\">Underground</span>","+5 Outdoor Free Kills"));
+        spleeners.listAppend(listMake("Homebodyl","<span style=\"color:Wheat\">Outdoors</span>","+11 Free Crafts"));
         spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
         description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
 

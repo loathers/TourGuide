@@ -10,7 +10,10 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
     {
         int universe_calculated = get_property_int("_universeCalculated");
         int limit = 1;
-        int skill_number = get_property_int("skillLevel144");
+
+        // As of August 2022, within run, you only get access to 3 calculates per day. This cuts the tile off in-run while letting 
+        //   it remain active out-of-run. 
+        int skill_number = __misc_state["in run"] ?  min(get_property_int("skillLevel144"),3) : get_property_int("skillLevel144");
         limit = max(skill_number, limit);
         if (universe_calculated >= limit)
             return;
@@ -51,6 +54,8 @@ void SCalculateUniverseGenerateResource(ChecklistEntry [int] resource_entries)
         {
             useful_digits_and_their_reasons[9] = "knob goblin perfume for boss fight";
         }
+        if ($item[Vegetable of Jarlsberg].available_amount() > 0)
+            useful_digits_and_their_reasons[16] = "magicalness-in-a-can for Jarlsberg's vegetable soup";
     }
     if (my_level() < 13)
     {
