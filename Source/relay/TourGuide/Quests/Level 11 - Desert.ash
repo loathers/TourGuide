@@ -60,6 +60,9 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         exploration_per_turn += 1.0;
     if (my_path().id == PATH_LICENSE_TO_ADVENTURE && get_property_boolean("bondDesert"))
         exploration_per_turn += 2.0;
+    if ($item[survival knife].have() && __misc_state["can equip just about any weapon"] && $effect[ultrahydrated].have_effect() > 0) {
+        exploration_per_turn += 2.0;
+    }
     
     boolean have_blacklight_bulb = (my_path().id == PATH_AVATAR_OF_SNEAKY_PETE && get_property("peteMotorbikeHeadlight") == "Blacklight Bulb");
     if (have_blacklight_bulb)
@@ -81,6 +84,8 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             description.listAppend("Adventure in the Oasis.");
             if ($items[11-leaf clover].available_amount() > 0)
                 description.listAppend("Potentially clover for 20 turns, versus 5.");
+            if (!get_property_boolean("fireExtinguisherDesertUsed") && !(available_amount($item[industrial fire extinguisher]) > 0) && get_property_int("_fireExtinguisherCharge") > 20)
+                description.listAppend("Or, use 20% fire extinguisher charge in the desert to drink the foam.");
             task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "place.php?whichplace=desertbeach", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11).ChecklistEntrySetIDTag("Council L11 quest desert ultrahydrated"));
         }
         //if (exploration > 0)
@@ -204,12 +209,20 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             else
                 line_extra += "|Or bring along Melodramedary.";
         }
+		if ($item[survival knife].have() && ($item[survival knife].equipped_amount() == 0)) {
+			if (line == "")
+                line += "Equip your survival knife (only effective while Ultrahydrated)";
+            else
+                line_extra += "|Equip your survival knife (only effective while Ultrahydrated)";
+		}
         if (line != "") {
             if (should_output_compass_in_red)
                 line = HTMLGenerateSpanFont(line, "red");
             line += line_extra;
             subentry.entries.listAppend(line);
         }
-    }
+	 
+    } else
+        subentry.entries.listAppend("Could bring along Melodramedary.");
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the arid\, extra-dry desert,the oasis]).ChecklistEntrySetIDTag("Council L11 quest desert exploration"));
 }
