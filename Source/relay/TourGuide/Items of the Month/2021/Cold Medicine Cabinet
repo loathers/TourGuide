@@ -146,7 +146,6 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		{
 			description.listAppend("" + HTMLGenerateSpanOfClass(next_CMC_Timer, "r_bold") + " adventures until your next consultation.");
 			description.listAppend("Spend " + HTMLGenerateSpanOfClass(next_CMC_Timer - 9, "r_bold") + " non-environmental adventures to double your pill.");
-			description.listAppend("" + HTMLGenerateSpanOfClass("Last 20 environments: ", "r_bold") + cmcCombatString + "");
 		}
 			
 		// Append the lil dot guy if it's useful.
