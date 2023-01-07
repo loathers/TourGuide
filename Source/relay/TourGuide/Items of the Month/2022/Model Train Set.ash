@@ -11,6 +11,46 @@ int trainSetReconfigurableIn() {
     }
 }
 
+boolean stationConfigured(string station) {
+    return contains_text(get_property("trainsetConfiguration"), station);
+}
+
+boolean oreConfiguredWhenNotNeeded() {
+    boolean oreConfigured = stationConfigured("ore_hopper");
+    string oreNeeded = get_property("trapperOre");
+    boolean haveAllOreNeeded = __quest_state["Level 8"].state_boolean["Past mine"] ||
+        (oreNeeded != "" && to_item(oreNeeded).available_amount() >= 3) ||
+        (to_item("asbestos ore").available_amount() >= 3 &&
+         to_item("chrome ore").available_amount() >= 3 &&
+         to_item("linoleum ore").available_amount() >= 3);
+    return oreConfigured && haveAllOreNeeded;
+}
+
+boolean loggingMillConfiguredWhenNotNeeded() {
+    boolean loggingMillConfigured = stationConfigured("logging_mill");
+    int fastenersNeeded = __quest_state["Level 9"].state_int["bridge fasteners needed"];
+	int lumberNeeded = __quest_state["Level 9"].state_int["bridge lumber needed"];
+    boolean haveAllPartsNeeded = __quest_state["Level 9"].mafia_internal_step > 1 ||
+        (fastenersNeeded == 0 && lumberNeeded == 0);
+    return loggingMillConfigured && haveAllPartsNeeded;
+}
+
+boolean statsConfiguredWhenNotNeeded() {
+    boolean statsConfigured = stationConfigured("viewing_platform") ||
+        (stationConfigured("brawn_silo") && my_primestat() == $stat[muscle]) ||
+        (stationConfigured("brain_silo") && my_primestat() == $stat[mysticality]) ||
+        (stationConfigured("groin_silo") && my_primestat() == $stat[moxie]);
+    boolean haveAllStatsNeeded = my_level() >= 13 && __misc_state["in run"];
+    return statsConfigured && haveAllStatsNeeded;
+}
+
+boolean shouldNag() {
+    return trainSetReconfigurableIn() == 0 &&
+        (oreConfiguredWhenNotNeeded() ||
+        loggingMillConfiguredWhenNotNeeded() ||
+        statsConfiguredWhenNotNeeded());
+}
+
 RegisterTaskGenerationFunction("IOTMModelTrainSetGenerateTasks");
 void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -24,6 +64,16 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     int whenTrainsetWasConfigured = get_property_int("lastTrainsetConfiguration");
     string trainCars = get_property("trainsetConfiguration");
     string[int] splitTrain = split_string(trainCars, ",");
+
+    if (oreConfiguredWhenNotNeeded()) {
+        description.listAppend(HTMLGenerateSpanFont("Have ore configured when it's not needed!", "red"));
+    }
+    if (loggingMillConfiguredWhenNotNeeded()) {
+        description.listAppend(HTMLGenerateSpanFont("Have lumber mill configured when it's not needed!", "red"));
+    }
+    if (statsConfiguredWhenNotNeeded()) {
+        description.listAppend(HTMLGenerateSpanFont("Have stats configured when they're not needed!", "red"));
+    }
 
     int reconfigurableIn = trainSetReconfigurableIn();
     if (reconfigurableIn == 0)
@@ -48,9 +98,15 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     string trainCycleList = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltipText, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Full train cycle", "r_tooltip_outer_class");
 	description.listAppend(trainCycleList);
     
-    ChecklistEntry[int] whereToAddIt;
+    ChecklistEntry[int] whereToAddTile = optional_task_entries;
+    int priority = 8;
 
-    optional_task_entries.listAppend(ChecklistEntryMake("__item toy crazy train", url, ChecklistSubentryMake(main_title, description), 8).ChecklistEntrySetIDTag("Model train set"));
+    if (shouldNag()) {
+        whereToAddTile = task_entries;
+        priority = -11;
+    }
+
+    whereToAddTile.listAppend(ChecklistEntryMake("__item toy crazy train", url, ChecklistSubentryMake(main_title, description), priority).ChecklistEntrySetIDTag("Model train set"));
 }
 
 carDescriptions = {
