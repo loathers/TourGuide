@@ -1,4 +1,4 @@
-string [string, string] carDescriptions;
+string [string, string] stationDescriptions;
 
 int trainSetReconfigurableIn() {
     int trainPosition = get_property_int("trainsetPosition");
@@ -63,8 +63,7 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 
     int trainPosition = get_property_int("trainsetPosition");
     int whenTrainsetWasConfigured = get_property_int("lastTrainsetConfiguration");
-    string trainCars = get_property("trainsetConfiguration");
-    string[int] splitTrain = split_string(trainCars, ",");
+    string[int] stations = split_string(get_property("trainsetConfiguration"), ",");
 
     if (oreConfiguredWhenNotNeeded()) {
         description.listAppend(HTMLGenerateSpanFont("Have ore configured when it's not needed!", "red"));
@@ -88,16 +87,16 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         description.listAppend("Train set reconfigurable in " + HTMLGenerateSpanOfClass(reconfigurableIn.to_string() + " combats.", "r_bold"));
     }
 
-    string[string] nextTrainCar = carDescriptions[splitTrain[trainPosition % 8]];
-    description.listAppend("Next car: " + HTMLGenerateSpanOfClass(nextTrainCar["name"], "r_bold") + " - " + nextTrainCar["description"]);
+    string[string] nextStation = stationDescriptions[stations[trainPosition % 8]];
+    description.listAppend("Next station: " + HTMLGenerateSpanOfClass(nextStation["name"], "r_bold") + " - " + nextStation["description"]);
 
     string [int][int] tooltipTable;
     for i from trainPosition to trainPosition + 7 {
-		string[string] car = carDescriptions[splitTrain[i % 8]];
-		tooltipTable.listAppend(listMake(HTMLGenerateSpanOfClass(car["name"], "r_bold"), car["description"]));
+		string[string] station = stationDescriptions[stations[i % 8]];
+		tooltipTable.listAppend(listMake(HTMLGenerateSpanOfClass(station["name"], "r_bold"), station["description"]));
 	}
     buffer tooltipText;
-    tooltipText.append(HTMLGenerateTagWrap("div", "Train car cycle", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+    tooltipText.append(HTMLGenerateTagWrap("div", "Train station cycle", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
 	tooltipText.append(HTMLGenerateSimpleTableLines(tooltipTable));
     string trainCycleList = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltipText, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Full train cycle", "r_tooltip_outer_class");
 	description.listAppend(trainCycleList);
@@ -113,13 +112,13 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     whereToAddTile.listAppend(ChecklistEntryMake("__item toy crazy train", url, ChecklistSubentryMake(main_title, description), priority).ChecklistEntrySetIDTag("Model train set"));
 }
 
-carDescriptions = {
+stationDescriptions = {
     "unknown": {
         "name": "Unknown",
-        "description": "We don't recognize that train car!",
+        "description": "We don't recognize that train station!",
     },
     "empty": {
-        "name": "Empty",
+        "name": "Empty station",
         "description": HTMLGenerateSpanFont("Train set isn't fully configured!", "red"),
     },
     "meat_mine": {
