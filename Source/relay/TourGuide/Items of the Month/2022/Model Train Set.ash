@@ -48,7 +48,8 @@ boolean shouldNag() {
     return trainSetReconfigurableIn() == 0 &&
         (oreConfiguredWhenNotNeeded() ||
         loggingMillConfiguredWhenNotNeeded() ||
-        statsConfiguredWhenNotNeeded());
+        statsConfiguredWhenNotNeeded() ||
+        stationConfigured("empty"));
 }
 
 RegisterTaskGenerationFunction("IOTMModelTrainSetGenerateTasks");
@@ -73,6 +74,9 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     }
     if (statsConfiguredWhenNotNeeded()) {
         description.listAppend(HTMLGenerateSpanFont("Have stats configured when they're not needed!", "red"));
+    }
+    if (stationConfigured("empty")) {
+        description.listAppend(HTMLGenerateSpanFont("Have an empty station configured!", "red"));
     }
 
     int reconfigurableIn = trainSetReconfigurableIn();
