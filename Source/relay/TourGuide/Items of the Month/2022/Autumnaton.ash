@@ -57,7 +57,7 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		description.listAppend("Visit mid underground for +1 autumn item (Cyrpt zone, Daily Dungeon?)");
 	}
 	if (!get_property("autumnatonUpgrades").contains_text("leftarm1")) {
-		description.listAppend("Visit low indoor for +1 item (Haunted Kitchen?)");
+		description.listAppend("Visit low indoor for +1 item (Haunted Pantry?)");
 	}
 	if (!get_property("autumnatonUpgrades").contains_text("rightarm1")) {
 		description.listAppend("Visit mid outdoor for +1 item (Smut Orc Camp?)");
