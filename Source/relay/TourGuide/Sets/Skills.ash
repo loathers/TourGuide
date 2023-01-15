@@ -249,7 +249,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     if (lookupSkill("Evoke Eldritch Horror").skill_is_usable() && !get_property_boolean("_eldritchHorrorEvoked")) {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Evoke eldritch horror skill free fight"));
     }
-    if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS) {
+    if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS && my_path().id != PATH_COMMUNITY_SERVICE) {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Daily forest tentacle free fight"));
     }
     

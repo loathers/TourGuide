@@ -16,7 +16,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         if (my_path().id == PATH_NUCLEAR_AUTUMN)
         {
-            subentry.entries.listAppend("Wait until level eleven, which will unlock it autumnaically.");
+            subentry.entries.listAppend("Wait until level eleven, which will unlock it autumn-atically.");
         }
 		else if (!knoll_available())
 		{

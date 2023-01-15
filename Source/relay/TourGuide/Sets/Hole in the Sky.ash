@@ -9,6 +9,8 @@ boolean HITSStillRelevant()
 		return false;
 	if (!__quest_state["Level 10"].finished && my_path().id != PATH_EXPLOSIONS)
 		return false;
+    if (my_path().id == PATH_COMMUNITY_SERVICE)
+        return false;
         
 	return true;
 }

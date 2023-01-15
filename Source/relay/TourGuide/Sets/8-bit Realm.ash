@@ -66,7 +66,7 @@ void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake(title, modifiers, description), $locations[fear man's level]).ChecklistEntrySetIDTag("Angry jung man familiar digital key psycho jar use"));
         need_route_output = false;
     }
-    if (my_path().id == PATH_EXPLOSIONS) need_route_output = false;
+    if (my_path().id == PATH_EXPLOSIONS || my_path().id == PATH_COMMUNITY_SERVICE) need_route_output = false;
     if (need_route_output)
     {
         if (in_hardcore() || !$item[jar of psychoses (The Crackpot Mystic)].is_unrestricted() || !$item[jar of psychoses (The Crackpot Mystic)].item_is_usable())

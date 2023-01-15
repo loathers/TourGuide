@@ -74,6 +74,9 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     int skeleton_key_amount = $item[skeleton key].available_amount() + $item[skeleton key].creatable_amount();
     boolean avoid_using_skeleton_key = ($item[Platinum Yendorian Express Card].available_amount() == 0 && $item[pick-o-matic lockpicks].available_amount() == 0 && (skeleton_key_amount) <= 2 && skeleton_key_amount > 0 && !__quest_state["Level 13"].state_boolean["Past keys"] && in_ronin());
 	
+	if (my_path().id == PATH_COMMUNITY_SERVICE) 
+		need_to_do_daily_dungeon = false;
+
 	boolean delay_daily_dungeon = false;
 	string delay_daily_dungeon_reason = "";
 	if (need_to_do_daily_dungeon)
@@ -151,6 +154,10 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
     
     if (get_property_int("_lastDailyDungeonRoom") > 0)
         need_to_do_daily_dungeon = true;
+
+	if (my_path().id == PATH_COMMUNITY_SERVICE) 
+		need_to_do_daily_dungeon = false;
+
 	if (need_to_do_daily_dungeon && !get_property_boolean("dailyDungeonDone"))
 	{
 		if (delay_daily_dungeon)
