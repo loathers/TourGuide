@@ -23,8 +23,15 @@ void QLevel6Init()
 float QLevel6TurnsToCompleteArea(location place)
 {
     //FIXME not sure how accurate these calculations are.
-    int turns_spent_in_zone = turnsAttemptedInLocation(place); //not always accurate
     int ncs_found = noncombatTurnsAttemptedInLocation(place);
+
+
+    // get_property("lastFriarsXNC").to_int() will return 0 until the first NC is hit, then it will return the turns spent in the zone prior to hitting the NC,
+    // so we need to add 1 to account for the last NC itself
+    int lastFriarsNeckNC = get_property("lastFriarsNeckNC").to_int() > 0 ? get_property("lastFriarsNeckNC").to_int() + 1 : 0;
+    int lastFriarsHeartNC = get_property("lastFriarsHeartNC").to_int() > 0 ? get_property("lastFriarsHeartNC").to_int() + 1 : 0;
+    int lastFriarsElbowNC = get_property("lastFriarsElbowNC").to_int() > 0 ? get_property("lastFriarsElbowNC").to_int() + 1 : 0;
+
 
 	QuestState base_quest_state = __quest_state["Level 6"];
     
@@ -67,11 +74,11 @@ float QLevel6TurnsToCompleteArea(location place)
 
     int max_turns_remaining = ncs_remaining * 5;
     if (place == $location[The Dark Neck of the Woods])
-        max_turns_remaining -= ($location[The Dark Neck of the Woods].turns_spent - get_property("lastFriarsNeckNC").to_int());
+        max_turns_remaining -= $location[The Dark Neck of the Woods].turns_spent - lastFriarsNeckNC;
     if (place == $location[The Dark Heart of the Woods])
-        max_turns_remaining -= ($location[The Dark Heart of the Woods].turns_spent - get_property("lastFriarsHeartNC").to_int());
+        max_turns_remaining -= $location[The Dark Heart of the Woods].turns_spent - lastFriarsHeartNC;
     if (place == $location[The Dark Elbow of the Woods])
-        max_turns_remaining -= ($location[The Dark Elbow of the Woods].turns_spent - get_property("lastFriarsElbowNC").to_int());
+        max_turns_remaining -= $location[The Dark Elbow of the Woods].turns_spent - lastFriarsElbowNC;
     return MIN(turns_remaining, max_turns_remaining);
 }
 
