@@ -3,8 +3,8 @@ RegisterTaskGenerationFunction("IOTMCommerceGhostGenerateTasks");
 void IOTMCommerceGhostGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	item commerce_item = get_property_item("commerceGhostItem");
-	int commerce_statgain1 = my_level() * 20;
-	int commerce_statgain2 = my_level() * 25;
+	int commerce_statgain1 = (my_level() * 20) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
+	int commerce_statgain2 = (my_level() * 25) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
 	boolean in_grey_you = my_class() == $class[grey goo]; // Grey You gains zero stats from your commerce ghost.
 
 	if (__misc_state["in run"] && $familiar[Ghost of Crimbo Commerce].familiar_is_usable() && !in_grey_you)
