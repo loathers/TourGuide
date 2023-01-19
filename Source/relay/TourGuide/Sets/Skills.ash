@@ -43,6 +43,15 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         if (get_property_int("homebodylCharges") > 0) {
             free_crafts_left += (get_property_int("homebodylCharges"));
         }
+        // adding cookbookbat free crafts into crafting tile        
+        if (lookupFamiliar("Cookbookbat").familiar_is_usable()) {
+            string [int] description;
+			free_cooks_left += clampi(5 - get_property_int("_cookbookbatCrafting"), 0, 5);
+			string title = "free cooking";
+			if (free_cooks_left > 0) {
+			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_cooks_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "COOKING only" : "", description));
+			}
+        }
 
         int free_smiths_left = 0;
         if (__campground[$item[warbear auto-anvil]] > 0) {
