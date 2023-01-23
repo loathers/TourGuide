@@ -14,7 +14,7 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
         if (lookupItem("kremlin's greatest briefcase").equipped_amount() == 0)
         {
 		    description.listAppend(HTMLGenerateSpanFont("Equip the briefcase first!", "red"));
-            url = "inventory.php?ftext=kremlin";
+            entry.url = "inventory.php?ftext=kremlin";
         }
         resource_entries.listAppend(ChecklistEntryMake("__item Kremlin's Greatest Briefcase", entry.url, ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "briefcase dart", "briefcase darts"), "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Kremlin Briefcase tranq dart banish"));
     }
