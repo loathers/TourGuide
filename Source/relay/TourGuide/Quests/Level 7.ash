@@ -1,6 +1,6 @@
-
 void QLevel7Init()
 {
+	int CYRPT_BOSS_EVILNESS = 13;
 	//questL07Cyrptic
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL07Cyrptic");
@@ -45,7 +45,7 @@ void QLevel7Init()
         if (l == "alcove" && get_property_monster("romanticTarget") == $monster[modern zmobie])
             evilness -= 5 * get_property_int("_romanticFightsLeft");
         
-        if (evilness <= 26)
+        if (evilness <= CYRPT_BOSS_EVILNESS + 1)
             need_speeding_up = false;
         else
             need_speeding_up = true;
@@ -70,6 +70,7 @@ void QLevel7Init()
 
 void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+	int CYRPT_BOSS_EVILNESS = 13;
 	if (!__quest_state["Level 7"].in_progress)
 		return;
 	QuestState base_quest_state = __quest_state["Level 7"];
@@ -92,10 +93,10 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		string text;
 		if (evilness == 0)
 			text = "Finished";
-		else if (evilness <= 25)
+		else if (evilness <= CYRPT_BOSS_EVILNESS)
 			text = HTMLGenerateSpanFont("At boss", "red");
 		else
-			text = (evilness - 25) + " evilness to boss.";
+			text = (evilness - CYRPT_BOSS_EVILNESS) + " evilness to boss.";
 		evilness_text[property] = text;
 	}
 
@@ -131,7 +132,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		
 		subentry.entries.listAppend(evilness_text["cyrptNookEvilness"]);
 		
-		if (evilness > 26 && my_path().id != PATH_G_LOVER)
+		if (evilness > CYRPT_BOSS_EVILNESS + 1 && my_path().id != PATH_G_LOVER)
 		{
             subentry.modifiers.listAppend("+400% item");
 			subentry.modifiers.listAppend("banish party skelteon");
@@ -145,8 +146,8 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
 			float eyes_per_adventure = MIN(1.0, (item_drop) * 0.2);
             float eyes_value = 3.0;
-            if (evilness < 29)
-                eyes_value = clampi(evilness - 25 - 1, 0, 3);
+            if (evilness < CYRPT_BOSS_EVILNESS + 4)
+                eyes_value = clampi(evilness - CYRPT_BOSS_EVILNESS - 1, 0, 3);
 			float evilness_per_adventure = 1.0;
             if ($item[gravy boat].equipped_amount() > 0)
                 evilness_per_adventure += 1.0;
@@ -159,7 +160,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
                 else
                     subentry.entries.listAppend("Use your evil eyes.");
             }
-            if (__iotms_usable[$item[haunted doghouse]] && !$location[the defiled nook].noncombat_queue.contains_text("Seeing-Eyes Dog") && $location[the defiled nook].turns_spent >= 5)// && evilness <= 25 + 9)
+            if (__iotms_usable[$item[haunted doghouse]] && !$location[the defiled nook].noncombat_queue.contains_text("Seeing-Eyes Dog") && $location[the defiled nook].turns_spent >= 5)
             {
                 //haunted doghouse adventures are a percentage chance, and the NC is skippable. more NCs, more chances, less turns spent
                 subentry.modifiers.listAppend("-combat");
@@ -167,7 +168,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             if (my_path().id == PATH_EXPLOSIONS)
             	subentry.entries.listAppend("Ignore this area until the end of the run; wandering astronauts drop evil eyes. Lure them to delay-burning areas; keep signal jammer equipped otherwise.");
 		
-			float evilness_remaining = evilness - 25;
+			float evilness_remaining = evilness - CYRPT_BOSS_EVILNESS;
 			evilness_remaining -= $item[evil eye].available_amount() * 3;
 			if (evilness_remaining > 0)
 			{
@@ -198,18 +199,18 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         evilness_removed_per_adventure += 1.0 * appearance_rates[$monster[senile lihc]] / 100.0;
         evilness_removed_per_adventure += 3.0 * appearance_rates[$monster[dirty old lihc]] / 100.0;
         
-        float evilness_remaining = MAX(0, evilness - 25);
+        float evilness_remaining = MAX(0, evilness - CYRPT_BOSS_EVILNESS);
         int turns_remaining = evilness_remaining;
 
         if (evilness_removed_per_adventure != 0.0)
             turns_remaining = MAX(1, ceiling(evilness_remaining / evilness_removed_per_adventure));
         
-		if (evilness > 26 && (appearance_rates[$monster[slick lihc]] > 0.0 || appearance_rates[$monster[senile lihc]] > 0.0))
+		if (evilness > CYRPT_BOSS_EVILNESS + 1 && (appearance_rates[$monster[slick lihc]] > 0.0 || appearance_rates[$monster[senile lihc]] > 0.0))
         {
             subentry.modifiers.listAppend("olfact dirty old lihc");
             subentry.modifiers.listAppend("banish");
         }
-		if (evilness > 25)
+		if (evilness > CYRPT_BOSS_EVILNESS)
             subentry.entries.listAppend("~" + turns_remaining.roundForOutput(1) + " turns remaining to boss.");
 		
 		entry.subentries.listAppend(subentry);
@@ -220,7 +221,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		subentry.header = "Defiled Cranny";
 		subentry.entries.listAppend(evilness_text["cyrptCrannyEvilness"]);
 		
-		if (base_quest_state.state_int["cranny evilness"] > 26)
+		if (base_quest_state.state_int["cranny evilness"] > CYRPT_BOSS_EVILNESS + 1)
 		{
             subentry.modifiers.listAppend("-combat");
             subentry.modifiers.listAppend("+ML");
@@ -235,13 +236,13 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             float area_nc_rate = 1.0 - area_combat_rate;
             
             float average_beeps_per_turn = cranny_beep_beep_beep * area_nc_rate + 1.0 * area_combat_rate;
-            float average_turns_remaining = ((base_quest_state.state_int["cranny evilness"] - 25) / average_beeps_per_turn);
+            float average_turns_remaining = ((base_quest_state.state_int["cranny evilness"] - CYRPT_BOSS_EVILNESS) / average_beeps_per_turn);
             
             average_turns_remaining = MAX(1, average_turns_remaining);
 			
 			subentry.entries.listAppend("~" + cranny_beep_beep_beep.roundForOutput(1) + " beeps per ghuol swarm. ~" + average_turns_remaining.roundForOutput(1) + " turns remain to boss.");
 		}
-        else if (base_quest_state.state_int["cranny evilness"] <= 25)
+        else if (base_quest_state.state_int["cranny evilness"] <= CYRPT_BOSS_EVILNESS)
             subentry.modifiers.listAppend("+meat");
 		
 		entry.subentries.listAppend(subentry);
@@ -258,15 +259,15 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
         if (get_property_monster("romanticTarget") == $monster[modern zmobie])
             evilness_after_arrow -= 5 * get_property_int("_romanticFightsLeft");
         
-        if (evilness_after_arrow <= 25 && evilness > 25)
+        if (evilness_after_arrow <= CYRPT_BOSS_EVILNESS && evilness > CYRPT_BOSS_EVILNESS)
         {
             subentry.entries.listAppend("Wait for modern zmobie arrows.");
         }
-		else if (evilness > 26)
+		else if (evilness > CYRPT_BOSS_EVILNESS + 1)
 		{
             subentry.modifiers.listAppend("+850% init");
             subentry.modifiers.listAppend("-combat");
-			int zmobies_needed = ceil((evilness.to_float() - 26.0) / 5.0);
+			int zmobies_needed = ceil((evilness.to_float() - CYRPT_BOSS_EVILNESS.to_float() + 1.0) / 5.0);
 			float zmobie_chance = min(100.0, 15.0 + initiative_modifier_for_location($location[the defiled alcove]) / 10.0);
 			
 			subentry.entries.listAppend(pluralise(zmobies_needed, "modern zmobie", "modern zmobies") + " needed (" + roundForOutput(zmobie_chance, 0) + "% chance of appearing)");
@@ -282,7 +283,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 			
             
 		}
-        else if (evilness <= 25)
+        else if (evilness <= CYRPT_BOSS_EVILNESS)
             subentry.modifiers.listAppend("+meat");
 		entry.subentries.listAppend(subentry);
 	}
