@@ -13,8 +13,8 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Free run/banishes for twenty turns.|Use the KGB tranquilizer dart skill in-combat.");
         if (lookupItem("kremlin's greatest briefcase").equipped_amount() == 0)
         {
-            description.listAppend("Equip the briefcase first.");
-            //entry.url = "inventory.php?which=2";
+		    description.listAppend(HTMLGenerateSpanFont("Equip the briefcase first!", "red"));
+            entry.url = "inventory.php?ftext=kremlin";
         }
         resource_entries.listAppend(ChecklistEntryMake("__item Kremlin's Greatest Briefcase", entry.url, ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "briefcase dart", "briefcase darts"), "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Kremlin Briefcase tranq dart banish"));
     }

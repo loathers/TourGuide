@@ -634,6 +634,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         int stinky_cheese_charge = min(100, get_property_int("_stinkyCheeseCount"));
         string title;
         string [int] description;
+		string url;
+		url = invSearch("stinky cheese");
         int importance = importance_level_item;
 
         if (stinky_cheese_charge < 100) {
@@ -648,7 +650,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         description.listAppend("Or some other stinky things.");
         
-        resource_entries.listAppend(ChecklistEntryMake("__item Ched", "", ChecklistSubentryMake(title, "", description), importance).ChecklistEntrySetIDTag("Stinky cheese resource"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Ched", url, ChecklistSubentryMake(title, "", description), importance).ChecklistEntrySetIDTag("Stinky cheese resource"));
     }
 
     if ($item[mayfly bait necklace].available_amount() > 0 && get_property_int("_mayflySummons") < 30) {
