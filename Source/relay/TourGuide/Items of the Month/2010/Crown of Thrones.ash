@@ -1,3 +1,75 @@
+Record COTSuggestion
+{
+    string reason;
+    familiar [int] familiars;
+};
+
+
+COTSuggestion COTSuggestionMake(string reason, familiar [int] familiars)
+{
+    COTSuggestion suggestion;
+    suggestion.reason = reason;
+    suggestion.familiars = familiars;
+    
+    return suggestion;
+}
+
+COTSuggestion COTSuggestionMake(string reason, familiar f)
+{
+    familiar [int] familiar_list;
+    familiar_list.listAppend(f);
+    return COTSuggestionMake(reason, familiar_list);
+}
+
+COTSuggestion COTSuggestionMake(string reason, boolean [familiar] familiars_in)
+{
+    familiar [int] familiars_out;
+    foreach f in familiars_in
+        familiars_out.listAppend(f);
+    return COTSuggestionMake(reason, familiars_out);
+}
+
+void listAppend(COTSuggestion [int] list, COTSuggestion entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+
+//Follows in order. If we can't find one in the first set, we check the second, then third, etc.
+//This allows for supporting +25% meat, then falling back on +20%, etc.
+Record COTSuggestionSet
+{
+    COTSuggestion [int] suggestions;
+};
+
+COTSuggestionSet COTSuggestionSetMake(COTSuggestion [int] suggestions)
+{
+    COTSuggestionSet suggestion_set;
+    suggestion_set.suggestions = suggestions;
+    
+    return suggestion_set;
+}
+
+COTSuggestionSet COTSuggestionSetMake(COTSuggestion suggestion)
+{
+    COTSuggestionSet suggestion_set;
+    suggestion_set.suggestions.listAppend(suggestion);
+    
+    return suggestion_set;
+}
+
+void listAppend(COTSuggestionSet [int] list, COTSuggestionSet entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+
 void IOTMCOTGenerateSuggestions(string [int] description)
 {
     familiar enthroned_familiar = my_enthroned_familiar();

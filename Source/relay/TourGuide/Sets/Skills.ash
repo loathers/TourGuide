@@ -28,6 +28,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         craft_entry.importance_level = 4;
 
         int free_crafts_left = 0;
+        int free_cooks_left = 0;
         if ($effect[Inigo's Incantation of Inspiration].have_effect() >= 5) {
             free_crafts_left += $effect[Inigo's Incantation of Inspiration].have_effect() / 5;
         }
