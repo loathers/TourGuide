@@ -233,6 +233,50 @@ void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     string [int] description;
     
+    void addFamiliarDropsLine(string fam, string prop, int limit, string dropdesc) {
+        int currentDrops = get_property_int(prop);
+        familiar thisFam = fam.to_familiar();
+        if    ( !thisFam.have_familiar() ) { return; }
+        string txtclr = "";
+        if    ( fam.index_of("Stomping") > -1 ) {
+            txtclr = (get_property_boolean("bootsCharged"))?"blue":"black";
+        }
+        if    ( currentDrops == limit ) { txtclr = "gray"; }
+        
+        description.listAppend(HTMLGenerateSpanFont(fam+": "+currentDrops + "/"+limit+" "+dropdesc+".", txtclr));
+        return;
+    }
+    
+    description.listAppend(HTMLGenerateSpanFont("Crown/Bjorn-specific drops", "purple"));
+    addFamiliarDropsLine("Garbage Fire", "_garbageFireDropsCrown", 3, "burning newspapers");
+	addFamiliarDropsLine("Grim Brother", "_grimFairyTaleDropsCrown", 2, "grim fairy tales");
+	addFamiliarDropsLine("Grimstone Golem", "_grimstoneMaskDropsCrown", 1, "grimstone mask");
+	addFamiliarDropsLine("Machine Elf", "_abstractionDropsCrown", 25, "abstractions");
+    addFamiliarDropsLine("Optimistic Candle", "_optimisticCandleDropsCrown", 3, "globs of melted wax");
+	addFamiliarDropsLine("Ms. Puck Man", "_yellowPixelDropsCrown", 25, "yellow pixels");
+	addFamiliarDropsLine("Puck Man", "_yellowPixelDropsCrown", 25, "yellow pixels");
+	addFamiliarDropsLine("Trick-or-Treating Tot", "_hoardedCandyDropsCrown", 3, "hoarded candy wads");
+	
+    description.listAppend(HTMLGenerateSpanFont("General familiar drops", "purple"));
+    addFamiliarDropsLine("Adventurous Spelunker", "_spelunkingTalesDrops", 1, "Tales of Spelunking");
+	addFamiliarDropsLine("Astral Badger", "_astralDrops", 5, "astral mushrooms");
+	addFamiliarDropsLine("Baby Sandworm", "_aguaDrops", 5, "Agua de Vidae");
+	addFamiliarDropsLine("Blavious Kloop", "_kloopDrops", 5, "devlish folios");
+	addFamiliarDropsLine("Bloovian Groose", "_grooseDrops", 5, "groose grease");
+	addFamiliarDropsLine("Cat Burglar", "_catBurglarCharge", 30, "Heist charges");
+	#addFamiliarDropsLine("Cookbookbat", "_turkeyBooze", 5, "Turkey booze");
+	addFamiliarDropsLine("Fist Turkey", "_turkeyBooze", 5, "Turkey booze");
+	addFamiliarDropsLine("Galloping Grill", "_hotAshesDrops", 5, "hot ashes");
+    addFamiliarDropsLine("Golden Monkey", "_powderedGoldDrops", 5, "powdered gold");
+    addFamiliarDropsLine("Green Pixie", "_absintheDrops", 5, "bottles of absinthe");
+	addFamiliarDropsLine("Grim Brother", "_grimFairyTaleDrops", 5, "grim fairy tales");
+	addFamiliarDropsLine("Li'l Xenomorph", "_transponderDrops", 5, "transponders");
+	addFamiliarDropsLine("Llama Lama", "_gongDrops", 5, "Llama gongs");
+	addFamiliarDropsLine("Puck Man", "_powerPillDrops", 11, "power pills");
+    addFamiliarDropsLine("Ms. Puck Man", "_powerPillDrops", 11, "power pills");
+    addFamiliarDropsLine("Rogue Program", "_tokenDrops", 5, "GG tokens");
+    addFamiliarDropsLine("Stomping Boots", "_pasteDrops", 7, "spleen pastes");
+    addFamiliarDropsLine("Unconscious Collective", "_dreamJarDrops", 5, "dream jars");
     item crown_item = $item[crown of thrones];
     if (crown_item.equipped_amount() == 0 && $item[Buddy Bjorn].available_amount() > 0)
         crown_item = $item[Buddy Bjorn];

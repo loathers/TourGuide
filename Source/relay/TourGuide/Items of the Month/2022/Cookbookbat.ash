@@ -44,8 +44,14 @@ void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
     buffer tooltip_text;
 	tooltip_text.append(HTMLGenerateTagWrap("div", "Cookbookbat Recipes!", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
 	tooltip_text.append(HTMLGenerateSimpleTableLines(pizzaParlorRecipes));
-			
+		
 	description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Important Recipes", "r_tooltip_outer_class"));
 
+    int cookings_remaining = clampi(5 - get_property_int("_cookbookbatCrafting"), 0, 5);
+    if (cookings_remaining > 0) 
+    {
+        description.listAppend(HTMLGenerateSpanOfClass(cookings_remaining, "r_bold") + " free cooks: Unstable fulminate, potions, and more.");
+    }
+	
     resource_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", url, ChecklistSubentryMake("Pizza party with the Cookbookbat!", "", description)).ChecklistEntrySetIDTag("Cookbookbat Resource"));
 }

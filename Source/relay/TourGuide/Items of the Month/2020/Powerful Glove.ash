@@ -18,7 +18,7 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend(HTMLGenerateSpanOfClass("Replace Enemy (10% charge):", "r_bold") + " Swap monster.");
     description.listAppend(HTMLGenerateSpanOfClass("Shrink Enemy (5% charge):", "r_bold") + " Delevel.");
 
-    resource_entries.listAppend(ChecklistEntryMake("__item Powerful Glove", url, ChecklistSubentryMake(chargeLeft + "% battery charge", "", description)).ChecklistEntrySetIDTag("Powerful glove skills resource"));
+    resource_entries.listAppend(ChecklistEntryMake("__item Powerful Glove", url, ChecklistSubentryMake(chargeLeft + "% Powerful Glove battery charge", "", description)).ChecklistEntrySetIDTag("Powerful glove skills resource"));
 }
 
 RegisterTaskGenerationFunction("IOTMPowerfulGloveTask");
