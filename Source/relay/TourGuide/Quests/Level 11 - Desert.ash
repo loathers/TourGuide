@@ -170,6 +170,15 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         else
             subentry.entries.listAppend("Use your desert sightseeing pamphlets. (+15% exploration)");
     }
+    int campgroundMilestoneCount = __campground[$item[milestone]];
+    if (campgroundMilestoneCount > 0) {
+        string milestonesPlural = campgroundMilestoneCount == 1 ? "" : "s";
+        subentry.entries.listAppend(HTMLGenerateSpanFont("Harvest your rock garden milestone" + milestonesPlural + "!", "red"));
+    }
+    if ($item[milestone].available_amount() > 0 && $item[milestone].item_is_usable()) {
+        string milestonesPlural = $item[milestone].available_amount() == 1 ? "" : "s";
+        subentry.entries.listAppend("Use your milestone" + mileStonesPlural + ". (+5% exploration each)");
+    }
     if (!base_quest_state.state_boolean["Have UV-Compass eqipped"] && __quest_state["Level 11 Desert"].state_int["Desert Exploration"] < 99) {
         boolean should_output_compass_in_red = true;
         string line = "";
