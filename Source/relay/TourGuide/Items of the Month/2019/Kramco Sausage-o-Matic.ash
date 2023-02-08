@@ -46,14 +46,14 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
         main_title = "Sausage goblin fight available";
         if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0) {
             main_description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
-            entry.url = "inventory.php?ftext=kramco+sausage-o-matic";
+            entry.url = "inventory.php?action=grind";
         }
     } else {
         main_title = round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of sausage goblin this turn";
         main_description.listAppend(pluralise(fight_information.turns_to_next_guaranteed_fight, "turn", "turns") + " until next guaranteed goblin fight.");
         if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0) {
-            main_description.listAppend("Equip the Kramco Sausage-o-Matic&trade; first.");
-            entry.url = "inventory.php?ftext=kramco+sausage-o-matic";
+            main_description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
+            entry.url = "inventory.php?action=grind";
         }
     }
 
@@ -75,9 +75,15 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
         int sausages_made = get_property_int("_sausagesMade");
         int meat_cost = 111 * (sausages_made + 1);
         sausage_description.listAppend("+1 adventure and +999 MP each.");
-        sausage_description.listAppend(sausage_casings + " casings available, " + sausages_eaten + "/23 eaten today.");
-        sausage_description.listAppend(pluralise(sausages_made, "sausage", "sausages") + " made; next costs " + meat_cost + " meat.");
-        
+        sausage_description.listAppend(HTMLGenerateSpanOfClass(sausage_casings, "r_bold") + " casings available, " + HTMLGenerateSpanOfClass(sausages_eaten + "/23", "r_bold") + " eaten today.");
+        if (sausages_made > 22)
+		{
+            sausage_description.listAppend(HTMLGenerateSpanFont(sausages_made + " sausages made today.", "purple"));
+        }	
+        else
+		{
+			sausage_description.listAppend(pluralise(sausages_made, "sausage", "sausages") + " made; next costs " + meat_cost + " meat.");
+		}
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(MIN(sausages_available, 23 - sausages_eaten), "magical sausage", "magical sausages") + " edible", "", sausage_description));
     }
     

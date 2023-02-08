@@ -372,7 +372,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
         
         float drawers_per_turn = 1.0 + MAX(hot_resistance / 6.0, 0.0) + MAX(stench_resistance / 6.0, 0.0);
         
-        float drawers_needed = MAX(0, 21 - get_property_int("manorDrawerCount"));
+        int drawers_needed = MAX(0, 21 - get_property_int("manorDrawerCount"));
         
         int total_turns = ceil(drawers_needed / drawers_per_turn) + 1;
         
@@ -398,7 +398,7 @@ void QManorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
                 }
             }
             
-            line += total_turns + " turns remaining.";
+            line += total_turns + " turns remaining, " + drawers_needed + " drawers remaining.";
             subentry.entries.listAppend(line);
         }
         

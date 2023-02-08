@@ -3,6 +3,24 @@ import "relay/TourGuide/Support/Monster Data.ash";
 RegisterTaskGenerationFunction("IOTMProtonicAcceleratorPackGenerateTasks");
 void IOTMProtonicAcceleratorPackGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    if (!$item[protonic accelerator pack].have()) return;
+	{	int nextGhostTurn = get_property_int("nextParanormalActivity");
+		int nextGhostTimer = (nextGhostTurn - total_turns_played());
+		string [int] description;
+		string url;
+		url = invSearch("protonic accelerator pack");
+		
+		if (nextGhostTurn <= total_turns_played())
+		{
+			description.listAppend(HTMLGenerateSpanFont("Who you gonna call? You!", "blue"));
+			if (!lookupItem("protonic accelerator pack").equipped())
+				description.listAppend(HTMLGenerateSpanFont("Equip the protopack first", "red"));
+			task_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake("It's ghost bustin' time!", "", description), -11));
+		}	
+		else
+			description.listAppend(nextGhostTimer + " adventures until your next protonic ghost.");
+			optional_task_entries.listAppend(ChecklistEntryMake("__item protonic accelerator pack", url, ChecklistSubentryMake("It's ghost bustin' time... eventually.", "", description), 8));
+	}	
     //Quest:
     if (QuestState("questPAGhost").in_progress || get_property("ghostLocation") != "")
     {

@@ -304,7 +304,33 @@ void QSleazeAirportGenerateTasks(ChecklistEntry [int] task_entries)
     QSleazeAirportUMDGenerateTasks(task_entries);
 }
 
-//
+//Conspiracy Island Omega Button
+RegisterTaskGenerationFunction("IOTMConspiracyIslandGenerateTasks");
+void IOTMConspiracyIslandGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!__misc_state["spooky airport available"])
+        return;
+	//press the button!
+    ChecklistEntry entry;
+    entry.url = "place.php?whichplace=airport_spooky_bunker&action=si_controlpanel";
+    entry.image_lookup_name = "__item big red button";
+    entry.importance_level = 8;
+	int omegaPower = get_property_int("controlPanelOmega");
+	if (!get_property_boolean("_controlPanelUsed"))
+	{
+        entry.subentries.listAppend(ChecklistSubentryMake(omegaPower + "% Conspiracy Island Omega power", "", "At 100%, press Omega Button to reset better quests."));
+		if (!get_property_boolean("controlPanel8") == false)
+			entry.subentries.listAppend(ChecklistSubentryMake("", "", "Press 1912 Button."));
+		if (!get_property_boolean("controlPanel9") == false)
+			entry.subentries.listAppend(ChecklistSubentryMake("", "", "Press 0-0Z-E Button."));
+	}
+	if (omegaPower == 100)
+		entry.subentries.listAppend(ChecklistSubentryMake("100% power! Reset to gain new quests and then uze 0-0Z-E again!"));
+	if (entry.subentries.count() > 0)
+	{
+        optional_task_entries.listAppend(entry);
+	}
+}
 
 void QSpookyAirportJunglePunGenerateTasks(ChecklistEntry [int] task_entries)
 {

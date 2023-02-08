@@ -109,6 +109,22 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             task_entries.listAppend(ChecklistEntryMake("__effect " + have_poison, url, ChecklistSubentryMake("Remove " + have_poison, "", methods), -11).ChecklistEntrySetIDTag("Poisoned reminder"));
         }
     }
+    if ($effect[teleportitis].have_effect() > 0)
+    {
+        string url = "inventory.php";
+		string method = "Use a soft green echo eyedrop antidote.";
+        if ($item[soft green echo eyedrop antidote].available_amount()<1)
+            method = "Acquire & use a soft green echo eyedrop antidote.";
+        task_entries.listAppend(ChecklistEntryMake("__effect teleportitis", url, ChecklistSubentryMake("Remove Teleportitis", "", method), -11).ChecklistEntrySetIDTag("Teleportitis reminder"));
+    }
+	if ($effect[feeling lost].have_effect() > 0)
+    {
+        string url = "inventory.php";
+		string method = "Use a soft green echo eyedrop antidote.";
+        if ($item[soft green echo eyedrop antidote].available_amount()<1)
+            method = "Acquire & use a soft green echo eyedrop antidote.";
+        task_entries.listAppend(ChecklistEntryMake("__effect Feeling Lost", url, ChecklistSubentryMake("Remove Feeling Lost", "", method), -11).ChecklistEntrySetIDTag("Feeling Lost reminder"));
+    }	
     if ($effect[Cunctatitis].have_effect() > 0 && $skill[disco nap].skill_is_usable() && $skill[adventurer of leisure].skill_is_usable())
     {
         string url = "skills.php";

@@ -62,8 +62,8 @@ static
     __banish_source_length["beancannon"] = -1;
     __banish_source_length["licorice rope"] = -1;
     __banish_source_length["kgb tranquilizer dart"] = 20;
-    //__banish_source_length["breathe out"] = 20; // is it listed as hot jelly, breathe out or space jellyfish ?
-    //__banish_source_length["daily affirmation: be a mind master"] = 80; // how long does it last, exactly? is it still unknown?
+    __banish_source_length["breathe out"] = 20; // is it listed as hot jelly, breathe out or space jellyfish ?
+    __banish_source_length["daily affirmation: be a mind master"] = 80; // how long does it last, exactly? is it still unknown?
     __banish_source_length["spring-loaded front bumper"] = 30;
     __banish_source_length["mafia middle finger ring"] = 60;
     __banish_source_length["throw latte on opponent"] = 30;
@@ -73,6 +73,10 @@ static
     __banish_source_length["saber force"] = 30;
     __banish_source_length["human musk"] = -1;
     __banish_source_length["ultra smash"] = -1; // is it the right name?
+    __banish_source_length["b. l. a. r. t. spray (wide)"] = -1;
+	__banish_source_length["system sweep"] = -1;
+	__banish_source_length["feel hatred"] = 50;
+	__banish_source_length["show your boring familiar pictures"] = 100;
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;
