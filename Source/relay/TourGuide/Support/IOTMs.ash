@@ -24,6 +24,8 @@ void initialiseIOTMsUsable()
             __iotms_usable[lookupItem("diabolic pizza cube")] = true;
         if (__campground[lookupItem("cold medicine cabinet")] > 0)
             __iotms_usable[lookupItem("cold medicine cabinet")] = true;
+        if (__campground[lookupItem("model train set")] > 0)
+            __iotms_usable[lookupItem("model train set")] = true;
 
         // Garden
         if (__campground[lookupItem("packet of mushroom spores")] > 0)
