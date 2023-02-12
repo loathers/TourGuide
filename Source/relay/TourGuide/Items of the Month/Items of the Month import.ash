@@ -130,4 +130,5 @@ import "relay/TourGuide/Items of the Month/2022/Cookbookbat.ash";
 
 // 2023
 import "relay/TourGuide/Items of the Month/2023/Rock Garden.ash";
+import "relay/TourGuide/Items of the Month/2023/SIT Course Certificate.ash";
 import "relay/TourGuide/Items of the Month/2022/Model Train Set.ash";
