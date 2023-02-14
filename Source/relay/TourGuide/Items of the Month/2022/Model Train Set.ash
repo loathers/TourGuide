@@ -23,7 +23,7 @@ boolean oreConfiguredWhenNotNeeded() {
         (to_item("asbestos ore").available_amount() >= 3 &&
          to_item("chrome ore").available_amount() >= 3 &&
          to_item("linoleum ore").available_amount() >= 3);
-    return oreConfigured && haveAllOreNeeded;
+    return __misc_state["in run"] && oreConfigured && haveAllOreNeeded;
 }
 
 boolean loggingMillConfiguredWhenNotNeeded() {
@@ -32,7 +32,7 @@ boolean loggingMillConfiguredWhenNotNeeded() {
 	int lumberNeeded = __quest_state["Level 9"].state_int["bridge lumber needed"];
     boolean haveAllPartsNeeded = __quest_state["Level 9"].mafia_internal_step > 1 ||
         (fastenersNeeded == 0 && lumberNeeded == 0);
-    return loggingMillConfigured && haveAllPartsNeeded;
+    return __misc_state["in run"] && loggingMillConfigured && haveAllPartsNeeded;
 }
 
 boolean statsConfiguredWhenNotNeeded() {
@@ -40,8 +40,8 @@ boolean statsConfiguredWhenNotNeeded() {
         (stationConfigured("brawn_silo") && my_primestat() == $stat[muscle]) ||
         (stationConfigured("brain_silo") && my_primestat() == $stat[mysticality]) ||
         (stationConfigured("groin_silo") && my_primestat() == $stat[moxie]);
-    boolean haveAllStatsNeeded = my_level() >= 13 && __misc_state["in run"];
-    return statsConfigured && haveAllStatsNeeded;
+    boolean haveAllStatsNeeded = my_level() >= 13;
+    return  __misc_state["in run"] && statsConfigured && haveAllStatsNeeded;
 }
 
 boolean shouldNag() {
