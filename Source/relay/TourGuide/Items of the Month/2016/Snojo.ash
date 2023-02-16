@@ -23,7 +23,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         if (snokes_left > 0)
         {
             string [int] description;
-            description.listAppend("Free run/banish.");
+            description.listAppend("Free run, 30-turn banish.");
             if (snojo_skill_entry.image_lookup_name == "")
                 snojo_skill_entry.image_lookup_name = "__skill Snokebomb";
             Banish snoke_banish = BanishByName("snokebomb");

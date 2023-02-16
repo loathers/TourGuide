@@ -10,7 +10,7 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
     if (get_property_int("_kgbTranquilizerDartUses") < 3 && my_path().id != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
-        description.listAppend("Free run/banishes for twenty turns.|Use the KGB tranquilizer dart skill in-combat.");
+        description.listAppend("Free run, 20-turn banish.|Use the KGB tranquilizer dart skill in-combat.");
         if (lookupItem("kremlin's greatest briefcase").equipped_amount() == 0)
         {
 		    description.listAppend(HTMLGenerateSpanFont("Equip the briefcase first!", "red"));
