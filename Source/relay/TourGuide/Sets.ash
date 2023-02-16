@@ -20,7 +20,7 @@ void SetsGenerateResources(ChecklistEntry [int] resource_entries)
     SFaxGenerateResource(resource_entries);
     SClassesGenerateResource(resource_entries);
     SEquipmentGenerateResource(resource_entries);
-    S8bitRealmGenerateResource(resource_entries);
+//  S8bitRealmGenerateResource(resource_entries);
     SCalculateUniverseGenerateResource(resource_entries);
     SEventsGenerateResource(resource_entries);
 }
@@ -33,7 +33,7 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SCopiedMonstersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SAftercoreGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QHitsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	S8bitRealmGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+//	S8bitRealmGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SDailyDungeonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SCountersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SBountyHunterHunterGenerateTasks(task_entries, optional_task_entries, future_task_entries);

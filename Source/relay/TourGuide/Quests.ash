@@ -37,6 +37,7 @@ void QuestsInit()
     QOldLandfillInit();
     QMadnessBakeryInit();
     QManorInit();
+	Q8BitInit();
 }
 
 
@@ -79,6 +80,8 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QGalaktikGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QOldLandfillGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QMadnessBakeryGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+
+	Q8bitRealmGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] resource_entries)
