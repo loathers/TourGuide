@@ -52444,6 +52444,10 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     int whenTrainsetWasConfigured = get_property_int("lastTrainsetConfiguration");
     string[int] stations = split_string(get_property("trainsetConfiguration"), ",");
 
+    if (count(stations) < 8) {
+        description.listAppend("We can't tell how your trainset is configured. Click this tile to fix.");
+    }
+
     if (oreConfiguredWhenNotNeeded()) {
         description.listAppend(HTMLGenerateSpanFont("Have ore configured when it's not needed!", "red"));
     }
