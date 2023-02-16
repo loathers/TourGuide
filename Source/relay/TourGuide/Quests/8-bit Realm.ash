@@ -26,7 +26,7 @@ void Q8BitInit()
     state.state_int["currentScore"] = get_property_int("8BitScore");
 
     // Bonus zone is tracked via the 8BitColor pref; black/red/blue/green are the zone colors 
-    state.currentColor = get_property("8BitColor");
+    state.state_string["currentColor"] = get_property("8BitColor");
 
     // If you don't have the digital key, you need the digital key
     state.state_boolean["haveDigitalKey"] = $item[digital key].available_amount() > 0;
@@ -51,6 +51,9 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
     // Read in the information initialized in the quest initializer.
     QuestState base_quest_state = __quest_state["Digital Key"];
+
+    // Make it easier to reference currentColor
+    string currentColor = base_quest_state.state_string["currentColor"];
 
     // Do not generate tiles if you do not need the digital key anymore. Need to add the 
     //   commented bit back when I finish testing!!!
@@ -104,14 +107,20 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
     // Populate expected points in each zone
     int [string] expectedPoints;
+    int addedBonus;
+    int denominator;
+    int rawPoints;
+    boolean isCurrentZoneBonus;
 
     foreach key in helpfulModifier
-        int addedBonus = (currentColor == key ? 100 : 50)
-        int denominator = (currentColor == key ? 10 : 20)
-        int rawPoints = min(300, max(0, userModifier[key] - minimumToAddPoints[key]));
+    {
+        isCurrentZoneBonus = (currentColor == key);
+        addedBonus = (isCurrentZoneBonus ? 100 : 50);
+        denominator = (isCurrentZoneBonus ? 10 : 20);
+        rawPoints = min(300, max(0, userModifier[key] - minimumToAddPoints[key]));
 
         expectedPoints[key] = addedBonus + round(rawPoints/denominator) * 10;
-
+    }
     // Now that we have calculated everything, we can finally make the tile!
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
@@ -126,21 +135,21 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     {
         url = "place.php?whichplace=forestvillage&action=fv_mystic";
         image = "__item continuum transfunctioner";
-        subentry.entries.listAppend("Visit the crackpot mystic for your transfunctioner!")
+        subentry.entries.listAppend("Visit the crackpot mystic for your transfunctioner!");
     }
     else {
         // Establish easier shorthand for the active bonus modifier.
-        string activeMod = helpfulModifier[base_quest_state.currentColor];
+        string activeMod = helpfulModifier[currentColor];
         
         // Add nice shorthand text to the subentry w/ the stat to maximize.
-        if (activeMod = "Initiative") {modifiers.listAppend("+init")};
-        if (activeMod = "Meat Drop") {modifiers.listAppend("+meat")};
-        if (activeMod = "Damage Absorption") {modifiers.listAppend("+DA")};
-        if (activeMod = "Item Drop") {modifiers.listAppend("+item")};
+        if (activeMod == "Initiative") {modifiers.listAppend("+init");}
+        if (activeMod == "Meat Drop") {modifiers.listAppend("+meat");}
+        if (activeMod == "Damage Absorption") {modifiers.listAppend("+DA");}
+        if (activeMod == "Item Drop") {modifiers.listAppend("+item");}
 
         // Give descriptive information about the current zone.
-        subentry.entries.listAppend("Adventure in "+zoneMap[base_quest_state.currentColor]+" for maximum points!";)
-        subentry.entries.listAppend("Current expected points: "+expectedPoints[base_quest_state.currentColor];)
+        subentry.entries.listAppend("Adventure in "+zoneMap[currentColor]+" for maximum points!");
+        subentry.entries.listAppend("Current expected points: "+to_string(expectedPoints[currentColor]));
 
         if ($item[continuum transfunctioner].equipped_amount() == 0)
             url = "inventory.php?ftext=continuum+transfunctioner";
@@ -149,7 +158,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     // If the user is below level 5, probably have better things to be doing unless they're 
     //   already maxed out at the relevant bonus zone; ergo, shift the tile to "Future Tasks"
-    if (my_level() > 5 || expectedPoints[base_quest_state.currentColor] == 300)
+    if (my_level() > 5 || expectedPoints[currentColor] == 300)
 	    task_entries.listAppend(ChecklistEntryMake(image, url, subentry).ChecklistEntrySetIDTag("Digital Key Quest"));
     else 
         future_task_entries.listAppend(ChecklistEntryMake(image, url, subentry).ChecklistEntrySetIDTag("Digital Key Quest"));
@@ -218,7 +227,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 void S8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 {
     // This is still helpful, but literally only for KoE. Keep it just for KoE.
-    if (!my_path().id == PATH_KINGDOM_OF_EXPLOATHING)
+    if (my_path().id != PATH_KINGDOM_OF_EXPLOATHING)
         return;
     if (!__misc_state["in run"] && !__misc_state["Example mode"])
         return;
