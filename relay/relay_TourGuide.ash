@@ -52377,101 +52377,6 @@ void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 	
     resource_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", url, ChecklistSubentryMake("Pizza party with the Cookbookbat!", "", description)).ChecklistEntrySetIDTag("Cookbookbat Resource"));
 }
-
-// 2023
-string gravelMessage(int gravels)
-{
-    return HTMLGenerateSpanOfClass(gravels, "r_bold") + "x groveling gravel (free kill*)";
-}
-
-string whetStoneMessage(int whetStones)
-{
-    return HTMLGenerateSpanOfClass(whetStones, "r_bold") + "x whet stone (+1 adv on food)";
-}
-
-string milestoneMessage(int milestones)
-{
-    int desertProgress = get_property_int("desertExploration");
-    return HTMLGenerateSpanOfClass(milestones, "r_bold") + "x milestone (+5% desert progress), " + (100 - desertProgress) + "% remaining";
-}
-
-// Prompt to harvest your garden in run when useful items are growing in it
-RegisterTaskGenerationFunction("IOTMRockGardenGenerateTasks");
-void IOTMRockGardenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-    string [int] description;
-    string url = "campground.php";
-
-    int gardenGravels = __campground[$item[groveling gravel]];
-    int gardenMilestones = __campground[$item[milestone]];
-    int gardenWhetstones = __campground[$item[whet stone]];
-
-    if (!__iotms_usable[lookupItem("packet of rock seeds")] ||
-        !__misc_state["in run"] ||
-        my_path().id == PATH_COMMUNITY_SERVICE ||
-        gardenGravels + gardenMilestones + gardenWhetstones == 0)
-        return;
-
-    int desertProgress = get_property_int("desertExploration");
-
-    if (gardenGravels > 0)
-    {
-        description.listAppend(gravelMessage(gardenGravels));
-    }
-
-    if (gardenWhetstones > 0)
-    {
-        description.listAppend(whetStoneMessage(gardenWhetstones));
-    }
-
-    if (gardenMilestones > 0 && desertProgress < 100)
-    {
-        description.listAppend(milestoneMessage(gardenMilestones));
-    }
-
-    task_entries.listAppend(ChecklistEntryMake("__item rock garden guide", url, ChecklistSubentryMake("Harvest your rock garden", "", description)).ChecklistEntrySetIDTag("rock garden task"));
-}
-
-// Prompt to use garden resources when they're helpful
-RegisterResourceGenerationFunction("IOTMRockGardenGenerateResource");
-void IOTMRockGardenGenerateResource(ChecklistEntry [int] resource_entries) {
-    string [int] description;
-    string url = "campground.php";
-
-    if (!get_property_boolean("_molehillMountainUsed") && available_amount($item[molehill mountain]) > 0)
-    {
-        resource_entries.listAppend(ChecklistEntryMake("__item molehill mountain", url = "inventory.php?ftext=molehill+mountain", ChecklistSubentryMake("Molehill moleman", "", "Free scaling fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Molehill free fight"));
-    }
-
-    int availableGravels = available_amount($item[groveling gravel]);
-    int availableMilestones = available_amount($item[milestone]);
-    int availableWhetStones = available_amount($item[whet stone]);
-
-    // Ascension stuff
-    if (!__misc_state["in run"] ||
-        my_path().id == PATH_COMMUNITY_SERVICE ||
-        availableGravels + availableMilestones + availableWhetstones == 0)
-        return;
-
-    int desertProgress = get_property_int("desertExploration");
-
-    if (availableGravels > 0 && $item[groveling gravel].item_is_usable())
-    {
-        description.listAppend(gravelMessage(availableGravels));
-    }
-
-    if (availableWhetStones > 0 && $item[whet stone].item_is_usable() && (__misc_state["can eat just about anything"]))
-    {
-        description.listAppend(whetStoneMessage(availableWhetStones));
-    }
-
-    if (availableMilestones > 0 && $item[milestone].item_is_usable() && desertProgress < 100)
-    {
-        description.listAppend(milestoneMessage(availableMilestones));
-    }
-
-    resource_entries.listAppend(ChecklistEntryMake("__item rock garden guide", url, ChecklistSubentryMake("Rock garden resources", "", description)).ChecklistEntrySetIDTag("rock garden resource"));
-}
-
 string [string, string] stationDescriptions;
 
 int trainSetReconfigurableIn() {
@@ -52497,7 +52402,7 @@ boolean oreConfiguredWhenNotNeeded() {
         (to_item("asbestos ore").available_amount() >= 3 &&
          to_item("chrome ore").available_amount() >= 3 &&
          to_item("linoleum ore").available_amount() >= 3);
-    return oreConfigured && haveAllOreNeeded;
+    return __misc_state["in run"] && oreConfigured && haveAllOreNeeded;
 }
 
 boolean loggingMillConfiguredWhenNotNeeded() {
@@ -52506,7 +52411,7 @@ boolean loggingMillConfiguredWhenNotNeeded() {
 	int lumberNeeded = __quest_state["Level 9"].state_int["bridge lumber needed"];
     boolean haveAllPartsNeeded = __quest_state["Level 9"].mafia_internal_step > 1 ||
         (fastenersNeeded == 0 && lumberNeeded == 0);
-    return loggingMillConfigured && haveAllPartsNeeded;
+    return __misc_state["in run"] && loggingMillConfigured && haveAllPartsNeeded;
 }
 
 boolean statsConfiguredWhenNotNeeded() {
@@ -52514,8 +52419,8 @@ boolean statsConfiguredWhenNotNeeded() {
         (stationConfigured("brawn_silo") && my_primestat() == $stat[muscle]) ||
         (stationConfigured("brain_silo") && my_primestat() == $stat[mysticality]) ||
         (stationConfigured("groin_silo") && my_primestat() == $stat[moxie]);
-    boolean haveAllStatsNeeded = my_level() >= 13 && __misc_state["in run"];
-    return statsConfigured && haveAllStatsNeeded;
+    boolean haveAllStatsNeeded = my_level() >= 13;
+    return  __misc_state["in run"] && statsConfigured && haveAllStatsNeeded;
 }
 
 boolean shouldNag() {
@@ -52538,6 +52443,10 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     int trainPosition = get_property_int("trainsetPosition");
     int whenTrainsetWasConfigured = get_property_int("lastTrainsetConfiguration");
     string[int] stations = split_string(get_property("trainsetConfiguration"), ",");
+
+    if (count(stations) < 8) {
+        description.listAppend("We can't tell how your trainset is configured. Click this tile to fix.");
+    }
 
     if (oreConfiguredWhenNotNeeded()) {
         description.listAppend(HTMLGenerateSpanFont("Have ore configured when it's not needed!", "red"));
@@ -52672,6 +52581,137 @@ stationDescriptions = {
         "description": "Get some ore",
     }
 };
+
+
+// 2023
+string gravelMessage(int gravels)
+{
+    return HTMLGenerateSpanOfClass(gravels, "r_bold") + "x groveling gravel (free kill*)";
+}
+
+string whetStoneMessage(int whetStones)
+{
+    return HTMLGenerateSpanOfClass(whetStones, "r_bold") + "x whet stone (+1 adv on food)";
+}
+
+string milestoneMessage(int milestones)
+{
+    int desertProgress = get_property_int("desertExploration");
+    return HTMLGenerateSpanOfClass(milestones, "r_bold") + "x milestone (+5% desert progress), " + (100 - desertProgress) + "% remaining";
+}
+
+// Prompt to harvest your garden in run when useful items are growing in it
+RegisterTaskGenerationFunction("IOTMRockGardenGenerateTasks");
+void IOTMRockGardenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+    string [int] description;
+    string url = "campground.php";
+
+    int gardenGravels = __campground[$item[groveling gravel]];
+    int gardenMilestones = __campground[$item[milestone]];
+    int gardenWhetstones = __campground[$item[whet stone]];
+
+    if (!__iotms_usable[lookupItem("packet of rock seeds")] ||
+        !__misc_state["in run"] ||
+        my_path().id == PATH_COMMUNITY_SERVICE ||
+        gardenGravels + gardenMilestones + gardenWhetstones == 0)
+        return;
+
+    int desertProgress = get_property_int("desertExploration");
+
+    if (gardenGravels > 0)
+    {
+        description.listAppend(gravelMessage(gardenGravels));
+    }
+
+    if (gardenWhetstones > 0)
+    {
+        description.listAppend(whetStoneMessage(gardenWhetstones));
+    }
+
+    if (gardenMilestones > 0 && desertProgress < 100)
+    {
+        description.listAppend(milestoneMessage(gardenMilestones));
+    }
+
+    task_entries.listAppend(ChecklistEntryMake("__item rock garden guide", url, ChecklistSubentryMake("Harvest your rock garden", "", description)).ChecklistEntrySetIDTag("rock garden task"));
+}
+
+// Prompt to use garden resources when they're helpful
+RegisterResourceGenerationFunction("IOTMRockGardenGenerateResource");
+void IOTMRockGardenGenerateResource(ChecklistEntry [int] resource_entries) {
+    string [int] description;
+    string url = "campground.php";
+
+    if (!get_property_boolean("_molehillMountainUsed") && available_amount($item[molehill mountain]) > 0)
+    {
+        resource_entries.listAppend(ChecklistEntryMake("__item molehill mountain", url = "inventory.php?ftext=molehill+mountain", ChecklistSubentryMake("Molehill moleman", "", "Free scaling fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Molehill free fight"));
+    }
+
+    int availableGravels = available_amount($item[groveling gravel]);
+    int availableMilestones = available_amount($item[milestone]);
+    int availableWhetStones = available_amount($item[whet stone]);
+
+    // Ascension stuff
+    if (!__misc_state["in run"] ||
+        my_path().id == PATH_COMMUNITY_SERVICE ||
+        availableGravels + availableMilestones + availableWhetstones == 0)
+        return;
+
+    int desertProgress = get_property_int("desertExploration");
+
+    if (availableGravels > 0 && $item[groveling gravel].item_is_usable())
+    {
+        description.listAppend(gravelMessage(availableGravels));
+    }
+
+    if (availableWhetStones > 0 && $item[whet stone].item_is_usable() && (__misc_state["can eat just about anything"]))
+    {
+        description.listAppend(whetStoneMessage(availableWhetStones));
+    }
+
+    if (availableMilestones > 0 && $item[milestone].item_is_usable() && desertProgress < 100)
+    {
+        description.listAppend(milestoneMessage(availableMilestones));
+    }
+
+    resource_entries.listAppend(ChecklistEntryMake("__item rock garden guide", url, ChecklistSubentryMake("Rock garden resources", "", description)).ChecklistEntrySetIDTag("rock garden resource"));
+}
+
+boolean hasAnySkillOf(string [int] skillNames) {
+    foreach i in skillNames {
+        string skillName = skillNames[i];
+        if (lookupSkill(skillName).have_skill()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Prompt to register which SIT course you took
+RegisterTaskGenerationFunction("IOTMSITCertificateGenerateTasks");
+void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+    if (!lookupItem("S.I.T. Course Completion Certificate").have())
+        return;
+
+    // Nag if we haven't picked a skill during this ascension    
+    string [int] skillNames = {"Psychogeologist", "Insectologist", "Cryptobotanist"};
+    if (hasAnySkillOf(skillNames)) {
+        return;
+    }
+
+    string [int] description;
+    string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem=11116";
+    string main_title = "S.I.T. Course Enrollment";
+
+    string [int] miscPhrases = {
+        "Don't play hooky!",
+        "You already paid for it.",
+        "This one time in college...",
+    };
+    string miscPhrase = miscPhrases[random(count(miscPhrases))];
+    description.listAppend(HTMLGenerateSpanFont(miscPhrase + " Take your S.I.T. course!", "red"));
+    task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
+}
 
 
 
