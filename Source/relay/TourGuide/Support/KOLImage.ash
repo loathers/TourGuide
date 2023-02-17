@@ -281,6 +281,8 @@ static
         building_images["Jick"] = KOLImageMake("images/otherimages/customavatars/1.gif", Vec2iMake(60,100));
         building_images["Superhuman Cocktailcrafting"] = KOLImageMake("images/itemimages/fruitym.gif", Vec2iMake(30,30));
         
+        // this door is more different, somehow
+        building_images["new and improved door"] = KOLImageMake("images/otherimages/woods/8bitdoor3.gif", Vec2iMake(100,100), RectMake(10, 38, 85, 99));
         building_images["inexplicable door"] = KOLImageMake("images/otherimages/woods/8bitdoor.gif", Vec2iMake(100,100), RectMake(15, 43, 85, 99));
         building_images["Dungeons of Doom"] = KOLImageMake("images/otherimages/town/ddoom.gif", Vec2iMake(100,100), RectMake(31, 33, 68, 99));
         

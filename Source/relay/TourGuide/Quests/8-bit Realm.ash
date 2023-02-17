@@ -15,12 +15,13 @@ void Q8BitInit()
     if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 
     // Finish this quest tile if you are no longer in-run. Currently commented for testing.
-    // if (!__misc_state["in run"]) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (!__misc_state["in run"]) QuestStateParseMafiaQuestPropertyValue(state, "finished");
 
     // Establish basic information for tile generation
     state.quest_name = "Digital Key Quest";
     // state.image_name = "__item digital key"; // digital key was my O.G. pick but door is better 
-    state.image_name = "inexplicable door";
+    // state.image_name = "inexplicable door";
+    state.image_name = "new and improved door";
     state.council_quest = true;
 
     // Total 8-bit score
@@ -105,7 +106,9 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     zoneMap["blue"] = "Megalo-City";
     zoneMap["green"] = "Hero's Field";
 
-    // Storing this so the tile can tell which zone is next.
+    // Storing this so the tile can tell which zone is next. This made me realize that I, like a
+    //   fool, ordered every one of these black/red/blue/green instead of the actual order of 
+    //   black/blue/green/red. Sorry, mom. Sorry, college.
     string [string] nextColor;
 
     nextColor["black"] = "blue";
@@ -115,7 +118,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
     int [string] turnsInZone;
     
-    // I do not like using turnsSpent; it has weird behavior w/ freeruns. Best we got tho!
+    // I do not like using turnsSpent; it has weird behavior w/ freeruns. Best we got tho! :-(
     foreach key in helpfulModifier
         turnsInZone[key] = to_location(zoneMap[key]).turns_spent;
 
@@ -170,7 +173,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
         // Establish easier shorthand for the active bonus modifier.
         string activeMod = helpfulModifier[currentColor];
-        string neededModifier = to_string(minimumToAddPoints[currentColor]);
+        string neededModifier = to_string(minimumToAddPoints[currentColor]+300);
         
         // Add nice shorthand text to the subentry w/ the stat to maximize.
         if (activeMod == "Initiative") {subentry.modifiers.listAppend("+"+neededModifier+"% init");}
@@ -192,10 +195,10 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             subentry.entries.listAppend("Current expected points: "+to_string(expectedPoints[currentColor]));
 
             string percentCharacter = (activeMod != "Damage Absorption" ? "%" : "");
-            string fractionNeeded = to_string(userModifier[currentColor])+percentCharacter+" of "+ to_string(minimumToAddPoints[currentColor]+300)+percentCharacter;
+            string modifierNeededText = to_string(minimumToAddPoints[currentColor]+300 - userModifier[currentColor])+percentCharacter;
 
             string buffUpLine = "Consider buffing <b>"+HTMLGenerateSpanFont(helpfulModifier[currentColor], currentColor)+"</b> for more points.";
-            buffUpLine += "|*Currently at "+fractionNeeded+" needed "+helpfulModifier[currentColor]+".";
+            buffUpLine += "|*You need "+modifierNeededText+" more for max points.";
             subentry.entries.listAppend(buffUpLine);
         }
         
@@ -213,18 +216,20 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
     entry.subentries.listAppend(subentry);
 
-    // Add small subentry near the end w/ current score!
-    ChecklistSubentry keyCompletionSubentry;
+    // Add small subentry near the end w/ current score! But only add it if they have their transfunctioner.
+    if (base_quest_state.started) {
+        ChecklistSubentry keyCompletionSubentry;
     
-    keyCompletionSubentry.header = "Projected Key Completion";
-    keyCompletionSubentry.modifiers.listAppend("Current Score: "+to_string(base_quest_state.state_int["currentScore"])+" of 10000");
-    keyCompletionSubentry.entries.listAppend("If you max your bonus, you'll have your key in "+pluralise((10000-round(base_quest_state.state_int["currentScore"]))/400," more turn","more turns"));
-    entry.subentries.listAppend(keyCompletionSubentry);
+        keyCompletionSubentry.header = "Projected Key Completion";
+        keyCompletionSubentry.modifiers.listAppend("Current Score: "+to_string(base_quest_state.state_int["currentScore"])+" of 10000");
+        keyCompletionSubentry.entries.listAppend("If you max your bonus, you'll have your key in "+pluralise((10000-round(base_quest_state.state_int["currentScore"]))/400," more turn","more turns"));
+        entry.subentries.listAppend(keyCompletionSubentry);
+    }
     
     // If the user is below level 5, probably have better things to be doing unless they're 
     //   already maxed out at the relevant bonus zone; ergo, shift the tile to "Future Tasks"
     
-    if (my_level() > 5 || expectedPoints[currentColor] == 300)
+    if (my_level() > 5 || expectedPoints[currentColor] == 400)
 	    task_entries.listAppend(entry);
     else 
         future_task_entries.listAppend(entry);
