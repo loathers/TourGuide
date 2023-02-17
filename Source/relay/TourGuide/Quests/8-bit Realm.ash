@@ -53,10 +53,8 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     // Read in the information initialized in the quest initializer.
     QuestState base_quest_state = __quest_state["Digital Key"];
 
-    // Do not generate tiles if you do not need the digital key anymore. Need to add the 
-    //   commented bit back when I finish testing!!!
-
-    // if (base_quest_state.finished) { return }
+    // Do not generate tiles if you do not need the digital key anymore.
+    if (base_quest_state.finished) { return }
 
     // Because I'm doing nested subentries, the broader quest is a ChecklistEntry.
     ChecklistEntry entry;
@@ -218,7 +216,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         subentry.entries.listAppend("In "+pluralise(bonusTurnsRemaining, "more fight", "more fights")+", bonus zone will be <b>"+HTMLGenerateSpanFont(zoneMap[nextColor[currentColor]],nextColor[currentColor])+"</b>.");
 
         if (highestPointColor != currentColor) {
-            subentry.entries.listAppend("Alternate Route:|*"+HTMLGenerateSpanFont("At current stats, you'd earn <b>"+expectedPoints[highestPointColor]+" points</b> per fight at <b>"+zoneMap[highestPointColor]+"</b>. Only do this if you can't buff higher.","gray"));
+            subentry.entries.listAppend("Alternate Route:|*"+HTMLGenerateSpanFont("At current stats, you'd earn <b>"+expectedPoints[highestPointColor]+" points</b> per fight at <b>"+zoneMap[highestPointColor]+"</b>. Not recommended!","gray"));
         }
 
         // If they don't have the transfunctioner equipped, equip it and change the URL.
@@ -270,8 +268,8 @@ void Q8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
     //   hide the tile if they don't like it.
     
     // ... though even I can't pretend we want this in aftercore, lol
-    // if (!__misc_state["in run"] || !in_ronin())
-    //     return;
+    if (!__misc_state["in run"] || !in_ronin())
+        return;
 
     // Comment originally from Ezandora noting good things in the pixel shop:
     //   - Blue pixel potion - [50,80] MP restore
@@ -345,6 +343,7 @@ void Q8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
         if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING)
             url = "shop.php?whichshop=exploathing";
         string [int] options;
+        // I had a change of heart and kept it for normal runs too. Dreams can come true.
         if (__quest_state["Digital Key"].state_int["currentScore"] > 9999) {
             options.listAppend("Visit 8-bit Realm's Treasure House and claim your key!");
         } else if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING) { 
