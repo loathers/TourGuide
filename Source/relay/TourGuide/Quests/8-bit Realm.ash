@@ -191,8 +191,8 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             // If the user is not at maximum, point out what they need to buff.
             subentry.entries.listAppend("Current expected points: "+to_string(expectedPoints[currentColor]));
 
-            string percentCharacter = (activeMod != "Damage Absorption" ? "?" : "");
-            string fractionNeeded = to_string(userModifier[currentColor])+percentCharacter+"/"+ to_string(minimumToAddPoints[currentColor]+300)+percentCharacter;
+            string percentCharacter = (activeMod != "Damage Absorption" ? "%" : "");
+            string fractionNeeded = to_string(userModifier[currentColor])+percentCharacter+" of "+ to_string(minimumToAddPoints[currentColor]+300)+percentCharacter;
 
             string buffUpLine = "Consider buffing <b>"+HTMLGenerateSpanFont(helpfulModifier[currentColor], currentColor)+"</b> for more points.";
             buffUpLine += "|*Currently at "+fractionNeeded+" needed "+helpfulModifier[currentColor]+".";
