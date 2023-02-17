@@ -148,14 +148,15 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
 
     // Figure out if the user is better-suited to adventure elsewhere.
-    string highestPointColor;
+    string highestPointColor = currentColor;
 
-    foreach key, value in expectedPoints
+    foreach key, value in expectedPoints {
         if (value > expectedPoints[currentColor]) {
             if (value > expectedPoints[highestPointColor]) {
                 highestPointColor = key;
             }
         }
+    }
 
     // Now that we have calculated everything, we can finally make the tile! Before the very 
     //   detailed subentry, we have a quick statement of what the quest wants you to do. We
