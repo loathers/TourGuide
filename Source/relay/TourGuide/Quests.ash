@@ -88,4 +88,5 @@ void QuestsGenerateResources(ChecklistEntry [int] resource_entries)
 {
     QSpookyravenLightsOutGenerateResource(resource_entries);
     QAirportGenerateResource(resource_entries);
+	Q8bitRealmGenerateResource(resource_entries);
 }
