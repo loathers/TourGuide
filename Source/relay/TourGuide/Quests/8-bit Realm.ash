@@ -149,10 +149,20 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         expectedPoints[key] = addedBonus + round(rawPoints/denominator) * 10;
     }
 
+    // Figure out if the user is better-suited to adventure elsewhere.
+    string highestPointColor;
+
+    foreach key, value in expectedPoints
+        if (value > expectedPoints[currentColor]) {
+            if (value > expectedPoints[highestPointColor]) {
+                highestPointColor = key;
+            }
+        }
+
     // Now that we have calculated everything, we can finally make the tile! Before the very 
     //   detailed subentry, we have a quick statement of what the quest wants you to do. We
     //   do this by adding to the subentries[0] guy.
-    entry.subentries[0].entries.listAppend("Gain "+pluralise(10000-base_quest_state.state_int["currentScore"], "more point","more points")+" to get your digital key.");
+    entry.subentries[0].entries.listAppend("Gain "+pluralise(max(10000-base_quest_state.state_int["currentScore"],0), "more point","more points")+" to get your digital key.");
 
     // OK, now we make our subentry for the bonus zone.
 	ChecklistSubentry subentry;
@@ -166,7 +176,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         entry.image_lookup_name = "__item continuum transfunctioner";
         subentry.entries.listAppend("Visit the crackpot mystic for your transfunctioner.");
     }
-    else {
+    else if (base_quest_state.state_int["currentScore"] < 10000) {
         
 	    subentry.header = "BONUS ZONE: "+zoneMap[currentColor]+" ("+pluralise(bonusTurnsRemaining, "more fight", "more fights")+")";
 
@@ -207,6 +217,10 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         // In both cases, show the # of turns remaining of bonus in this zone.
         subentry.entries.listAppend("In "+pluralise(bonusTurnsRemaining, "more fight", "more fights")+", bonus zone will be <b>"+HTMLGenerateSpanFont(zoneMap[nextColor[currentColor]],nextColor[currentColor])+"</b>.");
 
+        if (highestPointColor != currentColor) {
+            subentry.entries.listAppend("(If you really can't buff up more, you'd earn "+expectedPoints[highestPointColor]+" points per turn with your current buffs at "+zoneMap[highestPointColor]+")");
+        }
+
         // If they don't have the transfunctioner equipped, equip it and change the URL.
         if ($item[continuum transfunctioner].equipped_amount() == 0) 
         {
@@ -224,7 +238,16 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
         keyCompletionSubentry.header = "Projected Key Completion";
         keyCompletionSubentry.modifiers.listAppend("Current Score: "+to_string(base_quest_state.state_int["currentScore"])+" of 10000");
-        keyCompletionSubentry.entries.listAppend("If you max your bonus, you'll have your key in "+pluralise((10000-round(base_quest_state.state_int["currentScore"]))/400," more turn","more turns"));
+        
+        if (base_quest_state.state_int["currentScore"] < 10000) 
+        {
+            keyCompletionSubentry.entries.listAppend("If you max your bonus, you'll have your key in "+pluralise((10000-round(base_quest_state.state_int["currentScore"]))/400," more turn","more turns"));
+        } 
+        else 
+        {
+            keyCompletionSubentry.entries.listAppend("Woah, 10000 points??? That's this life's high score!");
+            keyCompletionSubentry.entries.listAppend("Visit the <b>Treasure House</b> to claim your hard-earned Digital Key.");
+        }
         entry.subentries.listAppend(keyCompletionSubentry);
     }
     
