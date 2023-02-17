@@ -62,9 +62,9 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     entry.url = "place.php?whichplace=8bit";
     entry.image_lookup_name = base_quest_state.image_name;
     entry.tags.id = "Digital Key Pixels 8bit L13";
-    entry.shoud_indent_after_first_subentry = true;
+    entry.should_indent_after_first_subentry = true;
     entry.subentries.listAppend(ChecklistSubentryMake(base_quest_state.quest_name));
-    entry.should_highlight = $locations[Vanya's Castle, The Fungus Plains, Megalo City, Hero's Field] contains __last_adventure_location;
+    entry.should_highlight = $locations[Vanya's Castle, The Fungus Plains, Megalo-City, Hero's Field] contains __last_adventure_location;
 
     // NOTE: Technically speaking, I think some of this probably -should- be in the Q8BitInit()
     //   function. However, I like the fact that this lets me read in currentColor as an index
@@ -99,7 +99,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
     zoneMap["black"] = "Vanya's Castle";
     zoneMap["red"] = "The Fungus Plains";
-    zoneMap["blue"] ="Megalo City";
+    zoneMap["blue"] = "Megalo-City";
     zoneMap["green"] = "Hero's Field";
 
     int [string] turnsInZone;
@@ -139,7 +139,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     // Now that we have calculated everything, we can finally make the tile! Before the very 
     //   detailed subentry, we have a quick statement of what the quest wants you to do. We
     //   do this by adding to the subentries[0] guy.
-    entry.subentries[0].entries.listAppend("Gain 10000 points to get your digital key.")
+    entry.subentries[0].entries.listAppend("Gain 10000 points to get your digital key.");
 
     // OK, now we make our subentry for the bonus zone.
 	ChecklistSubentry subentry;
@@ -148,9 +148,9 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     //   in the right order, even if our finishing reassignment in QuestInit doesn't work.
     if (!base_quest_state.started)
     {
-        subentry.header = "Go listen to a crackpot!"
+        subentry.header = "Go listen to a crackpot!";
         entry.url = "place.php?whichplace=forestvillage&action=fv_mystic";
-        entry.image = "__item continuum transfunctioner";
+        entry.image_lookup_name = "__item continuum transfunctioner";
         subentry.entries.listAppend("Visit the crackpot mystic for your transfunctioner.");
     }
     else {
@@ -167,29 +167,40 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (activeMod == "Item Drop") {subentry.modifiers.listAppend("+item");}
 
         // Give descriptive information about the current zone.
-        if (expectedPoints[currentColor] == 300)
+        if (expectedPoints[currentColor] == 400)
         {
             // If the user is at maximum, color the tile a bit and be merry.
             subentry.entries.listAppend(HTMLGenerateSpanFont("<b>MAXIMUM POINTS!</b>",currentColor));
-            subentry.entries.listAppend("Adventure in "+HTMLGenerateSpanFont("<b>"+zoneMap[currentColor]+"</b>",currentColor)+" for 300 points per turn!");
+            subentry.entries.listAppend("Adventure in "+HTMLGenerateSpanFont("<b>"+zoneMap[currentColor]+"</b>", currentColor)+" for 400 points per turn!");
         }
         else
         {
             // If the user is not at maximum, point out what they need to buff.
             subentry.entries.listAppend("Current expected points: "+to_string(expectedPoints[currentColor]));
-            subentry.entries.listAppend("Consider buffing "+helpfulModifier[currentColor]+" for more points.");
+            subentry.entries.listAppend("Consider buffing <b>"+HTMLGenerateSpanFont(helpfulModifier[currentColor], currentColor)+"</b> for more points.");
         }
         
         // In both cases, show the # of turns remaining of bonus in this zone.
-        subentry.entries.listAppend(zoneMap[currentColor]+" will be the bonus zone for "+to_string(bonusTurnsRemaining)+" more"+pluralise(bonusTurnsRemaining, "turn", "turns"))
+        subentry.entries.listAppend(zoneMap[currentColor]+" will be the bonus zone for "+pluralise(bonusTurnsRemaining, "more turn", "more turns"));
 
         // If they don't have the transfunctioner equipped, equip it and change the URL.
-        if ($item[continuum transfunctioner].equipped_amount() == 0)
+        if ($item[continuum transfunctioner].equipped_amount() == 0) 
+        {
             entry.url = "inventory.php?ftext=continuum+transfunctioner";
             subentry.entries.listAppend(HTMLGenerateSpanFont("Equip your transfunctioner to access the realm.", "red"));
+
+        }
     }
 
     entry.subentries.listAppend(subentry);
+
+    // Add small subentry near the end w/ current score!
+    ChecklistSubentry keyCompletionSubentry;
+    
+    keyCompletionSubentry.header = "Projected Key Completion";
+    keyCompletionSubentry.modifiers.listAppend("Current Score: "+to_string(base_quest_state.state_int["currentScore"])+" of 10000");
+    keyCompletionSubentry.entries.listAppend("If you max your bonus, you'll have your key in "+pluralise((10000-round(base_quest_state.state_int["currentScore"]))/400," more turn","more turns"));
+    entry.subentries.listAppend(keyCompletionSubentry);
     
     // If the user is below level 5, probably have better things to be doing unless they're 
     //   already maxed out at the relevant bonus zone; ergo, shift the tile to "Future Tasks"
