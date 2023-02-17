@@ -19,9 +19,8 @@ void Q8BitInit()
 
     // Establish basic information for tile generation
     state.quest_name = "Digital Key Quest";
-    // state.image_name = "__item digital key"; // digital key was my O.G. pick but door is better 
+    state.image_name = "__item digital key"; // if the bespoke logic fails 
     // state.image_name = "inexplicable door";
-    state.image_name = "new and improved door";
     state.council_quest = true;
 
     // Total 8-bit score
@@ -170,6 +169,9 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     else {
         
 	    subentry.header = "BONUS ZONE: "+zoneMap[currentColor]+" ("+pluralise(bonusTurnsRemaining, "more fight", "more fights")+")";
+
+        // Modify the overarching image to match the current zone.
+        entry.image_lookup_name = zoneMap[currentColor];
 
         // Establish easier shorthand for the active bonus modifier.
         string activeMod = helpfulModifier[currentColor];
