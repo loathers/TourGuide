@@ -9,7 +9,6 @@ import "relay/TourGuide/Sets/Council.ash";
 import "relay/TourGuide/Sets/Copied Monsters.ash";
 import "relay/TourGuide/Sets/Pulverise.ash";
 import "relay/TourGuide/Sets/Aftercore.ash";
-import "relay/TourGuide/Sets/8-bit Realm.ash";
 import "relay/TourGuide/Sets/Daily Dungeon.ash";
 import "relay/TourGuide/Sets/Counters.ash";
 import "relay/TourGuide/Sets/Bounty Hunter Hunter.ash";

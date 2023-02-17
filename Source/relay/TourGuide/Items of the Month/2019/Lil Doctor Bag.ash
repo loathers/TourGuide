@@ -85,7 +85,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(HTMLGenerateSpanFont("Equip the Lil' Doctor™ bag first", "red"));
             url = "inventory.php?ftext=lil'+doctor";
         } else {
-            description.listAppend("Free run/banish");
+            description.listAppend("Free run, 30-turn banish.");
         }
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Lil doctor bag reflex hammer banish"));
     }

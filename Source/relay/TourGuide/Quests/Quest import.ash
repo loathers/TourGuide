@@ -32,4 +32,5 @@ import "relay/TourGuide/Quests/Meatsmith.ash";
 import "relay/TourGuide/Quests/Intergalaktik.ash";
 import "relay/TourGuide/Quests/Old Landfill.ash";
 import "relay/TourGuide/Quests/Madness Bakery.ash";
+import "relay/TourGuide/Quests/8-bit Realm.ash";
 

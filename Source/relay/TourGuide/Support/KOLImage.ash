@@ -76,6 +76,10 @@ static
     
     void initialiseConstantKOLImages()
     {
+        // One note. In order to figure out RectMake here, you open up the respective images in an image editing program
+        //   and figure out X/Y coordinates. I believe it's Xmin, Ymin, Xmax, Ymax. This is generally better than most
+        //   other possible bespoke solutions. Thanks once again go to Ezandora, the queen of human civilization.
+        
         KOLimage [string] building_images;
         building_images["typical tavern"] = KOLImageMake("images/otherimages/woods/tavern0.gif", Vec2iMake(100,100), RectMake(0,39,99,97));
         building_images["boss bat"] = KOLImageMake("images/adventureimages/bossbat.gif", Vec2iMake(100,100), RectMake(0,27,99,74));
@@ -281,6 +285,12 @@ static
         building_images["Jick"] = KOLImageMake("images/otherimages/customavatars/1.gif", Vec2iMake(60,100));
         building_images["Superhuman Cocktailcrafting"] = KOLImageMake("images/itemimages/fruitym.gif", Vec2iMake(30,30));
         
+        // Big thanks to Beldur for looking up the right dimensions. A true king of kings.
+        building_images["Vanya's Castle"] = KOLImageMake("images/otherimages/8bitrealm.gif", Vec2iMake(400,400), RectMake(285,115,400,207));
+        building_images["Megalo-City"] = KOLImageMake("images/otherimages/8bitrealm.gif", Vec2iMake(400,400), RectMake(227,0,310,99));
+        building_images["The Fungus Plains"] = KOLImageMake("images/otherimages/8bitrealm.gif", Vec2iMake(400,400), RectMake(290,250,386,315));
+        building_images["Hero's Field"] = KOLImageMake("images/otherimages/8bitrealm.gif", Vec2iMake(400,400), RectMake(64,17,178,117));
+
         building_images["inexplicable door"] = KOLImageMake("images/otherimages/woods/8bitdoor.gif", Vec2iMake(100,100), RectMake(15, 43, 85, 99));
         building_images["Dungeons of Doom"] = KOLImageMake("images/otherimages/town/ddoom.gif", Vec2iMake(100,100), RectMake(31, 33, 68, 99));
         
