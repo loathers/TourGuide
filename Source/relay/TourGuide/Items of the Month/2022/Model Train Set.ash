@@ -67,6 +67,8 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 
     if (count(stations) < 8) {
         description.listAppend("We can't tell how your trainset is configured. Click this tile to fix.");
+        task_entries.listAppend(ChecklistEntryMake("__item toy crazy train", url, ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("Model train set"));
+        return;
     }
 
     if (oreConfiguredWhenNotNeeded()) {
