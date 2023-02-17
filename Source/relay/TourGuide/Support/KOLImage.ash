@@ -76,6 +76,10 @@ static
     
     void initialiseConstantKOLImages()
     {
+        // One note. In order to figure out RectMake here, you open up the respective images in an image editing program
+        //   and figure out X/Y coordinates. I believe it's Xmin, Ymin, Xmax, Ymax. This is generally better than most
+        //   other possible bespoke solutions. Thanks once again go to Ezandora, the queen of human civilization.
+        
         KOLimage [string] building_images;
         building_images["typical tavern"] = KOLImageMake("images/otherimages/woods/tavern0.gif", Vec2iMake(100,100), RectMake(0,39,99,97));
         building_images["boss bat"] = KOLImageMake("images/adventureimages/bossbat.gif", Vec2iMake(100,100), RectMake(0,27,99,74));

@@ -218,7 +218,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         subentry.entries.listAppend("In "+pluralise(bonusTurnsRemaining, "more fight", "more fights")+", bonus zone will be <b>"+HTMLGenerateSpanFont(zoneMap[nextColor[currentColor]],nextColor[currentColor])+"</b>.");
 
         if (highestPointColor != currentColor) {
-            subentry.entries.listAppend("At current stats, you'd earn "+expectedPoints[highestPointColor]+" points per fight at "+zoneMap[highestPointColor]+".");
+            subentry.entries.listAppend(HTMLGenerateSpanFont("At current stats, you'd earn <b>"+expectedPoints[highestPointColor]+" points</b> per fight at <b>"+zoneMap[highestPointColor]+"</b>.","gray"));
         }
 
         // If they don't have the transfunctioner equipped, equip it and change the URL.
@@ -269,21 +269,26 @@ void Q8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
     //   get black pixels. It might be slightly annoying for some speedrunners, but they can just
     //   hide the tile if they don't like it.
     
+    // ... though even I can't pretend we want this in aftercore, lol
     // if (!__misc_state["in run"] || !in_ronin())
     //     return;
 
     // Comment originally from Ezandora noting good things in the pixel shop:
     //   - Blue pixel potion - [50,80] MP restore
     //   - monster bait - +5% combat
-    //   - pixel sword - ? - +15% init
+    //   - pixel sword - +15% init
     //   - red pixel potion - [100,120] HP restore - the shadow knows
     //   - pixel whip - useful against vampires
 
     string [item] craftables;
     int [item] max_craftables_wanted;
+    craftables[$item[pixel bread]] = "+50% meat";
+    craftables[$item[pixel whiskey]] = "+50% item";
     craftables[$item[blue pixel potion]] = "~65 MP restore";
     craftables[$item[monster bait]] = "+5% combat";
     max_craftables_wanted[$item[monster bait]] = 1;
+
+    // Only generate red pixels if you need them for tower healing. They sell like shit.
     if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
         craftables[$item[red pixel potion]] = "~110 HP restore; good for shadow";
     if ($locations[dreadsylvanian castle,the spooky forest,The Haunted Sorority House,The Daily Dungeon] contains __last_adventure_location) //known vampire locations. it's perfectly reasonable to test against the sorority house, here in 2023
@@ -318,8 +323,8 @@ void Q8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] crafting_list = crafting_list_have;
         crafting_list.listAppendList(crafting_list_cannot);
-        string pixels_have = "Pixel crafting";
-        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10).ChecklistEntrySetIDTag("Crackpot mystic pixel crafting resource"));
+        string pixels_have = "Craft a few Pixel sundries";
+        resource_entries.listAppend(ChecklistEntryMake("__item red pixel potion", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10).ChecklistEntrySetIDTag("Crackpot mystic pixel crafting resource"));
     }
 }
 
