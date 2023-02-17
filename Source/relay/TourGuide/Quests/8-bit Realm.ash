@@ -19,7 +19,8 @@ void Q8BitInit()
 
     // Establish basic information for tile generation
     state.quest_name = "Digital Key Quest";
-    state.image_name = "__item digital key";
+    // state.image_name = "__item digital key"; // digital key was my O.G. pick but door is better 
+    state.image_name = "inexplicable door";
     state.council_quest = true;
 
     // Total 8-bit score
@@ -94,6 +95,8 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     minimumToAddPoints["blue"] = 300;
     minimumToAddPoints["green"] = 100;
 
+    // NOTE: to get to the max point, you add 300 to any of the minimumToAddPoints lol
+
     // Mapping zones for fun and profit, but mostly to make future things easier.
     string [string] zoneMap;
 
@@ -101,6 +104,14 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     zoneMap["red"] = "The Fungus Plains";
     zoneMap["blue"] = "Megalo-City";
     zoneMap["green"] = "Hero's Field";
+
+    // Storing this so the tile can tell which zone is next.
+    string [string] nextColor;
+
+    nextColor["black"] = "blue";
+    nextColor["red"] = "black";
+    nextColor["blue"] = "green";
+    nextColor["green"] = "red";
 
     int [string] turnsInZone;
     
@@ -139,7 +150,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     // Now that we have calculated everything, we can finally make the tile! Before the very 
     //   detailed subentry, we have a quick statement of what the quest wants you to do. We
     //   do this by adding to the subentries[0] guy.
-    entry.subentries[0].entries.listAppend("Gain 10000 points to get your digital key.");
+    entry.subentries[0].entries.listAppend("Gain "+pluralise(10000-base_quest_state.state_int["currentScore"], "more point","more points")+" to get your digital key.");
 
     // OK, now we make our subentry for the bonus zone.
 	ChecklistSubentry subentry;
@@ -155,16 +166,18 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     else {
         
-	    subentry.header = "BONUS ZONE: "+zoneMap[currentColor];
+	    subentry.header = "BONUS ZONE: "+zoneMap[currentColor]+" ("+pluralise(bonusTurnsRemaining, "more fight", "more fights")+")";
 
         // Establish easier shorthand for the active bonus modifier.
         string activeMod = helpfulModifier[currentColor];
+        string neededModifier = to_string(minimumToAddPoints[currentColor]);
         
         // Add nice shorthand text to the subentry w/ the stat to maximize.
-        if (activeMod == "Initiative") {subentry.modifiers.listAppend("+init");}
-        if (activeMod == "Meat Drop") {subentry.modifiers.listAppend("+meat");}
-        if (activeMod == "Damage Absorption") {subentry.modifiers.listAppend("+DA");}
-        if (activeMod == "Item Drop") {subentry.modifiers.listAppend("+item");}
+        if (activeMod == "Initiative") {subentry.modifiers.listAppend("+"+neededModifier+"% init");}
+        if (activeMod == "Meat Drop") {subentry.modifiers.listAppend("+"+neededModifier+"% meat");}
+        if (activeMod == "Damage Absorption") {subentry.modifiers.listAppend("+"+neededModifier+" DA");}
+        if (activeMod == "Item Drop") {subentry.modifiers.listAppend("+"+neededModifier+"% item");}
+        if (zoneMap[currentColor] != "Megalo-City") {subentry.modifiers.listAppend("outdoor zone");}
 
         // Give descriptive information about the current zone.
         if (expectedPoints[currentColor] == 400)
@@ -177,11 +190,17 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         {
             // If the user is not at maximum, point out what they need to buff.
             subentry.entries.listAppend("Current expected points: "+to_string(expectedPoints[currentColor]));
-            subentry.entries.listAppend("Consider buffing <b>"+HTMLGenerateSpanFont(helpfulModifier[currentColor], currentColor)+"</b> for more points.");
+
+            string percentCharacter = (activeMod != "Damage Absorption" ? "?" : "");
+            string fractionNeeded = to_string(userModifier[currentColor])+percentCharacter+"/"+ to_string(minimumToAddPoints[currentColor]+300)+percentCharacter;
+
+            string buffUpLine = "Consider buffing <b>"+HTMLGenerateSpanFont(helpfulModifier[currentColor], currentColor)+"</b> for more points.";
+            buffUpLine += "|*Currently at "+fractionNeeded+" needed "+helpfulModifier[currentColor]+".";
+            subentry.entries.listAppend(buffUpLine);
         }
         
         // In both cases, show the # of turns remaining of bonus in this zone.
-        subentry.entries.listAppend(zoneMap[currentColor]+" will be the bonus zone for "+pluralise(bonusTurnsRemaining, "more turn", "more turns"));
+        subentry.entries.listAppend("In "+pluralise(bonusTurnsRemaining, "more fight", "more fights")+", bonus zone will be <b>"+HTMLGenerateSpanFont(zoneMap[nextColor[currentColor]],nextColor[currentColor])+"</b>.");
 
         // If they don't have the transfunctioner equipped, equip it and change the URL.
         if ($item[continuum transfunctioner].equipped_amount() == 0) 
