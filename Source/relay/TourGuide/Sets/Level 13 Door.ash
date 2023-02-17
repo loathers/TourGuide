@@ -9,7 +9,7 @@ void SLevel13DoorGenerateMissingItems(ChecklistEntry [int] tower_door_entries)
         tower_door_entries.listAppend(ChecklistEntryMake("__item skeleton key", $location[the defiled nook].getClickableURLForLocation(), ChecklistSubentryMake("Skeleton key", "", line)).ChecklistEntrySetIDTag("Council L13 tower door skeleton key"));
     }
 
-    S8bitRealmGenerateMissingItems(tower_door_entries);
+    Q8bitRealmGenerateMissingItems(tower_door_entries);
 
     SDailyDungeonGenerateMissingItems(tower_door_entries);
 

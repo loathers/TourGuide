@@ -24,11 +24,17 @@ void initialiseIOTMsUsable()
             __iotms_usable[lookupItem("diabolic pizza cube")] = true;
         if (__campground[lookupItem("cold medicine cabinet")] > 0)
             __iotms_usable[lookupItem("cold medicine cabinet")] = true;
+        if (__campground[lookupItem("model train set")] > 0)
+            __iotms_usable[lookupItem("model train set")] = true;
 
-        // Garden
-        if (__campground[lookupItem("packet of mushroom spores")] > 0)
-            __iotms_usable[lookupItem("packet of mushroom spores")] = true;
-
+        // __iotms_usable for gardens tracks whether the user has the garden installed.
+        // Gardens start returning 0 instead of 1 when the items are picked, so checking
+        // presence of the key is more useful than checking the value.
+        foreach garden in $items[packet of mushroom spores, packet of rock seeds]
+        {
+            if (__campground contains garden)
+                __iotms_usable[garden] = true;
+        }
     }
     if (florist_available() && $item[hand turkey outline].is_unrestricted()) //May 2013
         //Order of the Green Thumb Order Form is not marked as out of standard.

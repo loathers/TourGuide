@@ -16,7 +16,7 @@ void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries
 		}
 		else
 		{
-			description.listAppend(familiar_scraps + " scraps collected.");
+			description.listAppend("Free run, 100-turn banish for 100 scraps.|"+familiar_scraps + " scraps collected.");
 		}
 
 		description.listAppend("Charge up your familiar scrapbook by letting familiars act in combat.");

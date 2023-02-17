@@ -26,7 +26,7 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
 			{
             emotions.listAppend(emotionHatred + " Hatreds left. 50-turn banish.");
 			
-			resource_entries.listAppend(ChecklistEntryMake("__skill feel hatred", "", ChecklistSubentryMake(pluralise(emotionHatred, "Feel Hatred", "Feels Hatreds"), "", "Cast Feel Hatred. Free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Emotion chip feel hatred banish"));
+			resource_entries.listAppend(ChecklistEntryMake("__skill feel hatred", "", ChecklistSubentryMake(pluralise(emotionHatred, "Feel Hatred", "Feels Hatreds"), "", "Free run, 50-turn banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Emotion chip feel hatred banish"));
 			}
         int emotionLonely = clampi(3 - get_property_int("_feelLonelyUsed"), 0, 3);
         if (emotionLonely > 0 && $skill[Feel Lonely].skill_is_usable())

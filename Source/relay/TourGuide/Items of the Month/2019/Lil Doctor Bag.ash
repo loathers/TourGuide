@@ -43,7 +43,8 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
 	if (lookupItem("Lil' Doctor&trade; bag").available_amount() == 0) return;
 	//Otoscope: +200% item
     int otoscopes_left = clampi(3 - get_property_int("_otoscopeUsed"), 0, 3);
-    if (otoscopes_left > 0 && $skill[Otoscope].skill_is_usable() && __misc_state["in run"])
+    boolean otoscope_usable = my_path().id != PATH_G_LOVER && my_path().id != PATH_POCKET_FAMILIARS;
+    if (otoscopes_left > 0 && otoscope_usable && __misc_state["in run"])
     {
         string url;
         string [int] description;
@@ -54,13 +55,12 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Equip the Lil' Doctor™ bag first.");
             url = "inventory.php?ftext=lil'+doctor";
         }
-        //if (snojo_skill_entry.image_lookup_name == "")
-            //snojo_skill_entry.image_lookup_name = "__skill shattering punch";
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(otoscopes_left, "otoscope", "otoscopes"), "", description), 8).ChecklistEntrySetIDTag("Lil doctor bag otoscope"));
     }
 	//Chest X-Ray: instakill
     int instakills_left = clampi(3 - get_property_int("_chestXRayUsed"), 0, 3);
-    if (instakills_left > 0 && $skill[Chest X-Ray].skill_is_usable())
+    boolean instakills_usable = my_path().id != PATH_G_LOVER && my_path().id != PATH_POCKET_FAMILIARS;
+    if (instakills_left > 0 && instakills_usable)
     {
     	string url;
         string [int] description;
@@ -69,24 +69,23 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0)
         {
         	description.listAppend("Equip the Lil' Doctor™ bag first.");
-            url = "inventory.php?which=3";
+            url = "inventory.php?ftext=lil'+doctor";
         }
-        //if (snojo_skill_entry.image_lookup_name == "")
-            //snojo_skill_entry.image_lookup_name = "__skill shattering punch";
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(instakills_left, "chest x-ray", "chest x-rays"), "", description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Lil doctor bag x-ray free kill"));
         
     }
 	//Reflex Hammer: Banish
     int banishes_left = clampi(3 - get_property_int("_reflexHammerUsed"), 0, 3);
-    if (banishes_left > 0 && $skill[Reflex Hammer].skill_is_usable())
+    boolean banishes_usable = my_path().id != PATH_G_LOVER && my_path().id != PATH_POCKET_FAMILIARS;
+    if (banishes_left > 0 && banishes_usable)
     {
         string url;
         string [int] description;
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0) {
             description.listAppend(HTMLGenerateSpanFont("Equip the Lil' Doctor™ bag first", "red"));
-            url = "inventory.php?which=3";
+            url = "inventory.php?ftext=lil'+doctor";
         } else {
-            description.listAppend("Free run/banish");
+            description.listAppend("Free run, 30-turn banish.");
         }
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Lil doctor bag reflex hammer banish"));
     }
