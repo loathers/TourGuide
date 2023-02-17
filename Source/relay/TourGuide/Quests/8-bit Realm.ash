@@ -218,7 +218,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         subentry.entries.listAppend("In "+pluralise(bonusTurnsRemaining, "more fight", "more fights")+", bonus zone will be <b>"+HTMLGenerateSpanFont(zoneMap[nextColor[currentColor]],nextColor[currentColor])+"</b>.");
 
         if (highestPointColor != currentColor) {
-            subentry.entries.listAppend("(If you really can't buff up more, you'd earn "+expectedPoints[highestPointColor]+" points per turn with your current buffs at "+zoneMap[highestPointColor]+")");
+            subentry.entries.listAppend("At current stats, you'd earn "+expectedPoints[highestPointColor]+" points per fight at "+zoneMap[highestPointColor]+".");
         }
 
         // If they don't have the transfunctioner equipped, equip it and change the URL.
@@ -262,98 +262,90 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 }
 
 
-// void S8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
-// {
-//     if (!(__quest_state["Level 13"].state_boolean["digital key used"] || $item[digital key].available_amount() > 0))
-//         return;
-//     if (!__misc_state["in run"] || !in_ronin())
-//         return;
-//     //This is mainly for one crazy random summer, where you have many pixels.
-//     //Blue pixel potion - [50,80] MP restore
-//     //monster bait - +5% combat
-//     //pixel sword - ? - +15% init
-//     //red pixel potion - [100,120] HP restore - the shadow knows
-//     //pixel whip - useful against vampires
-//     //pixel grappling hook would be useful, but it's unlikely anyone would defeat all four bosses in-run (resets upon ascension)
-//     string [item] craftables;
-//     int [item] max_craftables_wanted;
-//     craftables[$item[blue pixel potion]] = "~65 MP restore";
-//     craftables[$item[monster bait]] = "+5% combat";
-//     max_craftables_wanted[$item[monster bait]] = 1;
-//     //pixel sword?
-//     if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
-//         craftables[$item[red pixel potion]] = "~110 HP restore for shadow";
-//     if ($locations[dreadsylvanian castle,the spooky forest,The Haunted Sorority House,The Daily Dungeon] contains __last_adventure_location) //known vampire locations. it's perfectly reasonable to test against the sorority house, here in 2015
-//     {
-//         craftables[$item[pixel whip]] = "vampire killer";
-//         max_craftables_wanted[$item[pixel whip]] = 1;
-//     }
-    
-//     max_craftables_wanted[$item[blue pixel potion]] = 11;
-//     max_craftables_wanted[$item[red pixel potion]] = 4; //4 minimum to out-shadow
-    
-//     string [int] crafting_list_have;
-//     string [int] crafting_list_cannot;
-//     foreach it, reason in craftables
-//     {
-//         if (it.available_amount() >= MAX(1, max_craftables_wanted[it]))
-//             continue;
-//         string line = it;
-        
-//         if (max_craftables_wanted[it] != 1 && it.creatable_amount() > 0)
-//             line = pluralise(it.creatable_amount(), it);
-//         line += ": " + reason;
-//         if (it.creatable_amount() == 0)
-//         {
-//             line = HTMLGenerateSpanFont(line, "grey");
-//             crafting_list_cannot.listAppend(line);
-//         }
-//         else
-//             crafting_list_have.listAppend(line);
-//     }
-//     if (crafting_list_have.count() > 0)
-//     {
-//         string [int] crafting_list = crafting_list_have;
-//         crafting_list.listAppendList(crafting_list_cannot);
-//         string pixels_have = "Pixel crafting";
-//         resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10).ChecklistEntrySetIDTag("Crackpot mystic pixel crafting resource"));
-//     }
-// }
-
-void S8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
+void Q8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    // This is still helpful, but literally only for KoE. Keep it just for KoE.
-    if (my_path().id != PATH_KINGDOM_OF_EXPLOATHING)
-        return;
+    // This resource tile is still valuable for newbies who need/want red pixel potions. Somewhat
+    //   ironically, this is actually more useful post-revamp since newbies have more reason to
+    //   get black pixels. It might be slightly annoying for some speedrunners, but they can just
+    //   hide the tile if they don't like it.
+    
+    // if (!__misc_state["in run"] || !in_ronin())
+    //     return;
+
+    // Comment originally from Ezandora noting good things in the pixel shop:
+    //   - Blue pixel potion - [50,80] MP restore
+    //   - monster bait - +5% combat
+    //   - pixel sword - ? - +15% init
+    //   - red pixel potion - [100,120] HP restore - the shadow knows
+    //   - pixel whip - useful against vampires
+
+    string [item] craftables;
+    int [item] max_craftables_wanted;
+    craftables[$item[blue pixel potion]] = "~65 MP restore";
+    craftables[$item[monster bait]] = "+5% combat";
+    max_craftables_wanted[$item[monster bait]] = 1;
+    if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
+        craftables[$item[red pixel potion]] = "~110 HP restore; good for shadow";
+    if ($locations[dreadsylvanian castle,the spooky forest,The Haunted Sorority House,The Daily Dungeon] contains __last_adventure_location) //known vampire locations. it's perfectly reasonable to test against the sorority house, here in 2023
+    {
+        craftables[$item[pixel whip]] = "vampire killer";
+        max_craftables_wanted[$item[pixel whip]] = 1;
+    }
+    
+    max_craftables_wanted[$item[blue pixel potion]] = 11;
+    max_craftables_wanted[$item[red pixel potion]] = 4; //4 minimum to out-shadow
+    
+    string [int] crafting_list_have;
+    string [int] crafting_list_cannot;
+    foreach it, reason in craftables
+    {
+        if (it.available_amount() >= MAX(1, max_craftables_wanted[it]))
+            continue;
+        string line = it;
+        
+        if (max_craftables_wanted[it] != 1 && it.creatable_amount() > 0)
+            line = pluralise(it.creatable_amount(), it);
+        line += ": " + reason;
+        if (it.creatable_amount() == 0)
+        {
+            line = HTMLGenerateSpanFont(line, "grey");
+            crafting_list_cannot.listAppend(line);
+        }
+        else
+            crafting_list_have.listAppend(line);
+    }
+    if (crafting_list_have.count() > 0)
+    {
+        string [int] crafting_list = crafting_list_have;
+        crafting_list.listAppendList(crafting_list_cannot);
+        string pixels_have = "Pixel crafting";
+        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10).ChecklistEntrySetIDTag("Crackpot mystic pixel crafting resource"));
+    }
+}
+
+void Q8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
+{
+    // This is still helpful, but mostly for KoE, the only remaining path where you need 
+    //   to generate white pixels for the digital key. Keep it just for KoE? Heh.
+
     if (!__misc_state["in run"] && !__misc_state["Example mode"])
         return;
     if (__quest_state["Level 13"].state_boolean["digital key used"])
         return;
+    if (my_path().id == PATH_COMMUNITY_SERVICE)
+        return;
     
     if ($item[digital key].available_amount() == 0) {
-        string url = "place.php?whichplace=forestvillage&action=fv_mystic"; //forestvillage.php
+        string url = "place.php?whichplace=8bit";
         if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING)
             url = "shop.php?whichshop=exploathing";
         string [int] options;
-        if ($item[digital key].creatable_amount() > 0) {
-            options.listAppend("Have enough pixels, make it.");
+        if (__quest_state["Digital Key"].state_int["currentScore"] > 9999) {
+            options.listAppend("Visit 8-bit Realm's Treasure House and claim your key!");
+        } else if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING) { 
+            options.listAppend("Go fight invader bullets, or find some way to fight a Ghost.");
         } else {
-            if ($item[psychoanalytic jar].item_is_usable() && (!in_hardcore() || $familiar[angry jung man].familiar_is_usable()))
-                options.listAppend("Fear man's level (jar)");
-            if (__misc_state["fax equivalent accessible"] && in_hardcore()) //not suggesting this in SC
-                options.listAppend("Fax/copy a ghost");
-            if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING)
-                options.listAppend("Fight invader bullets");
-            else if ($item[continuum transfunctioner].item_is_usable())
-                options.listAppend("8-bit realm (olfact blooper, slow)");
-            if (my_path().id == PATH_ONE_CRAZY_RANDOM_SUMMER)
-                options.listAppend("Wait for pixellated monsters");
-            if (lookupItem("Powerful Glove").available_amount() > 0)
-                options.listAppend("Adventure with the Powerful Glove equipped");
-            
-            int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();
-            if (total_white_pixels > 0)
-                options.listAppend(total_white_pixels + "/30 white pixels found.");
+            options.listAppend("Visit the 8-bit Realm and max your score to claim a Digital Key.");
         }
         items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", url, ChecklistSubentryMake("Digital key", "", options)).ChecklistEntrySetIDTag("Council L13 quest tower door digital key"));
     }
