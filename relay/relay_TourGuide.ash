@@ -2,7 +2,7 @@
 
 since r26713; // $path update
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.5";
+string __version = "2.0.6";
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -8310,6 +8310,10 @@ static
     
     void initialiseConstantKOLImages()
     {
+        // One note. In order to figure out RectMake here, you open up the respective images in an image editing program
+        //   and figure out X/Y coordinates. I believe it's Xmin, Ymin, Xmax, Ymax. This is generally better than most
+        //   other possible bespoke solutions. Thanks once again go to Ezandora, the queen of human civilization.
+        
         KOLimage [string] building_images;
         building_images["typical tavern"] = KOLImageMake("images/otherimages/woods/tavern0.gif", Vec2iMake(100,100), RectMake(0,39,99,97));
         building_images["boss bat"] = KOLImageMake("images/adventureimages/bossbat.gif", Vec2iMake(100,100), RectMake(0,27,99,74));
@@ -8515,6 +8519,12 @@ static
         building_images["Jick"] = KOLImageMake("images/otherimages/customavatars/1.gif", Vec2iMake(60,100));
         building_images["Superhuman Cocktailcrafting"] = KOLImageMake("images/itemimages/fruitym.gif", Vec2iMake(30,30));
         
+        // Big thanks to Beldur for looking up the right dimensions. A true king of kings.
+        building_images["Vanya's Castle"] = KOLImageMake("images/otherimages/8bitrealm.gif", Vec2iMake(400,400), RectMake(285,115,400,207));
+        building_images["Megalo-City"] = KOLImageMake("images/otherimages/8bitrealm.gif", Vec2iMake(400,400), RectMake(227,0,310,99));
+        building_images["The Fungus Plains"] = KOLImageMake("images/otherimages/8bitrealm.gif", Vec2iMake(400,400), RectMake(290,250,386,315));
+        building_images["Hero's Field"] = KOLImageMake("images/otherimages/8bitrealm.gif", Vec2iMake(400,400), RectMake(64,17,178,117));
+
         building_images["inexplicable door"] = KOLImageMake("images/otherimages/woods/8bitdoor.gif", Vec2iMake(100,100), RectMake(15, 43, 85, 99));
         building_images["Dungeons of Doom"] = KOLImageMake("images/otherimages/town/ddoom.gif", Vec2iMake(100,100), RectMake(31, 33, 68, 99));
         
@@ -24673,6 +24683,362 @@ void QMadnessBakeryGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		
 	optional_task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[Madness Bakery]).ChecklistEntrySetIDTag("Armory madness bakery quest"));
 }
+void Q8BitInit()
+{
+    // This is a convoluted enough keygen method that I'm refactoring it as a quest as 
+    //   opposed to a set. This could be wrong! But I think it is a good exercise.
+    QuestState state;
+
+    // Set the state as "started" if you have the continuum transfunctioner.
+    if (!state.started && $items[continuum transfunctioner].available_amount() > 0)
+        QuestStateParseMafiaQuestPropertyValue(state, "started");
+
+    // Finish this quest if you are in community service, so the tiles never generate.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+
+    // Finish this quest tile if you are in Kingdom of Exploathing, as 8-bit doesn't exist there.
+    if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+
+    // Finish this quest tile if you are no longer in-run. Currently commented for testing.
+    if (!__misc_state["in run"]) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+
+    // Establish basic information for tile generation
+    state.quest_name = "Digital Key Quest";
+    state.image_name = "__item digital key"; // if the bespoke logic fails 
+    // state.image_name = "inexplicable door";
+    state.council_quest = true;
+
+    // Total 8-bit score
+    state.state_int["currentScore"] = get_property_int("8BitScore");
+
+    // Bonus zone is tracked via the 8BitColor pref; black/red/blue/green are the zone colors 
+    state.state_string["currentColor"] = get_property("8BitColor");
+
+    // If you don't have the digital key, you need the digital key
+    state.state_boolean["haveDigitalKey"] = $item[digital key].available_amount() > 0;
+
+    // Have you turned in the digital key?
+    state.state_boolean["turnedInDigitalKey"] = __quest_state["Level 13"].state_boolean["digital key used"];
+
+    if (state.finished)
+    {
+        state.state_boolean["haveDigitalKey"] = false;
+        state.state_boolean["turnedInDigitalKey"] = true;
+    }
+
+	__quest_state["Digital Key"] = state;
+}
+
+void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] future_task_entries)
+{
+    // In 2023, there was a large rework of the 8-bit realm. Instead of needing 30 white
+    //   pixels to generate your Digital Key, you now need a certain amount of score. This
+    //   new tile is an attempt to help users figure out the new 8-bit zone!
+
+    // Read in the information initialized in the quest initializer.
+    QuestState base_quest_state = __quest_state["Digital Key"];
+
+    // Do not generate tiles if you do not need the digital key anymore.
+    if (base_quest_state.finished) { return; }
+
+    // Because I'm doing nested subentries, the broader quest is a ChecklistEntry.
+    ChecklistEntry entry;
+    entry.url = "place.php?whichplace=8bit";
+    entry.image_lookup_name = base_quest_state.image_name;
+    entry.tags.id = "Digital Key Pixels 8bit L13";
+    entry.should_indent_after_first_subentry = true;
+    entry.subentries.listAppend(ChecklistSubentryMake(base_quest_state.quest_name));
+    entry.should_highlight = $locations[Vanya's Castle, The Fungus Plains, Megalo-City, Hero's Field] contains __last_adventure_location;
+
+    // NOTE: Technically speaking, I think some of this probably -should- be in the Q8BitInit()
+    //   function. However, I like the fact that this lets me read in currentColor as an index
+    //   key on this data; while you can make state.state_int[] and state.state_string[] fields,
+    //   it seems much less straightforward to make int/string fields keyed by a string but with
+    //   proper reference parameters. So instead, I initialize a ton of crap here. Hopefully the
+    //   comments help make everything a bit cleaner and clearer!
+
+    // Make it easier to reference currentColor, as it keys everything else.
+    string currentColor = base_quest_state.state_string["currentColor"];
+
+    // Will use the keys of this array as the loop key later.
+    string [string] helpfulModifier;
+
+    helpfulModifier["black"] = "Initiative";
+    helpfulModifier["red"] = "Meat Drop";
+    helpfulModifier["blue"] = "Damage Absorption";
+    helpfulModifier["green"] = "Item Drop";
+
+    // I'm using the same math that Beldur did in the 8-bit relay. These are the associated
+    //    values needed to make the expectedPoints equation work; basically, it's the level
+    //    of the modifier you need to see actual point generation increase.
+    int [string] minimumToAddPoints;
+
+    minimumToAddPoints["black"] = 300;
+    minimumToAddPoints["red"] = 150;
+    minimumToAddPoints["blue"] = 300;
+    minimumToAddPoints["green"] = 100;
+
+    // NOTE: to get to the max point, you add 300 to any of the minimumToAddPoints lol
+
+    // Mapping zones for fun and profit, but mostly to make future things easier.
+    string [string] zoneMap;
+
+    zoneMap["black"] = "Vanya's Castle";
+    zoneMap["red"] = "The Fungus Plains";
+    zoneMap["blue"] = "Megalo-City";
+    zoneMap["green"] = "Hero's Field";
+
+    // Storing this so the tile can tell which zone is next. This made me realize that I, like a
+    //   fool, ordered every one of these black/red/blue/green instead of the actual order of 
+    //   black/blue/green/red. Sorry, mom. Sorry, college.
+    string [string] nextColor;
+
+    nextColor["black"] = "blue";
+    nextColor["red"] = "black";
+    nextColor["blue"] = "green";
+    nextColor["green"] = "red";
+
+    int [string] turnsInZone;
+    
+    // I do not like using turnsSpent; it has weird behavior w/ freeruns. Best we got tho! :-(
+    foreach key in helpfulModifier
+        turnsInZone[key] = to_location(zoneMap[key]).turns_spent;
+
+    int bonusTurnsRemaining = 5 - ((turnsInZone["black"]+
+                                turnsInZone["red"]+
+                                turnsInZone["blue"]+
+                                turnsInZone["green"]) % 5);
+    
+    // Populate user's modifier for each bonus; iterates through black/red/blue/green
+    int [string] userModifier; 
+
+    foreach key in helpfulModifier
+        userModifier[key] = numeric_modifier(helpfulModifier[key]);
+
+    // Populate expected points in each zone
+    int [string] expectedPoints;
+    int addedBonus;
+    int denominator;
+    int rawPoints;
+    boolean isCurrentZoneBonus;
+
+    foreach key in helpfulModifier
+    {
+        isCurrentZoneBonus = (currentColor == key);
+        addedBonus = (isCurrentZoneBonus ? 100 : 50);
+        denominator = (isCurrentZoneBonus ? 10 : 20);
+        rawPoints = min(300, max(0, userModifier[key] - minimumToAddPoints[key]));
+
+        expectedPoints[key] = addedBonus + round(rawPoints/denominator) * 10;
+    }
+
+    // Figure out if the user is better-suited to adventure elsewhere.
+    string highestPointColor;
+
+    foreach key, value in expectedPoints
+        if (value > expectedPoints[currentColor]) {
+            if (value > expectedPoints[highestPointColor]) {
+                highestPointColor = key;
+            }
+        }
+
+    // Now that we have calculated everything, we can finally make the tile! Before the very 
+    //   detailed subentry, we have a quick statement of what the quest wants you to do. We
+    //   do this by adding to the subentries[0] guy.
+    entry.subentries[0].entries.listAppend("Gain "+pluralise(max(10000-base_quest_state.state_int["currentScore"],0), "more point","more points")+" to get your digital key.");
+
+    // OK, now we make our subentry for the bonus zone.
+	ChecklistSubentry subentry;
+    
+    // We have a return up top for a finished quest. As a result, it should only hit !started
+    //   in the right order, even if our finishing reassignment in QuestInit doesn't work.
+    if (!base_quest_state.started)
+    {
+        subentry.header = "Go listen to a crackpot!";
+        entry.url = "place.php?whichplace=forestvillage&action=fv_mystic";
+        entry.image_lookup_name = "__item continuum transfunctioner";
+        subentry.entries.listAppend("Visit the crackpot mystic for your transfunctioner.");
+    }
+    else if (base_quest_state.state_int["currentScore"] < 10000) {
+        
+	    subentry.header = "BONUS ZONE: "+zoneMap[currentColor]+" ("+pluralise(bonusTurnsRemaining, "more fight", "more fights")+")";
+
+        // Modify the overarching image to match the current zone.
+        entry.image_lookup_name = zoneMap[currentColor];
+
+        // Establish easier shorthand for the active bonus modifier.
+        string activeMod = helpfulModifier[currentColor];
+        string neededModifier = to_string(minimumToAddPoints[currentColor]+300);
+        
+        // Add nice shorthand text to the subentry w/ the stat to maximize.
+        if (activeMod == "Initiative") {subentry.modifiers.listAppend("+"+neededModifier+"% init");}
+        if (activeMod == "Meat Drop") {subentry.modifiers.listAppend("+"+neededModifier+"% meat");}
+        if (activeMod == "Damage Absorption") {subentry.modifiers.listAppend("+"+neededModifier+" DA");}
+        if (activeMod == "Item Drop") {subentry.modifiers.listAppend("+"+neededModifier+"% item");}
+        if (zoneMap[currentColor] != "Megalo-City") {subentry.modifiers.listAppend("outdoor zone");}
+
+        // Give descriptive information about the current zone.
+        if (expectedPoints[currentColor] == 400)
+        {
+            // If the user is at maximum, color the tile a bit and be merry.
+            subentry.entries.listAppend(HTMLGenerateSpanFont("<b>MAXIMUM POINTS!</b>",currentColor));
+            subentry.entries.listAppend("Adventure in "+HTMLGenerateSpanFont("<b>"+zoneMap[currentColor]+"</b>", currentColor)+" for 400 points per turn!");
+        }
+        else
+        {
+            // If the user is not at maximum, point out what they need to buff.
+            subentry.entries.listAppend("Current expected points: "+to_string(expectedPoints[currentColor]));
+
+            string percentCharacter = (activeMod != "Damage Absorption" ? "%" : "");
+            string modifierNeededText = to_string(minimumToAddPoints[currentColor]+300 - userModifier[currentColor])+percentCharacter;
+
+            string buffUpLine = "Consider buffing <b>"+HTMLGenerateSpanFont(helpfulModifier[currentColor], currentColor)+"</b> for more points.";
+            buffUpLine += "|*You need "+modifierNeededText+" more for max points.";
+            subentry.entries.listAppend(buffUpLine);
+        }
+        
+        // In both cases, show the # of turns remaining of bonus in this zone.
+        subentry.entries.listAppend("In "+pluralise(bonusTurnsRemaining, "more fight", "more fights")+", bonus zone will be <b>"+HTMLGenerateSpanFont(zoneMap[nextColor[currentColor]],nextColor[currentColor])+"</b>.");
+
+        if (highestPointColor != currentColor) {
+            subentry.entries.listAppend("Alternate Route:|*"+HTMLGenerateSpanFont("At current stats, you'd earn <b>"+expectedPoints[highestPointColor]+" points</b> per fight at <b>"+zoneMap[highestPointColor]+"</b>. Not recommended!","gray"));
+        }
+
+        // If they don't have the transfunctioner equipped, equip it and change the URL.
+        if ($item[continuum transfunctioner].equipped_amount() == 0) 
+        {
+            entry.url = "inventory.php?ftext=continuum+transfunctioner";
+            subentry.entries.listAppend(HTMLGenerateSpanFont("Equip your transfunctioner to access the realm.", "red"));
+
+        }
+    }
+
+    entry.subentries.listAppend(subentry);
+
+    // Add small subentry near the end w/ current score! But only add it if they have their transfunctioner.
+    if (base_quest_state.started) {
+        ChecklistSubentry keyCompletionSubentry;
+    
+        keyCompletionSubentry.header = "Projected Key Completion";
+        keyCompletionSubentry.modifiers.listAppend("Current Score: "+to_string(base_quest_state.state_int["currentScore"])+" of 10000");
+        
+        if (base_quest_state.state_int["currentScore"] < 10000) 
+        {
+            keyCompletionSubentry.entries.listAppend("If you max your bonus, you'll have your key in "+pluralise((10000-round(base_quest_state.state_int["currentScore"]))/400," more turn","more turns"));
+        } 
+        else 
+        {
+            keyCompletionSubentry.entries.listAppend("Woah, 10000 points??? That's this life's high score!");
+            keyCompletionSubentry.entries.listAppend("Visit the <b>Treasure House</b> to claim your hard-earned Digital Key.");
+        }
+        entry.subentries.listAppend(keyCompletionSubentry);
+    }
+    
+    // If the user is below level 5, probably have better things to be doing unless they're 
+    //   already maxed out at the relevant bonus zone; ergo, shift the tile to "Future Tasks"
+    
+    if (my_level() > 5 || expectedPoints[currentColor] == 400)
+	    task_entries.listAppend(entry);
+    else 
+        future_task_entries.listAppend(entry);
+
+}
+
+
+void Q8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    // This resource tile is still valuable for newbies who need/want red pixel potions. Somewhat
+    //   ironically, this is actually more useful post-revamp since newbies have more reason to
+    //   get black pixels. It might be slightly annoying for some speedrunners, but they can just
+    //   hide the tile if they don't like it.
+    
+    // ... though even I can't pretend we want this in aftercore, lol
+    if (!__misc_state["in run"] || !in_ronin())
+        return;
+
+    // Comment originally from Ezandora noting good things in the pixel shop:
+    //   - Blue pixel potion - [50,80] MP restore
+    //   - monster bait - +5% combat
+    //   - pixel sword - +15% init
+    //   - red pixel potion - [100,120] HP restore - the shadow knows
+    //   - pixel whip - useful against vampires
+
+    string [item] craftables;
+    int [item] max_craftables_wanted;
+    craftables[$item[pixel bread]] = "+50% meat";
+    craftables[$item[pixel whiskey]] = "+50% item";
+    craftables[$item[blue pixel potion]] = "~65 MP restore";
+    craftables[$item[monster bait]] = "+5% combat";
+    max_craftables_wanted[$item[monster bait]] = 1;
+
+    // Only generate red pixels if you need them for tower healing. They sell like shit.
+    if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
+        craftables[$item[red pixel potion]] = "~110 HP restore; good for shadow";
+    if ($locations[dreadsylvanian castle,the spooky forest,The Haunted Sorority House,The Daily Dungeon] contains __last_adventure_location) //known vampire locations. it's perfectly reasonable to test against the sorority house, here in 2023
+    {
+        craftables[$item[pixel whip]] = "vampire killer";
+        max_craftables_wanted[$item[pixel whip]] = 1;
+    }
+    
+    max_craftables_wanted[$item[blue pixel potion]] = 11;
+    max_craftables_wanted[$item[red pixel potion]] = 4; //4 minimum to out-shadow
+    
+    string [int] crafting_list_have;
+    string [int] crafting_list_cannot;
+    foreach it, reason in craftables
+    {
+        if (it.available_amount() >= MAX(1, max_craftables_wanted[it]))
+            continue;
+        string line = it;
+        
+        if (max_craftables_wanted[it] != 1 && it.creatable_amount() > 0)
+            line = pluralise(it.creatable_amount(), it);
+        line += ": " + reason;
+        if (it.creatable_amount() == 0)
+        {
+            line = HTMLGenerateSpanFont(line, "grey");
+            crafting_list_cannot.listAppend(line);
+        }
+        else
+            crafting_list_have.listAppend(line);
+    }
+    if (crafting_list_have.count() > 0)
+    {
+        string [int] crafting_list = crafting_list_have;
+        crafting_list.listAppendList(crafting_list_cannot);
+        string pixels_have = "Craft a few Pixel sundries";
+        resource_entries.listAppend(ChecklistEntryMake("__item red pixel potion", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10).ChecklistEntrySetIDTag("Crackpot mystic pixel crafting resource"));
+    }
+}
+
+void Q8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
+{
+    // This is still helpful, but mostly for KoE, the only remaining path where you need 
+    //   to generate white pixels for the digital key. Keep it just for KoE? Heh.
+
+    if (!__misc_state["in run"] && !__misc_state["Example mode"])
+        return;
+    if (__quest_state["Level 13"].state_boolean["digital key used"])
+        return;
+    if (my_path().id == PATH_COMMUNITY_SERVICE)
+        return;
+    
+    if ($item[digital key].available_amount() == 0) {
+        string url = "place.php?whichplace=8bit";
+        if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING)
+            url = "shop.php?whichshop=exploathing";
+        string [int] options;
+        // I had a change of heart and kept it for normal runs too. Dreams can come true.
+        if (__quest_state["Digital Key"].state_int["currentScore"] > 9999) {
+            options.listAppend("Visit 8-bit Realm's Treasure House and claim your key!");
+        } else if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING) { 
+            options.listAppend("Go fight invader bullets, or find some way to fight a Ghost.");
+        } else {
+            options.listAppend("Visit the 8-bit Realm and max your score to claim a Digital Key.");
+        }
+        items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", url, ChecklistSubentryMake("Digital key", "", options)).ChecklistEntrySetIDTag("Council L13 quest tower door digital key"));
+    }
+}
 
 
 
@@ -24711,6 +25077,7 @@ void QuestsInit()
     QOldLandfillInit();
     QMadnessBakeryInit();
     QManorInit();
+	Q8BitInit();
 }
 
 
@@ -24753,12 +25120,15 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QGalaktikGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QOldLandfillGenerateTasks(task_entries, optional_task_entries, future_task_entries);
     QMadnessBakeryGenerateTasks(task_entries, optional_task_entries, future_task_entries);
+
+	Q8bitRealmGenerateTasks(task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] resource_entries)
 {
     QSpookyravenLightsOutGenerateResource(resource_entries);
     QAirportGenerateResource(resource_entries);
+	Q8bitRealmGenerateResource(resource_entries);
 }
 
 
@@ -26263,12 +26633,12 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (in_run) {
         if (7014.to_item().available_amount() > 0) //Louder than bomb
-            resource_entries.listAppend(ChecklistEntryMake("__item " + 7014.to_item().to_string(), "", ChecklistSubentryMake(pluralise(7014.to_item()), "", "Free run, banish for 20 turns"), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Louder than bomb banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item " + 7014.to_item().to_string(), "", ChecklistSubentryMake(pluralise(7014.to_item()), "", "Free run, 20-turn banish."), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Louder than bomb banish"));
         if ($item[crystal skull].available_amount() > 0)
-            resource_entries.listAppend(ChecklistEntryMake("__item crystal skull", "", ChecklistSubentryMake(pluralise($item[crystal skull]), "", "Turn-costing banishing"), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Crystal skull banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item crystal skull", "", ChecklistSubentryMake(pluralise($item[crystal skull]), "", "Takes a turn, 20-turn banish."), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Crystal skull banish"));
             
         if ($item[harold's bell].available_amount() > 0 && $item[harold's bell].item_is_usable())
-            resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Turn-costing banishing"), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Takes a turn, 20-turn banish."), importance_level_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
         
         if ($item[lost key].available_amount() > 0 && $item[lost key].item_is_usable()){
             string [int] details;
@@ -26386,7 +26756,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
     }
     if ($item[divine champagne popper].available_amount() > 0 && in_run) {
-        resource_entries.listAppend(ChecklistEntryMake("__item divine champagne popper", "", ChecklistSubentryMake(pluralise($item[divine champagne popper]), "", "Free run and five-turn banish."), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Champagne popper banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item divine champagne popper", "", ChecklistSubentryMake(pluralise($item[divine champagne popper]), "", "Free run, 5-turn banish."), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Champagne popper banish"));
     }
     if (__misc_state["need to level"]) {
         if ($item[dance card].available_amount() > 0 && my_primestat() == $stat[moxie] && in_ronin()) {
@@ -27736,209 +28106,6 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     
     
     SAftercoreThingsToDoGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-}
-
-
-void S8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-	int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();
-        
-	if (__quest_state["Level 13"].state_boolean["digital key used"] || total_white_pixels >= 30 || $item[digital key].available_amount() > 0)
-        return;
-    
-    boolean need_route_output = true;
-    //Need white pixels for digital key.
-    if (familiar_is_usable($familiar[angry jung man]) && $item[psychoanalytic jar].available_amount() == 0 && $item[jar of psychoses (The Crackpot Mystic)].available_amount() == 0 && !get_property_boolean("_psychoJarUsed"))
-    {
-        //They have a jung man, but haven't acquired a jar yet.
-        ChecklistSubentry subentry;
-    
-        string url = "";
-        if (my_familiar() != $familiar[angry jung man])
-            url = "familiar.php";
-        int jung_mans_charge_turns_remaining = 1 + (30 - MIN(30, get_property_int("jungCharge")));
-
-        subentry.header = "Bring along the angry jung man";
-    
-        subentry.entries.listAppend(pluralise(jung_mans_charge_turns_remaining, "turn", "turns") + " until jar drops. (skip 8-bit realm)");
-        if (my_path().id == PATH_ONE_CRAZY_RANDOM_SUMMER)
-            subentry.entries.listAppend("Or wait for pixellated monsters.");
-    
-        optional_task_entries.listAppend(ChecklistEntryMake("__familiar angry jung man", url, subentry).ChecklistEntrySetIDTag("Angry jung man familiar digital key psycho jar drop"));
-        need_route_output = false;
-    }
-    if ($item[psychoanalytic jar].available_amount() > 0 || $item[jar of psychoses (The Crackpot Mystic)].available_amount() > 0 || get_property_boolean("_psychoJarUsed")) //FIXME check which jar used
-    {
-        string active_url = "";
-        string title = "Adventure in fear man's level";
-        //Have a jar, or jar was installed.
-        string [int] description;
-        string [int] modifiers;
-        
-        if (get_property_boolean("_psychoJarUsed"))
-        {
-            active_url = "place.php?whichplace=junggate_3";
-            modifiers.listAppend("+150% item");
-            modifiers.listAppend("olfact morbid skull");
-            description.listAppend("Run +150% item, olfact morbid skull.");
-            description.listAppend(total_white_pixels + "/30 white pixels found.");
-            if (my_path().id == PATH_ONE_CRAZY_RANDOM_SUMMER)
-                description.listAppend("Or wait for pixellated monsters.");
-        }
-        else if ($item[jar of psychoses (The Crackpot Mystic)].available_amount() > 0)
-        {
-            active_url = "inventory.php?ftext=jar+of+psychoses";
-            title = "Open the " + $item[jar of psychoses (The Crackpot Mystic)];
-            description.listAppend("Fear Man's level access, for digital key.");
-            if (my_path().id == PATH_ONE_CRAZY_RANDOM_SUMMER)
-                description.listAppend("Or wait for pixellated monsters.");
-        }
-        else if ($item[psychoanalytic jar].available_amount() > 0)
-        {
-            if (my_level() < 2) //no woods yet
-                return;
-            active_url = "place.php?whichplace=forestvillage&action=fv_mystic";
-            title = "Psychoanalyze the crackpot mystic";
-            description.listAppend("Fear Man's level access, for digital key.");
-            if (my_path().id == PATH_ONE_CRAZY_RANDOM_SUMMER)
-                description.listAppend("Or wait for pixellated monsters.");
-        }
-        optional_task_entries.listAppend(ChecklistEntryMake("__item digital key", active_url, ChecklistSubentryMake(title, modifiers, description), $locations[fear man's level]).ChecklistEntrySetIDTag("Angry jung man familiar digital key psycho jar use"));
-        need_route_output = false;
-    }
-    if (my_path().id == PATH_EXPLOSIONS) need_route_output = false;
-    if (need_route_output)
-    {
-        if (in_hardcore() || !$item[jar of psychoses (The Crackpot Mystic)].is_unrestricted() || !$item[jar of psychoses (The Crackpot Mystic)].item_is_usable())
-        {
-            string url = "place.php?whichplace=woods";
-            string [int] description;
-            string [int] modifiers;
-            modifiers.listAppend("olfact bloopers");
-            modifiers.listAppend("+100% item");
-            
-            description.listAppend("Run +100% item, olfact bloopers.");
-            description.listAppend(total_white_pixels + "/30 white pixels found.");
-            if (__misc_state["VIP available"] && __misc_state["fax equivalent accessible"])
-                description.listAppend("Possibly consider faxing/copying a ghost. (+150% item, drops five white pixels)");
-            if (my_path().id == PATH_ONE_CRAZY_RANDOM_SUMMER)
-                description.listAppend("Or wait for pixellated monsters.");
-            if ($item[continuum transfunctioner].equipped_amount() == 0)
-            {
-                url = "inventory.php?ftext=continuum+transfunctioner";
-                description.listAppend("Equip the continuum transfunctioner.");
-            }
-            //No other choice. 8-bit realm.
-            //Well, I suppose they could fax and arrow a ghost.
-            if ($item[continuum transfunctioner].available_amount() > 0)
-                optional_task_entries.listAppend(ChecklistEntryMake("inexplicable door", url, ChecklistSubentryMake("Adventure in the 8-bit realm", modifiers, description), $locations[8-bit realm]).ChecklistEntrySetIDTag("Crackpot mystic digital key 8-bit"));
-            else if (my_level() >= 2)
-                optional_task_entries.listAppend(ChecklistEntryMake("__item continuum transfunctioner", "place.php?whichplace=forestvillage&action=fv_mystic", ChecklistSubentryMake("Acquire a continuum transfunctioner", "", "From the crackpot mystic.")).ChecklistEntrySetIDTag("Crackpot mystic get transfunctioner"));
-        }
-        else
-        {
-            //softcore, suggest pulling a jar of psychoses.
-            string [int] description;
-            description.listAppend("To make digital key.");
-            if (my_path().id == PATH_ONE_CRAZY_RANDOM_SUMMER)
-                description.listAppend("Or wait for pixellated monsters.");
-            optional_task_entries.listAppend(ChecklistEntryMake("__item psychoanalytic jar", "", ChecklistSubentryMake("Pull a jar of psychoses (The Crackpot Mystic)", "", description)).ChecklistEntrySetIDTag("Crackpot mystic digital key psycho"));
-        }
-    }
-}
-
-void S8bitRealmGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (!(__quest_state["Level 13"].state_boolean["digital key used"] || $item[digital key].available_amount() > 0))
-        return;
-    if (!__misc_state["in run"] || !in_ronin())
-        return;
-    //This is mainly for one crazy random summer, where you have many pixels.
-    //Blue pixel potion - [50,80] MP restore
-    //monster bait - +5% combat
-    //pixel sword - ? - +15% init
-    //red pixel potion - [100,120] HP restore - the shadow knows
-    //pixel whip - useful against vampires
-    //pixel grappling hook would be useful, but it's unlikely anyone would defeat all four bosses in-run (resets upon ascension)
-    string [item] craftables;
-    int [item] max_craftables_wanted;
-    craftables[$item[blue pixel potion]] = "~65 MP restore";
-    craftables[$item[monster bait]] = "+5% combat";
-    max_craftables_wanted[$item[monster bait]] = 1;
-    //pixel sword?
-    if (__quest_state["Level 13"].state_boolean["shadow will need to be defeated"])
-        craftables[$item[red pixel potion]] = "~110 HP restore for shadow";
-    if ($locations[dreadsylvanian castle,the spooky forest,The Haunted Sorority House,The Daily Dungeon] contains __last_adventure_location) //known vampire locations. it's perfectly reasonable to test against the sorority house, here in 2015
-    {
-        craftables[$item[pixel whip]] = "vampire killer";
-        max_craftables_wanted[$item[pixel whip]] = 1;
-    }
-    
-    max_craftables_wanted[$item[blue pixel potion]] = 11;
-    max_craftables_wanted[$item[red pixel potion]] = 4; //4 minimum to out-shadow
-    
-    string [int] crafting_list_have;
-    string [int] crafting_list_cannot;
-    foreach it, reason in craftables
-    {
-        if (it.available_amount() >= MAX(1, max_craftables_wanted[it]))
-            continue;
-        string line = it;
-        
-        if (max_craftables_wanted[it] != 1 && it.creatable_amount() > 0)
-            line = pluralise(it.creatable_amount(), it);
-        line += ": " + reason;
-        if (it.creatable_amount() == 0)
-        {
-            line = HTMLGenerateSpanFont(line, "grey");
-            crafting_list_cannot.listAppend(line);
-        }
-        else
-            crafting_list_have.listAppend(line);
-    }
-    if (crafting_list_have.count() > 0)
-    {
-        string [int] crafting_list = crafting_list_have;
-        crafting_list.listAppendList(crafting_list_cannot);
-        string pixels_have = "Pixel crafting";
-        resource_entries.listAppend(ChecklistEntryMake("__item white pixel", "shop.php?whichshop=mystic", ChecklistSubentryMake(pixels_have,  "", crafting_list), 10).ChecklistEntrySetIDTag("Crackpot mystic pixel crafting resource"));
-    }
-}
-
-void S8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
-{
-    if (!__misc_state["in run"] && !__misc_state["Example mode"])
-        return;
-    if (__quest_state["Level 13"].state_boolean["digital key used"])
-        return;
-    
-    if ($item[digital key].available_amount() == 0) {
-        string url = "place.php?whichplace=forestvillage&action=fv_mystic"; //forestvillage.php
-        if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING)
-            url = "shop.php?whichshop=exploathing";
-        string [int] options;
-        if ($item[digital key].creatable_amount() > 0) {
-            options.listAppend("Have enough pixels, make it.");
-        } else {
-            if ($item[psychoanalytic jar].item_is_usable() && (!in_hardcore() || $familiar[angry jung man].familiar_is_usable()))
-                options.listAppend("Fear man's level (jar)");
-            if (__misc_state["fax equivalent accessible"] && in_hardcore()) //not suggesting this in SC
-                options.listAppend("Fax/copy a ghost");
-            if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING)
-                options.listAppend("Fight invader bullets");
-            else if ($item[continuum transfunctioner].item_is_usable())
-                options.listAppend("8-bit realm (olfact blooper, slow)");
-            if (my_path().id == PATH_ONE_CRAZY_RANDOM_SUMMER)
-                options.listAppend("Wait for pixellated monsters");
-            if (lookupItem("Powerful Glove").available_amount() > 0)
-                options.listAppend("Adventure with the Powerful Glove equipped");
-            
-            int total_white_pixels = $item[white pixel].available_amount() + $item[white pixel].creatable_amount();
-            if (total_white_pixels > 0)
-                options.listAppend(total_white_pixels + "/30 white pixels found.");
-        }
-        items_needed_entries.listAppend(ChecklistEntryMake("__item digital key", url, ChecklistSubentryMake("Digital key", "", options)).ChecklistEntrySetIDTag("Council L13 quest tower door digital key"));
-    }
 }
 
 //Lock Picking
@@ -32984,7 +33151,7 @@ void SLevel13DoorGenerateMissingItems(ChecklistEntry [int] tower_door_entries)
         tower_door_entries.listAppend(ChecklistEntryMake("__item skeleton key", $location[the defiled nook].getClickableURLForLocation(), ChecklistSubentryMake("Skeleton key", "", line)).ChecklistEntrySetIDTag("Council L13 tower door skeleton key"));
     }
 
-    S8bitRealmGenerateMissingItems(tower_door_entries);
+    Q8bitRealmGenerateMissingItems(tower_door_entries);
 
     SDailyDungeonGenerateMissingItems(tower_door_entries);
 
@@ -33028,7 +33195,6 @@ void SetsGenerateResources(ChecklistEntry [int] resource_entries)
     SFaxGenerateResource(resource_entries);
     SClassesGenerateResource(resource_entries);
     SEquipmentGenerateResource(resource_entries);
-    S8bitRealmGenerateResource(resource_entries);
     SCalculateUniverseGenerateResource(resource_entries);
     SEventsGenerateResource(resource_entries);
 }
@@ -33041,7 +33207,6 @@ void SetsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 	SCopiedMonstersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SAftercoreGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	QHitsGenerateTasks(task_entries, optional_task_entries, future_task_entries);
-	S8bitRealmGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SDailyDungeonGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SCountersGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 	SBountyHunterHunterGenerateTasks(task_entries, optional_task_entries, future_task_entries);
@@ -45930,7 +46095,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         if (snokes_left > 0)
         {
             string [int] description;
-            description.listAppend("Free run/banish.");
+            description.listAppend("Free run, 30-turn banish.");
             if (snojo_skill_entry.image_lookup_name == "")
                 snojo_skill_entry.image_lookup_name = "__skill Snokebomb";
             Banish snoke_banish = BanishByName("snokebomb");
@@ -47213,7 +47378,7 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
     if (get_property_int("_kgbTranquilizerDartUses") < 3 && my_path().id != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
-        description.listAppend("Free run/banishes for twenty turns.|Use the KGB tranquilizer dart skill in-combat.");
+        description.listAppend("Free run, 20-turn banish.|Use the KGB tranquilizer dart skill in-combat.");
         if (lookupItem("kremlin's greatest briefcase").equipped_amount() == 0)
         {
 		    description.listAppend(HTMLGenerateSpanFont("Equip the briefcase first!", "red"));
@@ -48822,7 +48987,7 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend(HTMLGenerateSpanFont("Equip the Lil' Doctor™ bag first", "red"));
             url = "inventory.php?ftext=lil'+doctor";
         } else {
-            description.listAppend("Free run/banish");
+            description.listAppend("Free run, 30-turn banish.");
         }
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Lil doctor bag reflex hammer banish"));
     }
@@ -50738,7 +50903,7 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
 			{
             emotions.listAppend(emotionHatred + " Hatreds left. 50-turn banish.");
 			
-			resource_entries.listAppend(ChecklistEntryMake("__skill feel hatred", "", ChecklistSubentryMake(pluralise(emotionHatred, "Feel Hatred", "Feels Hatreds"), "", "Cast Feel Hatred. Free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Emotion chip feel hatred banish"));
+			resource_entries.listAppend(ChecklistEntryMake("__skill feel hatred", "", ChecklistSubentryMake(pluralise(emotionHatred, "Feel Hatred", "Feels Hatreds"), "", "Free run, 50-turn banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Emotion chip feel hatred banish"));
 			}
         int emotionLonely = clampi(3 - get_property_int("_feelLonelyUsed"), 0, 3);
         if (emotionLonely > 0 && $skill[Feel Lonely].skill_is_usable())
@@ -50903,7 +51068,7 @@ void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries
 		}
 		else
 		{
-			description.listAppend(familiar_scraps + " scraps collected.");
+			description.listAppend("Free run, 100-turn banish for 100 scraps.|"+familiar_scraps + " scraps collected.");
 		}
 
 		description.listAppend("Charge up your familiar scrapbook by letting familiars act in combat.");
@@ -52377,6 +52542,22 @@ void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 	
     resource_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", url, ChecklistSubentryMake("Pizza party with the Cookbookbat!", "", description)).ChecklistEntrySetIDTag("Cookbookbat Resource"));
 }
+RegisterResourceGenerationFunction("IOTMOliversPlaceGenerateResource");
+void IOTMOliversPlaceGenerateResource(ChecklistEntry [int] resource_entries) 
+{
+    // Only generate if they actually have Oliver's Place
+    if (!get_property_boolean("ownsSpeakeasy")) return;
+
+    int free_oliver_fights_left = 3 - get_property_int("_speakeasyFreeFights");
+    string url = "place.php?whichplace=speakeasy";
+    string [int] description;
+
+    if (free_oliver_fights_left > 0) {
+        description.listAppend("Consider dragging wanderers into the speakeasy.");
+
+        resource_entries.listAppend(ChecklistEntryMake("__item Marltini", "", ChecklistSubentryMake(pluralise(free_oliver_fights_left, "Oliver's Tavern fight", "Oliver's Tavern fights"), "", description), 9).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Oliver's Tavern free fights"));
+    }
+}
 string [string, string] stationDescriptions;
 
 int trainSetReconfigurableIn() {
@@ -52446,6 +52627,8 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 
     if (count(stations) < 8) {
         description.listAppend("We can't tell how your trainset is configured. Click this tile to fix.");
+        task_entries.listAppend(ChecklistEntryMake("__item toy crazy train", url, ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("Model train set"));
+        return;
     }
 
     if (oreConfiguredWhenNotNeeded()) {
