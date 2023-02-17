@@ -54,7 +54,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     QuestState base_quest_state = __quest_state["Digital Key"];
 
     // Do not generate tiles if you do not need the digital key anymore.
-    if (base_quest_state.finished) { return }
+    if (base_quest_state.finished) { return; }
 
     // Because I'm doing nested subentries, the broader quest is a ChecklistEntry.
     ChecklistEntry entry;
