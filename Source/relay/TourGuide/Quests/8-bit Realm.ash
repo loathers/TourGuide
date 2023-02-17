@@ -218,7 +218,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         subentry.entries.listAppend("In "+pluralise(bonusTurnsRemaining, "more fight", "more fights")+", bonus zone will be <b>"+HTMLGenerateSpanFont(zoneMap[nextColor[currentColor]],nextColor[currentColor])+"</b>.");
 
         if (highestPointColor != currentColor) {
-            subentry.entries.listAppend("Alternate Route:|*"HTMLGenerateSpanFont("At current stats, you'd earn <b>"+expectedPoints[highestPointColor]+" points</b> per fight at <b>"+zoneMap[highestPointColor]+"</b>. Only do this if you can't buff higher.","gray"));
+            subentry.entries.listAppend("Alternate Route:|*"+HTMLGenerateSpanFont("At current stats, you'd earn <b>"+expectedPoints[highestPointColor]+" points</b> per fight at <b>"+zoneMap[highestPointColor]+"</b>. Only do this if you can't buff higher.","gray"));
         }
 
         // If they don't have the transfunctioner equipped, equip it and change the URL.
