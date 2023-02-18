@@ -87,7 +87,7 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		{
 			targets.listAppend("bubblin' crude (Oil Peak)");
 		}
-		if (get_property_int("desertExploration") < 100 && available_amount($item[killing jar]) < 1 && (get_property("gnasirProgress").to_int() & 4) == 0);
+		if (get_property_int("desertExploration") < 100 && available_amount($item[killing jar]) < 1 && (get_property_int("gnasirProgress") & 4) == 0);
 		{
 			targets.listAppend("killing jar (The Haunted Library)");
 		}
