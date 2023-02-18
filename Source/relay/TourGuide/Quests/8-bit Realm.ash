@@ -148,14 +148,15 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
 
     // Figure out if the user is better-suited to adventure elsewhere.
-    string highestPointColor;
+    string highestPointColor = currentColor;
 
-    foreach key, value in expectedPoints
+    foreach key, value in expectedPoints {
         if (value > expectedPoints[currentColor]) {
             if (value > expectedPoints[highestPointColor]) {
                 highestPointColor = key;
             }
         }
+    }
 
     // Now that we have calculated everything, we can finally make the tile! Before the very 
     //   detailed subentry, we have a quick statement of what the quest wants you to do. We
@@ -239,7 +240,9 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         
         if (base_quest_state.state_int["currentScore"] < 10000) 
         {
-            keyCompletionSubentry.entries.listAppend("If you max your bonus, you'll have your key in "+pluralise((10000-round(base_quest_state.state_int["currentScore"]))/400," more turn","more turns"));
+            int pointsLeft = 10000 - base_quest_state.state_int["currentScore"];
+            int minimumTurnsToGetKey = ceil(pointsLeft / 400.0); // ceil always rounds up, so any fraction of a leftover turn will add 1
+            keyCompletionSubentry.entries.listAppend("If you max your bonus, you'll have your key in "+pluralise(minimumTurnsToGetKey, "more turn", "more turns")+".");
         } 
         else 
         {
