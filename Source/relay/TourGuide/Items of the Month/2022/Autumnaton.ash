@@ -71,33 +71,33 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	
 	if (__misc_state["in run"] && my_path().id != 25)
 	{
-		if (locationAvailable($location[sonofa beach]) == true && available_amount($item[barrel of gunpowder]) < 5)
+		if (locationAvailable($location[sonofa beach]) == true && get_property("sidequestLighthouseCompleted") == "none" && available_amount($item[barrel of gunpowder]) < 5)
 		{
-			targets.listAppend("barrel of gunpowder");
+			targets.listAppend("barrel of gunpowder (Sonofa Beach)");
 		}
 		if (locationAvailable($location[twin peak]) == false && get_property_int("chasmBridgeProgress") < 30)
 		{
-			targets.listAppend("bridge parts");
+			targets.listAppend("bridge parts (The Smut Orc Logging Camp)");
 		}
-		if (get_property_int("hiddenBowlingAlleyProgress") < 6)
+		if (get_property_int("hiddenBowlingAlleyProgress") + available_amount($item[bowling ball]) < 6)
 		{
-			targets.listAppend("bowling balls");
+			targets.listAppend("bowling balls (The Hidden Bowling Alley)");
 		}
-		if (get_property_int("twinPeakProgress") < 14);
+		if (get_property_int("twinPeakProgress") < 14 && available_amount($item[jar of oil]) < 1 && available_amount($item[bubblin' crude]) < 12);
 		{
-			targets.listAppend("bubblin' crude");
+			targets.listAppend("bubblin' crude (Oil Peak)");
 		}
-		if (get_property_int("desertExploration") < 100);
+		if (get_property_int("desertExploration") < 100 && available_amount($item[killing jar]) < 1 && (get_property("gnasirProgress").to_int() & 4) == 0);
 		{
-			targets.listAppend("killing jar");
+			targets.listAppend("killing jar (The Haunted Library)");
 		}
 		if (locationAvailable($location[the oasis]) == true && get_property_int("desertExploration") < 100);
 		{
-			targets.listAppend("drum machine");
+			targets.listAppend("drum machine (An Oasis)");
 		}
 		if (__quest_state["Level 11 Ron"].mafia_internal_step < 5)
 		{
-			targets.listAppend("glark cables");
+			targets.listAppend("glark cables (The Red Zeppelin)");
 		}
 		if (targets.count() > 0)
 			description.listAppend(HTMLGenerateSpanOfClass("Potential autobot targets:", "r_bold") + "|*-" + targets.listJoinComponents("|*-"));
