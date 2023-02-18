@@ -83,15 +83,15 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		{
 			targets.listAppend("bowling balls (The Hidden Bowling Alley)");
 		}
-		if (get_property_int("twinPeakProgress") < 14 && available_amount($item[jar of oil]) < 1 && available_amount($item[bubblin' crude]) < 12);
+		if (get_property_int("twinPeakProgress") < 14 && available_amount($item[jar of oil]) < 1 && available_amount($item[bubblin' crude]) < 12)
 		{
 			targets.listAppend("bubblin' crude (Oil Peak)");
 		}
-		if (get_property_int("desertExploration") < 100 && available_amount($item[killing jar]) < 1 && (get_property_int("gnasirProgress") & 4) == 0);
+		if (get_property_int("desertExploration") < 100 && available_amount($item[killing jar]) < 1 && (get_property_int("gnasirProgress") & 4) == 0)
 		{
 			targets.listAppend("killing jar (The Haunted Library)");
 		}
-		if (locationAvailable($location[the oasis]) == true && get_property_int("desertExploration") < 100);
+		if (locationAvailable($location[the oasis]) == true && get_property_int("desertExploration") < 100)
 		{
 			targets.listAppend("drum machine (An Oasis)");
 		}
