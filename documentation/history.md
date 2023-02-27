@@ -21,4 +21,5 @@ In addition to [Ezandora](https://github.com/Ezandora) (noted above), here are a
 - [JamesDowney](https://github.com/JamesDowney) (aka Beldur)
 - [uthuluc](https://github.com/uthuluc) (aka The Erosionseeker)
 - [docrostov](https://github.com/docrostov) (aka Captain Scotch)
+- [ajcoppa](https://github.com/ajcoppa) (aka zincaito)
 - [cdrock](https://github.com/cdrock)
