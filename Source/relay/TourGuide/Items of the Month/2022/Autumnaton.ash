@@ -25,7 +25,7 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	
 	string url;
 	string [int] description;
-	string [int] targets;
+	string [int] [int] targets;
 
 	description.listAppend("Autobot grabs items from a zone you've previously visited.");
 	
@@ -73,33 +73,39 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	{
 		if (locationAvailable($location[sonofa beach]) == true && get_property("sidequestLighthouseCompleted") == "none" && available_amount($item[barrel of gunpowder]) < 5)
 		{
-			targets.listAppend("barrel of gunpowder (Sonofa Beach)");
+			targets.listAppend(listMake("barrel of gunpowder", "Sonofa Beach"));
 		}
 		if (locationAvailable($location[twin peak]) == false && get_property_int("chasmBridgeProgress") < 30)
 		{
-			targets.listAppend("bridge parts (The Smut Orc Logging Camp)");
+			targets.listAppend(listMake("bridge parts", "The Smut Orc Logging Camp"));
 		}
 		if (get_property_int("hiddenBowlingAlleyProgress") + available_amount($item[bowling ball]) < 6)
 		{
-			targets.listAppend("bowling balls (The Hidden Bowling Alley)");
+			targets.listAppend(listMake("bowling balls", "The Hidden Bowling Alley"));
 		}
 		if (get_property_int("twinPeakProgress") < 14 && available_amount($item[jar of oil]) < 1 && available_amount($item[bubblin' crude]) < 12)
 		{
-			targets.listAppend("bubblin' crude (Oil Peak)");
+			targets.listAppend(listMake("bubblin' crude", "Oil Peak"));
 		}
 		if (get_property_int("desertExploration") < 100 && available_amount($item[killing jar]) < 1 && (get_property_int("gnasirProgress") & 4) == 0)
 		{
-			targets.listAppend("killing jar (The Haunted Library)");
+			targets.listAppend(listMake("killing jar", "The Haunted Library"));
 		}
 		if (locationAvailable($location[the oasis]) == true && get_property_int("desertExploration") < 100)
 		{
-			targets.listAppend("drum machine (An Oasis)");
+			targets.listAppend(listMake("drum machine", "An Oasis"));
 		}
 		if (__quest_state["Level 11 Ron"].mafia_internal_step < 5)
 		{
-			targets.listAppend("glark cables (The Red Zeppelin)");
+			targets.listAppend(listMake("glark cables", "The Red Zeppelin"));
 		}
 		if (targets.count() > 0)
-			description.listAppend(HTMLGenerateSpanOfClass("Potential autobot targets:", "r_bold") + "|*-" + targets.listJoinComponents("|*-"));
+		{
+			buffer tooltip_text;
+			tooltip_text.append(HTMLGenerateTagWrap("div", "Potential Targets", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+			tooltip_text.append(HTMLGenerateSimpleTableLines(targets));
+			string potentialTargets = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Potential Autumnaton Targets", "r_tooltip_outer_class");
+			description.listAppend(potentialTargets);
+		}	
 	}
 }
