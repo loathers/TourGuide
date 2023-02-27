@@ -87,6 +87,8 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		{
 			targets.listAppend(listMake("bubblin' crude", "Oil Peak"));
 		}
+		// gnasirProgress is a weird property, please read the mafia wiki for clarification:
+		// https://wiki.kolmafia.us/index.php/Quest_Tracking_Preferences#gnasirProgress
 		if (get_property_int("desertExploration") < 100 && available_amount($item[killing jar]) < 1 && (get_property_int("gnasirProgress") & 4) == 0)
 		{
 			targets.listAppend(listMake("killing jar", "The Haunted Library"));
