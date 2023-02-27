@@ -11,7 +11,7 @@ void QLevel6Init()
 	
 	if (my_level() >= 6 || my_path().id == PATH_EXPLOSIONS)
 		state.startable = true;
-	
+
     state.state_int["dark neck turns on last nc"] = 0;
     state.state_int["dark heart turns on last nc"] = 0;
     state.state_int["dark elbow turns on last nc"] = 0;
@@ -22,18 +22,24 @@ void QLevel6Init()
 
 float QLevel6TurnsToCompleteArea(location place)
 {
+    QuestState base_quest_state = __quest_state["Level 6"];
     //FIXME not sure how accurate these calculations are.
     int ncs_found = noncombatTurnsAttemptedInLocation(place);
 
 
     // get_property("lastFriarsXNC").to_int() will return 0 until the first NC is hit, then it will return the turns spent in the zone prior to hitting the NC,
     // so we need to add 1 to account for the last NC itself
-    int lastFriarsNeckNC = get_property("lastFriarsNeckNC").to_int() > 0 ? get_property("lastFriarsNeckNC").to_int() + 1 : 0;
-    int lastFriarsHeartNC = get_property("lastFriarsHeartNC").to_int() > 0 ? get_property("lastFriarsHeartNC").to_int() + 1 : 0;
-    int lastFriarsElbowNC = get_property("lastFriarsElbowNC").to_int() > 0 ? get_property("lastFriarsElbowNC").to_int() + 1 : 0;
-
-
-	QuestState base_quest_state = __quest_state["Level 6"];
+    // For example, if you spend 3 turns in the neck, hit an NC, then hit another NC after 2 turns the pref will manifest as:
+    //     TURN 1: lastFriarsNeckNC = 0  
+    //     TURN 2: lastFriarsNeckNC = 0
+    //     TURN 3: lastFriarsNeckNC = 0
+    //     TURN 4: lastFriarsNeckNC = 3 <= hits NC
+    //     TURN 5: lastFriarsNeckNC = 3
+    //     TURN 6: lastFriarsNeckNC = 3
+    //     TURN 7: lastFriarsNeckNC = 6 <= hits NC
+    base_quest_state.state_int["dark neck turns on last nc"] = get_property("lastFriarsNeckNC").to_int() > 0 ? get_property("lastFriarsNeckNC").to_int() + 1 : 0;
+    base_quest_state.state_int["dark heart turns on last nc"] = get_property("lastFriarsHeartNC").to_int() > 0 ? get_property("lastFriarsHeartNC").to_int() + 1 : 0;
+    base_quest_state.state_int["dark elbow turns on last nc"] = get_property("lastFriarsElbowNC").to_int() > 0 ? get_property("lastFriarsElbowNC").to_int() + 1 : 0;
     
     boolean [string] area_known_ncs;
     if (place == $location[The Dark Neck of the Woods])
@@ -74,11 +80,11 @@ float QLevel6TurnsToCompleteArea(location place)
 
     int max_turns_remaining = ncs_remaining * 5;
     if (place == $location[The Dark Neck of the Woods])
-        max_turns_remaining -= $location[The Dark Neck of the Woods].turns_spent - lastFriarsNeckNC;
+        max_turns_remaining -= $location[The Dark Neck of the Woods].turns_spent - base_quest_state.state_int["dark neck turns on last nc"];
     if (place == $location[The Dark Heart of the Woods])
-        max_turns_remaining -= $location[The Dark Heart of the Woods].turns_spent - lastFriarsHeartNC;
+        max_turns_remaining -= $location[The Dark Heart of the Woods].turns_spent - base_quest_state.state_int["dark heart turns on last nc"];
     if (place == $location[The Dark Elbow of the Woods])
-        max_turns_remaining -= $location[The Dark Elbow of the Woods].turns_spent - lastFriarsElbowNC;
+        max_turns_remaining -= $location[The Dark Elbow of the Woods].turns_spent - base_quest_state.state_int["dark elbow turns on last nc"];
     return MIN(turns_remaining, max_turns_remaining);
 }
 
@@ -115,17 +121,23 @@ void QLevel6GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
     boolean need_minus_combat = false;
 	if ($item[dodecagram].available_amount() == 0) {
         hipster_fights_needed = true;
-		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Neck of the Woods", "r_bold") + ", acquire dodecagram.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[The Dark Neck of the Woods]), 1) + " average turns remain at " + combat_rate_modifier().floor() + "% combat.");
+		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Neck of the Woods", "r_bold") + ", acquire dodecagram.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[The Dark Neck of the Woods]), 1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
+        if ($location[The Dark Neck of the Woods].turns_spent - base_quest_state.state_int["dark neck turns on last nc"] >= 5) 
+            subentry.entries.listAppend(HTMLGenerateSpanOfClass("Your next adventure in the Neck will be an NC", "r_bold"));
         need_minus_combat = true;
     }
 	if ($item[box of birthday candles].available_amount() == 0) {
         hipster_fights_needed = true;
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Heart of the Woods", "r_bold") + ", acquire box of birthday candles.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[The Dark Heart of the Woods]), 1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
+        if ($location[The Dark Heart of the Woods].turns_spent - base_quest_state.state_int["dark heart turns on last nc"] >= 5) 
+            subentry.entries.listAppend(HTMLGenerateSpanOfClass("Your next adventure in the Heart will be an NC", "r_bold"));
         need_minus_combat = true;
     }
 	if ($item[Eldritch butterknife].available_amount() == 0) {
         hipster_fights_needed = true;
 		subentry.entries.listAppend("Adventure in " + HTMLGenerateSpanOfClass("Dark Elbow of the Woods", "r_bold") + ", acquire Eldritch butterknife.|~" + roundForOutput(QLevel6TurnsToCompleteArea($location[The Dark Elbow of the Woods]), 1) + " turns remain at " + combat_rate_modifier().floor() + "% combat.");
+        if ($location[The Dark Elbow of the Woods].turns_spent - base_quest_state.state_int["dark elbow turns on last nc"] >= 5) 
+            subentry.entries.listAppend(HTMLGenerateSpanOfClass("Your next adventure in the Elbow will be an NC", "r_bold"));
         need_minus_combat = true;
     }
     

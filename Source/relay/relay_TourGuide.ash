@@ -1,6 +1,6 @@
 //This script and its support scripts are in the public domain.
 
-since r26713; // $path update
+since r26878; // lastFriars NC tracking
 import "relay/TourGuide/Main.ash"
 
 void main()
