@@ -113,8 +113,6 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     nextColor["blue"] = "green";
     nextColor["green"] = "red";
 
-    int [string] turnsInZone;
-
     int bonusTurnsRemaining = 5 - get_property("8BitBonusTurns").to_int();
     
     // Populate user's modifier for each bonus; iterates through black/red/blue/green
