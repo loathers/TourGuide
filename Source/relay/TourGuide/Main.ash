@@ -130,7 +130,7 @@ void runMain(string relay_filename)
     
     string horizontal_container_styles = "position:relative;max-width:" + max_width_setting + "px;" + bottom_margin;
     if (isAprilFools()) {
-        horizontal_container_styles += "rotate: -0.45deg";
+        horizontal_container_styles += "transform: rotate3d(1, 1.5, 0.2, 30deg); transform-origin: 10px top";
     }
     PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_centre", "id", "Guide_horizontal_container", "style", horizontal_container_styles))); //centre holding container
     
