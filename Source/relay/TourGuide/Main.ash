@@ -27,7 +27,6 @@ import "relay/TourGuide/Sections/Contextual Menu.ash"
 import "relay/TourGuide/Items of the Month/Items of the Month import.ash"
 import "relay/TourGuide/Paths/Paths import.ash"
 
-
 void runMain(string relay_filename)
 {
 	string [string] form_fields = form_fields();
@@ -62,6 +61,9 @@ void runMain(string relay_filename)
 	generateChecklists(ordered_output_checklists);
 	
     string guide_title = "TourGuide";
+    if (isAprilFools()) {
+        guide_title = "Glup Shitto Stole Rogue V's Targeting Computer";
+    }
     if (limit_mode() == "batman")
         guide_title = "Bat-Guide";
 	
@@ -126,7 +128,11 @@ void runMain(string relay_filename)
     if (bottom_offset > 0.0)
         bottom_margin = "margin-bottom:" + bottom_offset + "em;";
     
-    PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_centre", "id", "Guide_horizontal_container", "style", "position:relative;max-width:" + max_width_setting + "px;" + bottom_margin))); //centre holding container
+    string horizontal_container_styles = "position:relative;max-width:" + max_width_setting + "px;" + bottom_margin;
+    if (isAprilFools()) {
+        horizontal_container_styles += "rotate: -0.45deg";
+    }
+    PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_centre", "id", "Guide_horizontal_container", "style", horizontal_container_styles))); //centre holding container
     
     
     
@@ -262,7 +268,12 @@ void runMain(string relay_filename)
         // Head text
         
         // Title
-        PageWrite(HTMLGenerateSpanOfStyle(guide_title, "font-weight:bold; font-size:1.5em"));
+        string titleStyles = "font-weight:bold; font-size:1.5em;";
+        if (isAprilFools()) {
+            titleStyles = titleStyles + "background-image: linear-gradient(-225deg,#231557 0%,#44107a 15%,#ff1361 30%,#fff800 60%);background-size: auto auto;background-clip: border-box;background-size: 200% auto;color: #fff;background-clip: text;text-fill-color: transparent;-webkit-background-clip: text;-webkit-text-fill-color: transparent;display: inline-block";
+        }
+        PageWrite(HTMLGenerateSpanOfStyle(guide_title, titleStyles));
+
         // Day + Turn Count
         if (__misc_state["in run"] && playerIsLoggedIn()) {
             PageWrite(HTMLGenerateDivOfClass("Day " + my_daycount() + ". " + pluralise(my_turncount(), "turn", "turns") + " played.", "r_bold"));
