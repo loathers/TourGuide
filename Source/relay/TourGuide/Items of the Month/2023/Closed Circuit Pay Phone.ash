@@ -10,7 +10,7 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
 
     int shadowLodestones = available_amount($item[Rufus's shadow lodestone]);
     if (shadowLodestones > 0) {
-        questDescription.listAppend(HTMLGenerateSpanFont("Have " + shadowLodestones + " " + pluralise($item[Rufus's shadow lodestone]) + ".", "purple"));
+        questDescription.listAppend(HTMLGenerateSpanFont("Have " + pluralise($item[Rufus's shadow lodestone]) + ".", "purple"));
     }
 
     int riftAdvsUntilNC = get_property_int("encountersUntilSRChoice");
