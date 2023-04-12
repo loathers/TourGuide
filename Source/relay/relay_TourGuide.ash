@@ -1,6 +1,6 @@
 //This script and its support scripts are in the public domain.
 
-since r26878; // lastFriars NC tracking
+since r27273; // 8BitBonusTurns implemented
 import "relay/TourGuide/Main.ash"
 
 void main()
