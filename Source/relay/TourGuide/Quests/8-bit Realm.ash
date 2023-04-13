@@ -113,16 +113,7 @@ void Q8bitRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     nextColor["blue"] = "green";
     nextColor["green"] = "red";
 
-    int [string] turnsInZone;
-    
-    // I do not like using turnsSpent; it has weird behavior w/ freeruns. Best we got tho! :-(
-    foreach key in helpfulModifier
-        turnsInZone[key] = to_location(zoneMap[key]).turns_spent;
-
-    int bonusTurnsRemaining = 5 - ((turnsInZone["black"]+
-                                turnsInZone["red"]+
-                                turnsInZone["blue"]+
-                                turnsInZone["green"]) % 5);
+    int bonusTurnsRemaining = 5 - get_property("8BitBonusTurns").to_int();
     
     // Populate user's modifier for each bonus; iterates through black/red/blue/green
     int [string] userModifier; 

@@ -1,6 +1,6 @@
 //This script and its support scripts are in the public domain.
 
-since r26713; // $path update
+since r27273; // 8BitBonusTurns implemented
 import "relay/TourGuide/Main.ash"
 
 void main()
