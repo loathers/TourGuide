@@ -78,7 +78,9 @@ void showCursedItemsResourceTile(ChecklistEntry [int] resource_entries) {
         }
     }
 
-    resource_entries.listAppend(ChecklistEntryMake("__monster shadow prism", "", ChecklistSubentryMake("Cursed boss drops", "", description), 2).ChecklistEntrySetIDTag("Avatar of Shadows Over Loathing cursed items resource"));
+    if (count(description) > 0) {
+        resource_entries.listAppend(ChecklistEntryMake("__monster shadow prism", "", ChecklistSubentryMake("Cursed boss drops", "", description), 2).ChecklistEntrySetIDTag("Avatar of Shadows Over Loathing cursed items resource"));
+    }
 }
 
 void showDecurseResourceTile(ChecklistEntry [int] resource_entries) {
