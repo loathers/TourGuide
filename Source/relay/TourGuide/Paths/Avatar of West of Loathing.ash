@@ -143,7 +143,7 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     class_points[$class[Snake Oiler]] += get_property_int("awolPointsSnakeoiler");
     
     item [class] tale_for_class;
-    tale_for_class[$class[Cow Puncher]] = $item[Tales of the West: Cow Punching];
+    tale_for_class[$class[Cow Puncher]] = $item[Tales of the West: \ Cow Punching];
     tale_for_class[$class[Beanslinger]] = $item[Tales of the West: Beanslinging];
     tale_for_class[$class[Snake Oiler]] = $item[Tales of the West: Snake Oiling];
     
