@@ -14,7 +14,7 @@ void LockPickingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 
 void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_path().id == PATH_COMMUNITY_SERVICE) {
+	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING) {
         return;
     }
 
