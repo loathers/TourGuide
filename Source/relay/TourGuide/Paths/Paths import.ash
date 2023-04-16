@@ -20,3 +20,4 @@ import "relay/TourGuide/Paths/Explosions.ash";
 import "relay/TourGuide/Paths/Low Key.ash";
 import "relay/TourGuide/Paths/Grey Goo.ash";
 import "relay/TourGuide/Paths/Fall of the Dinosaurs.ash";
+import "relay/TourGuide/Paths/Avatar of Shadows over Loathing.ash";

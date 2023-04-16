@@ -11,21 +11,21 @@ void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries
 			description.listAppend(HTMLGenerateSpanFont("Don't waste it on fire crackers!", "red"));
 			task_entries.listAppend(ChecklistEntryMake("__effect Ready to Eat", "", ChecklistSubentryMake("Ready to Eat!", "", description), -11));
 		}
-		if ($effect[Everything Looks Red].have_effect() == 0)
+		if ($effect[Everything Looks Red].have_effect() == 0 && my_class() != $class[pig skinner])
 		{
 			string [int] description;
 			string url = "clan_viplounge.php?action=fwshop&whichfloor=2";
 			description.listAppend(HTMLGenerateSpanFont("5x food statgain on the next thing you eat.", "red"));
 			optional_task_entries.listAppend(ChecklistEntryMake("__item red rocket", url, ChecklistSubentryMake("Fire a red rocket", "", description), 8));
 		}		
-		if ($effect[Everything Looks Blue].have_effect() == 0)
+		if ($effect[Everything Looks Blue].have_effect() == 0 && my_class() != $class[jazz agent])
 		{
 			string [int] description;
 			string url = "clan_viplounge.php?action=fwshop&whichfloor=2";
 			description.listAppend(HTMLGenerateSpanFont("More MP than your body has room for!", "blue"));
 			optional_task_entries.listAppend(ChecklistEntryMake("__item blue rocket", url, ChecklistSubentryMake("Fire a blue rocket", "", description), 8));
 		}
-		if ($effect[Everything Looks Yellow].have_effect() == 0)
+		if ($effect[Everything Looks Yellow].have_effect() == 0 && my_class() != $class[cheese wizard])
 		{
 			string [int] description;
 			string url = "clan_viplounge.php?action=fwshop&whichfloor=2";
