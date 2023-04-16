@@ -31,10 +31,7 @@ record CursedItem {
     boolean shouldDisplay;
 };
 
-RegisterResourceGenerationFunction("PathShadowsOverLoathingGenerateResource");
-void PathShadowsOverLoathingGenerateResource(ChecklistEntry [int] resource_entries) {
-    if (my_path() != $path[Avatar of Shadows Over Loathing]) return;
-
+void showCursedItemsResourceTile(ChecklistEntry [int] resource_entries) {
     CursedItem [int] cursedItems = {
         new CursedItem(
             $item[cursed bat paw],
@@ -82,4 +79,28 @@ void PathShadowsOverLoathingGenerateResource(ChecklistEntry [int] resource_entri
     }
 
     resource_entries.listAppend(ChecklistEntryMake("__monster shadow prism", "", ChecklistSubentryMake("Cursed boss drops", "", description), 2).ChecklistEntrySetIDTag("Avatar of Shadows Over Loathing cursed items resource"));
+}
+
+void showDecurseResourceTile(ChecklistEntry [int] resource_entries) {
+    int fastenersNeeded = __quest_state["Level 9"].state_int["bridge fasteners needed"];
+    int lumberNeeded = __quest_state["Level 9"].state_int["bridge lumber needed"];
+    boolean needBridgeParts =  __quest_state["Level 9"].mafia_internal_step == 1 && // Bridge not complete yet
+        (fastenersNeeded > 0 || lumberNeeded > 0 ); // And we need some parts
+    boolean shouldDecurseBatPaw = my_level() >= 12 &&
+        __quest_state["Cyrpt"].finished == true &&
+        __quest_state["Typical Tavern"].finished == true &&
+        needBridgeParts;
+
+    if (shouldDecurseBatPaw) {
+        string description = `{HTMLGenerateSpanOfClass("cursed bat paw", "r_bold")} to get -ML for bridge parts!`;
+        resource_entries.listAppend(ChecklistEntryMake("__item uncursed bat paw", "", ChecklistSubentryMake("Useful items to decurse", "", description), 0).ChecklistEntrySetIDTag("Avatar of Shadows Over Loathing decurse resource"));
+    }
+}
+
+RegisterResourceGenerationFunction("PathShadowsOverLoathingGenerateResource");
+void PathShadowsOverLoathingGenerateResource(ChecklistEntry [int] resource_entries) {
+    if (my_path() != $path[Avatar of Shadows Over Loathing]) return;
+
+    showCursedItemsResourceTile(resource_entries);
+    showDecurseResourceTile(resource_entries);
 }
