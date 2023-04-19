@@ -14,7 +14,10 @@ void LockPickingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 
 void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	
+	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING) {
+        return;
+    }
+
 	if (__last_adventure_location == $location[The Daily Dungeon])
 	{
 		if ($item[ring of detect boring doors].equipped_amount() == 0 && $item[ring of detect boring doors].available_amount() > 0 && !get_property_boolean("dailyDungeonDone") && get_property_int("_lastDailyDungeonRoom") < 10)
