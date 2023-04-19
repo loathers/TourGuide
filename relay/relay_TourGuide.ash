@@ -25196,7 +25196,9 @@ boolean HITSStillRelevant()
 		return false;
 	if (!__quest_state["Level 10"].finished && my_path().id != PATH_EXPLOSIONS)
 		return false;
-        
+	if (my_path().id == PATH_COMMUNITY_SERVICE)
+		return false;
+
 	return true;
 }
 
@@ -26307,7 +26309,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     if (lookupSkill("Evoke Eldritch Horror").skill_is_usable() && !get_property_boolean("_eldritchHorrorEvoked")) {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Evoke eldritch horror skill free fight"));
     }
-    if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS) {
+    if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS && my_path().id != PATH_COMMUNITY_SERVICE) {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage&action=fv_scientist", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Daily forest tentacle free fight"));
     }
     
@@ -27313,7 +27315,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item BittyCar MeatCar", "inventory.php?ftext=bittycar", ChecklistSubentryMake("BittyCar " + available_items.listJoinComponents(", ", "or") + " usable", "", description), importance_level_unimportant_item).ChecklistEntrySetIDTag("Bittycars resource"));
     }
     
-    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "mysticality" && !get_property_ascension("lastGoofballBuy") && __quest_state["Level 3"].started && my_path().id != PATH_ZOMBIE_SLAYER) {
+    if (in_run && !__quest_state["Level 13"].state_boolean["Stat race completed"] && __quest_state["Level 13"].state_string["Stat race type"] != "mysticality" && !get_property_ascension("lastGoofballBuy") && __quest_state["Level 3"].started && my_path().id != PATH_ZOMBIE_SLAYER && my_path().id != PATH_COMMUNITY_SERVICE) {
         resource_entries.listAppend(ChecklistEntryMake("__item bottle of goofballs", "tavern.php?place=susguy", ChecklistSubentryMake("Bottle of goofballs obtainable", "", "For the lair stat test.|Costs nothing, but be careful..."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Goofballs resource"));
     }
     
@@ -28130,7 +28132,10 @@ void LockPickingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 
 void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	
+	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING) {
+        return;
+    }
+
 	if (__last_adventure_location == $location[The Daily Dungeon])
 	{
 		if ($item[ring of detect boring doors].equipped_amount() == 0 && $item[ring of detect boring doors].available_amount() > 0 && !get_property_boolean("dailyDungeonDone") && get_property_int("_lastDailyDungeonRoom") < 10)
@@ -31693,7 +31698,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         if (my_path().id == PATH_NUCLEAR_AUTUMN)
         {
-            subentry.entries.listAppend("Wait until level eleven, which will unlock it autumnaically.");
+            subentry.entries.listAppend("Wait until level eleven, which will unlock it autumn-atically.");
         }
 		else if (!knoll_available())
 		{
