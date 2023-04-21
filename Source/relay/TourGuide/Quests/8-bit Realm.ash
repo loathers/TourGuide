@@ -6,16 +6,21 @@ void Q8BitInit()
 
     // Set the state as "started" if you have the continuum transfunctioner.
     if (!state.started && $items[continuum transfunctioner].available_amount() > 0)
-        QuestStateParseMafiaQuestPropertyValue(state, "started");
+        state.started = true;
 
     // Finish this quest if you are in community service, so the tiles never generate.
-    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_COMMUNITY_SERVICE) state.finished = true;
 
     // Finish this quest tile if you are in Kingdom of Exploathing, as 8-bit doesn't exist there.
-    if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_KINGDOM_OF_EXPLOATHING) state.finished = true;
 
     // Finish this quest tile if you are no longer in-run. Currently commented for testing.
-    if (!__misc_state["in run"]) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (!__misc_state["in run"]) state.finished = true;
+
+    boolean haveDigitalKey = $item[digital key].available_amount() > 0;
+    boolean turnedInDigitalKey = __quest_state["Level 13"].state_boolean["digital key used"];
+
+    if (haveDigitalKey || turnedInDigitalKey) state.finished = true;
 
     // Establish basic information for tile generation
     state.quest_name = "Digital Key Quest";
@@ -28,18 +33,6 @@ void Q8BitInit()
 
     // Bonus zone is tracked via the 8BitColor pref; black/red/blue/green are the zone colors 
     state.state_string["currentColor"] = get_property("8BitColor");
-
-    // If you don't have the digital key, you need the digital key
-    state.state_boolean["haveDigitalKey"] = $item[digital key].available_amount() > 0;
-
-    // Have you turned in the digital key?
-    state.state_boolean["turnedInDigitalKey"] = __quest_state["Level 13"].state_boolean["digital key used"];
-
-    if (state.finished)
-    {
-        state.state_boolean["haveDigitalKey"] = false;
-        state.state_boolean["turnedInDigitalKey"] = true;
-    }
 
 	__quest_state["Digital Key"] = state;
 }
