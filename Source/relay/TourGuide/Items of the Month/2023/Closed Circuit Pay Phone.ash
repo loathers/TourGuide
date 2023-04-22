@@ -25,38 +25,52 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
         return;
 
     string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem=11169";
+    QuestState state = parseRufusQuestState();
 
-    string [int] questDescription;
+    ChecklistEntry [int] whereToAddRufusQuestTile;
+    string rufusImage = "__item closed-circuit pay phone";
+    string rufusQuestTitle;
+    string [int] rufusQuestDescription;
+    int rufusQuestPriority;
+    
     int shadowLodestones = available_amount($item[Rufus's shadow lodestone]);
     if (shadowLodestones > 0) {
-        questDescription.listAppend(HTMLGenerateSpanFont("Have " + pluralise($item[Rufus's shadow lodestone]) + ".", "purple"));
+        rufusQuestDescription.listAppend(HTMLGenerateSpanFont("Have " + pluralise($item[Rufus's shadow lodestone]) + ".", "purple"));
     }
 
     int riftAdvsUntilNC = get_property_int("encountersUntilSRChoice");
-    questDescription.listAppend(HTMLGenerateSpanFont(riftAdvsUntilNC + " encounters until NC/boss.", "black"));
-
-    QuestState state = parseRufusQuestState();
+    rufusQuestDescription.listAppend(HTMLGenerateSpanFont(riftAdvsUntilNC + " encounters until NC/boss.", "black"));
 
     if (state.state_boolean["quest objective fulfilled"]) {
         // We've fulfilled the quest objective but still need to call Rufus
-        questDescription.listAppend(HTMLGenerateSpanFont("Call Rufus and get a lodestone", "black"));
-        task_entries.listAppend(ChecklistEntryMake("__item closed-circuit pay phone", url, ChecklistSubentryMake("Rufus quest done", "", questDescription), -11));
+        rufusQuestDescription.listAppend(HTMLGenerateSpanFont("Call Rufus and get a lodestone", "black"));
+        rufusQuestTitle = "Rufus quest done";
+        rufusQuestPriority = -11;
+        whereToAddRufusQuestTile = task_entries;
+    }
+    else if (state.started && riftAdvsUntilNC == 0) {
+        rufusQuestDescription.listAppend(HTMLGenerateSpanFont("Fight a boss or get an artifact", "black"));
+        rufusQuestTitle = "Shadow Rift NC up next";
+        rufusQuestPriority = -11;
+        rufusImage = "__item shadow bucket";
+        whereToAddRufusQuestTile = task_entries;
     }
     else if (state.started) {
-        optional_task_entries.listAppend(ChecklistEntryMake("__item closed-circuit pay phone", url, ChecklistSubentryMake("Rufus quest in progress", "", questDescription), 11));
+        rufusQuestTitle = "Rufus quest in progress";
+        rufusQuestPriority = 11;
+        whereToAddRufusQuestTile = optional_task_entries;
     }
     else if (!state.started) {
         boolean calledRufusToday = get_property_boolean("_shadowAffinityToday");
         string textColor = calledRufusToday ? "black" : "red";
         string callRufusMessage = calledRufusToday ? "Optionally call Rufus again for another (turn-taking) quest." : "Haven't called Rufus yet today.";
-        questDescription.listAppend(HTMLGenerateSpanFont(callRufusMessage, textColor));
-        optional_task_entries.listAppend(ChecklistEntryMake("__item closed-circuit pay phone", url, ChecklistSubentryMake("Rufus quest doable now", "", questDescription), 11));
+        rufusQuestDescription.listAppend(HTMLGenerateSpanFont(callRufusMessage, textColor));
+        rufusQuestTitle = "Rufus quest doable now";
+        rufusQuestPriority = 11;
+        whereToAddRufusQuestTile = optional_task_entries;
     }
 
-    if (riftAdvsUntilNC == 0) {
-        questDescription.listAppend(HTMLGenerateSpanFont("Fight a boss or get an artifact", "black"));
-        task_entries.listAppend(ChecklistEntryMake("__item shadow bucket", url, ChecklistSubentryMake("Shadow Rift NC up next", "", questDescription), -11));
-    }
+    whereToAddRufusQuestTile.listAppend(ChecklistEntryMake(rufusImage, url, ChecklistSubentryMake(rufusQuestTitle, "", rufusQuestDescription), rufusQuestPriority));
 
     if ($effect[Shadow Affinity].have_effect() > 0) {
         int shadowRiftFightsDoableRightNow = $effect[Shadow Affinity].have_effect();
