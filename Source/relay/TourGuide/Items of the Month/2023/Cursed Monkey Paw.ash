@@ -1,8 +1,19 @@
 record Wishable {
+    // If the wishable is an item, set that here. Otherwise, use $item[none].
     item theItem;
+
+    // If the wishable is an effect, set that here. Otherwise, use $effect[none].
     effect theEffect;
+
+    // If you want additional description text other than the item/effect name,
+    // set that here.
     string additionalDescription;
+
+    // A boolean value indicating whether the wishable is useful at all.
     boolean shouldDisplay;
+
+    // A boolean value indicating whether the wishable is currently accessible
+    // (since the paw will prevent wishes you can't access).
     boolean currentlyAccessible;
 };
 
