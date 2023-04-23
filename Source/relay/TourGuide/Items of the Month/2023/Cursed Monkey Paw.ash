@@ -141,6 +141,13 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             true
         ),
         new Wishable(
+            $item[none],
+            $effect[Painted-On Bikini],
+            HTMLGenerateSpanFont("+100 sleaze damage", "purple"),
+            get_property_int("zeppelinProtestors") < 80,
+            true
+        ),
+        new Wishable(
             $item[glark cable],
             $effect[none],
             "",
