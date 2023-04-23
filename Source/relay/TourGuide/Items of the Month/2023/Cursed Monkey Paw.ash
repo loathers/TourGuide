@@ -198,7 +198,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         new Wishable(
             $item[none],
             $effect[Frosty],
-            "item/meat for 8-bit",
+            "init/item/meat for 8-bit",
             !__quest_state["Level 13"].state_boolean["digital key used"] &&
                 $item[digital key].available_amount() < 1 &&
                 get_property("8BitScore") < 10000,
