@@ -134,3 +134,4 @@ import "relay/TourGuide/Items of the Month/2022/Model Train Set.ash";
 import "relay/TourGuide/Items of the Month/2023/Rock Garden.ash";
 import "relay/TourGuide/Items of the Month/2023/SIT Course Certificate.ash";
 import "relay/TourGuide/Items of the Month/2023/Closed Circuit Pay Phone.ash";
+import "relay/TourGuide/Items of the Month/2023/Cursed Monkey Paw.ash";
