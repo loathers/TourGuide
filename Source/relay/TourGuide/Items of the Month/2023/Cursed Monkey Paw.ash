@@ -1,59 +1,55 @@
-record Wishable {
-    // If the wishable is an item, set that here. Otherwise, use $item[none].
+record MonkeyWish {
+    // If the wish is an item, set that here. Otherwise, use $item[none].
     item theItem;
 
-    // If the wishable is an effect, set that here. Otherwise, use $effect[none].
+    // If the wish is an effect, set that here. Otherwise, use $effect[none].
     effect theEffect;
 
     // If you want additional description text other than the item/effect name,
     // set that here.
     string additionalDescription;
 
-    // A boolean value indicating whether the wishable is useful at all.
+    // A boolean value indicating whether the wish is useful at all.
     boolean shouldDisplay;
 
-    // A boolean value indicating whether the wishable is currently accessible
+    // A boolean value indicating whether the wish is currently accessible
     // (since the paw will prevent wishes you can't access).
     boolean currentlyAccessible;
 };
 
-string showWishable(Wishable wishable) {
-    string color = wishable.currentlyAccessible ? "black" : "gray";
-    string wishableStr;
-    string additionalDescription = wishable.additionalDescription != "" ?
-        `: {wishable.additionalDescription}` :
+string showWish(MonkeyWish wish) {
+    string color = wish.currentlyAccessible ? "black" : "gray";
+    string wishStr;
+    string additionalDescription = wish.additionalDescription != "" ?
+        `: {wish.additionalDescription}` :
         "";
-    if (wishable.theItem != $item[none]) {
-        wishableStr = `{wishable.theItem.name}{additionalDescription}`;
-    } else if (wishable.theEffect != $effect[none]) {
-        wishableStr = `{wishable.theEffect.name}{additionalDescription}`;
+    if (wish.theItem != $item[none]) {
+        wishStr = `{wish.theItem.name}{additionalDescription}`;
+    } else if (wish.theEffect != $effect[none]) {
+        wishStr = `{wish.theEffect.name}{additionalDescription}`;
     } else {
-        wishableStr = "Unknown item/effect. Report to TourGuide devs >:(";
+        wishStr = "Unknown item/effect. Report to TourGuide devs >:(";
     }
-    return HTMLGenerateSpanFont(wishableStr, color);
+    return HTMLGenerateSpanFont(wishStr, color);
 }
 
-string [int] showWishables(Wishable [int] wishables) {
-    string [int] currentWishables = {};
-    string [int] futureWishables = {};
+string [int] showWishes(MonkeyWish [int] wishes) {
+    string [int] currentWishes = {};
+    string [int] futureWishes = {};
     // My kingdom for polymorphic filter :|
-    foreach index, wishable in wishables {
-        if (!wishable.shouldDisplay) continue;
+    foreach index, wish in wishes {
+        if (!wish.shouldDisplay) continue;
 
-        if (wishable.theItem == $item[short writ of habeas corpus]) {
-            print(__quest_state["Level 11 Hidden City"].finished);
-            print(wishable.shouldDisplay);
-        }
-        if (wishable.currentlyAccessible) {
-            currentWishables.listAppend(showWishable(wishable));
+        if (wish.currentlyAccessible) {
+            currentWishes.listAppend(showWish(wish));
         } else {
-            futureWishables.listAppend(showWishable(wishable));
+            futureWishes.listAppend(showWish(wish));
         }
     }
-    string [int] allWishables = {};
-    allWishables.listAppendList(currentWishables);
-    allWishables.listAppendList(futureWishables);
-    return allWishables;
+    string [int] allWishes = {};
+    allWishes.listAppendList(currentWishes);
+    allWishes.listAppendList(futureWishes);
+    return allWishes;
 }
 
 record MonkeySkill {
@@ -71,8 +67,8 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
     url = "main.php?action=cmonk&pwd=" + my_hash() + "";
     description.listAppend("Return to monke. Wish for items or effects:");
 
-    Wishable [int] inRunWishables = {
-        new Wishable(
+    MonkeyWish [int] inRunWishes = {
+        new MonkeyWish(
             $item[sonar-in-a-biscuit],
             $effect[none],
             "",
@@ -80,7 +76,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
                 !locationAvailable($location[The Boss Bat's Lair]),
             locationAvailable($location[Guano Junction])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[stone wool],
             $effect[none],
             "",
@@ -88,28 +84,28 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
                 available_amount($item[stone wool]) < 1,
             locationAvailable($location[The Hidden Temple])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[amulet of extreme plot significance],
             $effect[none],
             "",
             !locationAvailable($location[The Castle In The Clouds In The Sky (Basement)]),
             locationAvailable($location[The Penultimate Fantasy Airship])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[mohawk wig],
             $effect[none],
             "",
             !locationAvailable($location[The Castle In The Clouds In The Sky (Basement)]),
             locationAvailable($location[The Penultimate Fantasy Airship])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[soft green echo eyedrop antidote],
             $effect[none],
             "",
             !locationAvailable($location[The Castle In The Clouds In The Sky (Basement)]),
             locationAvailable($location[The Penultimate Fantasy Airship])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[book of matches],
             $effect[none],
             "",
@@ -117,14 +113,14 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
                 $item[book of matches].available_amount() < 1,
             locationAvailable($location[The Hidden Park])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[rusty hedge trimmers],
             $effect[none],
             "",
             get_property_int("twinPeakProgress") < 13,
             locationAvailable($location[Twin Peak])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[killing jar],
             $effect[none],
             "",
@@ -133,35 +129,35 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
                 available_amount($item[killing jar]) < 1,
             locationAvailable($location[The Haunted Library])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[none],
             $effect[Dirty Pear],
             HTMLGenerateSpanFont("double sleaze damage", "purple"),
             get_property_int("zeppelinProtestors") < 80,
             true
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[none],
             $effect[Painted-On Bikini],
             HTMLGenerateSpanFont("+100 sleaze damage", "purple"),
             get_property_int("zeppelinProtestors") < 80,
             true
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[glark cable],
             $effect[none],
             "",
             __quest_state["Level 11 Ron"].mafia_internal_step < 5,
             locationAvailable($location[The Red Zeppelin])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[short writ of habeas corpus],
             $effect[none],
             "",
             !__quest_state["Level 11 Hidden City"].finished,
             locationAvailable($location[The Hidden Park])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[lion oil],
             $effect[none],
             "",
@@ -169,7 +165,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
                 $item[lion oil].available_amount() < 1,
             locationAvailable($location[Whitey's Grove])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[bird rib],
             $effect[none],
             "",
@@ -177,7 +173,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
                 $item[bird rib].available_amount() < 1,
             locationAvailable($location[Whitey's Grove])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[drum machine],
             $effect[none],
             "",
@@ -185,7 +181,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
                 $item[drum machine].available_amount() < 1,
             locationAvailable($location[The Oasis])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[green smoke bomb],
             $effect[none],
             "",
@@ -193,7 +189,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             !__quest_state["Level 12"].finished &&
                 locationAvailable($location[The Battlefield (Frat Uniform)])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[star chart],
             $effect[none],
             "",
@@ -202,7 +198,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
                 $item[star chart].available_amount() < 1,
             locationAvailable($location[The Hole In The Sky])
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[none],
             $effect[Frosty],
             "init/item/meat for 8-bit",
@@ -211,7 +207,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
                 get_property("8BitScore") < 10000,
             true
         ),
-        new Wishable(
+        new MonkeyWish(
             $item[lowercase N],
             $effect[none],
             "",
@@ -222,8 +218,8 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         )
     };
 
-    Wishable [int] aftercoreWishables = {
-        new Wishable(
+    MonkeyWish [int] aftercoreWishes = {
+        new MonkeyWish(
             $item[bag of foreign bribes],
             $effect[none],
             "",
@@ -235,10 +231,10 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
     int monkeyWishesLeft = clampi(5 - get_property_int("_monkeyPawWishesUsed"), 0, 5);
     string [int] options;
     if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE) {
-        options.listAppendList(showWishables(inRunWishables));
+        options.listAppendList(showWishes(inRunWishes));
     }
     if (!__misc_state["in run"]) {
-        options.listAppendList(showWishables(aftercoreWishables));
+        options.listAppendList(showWishes(aftercoreWishes));
         if (count(options) == 0) {
             options.listAppend("The poors will have to settle for wishing effects.");
         }
