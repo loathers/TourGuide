@@ -81,35 +81,30 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             $effect[none],
             "",
             !locationAvailable($location[The Hidden Park]) &&
-                available_amount($item[stone wool]) < 1,
+                available_amount($item[stone wool]) < 2,
             locationAvailable($location[The Hidden Temple])
         ),
         new MonkeyWish(
             $item[amulet of extreme plot significance],
             $effect[none],
             "",
-            !locationAvailable($location[The Castle In The Clouds In The Sky (Basement)]),
+            !locationAvailable($location[The Castle In The Clouds In The Sky (Ground Floor)]) &&
+                available_amount($item[amulet of extreme plot significance]) < 1,
             locationAvailable($location[The Penultimate Fantasy Airship])
         ),
         new MonkeyWish(
             $item[mohawk wig],
             $effect[none],
             "",
-            !locationAvailable($location[The Castle In The Clouds In The Sky (Basement)]),
-            locationAvailable($location[The Penultimate Fantasy Airship])
-        ),
-        new MonkeyWish(
-            $item[soft green echo eyedrop antidote],
-            $effect[none],
-            "",
-            !locationAvailable($location[The Castle In The Clouds In The Sky (Basement)]),
+            !__quest_state["Level 10"].finished &&
+                available_amount($item[mohawk wig]) < 1,
             locationAvailable($location[The Penultimate Fantasy Airship])
         ),
         new MonkeyWish(
             $item[book of matches],
             $effect[none],
             "",
-            my_ascensions() > get_property_int("hiddenTavernUnlock") &&
+            my_ascensions() != get_property_int("hiddenTavernUnlock") &&
                 $item[book of matches].available_amount() < 1,
             locationAvailable($location[The Hidden Park])
         ),
@@ -201,7 +196,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         new MonkeyWish(
             $item[none],
             $effect[Frosty],
-            "init/item/meat for 8-bit",
+            "init/item/meat",
             !__quest_state["Level 13"].state_boolean["digital key used"] &&
                 $item[digital key].available_amount() < 1 &&
                 get_property("8BitScore") < 10000,
@@ -210,10 +205,15 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         new MonkeyWish(
             $item[lowercase N],
             $effect[none],
-            "",
+            "summon the nagamar",
             !__quest_state["Level 13"].state_boolean["king waiting to be freed"] &&
-                $item[wand of nagamar].available_amount() < 1 &&
-                $item[lowercase N].available_amount() < 1,
+                // This accounts for being on a path that needs the wand as well
+                // as whether you already have one. See State.ash
+                __misc_state["wand of nagamar needed"] &&
+                $item[lowercase N].available_amount() < 1 &&
+                $item[ruby W].available_amount() > 0 &&
+                $item[metallic A].available_amount() > 0 &&
+                $item[heavy D].available_amount() > 0,
             locationAvailable($location[The Valley of Rof L'm Fao])
         )
     };
