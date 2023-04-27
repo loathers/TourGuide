@@ -77,6 +77,38 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             locationAvailable($location[Guano Junction])
         ),
         new MonkeyWish(
+            $item[enchanted bean],
+            $effect[none],
+            "",
+            !__quest_state["Level 10"].state_boolean["beanstalk grown"] &&
+                available_amount($item[enchanted bean]) < 1,
+            locationAvailable($location[The Beanbat Chamber])
+        ),
+        new MonkeyWish(
+            $item[none],
+            $effect[Knob Goblin Perfume],
+            "",
+            !__quest_state["Level 5"].finished &&
+                available_amount($item[Knob Goblin perfume]) < 1,
+            true
+        ),
+        new MonkeyWish(
+            $item[Knob Goblin harem veil],
+            $effect[none],
+            "",
+            !__quest_state["Level 5"].finished &&
+                available_amount($item[Knob Goblin harem veil]) < 1,
+            locationAvailable($location[Cobb's Knob Harem])
+        ),
+        new MonkeyWish(
+            $item[Knob Goblin harem pants],
+            $effect[none],
+            "",
+            !__quest_state["Level 5"].finished &&
+                available_amount($item[Knob Goblin harem pants]) < 1,
+            locationAvailable($location[Cobb's Knob Harem])
+        ),
+        new MonkeyWish(
             $item[stone wool],
             $effect[none],
             "",
@@ -177,12 +209,20 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             locationAvailable($location[The Oasis])
         ),
         new MonkeyWish(
+            $item[shadow brick],
+            $effect[none],
+            "",
+            get_property_int("_shadowBricksUsed") + available_amount($item[shadow brick]) < 13,
+            true
+        ),
+        new MonkeyWish(
             $item[green smoke bomb],
             $effect[none],
             "",
-            __quest_state["Level 12"].state_string["Side seemingly fighting for"] != "hippy",
             !__quest_state["Level 12"].finished &&
-                locationAvailable($location[The Battlefield (Frat Uniform)])
+                __quest_state["Level 12"].state_string["Side seemingly fighting for"] != "hippy",
+            __quest_state["Level 12"].state_boolean["War in progress"] &&
+                get_property_int("hippiesDefeated") >= 400
         ),
         new MonkeyWish(
             $item[star chart],
