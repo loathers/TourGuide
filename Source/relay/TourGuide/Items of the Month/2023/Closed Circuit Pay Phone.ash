@@ -62,7 +62,7 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
     }
     else if (!state.started) {
         boolean calledRufusToday = get_property_boolean("_shadowAffinityToday");
-        string textColor = calledRufusToday ? "black" : "red";
+        string textColor = calledRufusToday ? "black" : "blue";
         string callRufusMessage = calledRufusToday ? "Optionally call Rufus again for another (turn-taking) quest." : "Haven't called Rufus yet today.";
         rufusQuestDescription.listAppend(HTMLGenerateSpanFont(callRufusMessage, textColor));
         rufusQuestTitle = "Rufus quest doable now";
