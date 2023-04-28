@@ -29,57 +29,65 @@ record CursedItem {
     monster boss;
     string description;
     boolean shouldDisplay;
+    boolean valuableToGooseDupe;
 };
 
 void showCursedItemsResourceTile(ChecklistEntry [int] resource_entries) {
     CursedItem [int] cursedItems = {
         new CursedItem(
-            $item[cursed bat paw],
-            $monster[two-headed shadow bat],
-            "+25 ML",
-            __quest_state["Boss Bat"].finished != true
-        ),
-        new CursedItem(
             $item[cursed goblin cape],
             $monster[goblin king's shadow],
             "-15% combat!",
-            __quest_state["Knob Goblin King"].finished != true
+            __quest_state["Knob Goblin King"].finished != true,
+            false
+        ),
+        new CursedItem(
+            $item[cursed bat paw],
+            $monster[two-headed shadow bat],
+            "+25 ML",
+            __quest_state["Boss Bat"].finished != true,
+            true
         ),
         new CursedItem(
             $item[cursed dragon wishbone],
             $monster[shadowboner shadowdagon],
             "+50% item",
-            __quest_state["Cyrpt"].finished != true
+            __quest_state["Cyrpt"].finished != true,
+            true
         ),
         new CursedItem(
             $item[cursed blanket],
             $monster[shadow of groar],
             "+3 res",
-            __quest_state["Trapper"].finished != true
+            __quest_state["Trapper"].finished != true,
+            false
         ),
         new CursedItem(
             $item[cursed machete],
             $monster[corruptor shadow],
             "+50% meat",
-            __quest_state["Level 11 Hidden City"].finished != true
+            __quest_state["Level 11 Hidden City"].finished != true,
+            false
         ),
         new CursedItem(
             $item[cursed medallion],
             $monster[shadow of the 1960s],
             "+100% init",
-            __quest_state["Island War"].finished != true
+            __quest_state["Island War"].finished != true,
+            false
         )
     };
 
     string [int] description;
     foreach index, cursedItem in cursedItems {
         if (cursedItem.shouldDisplay) {
-            description.listAppend(`{HTMLGenerateSpanOfClass(cursedItem.boss.name, "r_bold")}: {cursedItem.description}`);
+            string goose = cursedItem.valuableToGooseDupe ? "🦢 " : "";
+            description.listAppend(`{goose}{HTMLGenerateSpanOfClass(cursedItem.boss.name, "r_bold")}: {cursedItem.description}`);
         }
     }
 
     if (count(description) > 0) {
-        resource_entries.listAppend(ChecklistEntryMake("__monster shadow prism", "", ChecklistSubentryMake("Cursed boss drops", "", description), 2).ChecklistEntrySetIDTag("Avatar of Shadows Over Loathing cursed items resource"));
+        resource_entries.listAppend(ChecklistEntryMake("__monster shadow prism", "", ChecklistSubentryMake("Cursed boss drops", "consider duping the items with 🦢", description), 2).ChecklistEntrySetIDTag("Avatar of Shadows Over Loathing cursed items resource"));
     }
 }
 
