@@ -99,7 +99,8 @@ void showDecurseResourceTile(ChecklistEntry [int] resource_entries) {
     boolean shouldDecurseBatPaw = my_level() >= 12 &&
         __quest_state["Cyrpt"].finished == true &&
         __quest_state["Typical Tavern"].finished == true &&
-        needBridgeParts;
+        needBridgeParts &&
+        $item[uncursed bat paw].available_amount() < 1;
 
     if (shouldDecurseBatPaw) {
         string description = `{HTMLGenerateSpanOfClass("cursed bat paw", "r_bold")} to get -ML for bridge parts!`;
