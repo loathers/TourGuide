@@ -70,6 +70,14 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
         whereToAddRufusQuestTile = optional_task_entries;
     }
 
+    string [int][int] shadowBricksTable;
+    shadowBricksTable.listAppend(listMake(HTMLGenerateSpanOfClass("Cemetary", "r_bold"), "(also has bread, stick)"));
+    shadowBricksTable.listAppend(listMake(HTMLGenerateSpanOfClass("Hidden City", "r_bold"), "(also has sinew, nectar)"));
+    shadowBricksTable.listAppend(listMake(HTMLGenerateSpanOfClass("Pyramid", "r_bold"), "(also has sausage, sinew)"));
+    string shadowBricksTooltip = HTMLGenerateSimpleTableLines(shadowBricksTable);
+    string shadowBrickLocations = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(shadowBricksTooltip, "r_tooltip_inner_class") + "Shadow Brick locations", "r_tooltip_outer_class");
+    rufusQuestDescription.listAppend(shadowBrickLocations);
+
     whereToAddRufusQuestTile.listAppend(ChecklistEntryMake(rufusImage, url, ChecklistSubentryMake(rufusQuestTitle, "", rufusQuestDescription), rufusQuestPriority));
 
     if ($effect[Shadow Affinity].have_effect() > 0) {
