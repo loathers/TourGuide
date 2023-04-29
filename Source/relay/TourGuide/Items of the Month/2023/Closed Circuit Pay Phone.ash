@@ -19,6 +19,43 @@ QuestState parseRufusQuestState() {
     return state;
 }
 
+record ShadowBrickLocation {
+    string zoneName;
+    string extraItems;
+    boolean canAccess;
+};
+
+string getShadowBrickLocationTooltip() {
+    ShadowBrickLocation [int] shadowBrickLocations = {
+        new ShadowBrickLocation(
+            "Cemetary",
+            "(also has bread, stick)",
+            can_adventure($location[Shadow Rift (The Misspelled Cemetary)])
+        ),
+        new ShadowBrickLocation(
+            "Hidden City",
+            "(also has sinew, nectar)",
+            can_adventure($location[Shadow Rift (The Hidden City)])
+        ),
+        new ShadowBrickLocation(
+            "Pyramid",
+            "(also has sausage, sinew)",
+            can_adventure($location[Shadow Rift (The Ancient Buried Pyramid)])
+        )
+    };
+
+    string [int][int] shadowBricksTable;
+    foreach index, brickLocation in shadowBrickLocations {
+        string formattedLocationName = brickLocation.canAccess ?
+            HTMLGenerateSpanOfClass(brickLocation.zoneName, "r_bold") :
+            HTMLGenerateSpanOfClass(HTMLGenerateSpanFont(brickLocation.zoneName, "gray"), "r_bold");
+        shadowBricksTable.listAppend(listMake(formattedLocationName, brickLocation.extraItems));
+    }
+
+    string shadowBricksTooltip = HTMLGenerateSimpleTableLines(shadowBricksTable);
+    return HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(shadowBricksTooltip, "r_tooltip_inner_class") + "Shadow Brick locations", "r_tooltip_outer_class");
+}
+
 RegisterTaskGenerationFunction("IOTMClosedCircuitPayPhoneGenerateTasks");
 void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
     if (!lookupItem("closed-circuit pay phone").have())
@@ -70,13 +107,7 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
         whereToAddRufusQuestTile = optional_task_entries;
     }
 
-    string [int][int] shadowBricksTable;
-    shadowBricksTable.listAppend(listMake(HTMLGenerateSpanOfClass("Cemetary", "r_bold"), "(also has bread, stick)"));
-    shadowBricksTable.listAppend(listMake(HTMLGenerateSpanOfClass("Hidden City", "r_bold"), "(also has sinew, nectar)"));
-    shadowBricksTable.listAppend(listMake(HTMLGenerateSpanOfClass("Pyramid", "r_bold"), "(also has sausage, sinew)"));
-    string shadowBricksTooltip = HTMLGenerateSimpleTableLines(shadowBricksTable);
-    string shadowBrickLocations = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(shadowBricksTooltip, "r_tooltip_inner_class") + "Shadow Brick locations", "r_tooltip_outer_class");
-    rufusQuestDescription.listAppend(shadowBrickLocations);
+    rufusQuestDescription.listAppend(getShadowBrickLocationTooltip());
 
     whereToAddRufusQuestTile.listAppend(ChecklistEntryMake(rufusImage, url, ChecklistSubentryMake(rufusQuestTitle, "", rufusQuestDescription), rufusQuestPriority));
 
