@@ -2517,6 +2517,7 @@ static {
     int PATH_GREY_YOU = 44;
     int PATH_JOURNEYMAN = 45;
     int PATH_FALL_OF_THE_DINOSAURS = 46;
+    int PATH_AVATAR_OF_SHADOWS_OVER_LOATHING = 47;
 }
 
 float numeric_modifier_replacement(item it, string modifier) {
@@ -13776,8 +13777,11 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             subentry.entries.listAppend(line);
         }
 	 
-    } else
-        subentry.entries.listAppend("Could bring along Melodramedary.");
+    } else {
+        if (canCamel && !haveCamel) {
+            subentry.entries.listAppend("Could bring along Melodramedary.");
+        }
+    }
     task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, url, subentry, $locations[the arid\, extra-dry desert,the oasis]).ChecklistEntrySetIDTag("Council L11 quest desert exploration"));
 }
 
@@ -34449,7 +34453,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_FALL_OF_THE_DINOSAURS)
+	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_FALL_OF_THE_DINOSAURS || my_path().id == PATH_AVATAR_OF_SHADOWS_OVER_LOATHING)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -52936,6 +52940,43 @@ QuestState parseRufusQuestState() {
     return state;
 }
 
+record ShadowBrickLocation {
+    string zoneName;
+    string extraItems;
+    boolean canAccess;
+};
+
+string getShadowBrickLocationTooltip() {
+    ShadowBrickLocation [int] shadowBrickLocations = {
+        new ShadowBrickLocation(
+            "Cemetary",
+            "(also has bread, stick)",
+            can_adventure($location[Shadow Rift (The Misspelled Cemetary)])
+        ),
+        new ShadowBrickLocation(
+            "Hidden City",
+            "(also has sinew, nectar)",
+            can_adventure($location[Shadow Rift (The Hidden City)])
+        ),
+        new ShadowBrickLocation(
+            "Pyramid",
+            "(also has sausage, sinew)",
+            can_adventure($location[Shadow Rift (The Ancient Buried Pyramid)])
+        )
+    };
+
+    string [int][int] shadowBricksTable;
+    foreach index, brickLocation in shadowBrickLocations {
+        string formattedLocationName = brickLocation.canAccess ?
+            HTMLGenerateSpanOfClass(brickLocation.zoneName, "r_bold") :
+            HTMLGenerateSpanOfClass(HTMLGenerateSpanFont(brickLocation.zoneName, "gray"), "r_bold");
+        shadowBricksTable.listAppend(listMake(formattedLocationName, brickLocation.extraItems));
+    }
+
+    string shadowBricksTooltip = HTMLGenerateSimpleTableLines(shadowBricksTable);
+    return HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(shadowBricksTooltip, "r_tooltip_inner_class") + "Shadow Brick locations", "r_tooltip_outer_class");
+}
+
 RegisterTaskGenerationFunction("IOTMClosedCircuitPayPhoneGenerateTasks");
 void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
     if (!lookupItem("closed-circuit pay phone").have())
@@ -52979,13 +53020,15 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
     }
     else if (!state.started) {
         boolean calledRufusToday = get_property_boolean("_shadowAffinityToday");
-        string textColor = calledRufusToday ? "black" : "red";
+        string textColor = calledRufusToday ? "black" : "blue";
         string callRufusMessage = calledRufusToday ? "Optionally call Rufus again for another (turn-taking) quest." : "Haven't called Rufus yet today.";
         rufusQuestDescription.listAppend(HTMLGenerateSpanFont(callRufusMessage, textColor));
         rufusQuestTitle = "Rufus quest doable now";
         rufusQuestPriority = 11;
         whereToAddRufusQuestTile = optional_task_entries;
     }
+
+    rufusQuestDescription.listAppend(getShadowBrickLocationTooltip());
 
     whereToAddRufusQuestTile.listAppend(ChecklistEntryMake(rufusImage, url, ChecklistSubentryMake(rufusQuestTitle, "", rufusQuestDescription), rufusQuestPriority));
 
@@ -56556,57 +56599,65 @@ record CursedItem {
     monster boss;
     string description;
     boolean shouldDisplay;
+    boolean valuableToGooseDupe;
 };
 
 void showCursedItemsResourceTile(ChecklistEntry [int] resource_entries) {
     CursedItem [int] cursedItems = {
         new CursedItem(
-            $item[cursed bat paw],
-            $monster[two-headed shadow bat],
-            "+25 ML",
-            __quest_state["Boss Bat"].finished != true
-        ),
-        new CursedItem(
             $item[cursed goblin cape],
             $monster[goblin king's shadow],
             "-15% combat!",
-            __quest_state["Knob Goblin King"].finished != true
+            __quest_state["Knob Goblin King"].finished != true,
+            false
+        ),
+        new CursedItem(
+            $item[cursed bat paw],
+            $monster[two-headed shadow bat],
+            "+25 ML",
+            __quest_state["Boss Bat"].finished != true,
+            true
         ),
         new CursedItem(
             $item[cursed dragon wishbone],
             $monster[shadowboner shadowdagon],
             "+50% item",
-            __quest_state["Cyrpt"].finished != true
+            __quest_state["Cyrpt"].finished != true,
+            true
         ),
         new CursedItem(
             $item[cursed blanket],
             $monster[shadow of groar],
             "+3 res",
-            __quest_state["Trapper"].finished != true
+            __quest_state["Trapper"].finished != true,
+            false
         ),
         new CursedItem(
             $item[cursed machete],
             $monster[corruptor shadow],
             "+50% meat",
-            __quest_state["Level 11 Hidden City"].finished != true
+            __quest_state["Level 11 Hidden City"].finished != true,
+            false
         ),
         new CursedItem(
             $item[cursed medallion],
             $monster[shadow of the 1960s],
             "+100% init",
-            __quest_state["Island War"].finished != true
+            __quest_state["Island War"].finished != true,
+            false
         )
     };
 
     string [int] description;
     foreach index, cursedItem in cursedItems {
         if (cursedItem.shouldDisplay) {
-            description.listAppend(`{HTMLGenerateSpanOfClass(cursedItem.boss.name, "r_bold")}: {cursedItem.description}`);
+            string goose = cursedItem.valuableToGooseDupe ? "🦢 " : "";
+            description.listAppend(`{goose}{HTMLGenerateSpanOfClass(cursedItem.boss.name, "r_bold")}: {cursedItem.description}`);
         }
     }
 
     if (count(description) > 0) {
-        resource_entries.listAppend(ChecklistEntryMake("__monster shadow prism", "", ChecklistSubentryMake("Cursed boss drops", "", description), 2).ChecklistEntrySetIDTag("Avatar of Shadows Over Loathing cursed items resource"));
+        resource_entries.listAppend(ChecklistEntryMake("__monster shadow prism", "", ChecklistSubentryMake("Cursed boss drops", "consider duping the items with 🦢", description), 2).ChecklistEntrySetIDTag("Avatar of Shadows Over Loathing cursed items resource"));
     }
 }
 
@@ -56618,7 +56669,8 @@ void showDecurseResourceTile(ChecklistEntry [int] resource_entries) {
     boolean shouldDecurseBatPaw = my_level() >= 12 &&
         __quest_state["Cyrpt"].finished == true &&
         __quest_state["Typical Tavern"].finished == true &&
-        needBridgeParts;
+        needBridgeParts &&
+        $item[uncursed bat paw].available_amount() < 1;
 
     if (shouldDecurseBatPaw) {
         string description = `{HTMLGenerateSpanOfClass("cursed bat paw", "r_bold")} to get -ML for bridge parts!`;
