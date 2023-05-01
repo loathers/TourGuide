@@ -55,6 +55,7 @@ static {
     int PATH_GREY_YOU = 44;
     int PATH_JOURNEYMAN = 45;
     int PATH_FALL_OF_THE_DINOSAURS = 46;
+    int PATH_AVATAR_OF_SHADOWS_OVER_LOATHING = 47;
 }
 
 float numeric_modifier_replacement(item it, string modifier) {

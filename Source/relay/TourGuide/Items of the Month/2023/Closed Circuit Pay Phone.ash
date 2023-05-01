@@ -19,6 +19,43 @@ QuestState parseRufusQuestState() {
     return state;
 }
 
+record ShadowBrickLocation {
+    string zoneName;
+    string extraItems;
+    boolean canAccess;
+};
+
+string getShadowBrickLocationTooltip() {
+    ShadowBrickLocation [int] shadowBrickLocations = {
+        new ShadowBrickLocation(
+            "Cemetary",
+            "(also has bread, stick)",
+            can_adventure($location[Shadow Rift (The Misspelled Cemetary)])
+        ),
+        new ShadowBrickLocation(
+            "Hidden City",
+            "(also has sinew, nectar)",
+            can_adventure($location[Shadow Rift (The Hidden City)])
+        ),
+        new ShadowBrickLocation(
+            "Pyramid",
+            "(also has sausage, sinew)",
+            can_adventure($location[Shadow Rift (The Ancient Buried Pyramid)])
+        )
+    };
+
+    string [int][int] shadowBricksTable;
+    foreach index, brickLocation in shadowBrickLocations {
+        string formattedLocationName = brickLocation.canAccess ?
+            HTMLGenerateSpanOfClass(brickLocation.zoneName, "r_bold") :
+            HTMLGenerateSpanOfClass(HTMLGenerateSpanFont(brickLocation.zoneName, "gray"), "r_bold");
+        shadowBricksTable.listAppend(listMake(formattedLocationName, brickLocation.extraItems));
+    }
+
+    string shadowBricksTooltip = HTMLGenerateSimpleTableLines(shadowBricksTable);
+    return HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(shadowBricksTooltip, "r_tooltip_inner_class") + "Shadow Brick locations", "r_tooltip_outer_class");
+}
+
 RegisterTaskGenerationFunction("IOTMClosedCircuitPayPhoneGenerateTasks");
 void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
     if (!lookupItem("closed-circuit pay phone").have())
@@ -62,13 +99,15 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
     }
     else if (!state.started) {
         boolean calledRufusToday = get_property_boolean("_shadowAffinityToday");
-        string textColor = calledRufusToday ? "black" : "red";
+        string textColor = calledRufusToday ? "black" : "blue";
         string callRufusMessage = calledRufusToday ? "Optionally call Rufus again for another (turn-taking) quest." : "Haven't called Rufus yet today.";
         rufusQuestDescription.listAppend(HTMLGenerateSpanFont(callRufusMessage, textColor));
         rufusQuestTitle = "Rufus quest doable now";
         rufusQuestPriority = 11;
         whereToAddRufusQuestTile = optional_task_entries;
     }
+
+    rufusQuestDescription.listAppend(getShadowBrickLocationTooltip());
 
     whereToAddRufusQuestTile.listAppend(ChecklistEntryMake(rufusImage, url, ChecklistSubentryMake(rufusQuestTitle, "", rufusQuestDescription), rufusQuestPriority));
 
