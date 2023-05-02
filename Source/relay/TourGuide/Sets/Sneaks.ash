@@ -73,7 +73,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
         // Use plauisible jellies here, to make sure it's added if it's possible
         final.sneakCount = plausibleJellies;
-        final.tileDescription = `<b>{plausibleJellies}x stench jellies</b> (have {clampi(toastCount,0,15)} toast, {clampi(jellyCount,0,15)} spleen)`;
+        final.tileDescription = `<b>{plausibleJellies}x stench jellies</b> (have {clampi(toastCount,0,15)} on toast, {clampi(jellyCount,0,15)} as jelly)`;
         return final;
     }
     
@@ -194,22 +194,40 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalSneaks, "sneak usable", "sneaks usable"), "", description));
 
     // OK, now we're going to make a big table with the NC recommendations. Yeesh. 
-    //   This tile is complicated, dude. First, start by initializing variables. 
+    //   This tile is complicated, dude! First, start by initializing variables. 
     //   Ezan's table creators are formatted as string[int][int], where the first
     //   is the row and the second is the column... I think?
+
     int totalNCsRemaining = 0;
     string [int][int] table;
 
-    // In the synth tile, Ezan populates table_lines and builds out 
+    // In the synth tile, Ezan populates table_lines and builds out from there. I
+    //   am doing the same because I don't fully understand the syntax.
     string [int] tableLines;
 
-    // This is a function that generates the right format for the table
+    // This is a function that generates the right format for the table. Basically,
+    //   it ingests the table title + a separated list of all sneak opportunities in
+    //   that summarized title. 
     string populateSneakTable(string title, string [int] desc) {
         string finalDesc = "";
+
+        // If nothing got added, just add an "all done!" to make the user feel better
         if (desc.count() == 0) finalDesc = "All done!";
+
+        // Have to add line breaks here.
         foreach k, d in desc {
             finalDesc += d+"<br>";
         }
+
+        // Finally, generate a little sub-tile that looks like this:
+        
+        //   NAME OF SNEAKS
+        //   1 sneaksource
+        //   1 sneaksource
+
+        // Where the name is bold and the sneaksources are tiny. In some future world,
+        // it might be nice to have coloring that grays those that are not available 
+        // yet, but that is too much for this first implementation.
         return HTMLGenerateSpanOfClass(title, "r_bold") + "<br>" + HTMLGenerateSpanOfStyle(finalDesc, "font-size:0.8em");
     }
 
@@ -220,15 +238,17 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     //   1x hidden apartment
     //   1x hidden office
 
+    // Initialize your string-int array of the sneaks.
     string [int] sneakDelay;
 
-    // We can just use quest tracking preferences for these two, luckily. 
-
+    // You want to use prefs when possible to isolate that the user can use that sneak, then append to sneakDelay
     if (get_property_int("hiddenApartmentProgress") < 7) sneakDelay.listAppend("1 hidden apartment");
     if (get_property_int("hiddenOfficeProgress") < 7) sneakDelay.listAppend("1 hidden office");
 
+    // Populate the sneaky table.
     tableLines[1] = populateSneakTable("Delay Zones", sneakDelay);
 
+    // Add the detected NCs to your total NCs remaining.
     totalNCsRemaining += sneakDelay.count();
 
     // NEXT = 95% COMBAT SNEAKS
@@ -238,12 +258,12 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     string [int] sneak95;
 
-    // Ripping some code from the friars tile to count NCs encountered.
+    // Ripping some code from the friars tile to count NCs encountered. First, names of the relevant NCs.
     boolean [string] necks_known_ncs = $strings[How Do We Do It? Quaint and Curious Volume!,Strike One!,Olive My Love To You\, Oh.,Dodecahedrariffic!];
     boolean [string] heart_known_ncs = $strings[Moon Over the Dark Heart,Running the Lode,I\, Martin,Imp Be Nimble\, Imp Be Quick];
     boolean [string] elbow_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,A Secret\, But Not the Secret You're Looking For,Butter Knife? I'll Take the Knife];
     
-    // Tiny function to count the NCs found by zone for friars.
+    // Then, a tiny function to count the NCs found by zone for friars.
     int countFriarNCs(boolean [string] known_ncs, location place) {
         int ncs_found = 0;
 
@@ -260,14 +280,19 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     }
 
+    // You can remove one from the needed NCs if they have carto in their run.
     int cartoAdjustment = lookupSkill("Comprehensive Cartography").have_skill() ? 1 : 0;
 
+    // Right now I think this is off; I noted in the discord that we are having some small issues with
+    //   it showing extra NCs in a few places. Not really sure what's up with that? An easy fix is to
+    //   just set all of these to 0 in the event that questL06Friar = 'finished'. 
     int necksNCsLeft = 4 - countFriarNCs(necks_known_ncs, $location[The Dark Neck of the Woods]) - cartoAdjustment;
     int heartNCsLeft = 4 - countFriarNCs(heart_known_ncs, $location[The Dark Heart of the Woods]);
     int elbowNCsLeft = 4 - countFriarNCs(elbow_known_ncs, $location[The Dark Elbow of the Woods]);
 
     // Also correcting total NCs left here; we are using a "count" for this, and thus we only get 1
-    //   out of however many NCs actually are left in these zones
+    //   out of however many NCs actually are left in these zones, because it just counts the elements
+    //   in the list rather than the # prepending the element in the list.
     if (necksNCsLeft > 0) {
         sneak95.listAppend(`{necksNCsLeft} Dark Neck`);
         totalNCsRemaining += necksNCsLeft-1;
@@ -281,9 +306,12 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         totalNCsRemaining += elbowNCsLeft-1;
     }
     
+    // If the pref is any of these, you can still sneak the basement.
     boolean [string] canSneakBasement = $strings[unstarted,started,step1,step2,step3,step4,step5,step6,step7];
 
     if (canSneakBasement contains get_property("questL10Garbage")) sneak95.listAppend("1 castle basement");
+
+    // If the quest is unfinished, you can sneak theg top floor.
     if (get_property("questL10Garbage")!= "finished") sneak95.listAppend("1 castle top floor");
 
     tableLines[2] = populateSneakTable("95% Combat", sneak95);
@@ -296,6 +324,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     string [int] sneak90;
 
+    // I don't really think I need to import this but I'm tired and copy/pasting logic from the spookyraven tile seems fine.
     QuestState dance_quest_state;
     QuestStateParseMafiaQuestProperty(dance_quest_state, "questM21Dance");
     if ($item[Lady Spookyraven's powder puff].available_amount() == 0 && dance_quest_state.mafia_internal_step < 4) sneak90.listAppend("1 spookyraven bathroom");
@@ -305,20 +334,28 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     totalNCsRemaining += sneak90.count();
 
-    // Weird thing ezan did to build lines
+    // Here is how Ezan built the lines into a table. It's kind of cute. First, make a placeholder "builder" line.
     string [int] building_line;
     foreach key in tableLines
     {
+        // For each key, you append it to the empty building lines.
         building_line.listAppend(tableLines[key]);
+
+        // However, if the key is even, you append to the table. This works, because you are appending a two-element
+        //   item into the table, so it creates a string [int] that creates a row in the table.
         if (key % 2 == 1)
         {
             table.listAppend(building_line);
+
+            // Then, you clear out the building line, to reset the next table row
             building_line = listMakeBlankString();
         }
     }
+    // Then, at the end, you append the remainder to the table.
     if (building_line.count() > 0)
         table.listAppend(building_line);
 
+    // Having done this, you now append the NCs remaining subentry to the end of the core entry, with an on_mouseover bit as well.
     entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", HTMLGenerateSpanOfClass("Mouse over for the best sneaks!", "r_bold r_element_spooky_desaturated")));
     entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", table.HTMLGenerateSimpleTableLines(false)));
  
