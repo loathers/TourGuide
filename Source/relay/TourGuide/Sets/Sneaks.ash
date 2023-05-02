@@ -160,7 +160,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     ChecklistEntry entry;
     
 	entry.url = "";
-	entry.image_lookup_name = "";
+	entry.image_lookup_name = "__effect Feeling Sneaky";
     entry.tags.id = "Sneak sources available";
     entry.importance_level = -2;
 
@@ -174,7 +174,6 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         SneakSource sneaker = sneakSources[sneakType];
         if (sneaker.sneakCount > 0 && sneaker.sneakCondition) {
             totalSneaks += sneaker.sneakCount;
-            entry.image_lookup_name = sneaker.imageLookupName;
             entry.url = sneaker.url;
 
             line += "|*"+sneaker.tileDescription;
