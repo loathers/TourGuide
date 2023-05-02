@@ -161,7 +161,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 	entry.url = "";
 	entry.image_lookup_name = "";
     entry.tags.id = "Sneak sources available";
-    entry.importance_level = 2;
+    entry.importance_level = -2;
 
     string [int] description;
     int totalSneaks = 0;
