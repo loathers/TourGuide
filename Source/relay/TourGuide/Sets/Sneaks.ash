@@ -1,3 +1,22 @@
+// STEPS TO HAVE NC FORCERS IN TILES
+//   This will require quite a few things. Things that still need to be done:
+//     - we will need to have a way for tourguide to tell that you have an NC forcer up for supernag
+//     - we will need to have a tile that shows good NCs to force
+
+// SYNTAX FOR NEW NC FORCERS
+//   In order to centralize, all NC forcers that were old were placed in this file. They utilize a
+//   new record type that should make it mildly easier to loop through the lot.
+
+    record SneakSource {
+        string sourceName;
+        string url;
+        string imageLookupName;
+        boolean sneakCondition;
+        int sneakCount;
+        string tileDescription;
+    };
+
+
 RegisterResourceGenerationFunction("SocialDistanceGenerator");
 void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 {
@@ -22,7 +41,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
         final.sneakCount = freeSneakLeft + spleenSneaks;
         final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x free sneak, </b>`;
-        final.tileDescription = final.tileDescription + `<b>{spleenSneaks}x sneaks</b> for 3 spleen`;
+        final.tileDescription = final.tileDescription + `<b>{spleenSneaks}x sneaks</b> for 3 spleen each`;
         return final;
     }
 
@@ -108,9 +127,9 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         int [int] cinchLevels = listMake(30,30,30,30,30,25,20,15,10,5);
 
         int totalCinch = 100 - cinchUsed;
-        int rest = 1;
+        int rest = 0;
 
-        while (rest < freeRests)
+        while (rest < freeRests+1)
 			{
 				int cinchAmount = rest > count(cinchLevels) ? 5 : cinchLevels[rest];
                 totalCinch += cinchAmount;
@@ -120,7 +139,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         int possibleFiestaExits = floor(totalCinch/60);
 
         final.sneakCount = possibleFiestaExits;
-        final.tileDescription = `{possibleFiestaExits}x fiesta exits, with {totalCinch % 60} leftover cinch`;
+        final.tileDescription = `<b>{possibleFiestaExits}x fiesta exits</b>, with {totalCinch % 60} leftover cinch`;
         return final;
     }
 
@@ -168,7 +187,6 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     description.listAppend(line);
 
     entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalSneaks, "sneak usable", "sneaks usable"), "", description));
-
 
     if (entry.subentries.count() > 0) resource_entries.listAppend(entry);
 
