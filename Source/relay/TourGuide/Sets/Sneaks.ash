@@ -115,9 +115,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.imageLookupName = "__skill Cincho: Fiesta Exit";
         final.sneakCondition = lookupItem("Cincho de Mayo").have();
 
-        // In the most recent draft of the PR (located here https://github.com/kolmafia/kolmafia/pull/1685 )
-        //   the prefs are _cinchUsed for the amount of cinch used and _cinchRests for the amount 
-        //   of rests you've done with your cincho. 
+        // _cinchUsed is a weird preference that actually means distance from 100% you are at in your current cinch.
 
         int freeRests = __misc_state_int["free rests remaining"];
         int cinchoRests = get_property_int('_cinchRests');
@@ -127,12 +125,14 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
         int [int] cinchLevels = listMake(30,30,30,30,30,25,20,15,10,5);
 
+        // Since the pref is weird, this tells you your current total cinch
         int totalCinch = 100 - cinchUsed;
-        int rest = 0;
+        int rest = cinchoRests;
 
+        // This while loop expands your possible cinch starting at rests you haven't used.
         while (rest < freeRests+1)
 			{
-				int cinchAmount = rest > count(cinchLevels) ? 5 : cinchLevels[rest];
+                int cinchAmount = rest > count(cinchLevels) ? 5 : cinchLevels[rest];
                 totalCinch += cinchAmount;
                 rest += 1;
 			}
@@ -282,12 +282,16 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     // You can remove one from the needed NCs if they have carto in their run.
     int cartoAdjustment = lookupSkill("Comprehensive Cartography").have_skill() ? 1 : 0;
 
-    // Right now I think this is off; I noted in the discord that we are having some small issues with
+    // Right now I think the raw logic off; I noted in the discord that we are having some small issues with
     //   it showing extra NCs in a few places. Not really sure what's up with that? An easy fix is to
-    //   just set all of these to 0 in the event that questL06Friar = 'finished'. 
-    int necksNCsLeft = 4 - countFriarNCs(necks_known_ncs, $location[The Dark Neck of the Woods]) - cartoAdjustment;
-    int heartNCsLeft = 4 - countFriarNCs(heart_known_ncs, $location[The Dark Heart of the Woods]);
-    int elbowNCsLeft = 4 - countFriarNCs(elbow_known_ncs, $location[The Dark Elbow of the Woods]);
+    //   just set all of these to 0 in the event that questL06Friar = 'finished' -- I've implemented
+    //   this fix, but I do think it's worth solving this at some point.
+
+    int questPropMin = get_property('questL06Friar') == 'finished' ? 0 : 4;
+    
+    int necksNCsLeft = min(4 - countFriarNCs(necks_known_ncs, $location[The Dark Neck of the Woods]) - cartoAdjustment, questPropMin);
+    int heartNCsLeft = min(4 - countFriarNCs(heart_known_ncs, $location[The Dark Heart of the Woods]), questPropMin);
+    int elbowNCsLeft = min(4 - countFriarNCs(elbow_known_ncs, $location[The Dark Elbow of the Woods]), questPropMin);
 
     // Also correcting total NCs left here; we are using a "count" for this, and thus we only get 1
     //   out of however many NCs actually are left in these zones, because it just counts the elements
@@ -310,7 +314,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     if (canSneakBasement contains get_property("questL10Garbage")) sneak95.listAppend("1 castle basement");
 
-    // If the quest is unfinished, you can sneak theg top floor.
+    // If the quest is unfinished, you can sneak the top floor.
     if (get_property("questL10Garbage")!= "finished") sneak95.listAppend("1 castle top floor");
 
     tableLines[2] = populateSneakTable("95% Combat", sneak95);
@@ -354,7 +358,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     if (building_line.count() > 0)
         table.listAppend(building_line);
 
-    // Having done this, you now append the NCs remaining subentry to the end of the core entry, with an on_mouseover bit as well.
+    // Having done this, you now append the NCs remaining subentry to the end of the core entry, with an on_mouse_over bit as well.
     entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", HTMLGenerateSpanOfClass("Mouse over for the best sneaks!", "r_bold r_element_spooky_desaturated")));
     entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", table.HTMLGenerateSimpleTableLines(false)));
  
