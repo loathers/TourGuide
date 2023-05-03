@@ -25,7 +25,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
             totalCinch += cinchAmount;
             rest += 1;
         }
-        
+
     // This gives you your possible uses of the most powerful skill, Fiesta Exits
     int possibleFiestaExits = floor(totalCinch/60);
 
@@ -54,8 +54,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
 
     // Doing this one outside of the large list append, because it's more important.
     if (totalCinch > 60) { 
-        description.listAppend("<strong>"+HTMLGenerateSpanOfClass("Fiesta Exit (60%)", "r_element_sleaze")+":</strong> Force a NC on your next adventure. "+HTMLGenerateSpanOfStyle("(Most of your cinch should do this!)", "font-size:0.8em"));
-        description.listAppend(`<b>You can do {possibleFiestaExits} more fiesta {pluralise(possibleFiestaExits,"exit","exits")}</b>, with {totalCinch % 60}% leftover cinch`);
+        description.listAppend("<strong>"+HTMLGenerateSpanOfClass("Fiesta Exit (60%)", "r_element_sleaze")+":</strong> Force a NC on your next adventure. "+`You have <b>{possibleFiestaExits}</b> more possible, with {totalCinch % 60}% cinch leftover`);
     }
 
     // Merge the list components together.
