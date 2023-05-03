@@ -470,6 +470,24 @@ int [int] listMake(int e1, int e2, int e3, int e4, int e5)
 	return result;
 }
 
+// Being a big ol' dummy and just adding a function for this
+
+int [int] listMake(int e1, int e2, int e3, int e4, int e5, int e6, int e7, int e8, int e9, int e10)
+{
+	int [int] result;
+	result.listAppend(e1);
+	result.listAppend(e2);
+	result.listAppend(e3);
+	result.listAppend(e4);
+	result.listAppend(e5);
+	result.listAppend(e6);
+	result.listAppend(e7);
+	result.listAppend(e8);
+	result.listAppend(e9);
+	result.listAppend(e10);
+	return result;
+}
+
 item [int] listMake(item e1)
 {
 	item [int] result;

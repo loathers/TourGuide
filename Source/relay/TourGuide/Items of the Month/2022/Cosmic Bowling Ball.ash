@@ -5,7 +5,7 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
-	int bowlingCooldown2 = bowlingUses * 2 + 6;
+	int bowlingCooldown2 = bowlingUses * 2 + 5;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
 	boolean bowlingSupernag = get_property_boolean("tourGuideBowlingBallSupernag");
 
@@ -38,7 +38,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 
 	// Entries
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
-	int bowlingCooldown2 = bowlingUses * 2 + 6;
+	int bowlingCooldown2 = bowlingUses * 2 + 5;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
 	string url;
 	if (bowlingCooldown == -1)
