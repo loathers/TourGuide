@@ -52,11 +52,11 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
         // Doing this one outside of the large list append, because it's more important.
         if (totalCinch > 60) { 
             description.listAppend("<strong>"+HTMLGenerateSpanOfClass("Fiesta Exit (60%)", "r_element_sleaze")+":</strong> Force a NC on your next adventure. "+HTMLGenerateSpanOfStyle("(Most of your cinch should do this!)", "font-size:0.8em"));
-            description.listAppend(`<b>You can do {possibleFiestaExits}x more fiesta exits</b>, with {totalCinch % 60}% leftover cinch`)
+            description.listAppend(`<b>You can do {possibleFiestaExits}x more fiesta exits</b>, with {totalCinch % 60}% leftover cinch`);
         }
         description.listAppend("|*"+ cinchUses.listJoinComponents("<hr>|*"));
 
-    description.listAppend(`Your {pluralise(freeRests,"free rest","free rests")} will net you {totalCinch} more cinch.`);
+    description.listAppend(`You have {totalCinch}% more cinch available, accounting for your {pluralise(freeRests,"free rest","free rests")}.`);
 
     if (lookupItem("June cleaver").have() && !lookupItem("mother's necklace").have()) {
         description.listAppend("You do "+HTMLGenerateSpanOfClass("not", "r_element_hot")+" have a mother's necklace yet, so you're missing 5 free rests. Be careful of overusing the combat skills!");
