@@ -50,7 +50,10 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     if (cinchUses.count() > 0)
         description.listAppend("Use <b>free rests</b> to cinch up your belt and cast some cool skills:");
         // Doing this one outside of the large list append, because it's more important.
-        if (totalCinch > 60) description.listAppend("<strong>"+HTMLGenerateSpanOfClass("Fiesta Exit (60%)", "r_element_sleaze")+":</strong> Force a NC on your next adventure. "+HTMLGenerateSpanOfStyle("(Most of your cinch should do this!)", "font-size:0.8em"));
+        if (totalCinch > 60) { 
+            description.listAppend("<strong>"+HTMLGenerateSpanOfClass("Fiesta Exit (60%)", "r_element_sleaze")+":</strong> Force a NC on your next adventure. "+HTMLGenerateSpanOfStyle("(Most of your cinch should do this!)", "font-size:0.8em"));
+            description.listAppend(`<b>You can do {possibleFiestaExits}x more fiesta exits</b>, with {totalCinch % 60}% leftover cinch`)
+        }
         description.listAppend("|*"+ cinchUses.listJoinComponents("<hr>|*"));
 
     description.listAppend(`Your {pluralise(freeRests,"free rest","free rests")} will net you {totalCinch} more cinch.`);
