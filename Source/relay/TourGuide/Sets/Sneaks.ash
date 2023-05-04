@@ -88,7 +88,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         
         final.sneakCondition = lookupItem("jurassic parka").have();
         final.sneakCount = spikosLeft;
-        final.tileDescription = `<b>{spikosLeft}x spikalodon spikes</b> left`;
+        final.tileDescription = `<b>{spikosLeft}x spikolodon spikes</b> left`;
         return final;
 
     }
