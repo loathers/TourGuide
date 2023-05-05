@@ -123,9 +123,9 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		string dotMatrix = '';
 
         foreach turn in splitCMC {
-            if (splitCMC[turn] == "i") {iTurns +=1; dotMatrix = dotMatrix+'<span style="color:Salmon">• </span>';}
-            if (splitCMC[turn] == "u") {uTurns +=1; dotMatrix = dotMatrix+'<span style="color:Indigo">• </span>';}
-            if (splitCMC[turn] == "o") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:Wheat">• </span>';}
+            if (splitCMC[turn] == "i") {iTurns +=1; dotMatrix = dotMatrix+'<span style="color:blue">▣ </span>';}
+            if (splitCMC[turn] == "u") {uTurns +=1; dotMatrix = dotMatrix+'<span style="color:red">🞮 </span>';}
+            if (splitCMC[turn] == "o") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:green">🞉 </span>';}
         }
         
     	string expectedSpleenItem = "Fleshazole";
@@ -164,9 +164,9 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         string [int][int] spleeners;
         // Generates a reference table for the user of the spleener effects.
         spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
-        spleeners.listAppend(listMake("Extrovermectin","<span style=\"color:Salmon\">Indoors</span>","+3 Wandering Monsters"));
-        spleeners.listAppend(listMake("Breathitin","<span style=\"color:Indigo\">Underground</span>","+5 Outdoor Free Kills"));
-        spleeners.listAppend(listMake("Homebodyl","<span style=\"color:Wheat\">Outdoors</span>","+11 Free Crafts"));
+        spleeners.listAppend(listMake("Extrovermectin","<span style=\"color:blue\">Indoors ▣</span>","+3 Wandering Monsters"));
+        spleeners.listAppend(listMake("Breathitin","<span style=\"color:red\">Underground 🞮</span>","+5 Outdoor Free Kills"));
+        spleeners.listAppend(listMake("Homebodyl","<span style=\"color:green\">Outdoors 🞉</span>","+11 Free Crafts"));
         spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
         description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
 

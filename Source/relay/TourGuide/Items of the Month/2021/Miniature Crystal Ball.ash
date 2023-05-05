@@ -18,12 +18,12 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] resource_entries)
 		{
 			description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "black") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "black"));
 			description.listAppend("" + HTMLGenerateSpanFont("Equip the miniature crystal ball first!", "red") + "");
-			resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
+			optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
 		}
 		else
 		{
 			description.listAppend("Equip the miniature crystal ball to predict a monster!");
-			resource_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", url, ChecklistSubentryMake(title, description)));
+			optional_task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", url, ChecklistSubentryMake(title, description)));
 		}
 	}
 	else
@@ -31,12 +31,12 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] resource_entries)
 		if (crystalBallPrediction != $monster[none])
 		{
 			description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "blue") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "blue"));
-			resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
+			task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
 		}
 		else
 		{
 			description.listAppend("Adventure in a snarfblat to predict a monster!");
-			resource_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", url, ChecklistSubentryMake(title, description)));
+			task_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", url, ChecklistSubentryMake(title, description)));
 		}	
 	}
 }

@@ -78,7 +78,7 @@ void QuestStateParseMafiaQuestPropertyValue(QuestState state, string property_va
 		state.in_progress = true;
 
 	// Adding a new state check that finishes our quests if the user is in CS or GG.
-	if (path == PATH_COMMUNITY_SERVICE || path == PATH_GREY_GOO)
+	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO)
 		state.finished = true;
 }
 
