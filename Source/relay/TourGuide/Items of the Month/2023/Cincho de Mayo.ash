@@ -50,7 +50,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     // This should always be true because there's no way to have <5 cinch and not hit the return on line 33.
     //   Still including it as a conditional for the tile build as a failsafe I guess.
     if (cinchUses.count() > 0)
-        description.listAppend("Use your Cincho de Mayo to cast skills in exchange for cinch; when you're out of cinch, take a <b>free rest!/b>");
+        description.listAppend("Use your Cincho de Mayo to cast skills in exchange for cinch; when you're out of cinch, take a <b>free rest!?</b>");
 
     // Doing this one outside of the large list append, because it's more important.
     if (totalCinch > 60) { 

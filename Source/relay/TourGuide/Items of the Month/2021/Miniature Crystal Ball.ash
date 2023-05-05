@@ -1,6 +1,6 @@
 //2021
 //Miniature Crystal ball
-RegisterResourceGenerationFunction("IOTMCrystalBallGenerateTasks");
+RegisterTaskGenerationFunction("IOTMCrystalBallGenerateTasks");
 void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (lookupItem("miniature crystal ball").available_amount() == 0)
