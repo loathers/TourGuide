@@ -84,7 +84,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 		if (familiar_is_usable($familiar[gelatinous cubeling]))
 		{
             item [int] missing_items;
-			int gelatinousCubelingProgress = get_property("cubelingProgress");
+			string gelatinousCubelingProgress = get_property("cubelingProgress");
             int priority = CHECKLIST_DEFAULT_IMPORTANCE;
             
             missing_items = $items[eleven-foot pole,ring of detect boring doors,pick-o-matic lockpicks].items_missing();
