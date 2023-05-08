@@ -56,6 +56,6 @@ void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_
 			description.listAppend("Fedora-mounted fountain: +20 ML hat");
 			description.listAppend("Sombrero-mounted sparkler: +5% combat hat");
 			description.listAppend("Porkpie-mounted popper: -5% combat hat");
-			resource_entries.listAppend(ChecklistEntryMake("__item fedora-mounted mountain", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Dangerous hats", description), 8).ChecklistEntrySetIDTag("Clan fireworks hat resource"));
+			resource_entries.listAppend(ChecklistEntryMake("__item fedora-mounted fountain", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Dangerous hats", description), 8).ChecklistEntrySetIDTag("Clan fireworks hat resource"));
 		}
 }
