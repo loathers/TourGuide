@@ -62,10 +62,10 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
     }	
 	title = HTMLGenerateSpanFont(sweatAdvs + " adv stillsuit sweat booze", "purple");
-	if (__misc_state["in run"] && sweatAdvs > 3) {
+	if (__misc_state["in run"] && sweatAdvs > 6) {
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
-	else if (!__misc_state["in run"] && sweatAdvs > 8) {
+	else if (!__misc_state["in run"] && sweatAdvs > 10) {
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
 }
