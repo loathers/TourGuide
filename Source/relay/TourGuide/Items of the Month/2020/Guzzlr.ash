@@ -99,7 +99,7 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
             if (hasShoesEquipped)
 				description.listAppend("Takes " + pluralise(guzzlrQuestShoedFightsLeft, "more fight", "more fights") + " (" + guzzlrQuestFightsLeft + " without shoes).");
 			else {
-				description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
+                if (hasShoes) description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
 			}
 			#task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", "inventory.php?tap=guzzlr", ChecklistSubentryMake("Guzzlr delivery", "", description), -11));
 			task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", questLocation.getClickableURLForLocation(), ChecklistSubentryMake("Guzzlr delivery", subtitle, description), -11, boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("Guzzlr quest task"));
@@ -110,14 +110,14 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
 		else if (guzzlrQuestProgressLeft == 1)
             description.listAppend(HTMLGenerateSpanFont("Delivery on next fight", "blue"));
         else if (guzzlrQuestShoedFightsLeft == 1)
-            description.listAppend(HTMLGenerateSpanFont("Equip shoes to receive delivery on next fight", "blue"));  
+            if (hasShoes) description.listAppend(HTMLGenerateSpanFont("Equip shoes to receive delivery on next fight", "blue"));  
         else if (!hasShoes || guzzlrQuestFightsLeft == guzzlrQuestShoedFightsLeft) // if no shoes or if doesn't matter at that point
             description.listAppend("Takes " + pluralise(guzzlrQuestFightsLeft, "more fight", "more fights") + ".");
         else if (hasShoesEquipped)
             description.listAppend("Takes " + pluralise(guzzlrQuestShoedFightsLeft, "more fight", "more fights") + " (" + guzzlrQuestFightsLeft + " without shoes).");
         else {
             description.listAppend("Takes " + guzzlrQuestFightsLeft + " more fights (" + guzzlrQuestShoedFightsLeft + " with shoes).");
-            description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
+            if (hasShoes) description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
         }
  
         if (hasPants && !hasPantsEquipped)
