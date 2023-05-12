@@ -34,6 +34,8 @@ void Q8BitInit()
     // Bonus zone is tracked via the 8BitColor pref; black/red/blue/green are the zone colors 
     state.state_string["currentColor"] = get_property("8BitColor");
 
+    if (state.state_string["currentColor"] == "") state.state_string["currentColor"] = "black";
+
 	__quest_state["Digital Key"] = state;
 }
 

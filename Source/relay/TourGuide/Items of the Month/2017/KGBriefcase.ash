@@ -25,6 +25,7 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;
         description.listAppend("All sorts of things. Buffs, martinis, cigars!");
+        entry.url = "place.php?whichplace=kgb";
         
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(clicks_remaining, "click", "clicks"), "", description));
     }

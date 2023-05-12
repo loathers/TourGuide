@@ -87,7 +87,7 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     int reconfigurableIn = trainSetReconfigurableIn();
     if (reconfigurableIn == 0)
     {
-        description.listAppend("Train set reconfigurable!");
+        HTMLGenerateSpanFont("Train set reconfigurable!", "blue");
     }
     else {
         description.listAppend("Train set reconfigurable in " + HTMLGenerateSpanOfClass(reconfigurableIn.to_string() + " combats.", "r_bold"));

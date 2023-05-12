@@ -32,13 +32,14 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.url = "main.php?eowkeeper=1";
         final.imageLookupName = "__item Eight Days a Week Pill Keeper";
 
-        final.sneakCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")];
-
         // see # of free pillkeeepers remaining
         int freeSneakLeft = get_property_boolean("_freePillKeeperUsed") ? 1 : 0;
 
         // calculate possible spleen-based sneaks
         int spleenSneaks = floor(spleenRemaining / 3);
+
+        // usable if we have pill keeper plus free sneaks or spleen sneaks available
+        final.sneakCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeSneakLeft + spleenSneaks > 0);
 
         final.sneakCount = freeSneakLeft + spleenSneaks;
         final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x free sneak, </b>`;
@@ -88,7 +89,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         
         final.sneakCondition = lookupItem("jurassic parka").have();
         final.sneakCount = spikosLeft;
-        final.tileDescription = `<b>{spikosLeft}x spikalodon spikes</b> left`;
+        final.tileDescription = `<b>{spikosLeft}x spikolodon spikes</b> left`;
         return final;
 
     }
@@ -359,9 +360,13 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         table.listAppend(building_line);
 
     // Having done this, you now append the NCs remaining subentry to the end of the core entry, with an on_mouse_over bit as well.
-    entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", HTMLGenerateSpanOfClass("Mouse over for the best sneaks!", "r_bold r_element_spooky_desaturated")));
-    entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", table.HTMLGenerateSimpleTableLines(false)));
- 
+
+    // However, I am going to be lazy, and not append either of these in the event the user is in CS/GG.
+    if (my_path().id != PATH_COMMUNITY_SERVICE && my_path().id != PATH_GREY_GOO) {
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", HTMLGenerateSpanOfClass("Mouse over for the best sneaks!", "r_bold r_element_spooky_desaturated")));
+        entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", table.HTMLGenerateSimpleTableLines(false)));
+    }
+
     if (entry.subentries.count() > 0) resource_entries.listAppend(entry);
 
 }

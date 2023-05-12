@@ -107,7 +107,7 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 	
 	//consultation counter
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
-	if (CMC_consults > 0 && __misc_state["in run"] && __iotms_usable[lookupItem("cold medicine cabinet")]) 
+	if (CMC_consults > 0 &&  __iotms_usable[lookupItem("cold medicine cabinet")]) 
 	{
 		// Tracking tile; gives the user information about the last turn-taking combats per the pref.
 		int next_CMC_Turn = get_property_int("_nextColdMedicineConsult");
@@ -123,9 +123,10 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		string dotMatrix = '';
 
         foreach turn in splitCMC {
-            if (splitCMC[turn] == "i") {iTurns +=1; dotMatrix = dotMatrix+'<span style="color:Salmon">• </span>';}
-            if (splitCMC[turn] == "u") {uTurns +=1; dotMatrix = dotMatrix+'<span style="color:Indigo">• </span>';}
-            if (splitCMC[turn] == "o") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:Wheat">• </span>';}
+            if (splitCMC[turn] == "i") {iTurns +=1; dotMatrix = dotMatrix+'<span style="color:blue;font-size:0.8em">🞓 </span>';}
+            if (splitCMC[turn] == "u") {uTurns +=1; dotMatrix = dotMatrix+'<span style="color:red;font-size:0.8em">🞮 </span>';}
+            if (splitCMC[turn] == "o") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:green;font-size:0.8em">🞉 </span>';}
+            if (splitCMC[turn] == "?") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:black;font-size:0.8em">❔ </span>';}
         }
         
     	string expectedSpleenItem = "Fleshazole";
@@ -141,8 +142,10 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		if (next_CMC_Turn > total_turns_played())
 		{
 			description.listAppend("" + HTMLGenerateSpanOfClass(next_CMC_Timer, "r_bold") + " adventures until your next consultation.");
-			description.listAppend("Spend " + HTMLGenerateSpanOfClass(next_CMC_Timer - 9, "r_bold") + " non-environmental adventures to double your pill.");
-			description.listAppend("" + HTMLGenerateSpanOfClass("Last 20 environments: ", "r_bold") + cmcCombatString + "");
+
+			// Commenting these out. It would be nice to actually solve the issue here, but the logic just needs to be better.
+			// description.listAppend("Spend " + HTMLGenerateSpanOfClass(next_CMC_Timer - 9, "r_bold") + " non-environmental adventures to double your pill.");
+			// description.listAppend("" + HTMLGenerateSpanOfClass("Last 20 environments: ", "r_bold") + cmcCombatString + "");
 		}
 			
 		// Append the lil dot guy if it's useful.
@@ -164,10 +167,10 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         string [int][int] spleeners;
         // Generates a reference table for the user of the spleener effects.
         spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
-        spleeners.listAppend(listMake("Extrovermectin","<span style=\"color:Salmon\">Indoors</span>","+3 Wandering Monsters"));
-        spleeners.listAppend(listMake("Breathitin","<span style=\"color:Indigo\">Underground</span>","+5 Outdoor Free Kills"));
-        spleeners.listAppend(listMake("Homebodyl","<span style=\"color:Wheat\">Outdoors</span>","+11 Free Crafts"));
-        spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
+        spleeners.listAppend(listMake("<span style=\"font-size:0.8em\">Extrovermectin</span>","<span style=\"color:blue;font-size:0.8em\">Indoors 🞓</span>","<span style=\"font-size:0.8em\">+3 Wandering Monsters</span>"));
+        spleeners.listAppend(listMake("<span style=\"font-size:0.8em\">Breathitin</span>","<span style=\"color:red;font-size:0.8em\">Underground 🞮</span>","<span style=\"font-size:0.8em\">+5 Outdoor Free Kills</span>"));
+        spleeners.listAppend(listMake("<span style=\"font-size:0.8em\">Homebodyl</span>","<span style=\"color:green;font-size:0.8em\">Outdoors 🞉</span>","<span style=\"font-size:0.8em\">+11 Free Crafts</span>"));
+        spleeners.listAppend(listMake("<span style=\"font-size:0.8em\">Fleshazole</span>","<span style=\"font-size:0.8em\">N/A</span>","<span style=\"font-size:0.8em\">+"+fleshazoleMeat.to_string()+" meat</span>"));
         description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
 
         resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake(CMC_consults.pluralise("CMC consultation", "CMC consultations" + " remaining"), "", description)).ChecklistEntrySetIDTag("cold medicine cabinet resource")); 
