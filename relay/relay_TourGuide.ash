@@ -2,7 +2,7 @@
 
 since r27339; // Cincho de Mayo implemented
 //These settings are for development. Don't worry about editing them.
-string __version = "2.0.6";
+string __version = "2.0.7";
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -6134,6 +6134,10 @@ void QuestStateParseMafiaQuestPropertyValue(QuestState state, string property_va
 		state.finished = true;
 	if (state.started && !state.finished)
 		state.in_progress = true;
+
+	// Adding a new state check that finishes our quests if the user is in CS or GG.
+	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO)
+		state.finished = true;
 }
 
 boolean QuestStateEquals(QuestState q1, QuestState q2)
@@ -14633,7 +14637,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     else
                     {
                         subentry.modifiers.listAppend("elemental damage");
-                        subentry.entries.listAppend("Fight the protector spectre!");
+                        subentry.entries.listAppend(`Fight the protector spectre! ({pluralise(3-$location[a massive ziggurat].numberOfDenseLianaFoughtInShrine(), "liana left", "lianas left")})`);
                     }
                 }
             }
@@ -24759,6 +24763,8 @@ void Q8BitInit()
     // Bonus zone is tracked via the 8BitColor pref; black/red/blue/green are the zone colors 
     state.state_string["currentColor"] = get_property("8BitColor");
 
+    if (state.state_string["currentColor"] == "") state.state_string["currentColor"] = "black";
+
 	__quest_state["Digital Key"] = state;
 }
 
@@ -28224,6 +28230,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
 		if (familiar_is_usable($familiar[gelatinous cubeling]))
 		{
             item [int] missing_items;
+			string gelatinousCubelingProgress = get_property("cubelingProgress");
             int priority = CHECKLIST_DEFAULT_IMPORTANCE;
             
             missing_items = $items[eleven-foot pole,ring of detect boring doors,pick-o-matic lockpicks].items_missing();
@@ -28236,7 +28243,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 string url = "";
                 if (my_familiar() != $familiar[gelatinous cubeling])
                     url = "familiar.php";
-				subentry.header = "Bring along the gelatinous cubeling";
+				subentry.header = "Bring your gelatinous cubeling ("+gelatinousCubelingProgress+"/12)";
 			
 				subentry.entries.listAppend("Acquire " + missing_items.listJoinComponents(", ", "and") + " to speed up the daily dungeon.");
                 
@@ -33242,13 +33249,14 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.url = "main.php?eowkeeper=1";
         final.imageLookupName = "__item Eight Days a Week Pill Keeper";
 
-        final.sneakCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")];
-
         // see # of free pillkeeepers remaining
         int freeSneakLeft = get_property_boolean("_freePillKeeperUsed") ? 1 : 0;
 
         // calculate possible spleen-based sneaks
         int spleenSneaks = floor(spleenRemaining / 3);
+
+        // usable if we have pill keeper plus free sneaks or spleen sneaks available
+        final.sneakCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeSneakLeft + spleenSneaks > 0);
 
         final.sneakCount = freeSneakLeft + spleenSneaks;
         final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x free sneak, </b>`;
@@ -33298,7 +33306,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         
         final.sneakCondition = lookupItem("jurassic parka").have();
         final.sneakCount = spikosLeft;
-        final.tileDescription = `<b>{spikosLeft}x spikalodon spikes</b> left`;
+        final.tileDescription = `<b>{spikosLeft}x spikolodon spikes</b> left`;
         return final;
 
     }
@@ -33569,12 +33577,17 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         table.listAppend(building_line);
 
     // Having done this, you now append the NCs remaining subentry to the end of the core entry, with an on_mouse_over bit as well.
-    entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", HTMLGenerateSpanOfClass("Mouse over for the best sneaks!", "r_bold r_element_spooky_desaturated")));
-    entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", table.HTMLGenerateSimpleTableLines(false)));
- 
+
+    // However, I am going to be lazy, and not append either of these in the event the user is in CS/GG.
+    if (my_path().id != PATH_COMMUNITY_SERVICE && my_path().id != PATH_GREY_GOO) {
+        entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", HTMLGenerateSpanOfClass("Mouse over for the best sneaks!", "r_bold r_element_spooky_desaturated")));
+        entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", table.HTMLGenerateSimpleTableLines(false)));
+    }
+
     if (entry.subentries.count() > 0) resource_entries.listAppend(entry);
 
 }
+
 
 
 void SetsInit()
@@ -47793,6 +47806,7 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string [int] description;
         description.listAppend("All sorts of things. Buffs, martinis, cigars!");
+        entry.url = "place.php?whichplace=kgb";
         
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(clicks_remaining, "click", "clicks"), "", description));
     }
@@ -48578,49 +48592,48 @@ void IOTMGodLobsterGenerateResource(ChecklistEntry [int] resource_entries)
     resource_entries.listAppend(ChecklistEntryMake("__familiar god lobster", url, ChecklistSubentryMake(pluralise(free_fights_left, "free God Lobster fight", "free God Lobster fights"), "", description)).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("God lobster daily fights"));
 }
 
-RegisterResourceGenerationFunction("IOTMBoomBoxGenerateTasks");
-void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] resource_entries)
+//Songboom
+RegisterTaskGenerationFunction("IOTMBoomBoxGenerateTasks");
+void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0)
-		return;
-	
+	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0) return;
+		 
+ 
 	string song = get_property("boomBoxSong");
 	int changes_left = get_property_int("_boomBoxSongsLeft"); //the boys are back in town, eleven times. everyone will love it
 	
 	int boomboxProgress = get_property_int("_boomBoxFights");
 	string [int] description;
 	{
-		if (song == "")
+		description.listAppend("Now playing: " + HTMLGenerateSpanOfClass(song, "r_bold")); //+ " (" + changes_left + " song swaps today)");
+		if (boomboxProgress < 9)
 		{
-			song = "The Sound of Silence";
-		}
-		description.listAppend("Currently playing " + song + ", the soundtrack of your life!");
-		description.listAppend("Currently " + boomboxProgress + "/11 fights until next drop.");
+            description.listAppend((11 - boomboxProgress).pluralise("combat", "combats") + " until next drop.");
+			optional_task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), 8));
+        }	
 		if (boomboxProgress == 9)
 		{
-			description.listAppend(HTMLGenerateSpanFont("Boombox drop soon", "blue"));
-		}
+            task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop in 2 fights", "", description), -11));
+        }	
+		
 		if (boomboxProgress == 10)
-		{
-			description.listAppend(HTMLGenerateSpanFont("Boombox drop next fight", "red"));
-		}
-		description.listAppend("" + changes_left + " song changes left today.");
-		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), -11));
+        {
+            task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop this fight", "", description), -11));
+        }
 	}	
-	
+ 
 	if (song == "" && changes_left > 0)
 	{
-		string [int] description;
-		if (!__quest_state["Level 7"].finished && my_path().id != PATH_COMMUNITY_SERVICE)
-			description.listAppend("Eye of the Giger: Nightmare Fuel for the cyrpt.");
-		if (fullness_limit() > 0)
-			description.listAppend("Food Vibrations: extra adventures from food" + (__misc_state["in run"] ? ", +30% food drop" : "") + ".");
-		description.listAppend("Total Eclipse of Your Meat: extra meat, +30% meat.");
-		
-		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Set BoomBox song", "", description), 8));
+        string [int] description;
+        if (!__quest_state["Level 7"].finished && my_path().id != PATH_COMMUNITY_SERVICE)
+        	description.listAppend("Eye of the Giger: Nightmare Fuel for the cyrpt.");
+        if (fullness_limit() > 0)
+	        description.listAppend("Food Vibrations: extra adventures from food" + (__misc_state["in run"] ? ", +30% food drop" : "") + ".");
+        description.listAppend("Total Eclipse of Your Meat: extra meat, +30% meat.");
+  
+        optional_task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Set BoomBox song", "", description), 8).ChecklistEntrySetIDTag("SongBoom BoomBox turn on"));
 	}
-	
-}
+}	
 RegisterResourceGenerationFunction("IOTMCatBurglarGenerateResource");
 void IOTMCatBurglarGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -50762,7 +50775,7 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
             if (hasShoesEquipped)
 				description.listAppend("Takes " + pluralise(guzzlrQuestShoedFightsLeft, "more fight", "more fights") + " (" + guzzlrQuestFightsLeft + " without shoes).");
 			else {
-				description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
+                if (hasShoes) description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
 			}
 			#task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", "inventory.php?tap=guzzlr", ChecklistSubentryMake("Guzzlr delivery", "", description), -11));
 			task_entries.listAppend(ChecklistEntryMake("__item Guzzlr tablet", questLocation.getClickableURLForLocation(), ChecklistSubentryMake("Guzzlr delivery", subtitle, description), -11, boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("Guzzlr quest task"));
@@ -50773,14 +50786,14 @@ void IOTMGuzzlrGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [i
 		else if (guzzlrQuestProgressLeft == 1)
             description.listAppend(HTMLGenerateSpanFont("Delivery on next fight", "blue"));
         else if (guzzlrQuestShoedFightsLeft == 1)
-            description.listAppend(HTMLGenerateSpanFont("Equip shoes to receive delivery on next fight", "blue"));  
+            if (hasShoes) description.listAppend(HTMLGenerateSpanFont("Equip shoes to receive delivery on next fight", "blue"));  
         else if (!hasShoes || guzzlrQuestFightsLeft == guzzlrQuestShoedFightsLeft) // if no shoes or if doesn't matter at that point
             description.listAppend("Takes " + pluralise(guzzlrQuestFightsLeft, "more fight", "more fights") + ".");
         else if (hasShoesEquipped)
             description.listAppend("Takes " + pluralise(guzzlrQuestShoedFightsLeft, "more fight", "more fights") + " (" + guzzlrQuestFightsLeft + " without shoes).");
         else {
             description.listAppend("Takes " + guzzlrQuestFightsLeft + " more fights (" + guzzlrQuestShoedFightsLeft + " with shoes).");
-            description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
+            if (hasShoes) description.listAppend(HTMLGenerateSpanFont("Equip your Guzzlr shoes for quicker deliveries.", "red"));
         }
  
         if (hasPants && !hasPantsEquipped)
@@ -51233,46 +51246,66 @@ void IOTMCommerceGhostGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 }
 
 // 2021
-//2021
-//Miniature Crystal ball
-RegisterResourceGenerationFunction("IOTMCrystalBallGenerateTasks");
-void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] resource_entries)
+// Miniature Crystal ball
+RegisterTaskGenerationFunction("IOTMCrystalBallGenerateTasks");
+void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (lookupItem("miniature crystal ball").available_amount() == 0)
-		return;
-	string title = "Miniature crystal ball monster prediction";
-	string image_name = "__item miniature crystal ball";
-	monster crystalBallPrediction = (get_property_monster("crystalBallMonster"));
-	location crystalBallZone = (get_property_location("crystalBallLocation"));
-	image_name = "__monster " + crystalBallPrediction;
+	string title;
+ 
+	title = "Miniature crystal ball monster prediction(s)";
+	string image_name = "__item packaged miniature crystal ball";
+	string crystalBall = (get_property("crystalBallPredictions"));
+	string url;
+	url = "inventory.php?ponder=1";
 	string [int] description;
-	string url = invSearch("miniature crystal ball");
-	if (!lookupItem("miniature crystal ball").equipped())
+	description.listAppend("The future foretells... dickstabbing!");
+	if (available_amount($item[miniature crystal ball]) > 0) 
 	{
-		if (crystalBallPrediction != $monster[none])
+		if (!have_equipped($item[miniature crystal ball])) //when mcb is not equipped
 		{
-			description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "black") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "black"));
-			description.listAppend("" + HTMLGenerateSpanFont("Equip the miniature crystal ball first!", "red") + "");
-			resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
+			if (crystalBall != "")
+			{
+				string [int] predictionsSection;
+                predictionsSection.listAppend(HTMLGenerateSpanOfClass("Predictions:", "r_bold"));
+                string[] predictions = crystalBall.split_string("[|]");
+                foreach i in (predictions) {
+                    string[] predictions_split = predictions[i].split_string(":");
+                    predictionsSection.listAppend(predictions_split[1] + " - " + predictions_split[2]);
+                }
+                description.listAppend(predictionsSection.listJoinComponents("|*"));
+				description.listAppend("" + HTMLGenerateSpanFont("Equip the miniature crystal ball first!", "red") + "");
+				url = "inventory.php?ponder=1";
+				task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
+			}
+			else 
+			{				
+				description.listAppend("Equip the miniature crystal ball to predict a monster!");
+				url = invSearch("miniature crystal ball");
+				optional_task_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", url, ChecklistSubentryMake(title, description)));
+			}
 		}
-		else
+		else //when mcb is equipped
 		{
-			description.listAppend("Equip the miniature crystal ball to predict a monster!");
-			resource_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", url, ChecklistSubentryMake(title, description)));
+			if (crystalBall != "")
+			{
+                string [int] predictionsSection;
+                predictionsSection.listAppend(HTMLGenerateSpanOfClass("Predictions:", "r_bold"));
+                string[] predictions = crystalBall.split_string("[|]");
+                foreach i in (predictions) {
+                    string[] predictions_split = predictions[i].split_string(":");
+                    predictionsSection.listAppend(predictions_split[1] + " - " + predictions_split[2]);
+                }
+                description.listAppend(predictionsSection.listJoinComponents("|*"));
+				description.listAppend("" + HTMLGenerateSpanFont("Miniature crystal ball equipped!", "blue") + "");
+				task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
+			}
+			else
+			{
+				description.listAppend("Adventure in a snarfblat to predict a monster!");
+				description.listAppend("" + HTMLGenerateSpanFont("Miniature crystal ball equipped!", "blue") + "");
+				task_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", url, ChecklistSubentryMake(title, description), -11));
+			}	
 		}
-	}
-	else
-	{
-		if (crystalBallPrediction != $monster[none])
-		{
-			description.listAppend("Next fight in " + HTMLGenerateSpanFont(crystalBallZone, "blue") + " will be: " + HTMLGenerateSpanFont(crystalBallPrediction, "blue"));
-			resource_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(title, description), -11));
-		}
-		else
-		{
-			description.listAppend("Adventure in a snarfblat to predict a monster!");
-			resource_entries.listAppend(ChecklistEntryMake("__item quantum of familiar", url, ChecklistSubentryMake(title, description)));
-		}	
 	}
 }
 //Emotion Chip
@@ -51535,10 +51568,10 @@ void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_
 		{
 			string [int] description;
 			description.listAppend("Can buy one of the following (500 meat):");
-			description.listAppend("Fedora-mounted mountain: +20 ML hat");
+			description.listAppend("Fedora-mounted fountain: +20 ML hat");
 			description.listAppend("Sombrero-mounted sparkler: +5% combat hat");
 			description.listAppend("Porkpie-mounted popper: -5% combat hat");
-			resource_entries.listAppend(ChecklistEntryMake("__item fedora-mounted mountain", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Dangerous hats", description), 8).ChecklistEntrySetIDTag("Clan fireworks hat resource"));
+			resource_entries.listAppend(ChecklistEntryMake("__item fedora-mounted fountain", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Dangerous hats", description), 8).ChecklistEntrySetIDTag("Clan fireworks hat resource"));
 		}
 }
 
@@ -51913,7 +51946,7 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 	
 	//consultation counter
 	int CMC_consults = clampi(5 - get_property_int("_coldMedicineConsults"), 0, 5);
-	if (CMC_consults > 0 && __misc_state["in run"] && __iotms_usable[lookupItem("cold medicine cabinet")]) 
+	if (CMC_consults > 0 &&  __iotms_usable[lookupItem("cold medicine cabinet")]) 
 	{
 		// Tracking tile; gives the user information about the last turn-taking combats per the pref.
 		int next_CMC_Turn = get_property_int("_nextColdMedicineConsult");
@@ -51929,9 +51962,10 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		string dotMatrix = '';
 
         foreach turn in splitCMC {
-            if (splitCMC[turn] == "i") {iTurns +=1; dotMatrix = dotMatrix+'<span style="color:Salmon">• </span>';}
-            if (splitCMC[turn] == "u") {uTurns +=1; dotMatrix = dotMatrix+'<span style="color:Indigo">• </span>';}
-            if (splitCMC[turn] == "o") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:Wheat">• </span>';}
+            if (splitCMC[turn] == "i") {iTurns +=1; dotMatrix = dotMatrix+'<span style="color:blue;font-size:0.8em">🞓 </span>';}
+            if (splitCMC[turn] == "u") {uTurns +=1; dotMatrix = dotMatrix+'<span style="color:red;font-size:0.8em">🞮 </span>';}
+            if (splitCMC[turn] == "o") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:green;font-size:0.8em">🞉 </span>';}
+            if (splitCMC[turn] == "?") {oTurns +=1; dotMatrix = dotMatrix+'<span style="color:black;font-size:0.8em">❔ </span>';}
         }
         
     	string expectedSpleenItem = "Fleshazole";
@@ -51947,8 +51981,10 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
 		if (next_CMC_Turn > total_turns_played())
 		{
 			description.listAppend("" + HTMLGenerateSpanOfClass(next_CMC_Timer, "r_bold") + " adventures until your next consultation.");
-			description.listAppend("Spend " + HTMLGenerateSpanOfClass(next_CMC_Timer - 9, "r_bold") + " non-environmental adventures to double your pill.");
-			description.listAppend("" + HTMLGenerateSpanOfClass("Last 20 environments: ", "r_bold") + cmcCombatString + "");
+
+			// Commenting these out. It would be nice to actually solve the issue here, but the logic just needs to be better.
+			// description.listAppend("Spend " + HTMLGenerateSpanOfClass(next_CMC_Timer - 9, "r_bold") + " non-environmental adventures to double your pill.");
+			// description.listAppend("" + HTMLGenerateSpanOfClass("Last 20 environments: ", "r_bold") + cmcCombatString + "");
 		}
 			
 		// Append the lil dot guy if it's useful.
@@ -51970,10 +52006,10 @@ void IOTMColdMedicineCabinetGenerateResource(ChecklistEntry [int] resource_entri
         string [int][int] spleeners;
         // Generates a reference table for the user of the spleener effects.
         spleeners.listAppend(listMake("<strong>Spleen Item</strong>", "<strong>Environment</strong>", "<strong>Effect</strong>"));
-        spleeners.listAppend(listMake("Extrovermectin","<span style=\"color:Salmon\">Indoors</span>","+3 Wandering Monsters"));
-        spleeners.listAppend(listMake("Breathitin","<span style=\"color:Indigo\">Underground</span>","+5 Outdoor Free Kills"));
-        spleeners.listAppend(listMake("Homebodyl","<span style=\"color:Wheat\">Outdoors</span>","+11 Free Crafts"));
-        spleeners.listAppend(listMake("Fleshazole","N/A","+"+fleshazoleMeat.to_string()+" meat"));
+        spleeners.listAppend(listMake("<span style=\"font-size:0.8em\">Extrovermectin</span>","<span style=\"color:blue;font-size:0.8em\">Indoors 🞓</span>","<span style=\"font-size:0.8em\">+3 Wandering Monsters</span>"));
+        spleeners.listAppend(listMake("<span style=\"font-size:0.8em\">Breathitin</span>","<span style=\"color:red;font-size:0.8em\">Underground 🞮</span>","<span style=\"font-size:0.8em\">+5 Outdoor Free Kills</span>"));
+        spleeners.listAppend(listMake("<span style=\"font-size:0.8em\">Homebodyl</span>","<span style=\"color:green;font-size:0.8em\">Outdoors 🞉</span>","<span style=\"font-size:0.8em\">+11 Free Crafts</span>"));
+        spleeners.listAppend(listMake("<span style=\"font-size:0.8em\">Fleshazole</span>","<span style=\"font-size:0.8em\">N/A</span>","<span style=\"font-size:0.8em\">+"+fleshazoleMeat.to_string()+" meat</span>"));
         description.listAppend(HTMLGenerateSimpleTableLines(spleeners));
 
         resource_entries.listAppend(ChecklistEntryMake("__item snow suit", url, ChecklistSubentryMake(CMC_consults.pluralise("CMC consultation", "CMC consultations" + " remaining"), "", description)).ChecklistEntrySetIDTag("cold medicine cabinet resource")); 
@@ -52066,7 +52102,7 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 	boolean bowlingSupernag = get_property_boolean("tourGuideBowlingBallSupernag");
 
 	string url;
-	if (bowlingCooldown == 0)
+	if (bowlingCooldown == 1)
 	{
 		string [int] description;
 		string main_title = "Cosmic bowling ball usable";
@@ -52117,7 +52153,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 		{
 			description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
 		}
-		if (bowlingCooldown == 0)
+		if (bowlingCooldown == 1)
 		{
 			description.listAppend(HTMLGenerateSpanFont("You can bowl again next turn!", "blue"));
 			description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
@@ -52614,10 +52650,10 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
     }	
 	title = HTMLGenerateSpanFont(sweatAdvs + " adv stillsuit sweat booze", "purple");
-	if (__misc_state["in run"] && sweatAdvs > 3) {
+	if (__misc_state["in run"] && sweatAdvs > 6) {
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
-	else if (!__misc_state["in run"] && sweatAdvs > 8) {
+	else if (!__misc_state["in run"] && sweatAdvs > 10) {
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
 }
@@ -53055,7 +53091,7 @@ void IOTMModelTrainSetGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     int reconfigurableIn = trainSetReconfigurableIn();
     if (reconfigurableIn == 0)
     {
-        description.listAppend("Train set reconfigurable!");
+        HTMLGenerateSpanFont("Train set reconfigurable!", "blue");
     }
     else {
         description.listAppend("Train set reconfigurable in " + HTMLGenerateSpanOfClass(reconfigurableIn.to_string() + " combats.", "r_bold"));
@@ -53796,7 +53832,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     int rest = cinchoRests;
 
     // This while loop expands your possible cinch starting at rests you haven't used.
-    while (rest < freeRests+1)
+    while (rest < freeRests)
         {
             int cinchAmount = rest > count(cinchLevels) ? 5 : cinchLevels[rest];
             totalCinch += cinchAmount;
@@ -53827,7 +53863,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     // This should always be true because there's no way to have <5 cinch and not hit the return on line 33.
     //   Still including it as a conditional for the tile build as a failsafe I guess.
     if (cinchUses.count() > 0)
-        description.listAppend("Use <b>free rests</b> to cinch up your belt and cast some cool skills:");
+        description.listAppend("Use your Cincho de Mayo to cast skills in exchange for cinch; when you're out of cinch, take a <b>free rest!?</b>");
 
     // Doing this one outside of the large list append, because it's more important.
     if (totalCinch > 60) { 
@@ -53845,6 +53881,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
 
     resource_entries.listAppend(ChecklistEntryMake("__item cincho de mayo", "", ChecklistSubentryMake(`{currentCinch}% belt cinch`, "", description), 3).ChecklistEntrySetIDTag("Cincho de Mayo resource"));
 }
+
 
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
