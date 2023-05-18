@@ -43,7 +43,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
         url = 'skills.php';
 
         // ... unless you have <60 cinch lol
-        if (totalCinch > 60) {
+        if (totalCinch < 60) {
             url = 'campground.php';
         }
     }
