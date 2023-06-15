@@ -1180,6 +1180,7 @@ function toggleTileDisplay(toggle_box_id, want_collapsed)
         {
             if (!element.classList.contains("r_cl_collapsed"))
                 element.classList.add("r_cl_collapsed");
+	    element.parentElement.append(element);
         }
         else
         {
