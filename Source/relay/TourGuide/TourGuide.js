@@ -1175,16 +1175,18 @@ function toggleTileDisplay(toggle_box_id, want_collapsed)
     const class_to_toggle = toggle_box_id.substring(7); //remove the "toggle_"
     const entry_group = document.getElementsByClassName( class_to_toggle );
     for (const element of entry_group)
-    {
-        if (want_collapsed)
+    if (want_collapsed)
         {
             if (!element.classList.contains("r_cl_collapsed"))
                 element.classList.add("r_cl_collapsed");
-	    element.parentElement.append(element);
+            let position = Array.prototype.slice.call( element.parentElement.children );
+            element.dataset.position = position.indexOf( element );
+            element.parentElement.append( element );
         }
         else
         {
             element.classList.remove("r_cl_collapsed");
+            element.parentElement.insertBefore(element, element.parentElement.childNodes[element.dataset.position]);
         }
     }
 
