@@ -57397,7 +57397,7 @@ void runMain(string relay_filename)
             style += "background-color:" + __setting_page_background_colour + ";";
         if (!__setting_side_negative_space_is_dark && !__setting_fill_vertical)
         {
-            style += "border:1px solid;border-top:0px;border-bottom:1px solid;";
+            style += "border:1px solid;border-top:1px solid;border-bottom:1px solid;";
             style += "border-color:" + __setting_line_colour + ";";
         }
         PageWrite(HTMLGenerateTagPrefix("div", mapMake("id", "Guide_body", "style", style)));
