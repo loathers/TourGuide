@@ -191,7 +191,7 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
                     else
                     {
                         subentry.modifiers.listAppend("elemental damage");
-                        subentry.entries.listAppend("Fight the protector spectre!");
+                        subentry.entries.listAppend(`Fight the protector spectre! ({pluralise(3-$location[a massive ziggurat].numberOfDenseLianaFoughtInShrine(), "liana left", "lianas left")})`);
                     }
                 }
             }

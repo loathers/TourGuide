@@ -10,7 +10,7 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 	boolean bowlingSupernag = get_property_boolean("tourGuideBowlingBallSupernag");
 
 	string url;
-	if (bowlingCooldown == 0)
+	if (bowlingCooldown == 1)
 	{
 		string [int] description;
 		string main_title = "Cosmic bowling ball usable";
@@ -61,7 +61,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 		{
 			description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
 		}
-		if (bowlingCooldown == 0)
+		if (bowlingCooldown == 1)
 		{
 			description.listAppend(HTMLGenerateSpanFont("You can bowl again next turn!", "blue"));
 			description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
