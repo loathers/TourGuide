@@ -247,32 +247,32 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     TFWMInternalModifier best_familiar_equipment;
     foreach key in weight_modifiers
     {
-        TFWMInternalModifier modifier = weight_modifiers[key];
-        if (modifier.have && modifier.from_familiar_equipment)
+        TFWMInternalModifier weight_modifier = weight_modifiers[key];
+        if (weight_modifier.have && weight_modifier.from_familiar_equipment)
         {
-            if (modifier.bonus > best_familiar_equipment.bonus)
-                best_familiar_equipment = modifier;
+            if (weight_modifier.bonus > best_familiar_equipment.bonus)
+                best_familiar_equipment = weight_modifier;
         }
     }
     
     float total = 0.0;
     foreach key in weight_modifiers
     {
-        TFWMInternalModifier modifier = weight_modifiers[key];
-        string description = modifier.description;
-        description += " (+" + modifier.bonus.floor() + ")";
-        if (modifier.have)
+        TFWMInternalModifier weight_modifier = weight_modifiers[key];
+        string description = weight_modifier.description;
+        description += " (+" + weight_modifier.bonus.floor() + ")";
+        if (weight_modifier.have)
         {
-            if (best_familiar_equipment.have && modifier.from_familiar_equipment && !TFWMInternalModifierEquals(best_familiar_equipment, modifier)) //not our chosen familiar equipment
+            if (best_familiar_equipment.have && weight_modifier.from_familiar_equipment && !TFWMInternalModifierEquals(best_familiar_equipment, weight_modifier)) //not our chosen familiar equipment
                 continue;
             how.listAppend(description);
-            total += modifier.bonus;
+            total += weight_modifier.bonus;
         }
-        else if (modifier.obtainable_now)
+        else if (weight_modifier.obtainable_now)
         {
             immediately_obtainable.listAppend(description);
         }
-        else if (modifier.obtainable_theoretically)
+        else if (weight_modifier.obtainable_theoretically)
         {
             missing_potentials.listAppend(description);
         }
