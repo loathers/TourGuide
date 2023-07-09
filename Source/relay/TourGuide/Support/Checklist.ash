@@ -325,9 +325,9 @@ string ChecklistGenerateModifierSpan(string [int] modifiers)
 	return HTMLGenerateSpanOfClass(modifiers.listJoinComponents(", "), "r_cl_modifier");
 }
 
-string ChecklistGenerateModifierSpan(string the_modifier) //no longer span, but I'm sure as hell not gonna change every instance of it :V
+string ChecklistGenerateModifierSpan(string checklist_modifier) //no longer span, but I'm sure as hell not gonna change every instance of it :V
 {
-	return HTMLGenerateDivOfClass(the_modifier, "r_cl_modifier");
+	return HTMLGenerateDivOfClass(checklist_modifier, "r_cl_modifier");
 }
 
 
