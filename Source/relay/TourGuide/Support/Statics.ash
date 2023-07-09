@@ -58,8 +58,8 @@ static {
     int PATH_AVATAR_OF_SHADOWS_OVER_LOATHING = 47;
 }
 
-float numeric_modifier_replacement(item it, string modifier) {
-    string modifier_lowercase = modifier.to_lower_case();
+float numeric_modifier_replacement(item it, string the_modifier) {
+    string modifier_lowercase = the_modifier.to_lower_case();
     float additional = 0;
     if (my_path().id == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
     	return 0.0;
@@ -89,7 +89,7 @@ float numeric_modifier_replacement(item it, string modifier) {
     	if (it.equipped_amount() == 0)
      	   additional += 5;
     }
-    return numeric_modifier(it, modifier) + additional;
+    return numeric_modifier(it, the_modifier) + additional;
 }
 
 
@@ -157,30 +157,30 @@ static {
     initialiseItems();
 }
 
-boolean [item] equipmentWithNumericModifier(string modifier)
+boolean [item] equipmentWithNumericModifier(string the_modifier)
 {
-	modifier = modifier.to_lower_case();
+	the_modifier = the_modifier.to_lower_case();
     boolean [item] dynamic_items;
     dynamic_items[to_item("kremlin's greatest briefcase")] = true;
     dynamic_items[$item[your cowboy boots]] = true;
     dynamic_items[$item[a light that never goes out]] = true; //FIXME all smithsness items
-    if (!(__equipment_by_numeric_modifier contains modifier))
+    if (!(__equipment_by_numeric_modifier contains the_modifier))
     {
         //Build it:
         boolean [item] blank;
-        __equipment_by_numeric_modifier[modifier] = blank;
+        __equipment_by_numeric_modifier[the_modifier] = blank;
         foreach it in __equipment
         {
             if (dynamic_items contains it) continue;
-            if (it.numeric_modifier(modifier) != 0.0)
-                __equipment_by_numeric_modifier[modifier][it] = true;
+            if (it.numeric_modifier(the_modifier) != 0.0)
+                __equipment_by_numeric_modifier[the_modifier][it] = true;
         }
     }
     //Certain equipment is dynamic. Inspect them dynamically:
     boolean [item] extra_results;
     foreach it in dynamic_items
     {
-        if (it.numeric_modifier_replacement(modifier) != 0.0)
+        if (it.numeric_modifier_replacement(the_modifier) != 0.0)
         {
             extra_results[it] = true;
         }
@@ -189,7 +189,7 @@ boolean [item] equipmentWithNumericModifier(string modifier)
     string secondary_modifier = "";
     foreach e in $elements[hot,cold,spooky,stench,sleaze]
     {
-        if (modifier == e + " damage")
+        if (the_modifier == e + " damage")
             secondary_modifier = e + " spell damage";
     }
     if (secondary_modifier != "")
@@ -199,11 +199,11 @@ boolean [item] equipmentWithNumericModifier(string modifier)
     }
     
     if (extra_results.count() == 0)
-        return __equipment_by_numeric_modifier[modifier];
+        return __equipment_by_numeric_modifier[the_modifier];
     else
     {
         //Add extras:
-        foreach it in __equipment_by_numeric_modifier[modifier]
+        foreach it in __equipment_by_numeric_modifier[the_modifier]
         {
             extra_results[it] = true;
         }
