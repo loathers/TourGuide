@@ -1180,10 +1180,14 @@ function toggleTileDisplay(toggle_box_id, want_collapsed)
         {
             if (!element.classList.contains("r_cl_collapsed"))
                 element.classList.add("r_cl_collapsed");
+            let position = Array.prototype.slice.call( element.parentElement.children );
+            element.dataset.position = position.indexOf( element );
+            element.parentElement.append( element );
         }
         else
         {
             element.classList.remove("r_cl_collapsed");
+            element.parentElement.insertBefore(element, element.parentElement.childNodes[element.dataset.position]);
         }
     }
 
