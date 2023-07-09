@@ -2538,8 +2538,8 @@ static {
     int PATH_AVATAR_OF_SHADOWS_OVER_LOATHING = 47;
 }
 
-float numeric_modifier_replacement(item it, string the_modifier) {
-    string modifier_lowercase = the_modifier.to_lower_case();
+float numeric_modifier_replacement(item it, string modifier_string) {
+    string modifier_lowercase = modifier_string.to_lower_case();
     float additional = 0;
     if (my_path().id == PATH_G_LOVER && !it.contains_text("g") && !it.contains_text("G"))
     	return 0.0;
@@ -2569,7 +2569,7 @@ float numeric_modifier_replacement(item it, string the_modifier) {
     	if (it.equipped_amount() == 0)
      	   additional += 5;
     }
-    return numeric_modifier(it, the_modifier) + additional;
+    return numeric_modifier(it, modifier_string) + additional;
 }
 
 
@@ -2637,30 +2637,30 @@ static {
     initialiseItems();
 }
 
-boolean [item] equipmentWithNumericModifier(string the_modifier)
+boolean [item] equipmentWithNumericModifier(string modifier_string)
 {
-	the_modifier = the_modifier.to_lower_case();
+	modifier_string = modifier_string.to_lower_case();
     boolean [item] dynamic_items;
     dynamic_items[to_item("kremlin's greatest briefcase")] = true;
     dynamic_items[$item[your cowboy boots]] = true;
     dynamic_items[$item[a light that never goes out]] = true; //FIXME all smithsness items
-    if (!(__equipment_by_numeric_modifier contains the_modifier))
+    if (!(__equipment_by_numeric_modifier contains modifier_string))
     {
         //Build it:
         boolean [item] blank;
-        __equipment_by_numeric_modifier[the_modifier] = blank;
+        __equipment_by_numeric_modifier[modifier_string] = blank;
         foreach it in __equipment
         {
             if (dynamic_items contains it) continue;
-            if (it.numeric_modifier(the_modifier) != 0.0)
-                __equipment_by_numeric_modifier[the_modifier][it] = true;
+            if (it.numeric_modifier(modifier_string) != 0.0)
+                __equipment_by_numeric_modifier[modifier_string][it] = true;
         }
     }
     //Certain equipment is dynamic. Inspect them dynamically:
     boolean [item] extra_results;
     foreach it in dynamic_items
     {
-        if (it.numeric_modifier_replacement(the_modifier) != 0.0)
+        if (it.numeric_modifier_replacement(modifier_string) != 0.0)
         {
             extra_results[it] = true;
         }
@@ -2669,7 +2669,7 @@ boolean [item] equipmentWithNumericModifier(string the_modifier)
     string secondary_modifier = "";
     foreach e in $elements[hot,cold,spooky,stench,sleaze]
     {
-        if (the_modifier == e + " damage")
+        if (modifier_string == e + " damage")
             secondary_modifier = e + " spell damage";
     }
     if (secondary_modifier != "")
@@ -2679,11 +2679,11 @@ boolean [item] equipmentWithNumericModifier(string the_modifier)
     }
     
     if (extra_results.count() == 0)
-        return __equipment_by_numeric_modifier[the_modifier];
+        return __equipment_by_numeric_modifier[modifier_string];
     else
     {
         //Add extras:
-        foreach it in __equipment_by_numeric_modifier[the_modifier]
+        foreach it in __equipment_by_numeric_modifier[modifier_string]
         {
             extra_results[it] = true;
         }
@@ -3788,17 +3788,17 @@ float initiative_modifier_ignoring_plants()
 
 float item_drop_modifier_ignoring_plants()
 {
-    float the_modifier = item_drop_modifier();
+    float item_modifier = item_drop_modifier();
     
     location my_location = my_location();
     if (my_location != $location[none])
     {
         if (my_location.locationHasPlant("Rutabeggar") || my_location.locationHasPlant("Stealing Magnolia"))
-            the_modifier -= 25.0;
+            item_modifier -= 25.0;
         if (my_location.locationHasPlant("Kelptomaniac"))
-            the_modifier -= 40.0;
+            item_modifier -= 40.0;
     }
-    return the_modifier;
+    return item_modifier;
 }
 
 int monster_level_adjustment_ignoring_plants() //this is unsafe to use in heavy rains
@@ -9358,9 +9358,9 @@ string ChecklistGenerateModifierSpan(string [int] modifiers)
 	return HTMLGenerateSpanOfClass(modifiers.listJoinComponents(", "), "r_cl_modifier");
 }
 
-string ChecklistGenerateModifierSpan(string the_modifier) //no longer span, but I'm sure as hell not gonna change every instance of it :V
+string ChecklistGenerateModifierSpan(string checklist_modifier) //no longer span, but I'm sure as hell not gonna change every instance of it :V
 {
-	return HTMLGenerateDivOfClass(the_modifier, "r_cl_modifier");
+	return HTMLGenerateDivOfClass(checklist_modifier, "r_cl_modifier");
 }
 
 
@@ -15312,20 +15312,20 @@ static
     {
         boolean [string] modifier_names = $strings[Meat Drop,Initiative,Muscle,Mysticality,Moxie,Muscle Percent,Mysticality Percent,Moxie Percent];
         
-        foreach the_modifier in modifier_names
+        foreach modifier_name in modifier_names
         {
-            __if_potions_with_numeric_modifiers[the_modifier] = listMakeBlankItem();
+            __if_potions_with_numeric_modifiers[modifier_name] = listMakeBlankItem();
         }
         foreach it in $items[]
         {
             if (it.inebriety > 0 || it.fullness > 0 || it.spleen > 0) continue;
             effect e = it.to_effect();
             if (e == $effect[none]) continue;
-            foreach the_modifier in modifier_names
+            foreach modifier_name in modifier_names
             {
-                if (e.numeric_modifier(the_modifier) > 0.0)
+                if (e.numeric_modifier(modifier_name) > 0.0)
                 {
-                    __if_potions_with_numeric_modifiers[the_modifier].listAppend(it);
+                    __if_potions_with_numeric_modifiers[modifier_name].listAppend(it);
                 }
             }
         }
@@ -15336,20 +15336,20 @@ static
 }
 
 
-void ItemFilterInitialisePotionsForModifier(string the_modifier)
+void ItemFilterInitialisePotionsForModifier(string numeric_modifier)
 {
-    if (__if_potions_with_numeric_modifiers contains the_modifier)
+    if (__if_potions_with_numeric_modifiers contains numeric_modifier)
         return;
-    __if_potions_with_numeric_modifiers[the_modifier] = listMakeBlankItem();
+    __if_potions_with_numeric_modifiers[numeric_modifier] = listMakeBlankItem();
 
     foreach it in $items[]
     {
         if (it.inebriety > 0 || it.fullness > 0 || it.spleen > 0) continue;
         effect e = it.to_effect();
         if (e == $effect[none]) continue;
-        if (e.numeric_modifier(the_modifier) != 0.0)
+        if (e.numeric_modifier(numeric_modifier) != 0.0)
         {
-            __if_potions_with_numeric_modifiers[the_modifier].listAppend(it);
+            __if_potions_with_numeric_modifiers[numeric_modifier].listAppend(it);
         }
     }
 }
@@ -15359,13 +15359,13 @@ item [int] ItemFilterGetPotionsWithNumericModifiers(string [int] modifiers)
 {
     item [int] potions;
     boolean [item] seen_potions;
-    foreach key, the_modifier in modifiers
+    foreach key, modifier_string in modifiers
     {
         item [int] first_layer_list;
-        if (!(__if_potions_with_numeric_modifiers contains the_modifier))
-            ItemFilterInitialisePotionsForModifier(the_modifier);
+        if (!(__if_potions_with_numeric_modifiers contains modifier_string))
+            ItemFilterInitialisePotionsForModifier(modifier_string);
         
-        first_layer_list = __if_potions_with_numeric_modifiers[the_modifier];
+        first_layer_list = __if_potions_with_numeric_modifiers[modifier_string];
         
         
         foreach key, it in first_layer_list
@@ -15396,8 +15396,8 @@ item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modi
         if (e.have_effect() > 0) continue;
         if (!e.effect_is_usable()) continue;
         float v = 0;
-        foreach key, the_modifier in modifiers
-            v += e.numeric_modifier(the_modifier);
+        foreach key, modifier_string in modifiers
+            v += e.numeric_modifier(modifier_string);
         if (v != 0.0 && v >= minimum_modifier && !(blacklist contains it))
         {
             relevant_potions.listAppend(it);
@@ -15412,9 +15412,9 @@ item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modi
 }
 
 
-item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string the_modifier, float minimum_modifier, boolean [item] blacklist)
+item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string modifier_string, float minimum_modifier, boolean [item] blacklist)
 {
-    return ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(the_modifier), minimum_modifier, blacklist);
+    return ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(modifier_string), minimum_modifier, blacklist);
 }
 
 
@@ -26587,18 +26587,18 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
 
     if ($item[BitterSweetTarts].available_amount() > 0 && __misc_state["need to level"]) {
-        int the_modifier = min(11, my_level());
+        int stat_modifier = min(11, my_level());
         string [int] description;
-        description.listAppend("+" + the_modifier + " stats/fight, 10 turns");
+        description.listAppend("+" + stat_modifier + " stats/fight, 10 turns");
         if (my_level() < 11) {
             description.listAppend("Wait until level 11 for full effectiveness");
         }
         resource_entries.listAppend(ChecklistEntryMake("__item BitterSweetTarts", "inventory.php?ftext=bittersweettarts", ChecklistSubentryMake(pluralise($item[BitterSweetTarts]), "", description), importance_level_item).ChecklistEntrySetIDTag("Bittersweettarts resource"));
     }
     if ($item[polka pop].available_amount() > 0 && in_run) {
-        int the_modifier = 5 * min(11, my_level());
+        int item_and_meat_modifier = 5 * min(11, my_level());
         string [int] description;
-        description.listAppend("+" + the_modifier + "% item, " + "+" + the_modifier + "% meat");
+        description.listAppend("+" + item_and_meat_modifier + "% item, " + "+" + item_and_meat_modifier + "% meat");
         if (my_level() < 11) {
             description.listAppend("Wait until level 11 for full effectiveness");
         }
