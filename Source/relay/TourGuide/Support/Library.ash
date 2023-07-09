@@ -913,17 +913,17 @@ float initiative_modifier_ignoring_plants()
 
 float item_drop_modifier_ignoring_plants()
 {
-    float the_modifier = item_drop_modifier();
+    float item_modifier = item_drop_modifier();
     
     location my_location = my_location();
     if (my_location != $location[none])
     {
         if (my_location.locationHasPlant("Rutabeggar") || my_location.locationHasPlant("Stealing Magnolia"))
-            the_modifier -= 25.0;
+            item_modifier -= 25.0;
         if (my_location.locationHasPlant("Kelptomaniac"))
-            the_modifier -= 40.0;
+            item_modifier -= 40.0;
     }
-    return the_modifier;
+    return item_modifier;
 }
 
 int monster_level_adjustment_ignoring_plants() //this is unsafe to use in heavy rains

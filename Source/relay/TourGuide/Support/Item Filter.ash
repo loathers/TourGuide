@@ -8,20 +8,20 @@ static
     {
         boolean [string] modifier_names = $strings[Meat Drop,Initiative,Muscle,Mysticality,Moxie,Muscle Percent,Mysticality Percent,Moxie Percent];
         
-        foreach the_modifier in modifier_names
+        foreach modifier_name in modifier_names
         {
-            __if_potions_with_numeric_modifiers[the_modifier] = listMakeBlankItem();
+            __if_potions_with_numeric_modifiers[modifier_name] = listMakeBlankItem();
         }
         foreach it in $items[]
         {
             if (it.inebriety > 0 || it.fullness > 0 || it.spleen > 0) continue;
             effect e = it.to_effect();
             if (e == $effect[none]) continue;
-            foreach the_modifier in modifier_names
+            foreach modifier_name in modifier_names
             {
-                if (e.numeric_modifier(the_modifier) > 0.0)
+                if (e.numeric_modifier(modifier_name) > 0.0)
                 {
-                    __if_potions_with_numeric_modifiers[the_modifier].listAppend(it);
+                    __if_potions_with_numeric_modifiers[modifier_name].listAppend(it);
                 }
             }
         }
@@ -32,20 +32,20 @@ static
 }
 
 
-void ItemFilterInitialisePotionsForModifier(string the_modifier)
+void ItemFilterInitialisePotionsForModifier(string numeric_modifier)
 {
-    if (__if_potions_with_numeric_modifiers contains the_modifier)
+    if (__if_potions_with_numeric_modifiers contains numeric_modifier)
         return;
-    __if_potions_with_numeric_modifiers[the_modifier] = listMakeBlankItem();
+    __if_potions_with_numeric_modifiers[numeric_modifier] = listMakeBlankItem();
 
     foreach it in $items[]
     {
         if (it.inebriety > 0 || it.fullness > 0 || it.spleen > 0) continue;
         effect e = it.to_effect();
         if (e == $effect[none]) continue;
-        if (e.numeric_modifier(the_modifier) != 0.0)
+        if (e.numeric_modifier(numeric_modifier) != 0.0)
         {
-            __if_potions_with_numeric_modifiers[the_modifier].listAppend(it);
+            __if_potions_with_numeric_modifiers[numeric_modifier].listAppend(it);
         }
     }
 }
@@ -55,13 +55,13 @@ item [int] ItemFilterGetPotionsWithNumericModifiers(string [int] modifiers)
 {
     item [int] potions;
     boolean [item] seen_potions;
-    foreach key, the_modifier in modifiers
+    foreach key, modifier_string in modifiers
     {
         item [int] first_layer_list;
-        if (!(__if_potions_with_numeric_modifiers contains the_modifier))
-            ItemFilterInitialisePotionsForModifier(the_modifier);
+        if (!(__if_potions_with_numeric_modifiers contains modifier_string))
+            ItemFilterInitialisePotionsForModifier(modifier_string);
         
-        first_layer_list = __if_potions_with_numeric_modifiers[the_modifier];
+        first_layer_list = __if_potions_with_numeric_modifiers[modifier_string];
         
         
         foreach key, it in first_layer_list
@@ -92,8 +92,8 @@ item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modi
         if (e.have_effect() > 0) continue;
         if (!e.effect_is_usable()) continue;
         float v = 0;
-        foreach key, the_modifier in modifiers
-            v += e.numeric_modifier(the_modifier);
+        foreach key, modifier_string in modifiers
+            v += e.numeric_modifier(modifier_string);
         if (v != 0.0 && v >= minimum_modifier && !(blacklist contains it))
         {
             relevant_potions.listAppend(it);
@@ -108,7 +108,7 @@ item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string [int] modi
 }
 
 
-item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string the_modifier, float minimum_modifier, boolean [item] blacklist)
+item [int] ItemFilterGetPotionsCouldPullToAddToNumericModifier(string modifier_string, float minimum_modifier, boolean [item] blacklist)
 {
-    return ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(the_modifier), minimum_modifier, blacklist);
+    return ItemFilterGetPotionsCouldPullToAddToNumericModifier(listMake(modifier_string), minimum_modifier, blacklist);
 }
