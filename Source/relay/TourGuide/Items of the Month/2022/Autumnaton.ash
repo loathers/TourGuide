@@ -4,6 +4,7 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 {
 	#if (!__misc_state["in run"]) return; 
 	if (!get_property_boolean("hasAutumnaton")) return;
+	if (my_path() == $path[Legacy of Loathing]) return;
 	int autobotsToday = get_property_int("_autumnatonQuests");
 	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");
 	

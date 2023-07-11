@@ -4,6 +4,7 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 {
 	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
+	if (my_path() == $path[Legacy of Loathing]) return;
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
 	int bowlingCooldown2 = bowlingUses * 2 + 5;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
@@ -35,6 +36,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 {
 	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
+	if (my_path() == $path[Legacy of Loathing]) return;
 
 	// Entries
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");

@@ -116,7 +116,7 @@ void setUpState()
     
 	if (my_turncount() >= 30 && get_property_int("singleFamiliarRun") != -1)
 		__misc_state["single familiar run"] = true;
-	if ($item[Clan VIP Lounge key].available_amount() > 0 && !in_bad_moon())
+	if ($item[Clan VIP Lounge key].available_amount() > 0 && !in_bad_moon() && my_path() != $path[Legacy of Loathing])
 		__misc_state["VIP available"] = true;
 	boolean fax_available = false;
 	if (__misc_state["VIP available"])
