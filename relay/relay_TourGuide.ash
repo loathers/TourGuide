@@ -34457,7 +34457,7 @@ void setUpState()
     
 	if (my_turncount() >= 30 && get_property_int("singleFamiliarRun") != -1)
 		__misc_state["single familiar run"] = true;
-	if ($item[Clan VIP Lounge key].available_amount() > 0 && !in_bad_moon())
+	if ($item[Clan VIP Lounge key].available_amount() > 0 && !in_bad_moon() && my_path() != $path[Legacy of Loathing])
 		__misc_state["VIP available"] = true;
 	boolean fax_available = false;
 	if (__misc_state["VIP available"])
@@ -52096,6 +52096,7 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 {
 	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
+	if (my_path() == $path[Legacy of Loathing]) return;
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
 	int bowlingCooldown2 = bowlingUses * 2 + 5;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
@@ -52127,6 +52128,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 {
 	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
+	if (my_path() == $path[Legacy of Loathing]) return;
 
 	// Entries
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
@@ -52169,6 +52171,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 		}
 	}
 }
+
 //Combat lover's locket
 RegisterResourceGenerationFunction("IOTMCombatLoversLocketGenerateResource");
 void IOTMCombatLoversLocketGenerateResource(ChecklistEntry [int] resource_entries)
@@ -52821,6 +52824,7 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 {
 	#if (!__misc_state["in run"]) return; 
 	if (!get_property_boolean("hasAutumnaton")) return;
+	if (my_path() == $path[Legacy of Loathing]) return;
 	int autobotsToday = get_property_int("_autumnatonQuests");
 	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");
 	
