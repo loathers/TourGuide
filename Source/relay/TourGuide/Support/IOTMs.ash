@@ -171,50 +171,56 @@ void initialiseIOTMsUsable()
     //   the real iotms, which means it'll properly populate __iotms_usable...
     //   even outside of LoL. 
 
+    // One last note -- I have noted where each is used in TourGuide. This is
+    //   mostly a check for me personally, to make sure I have looked at each.
+    //   We could delete the "no tile" entries at any time. I just didn't want to!
+
     // 2005
-    replicaCheck("miniature gravy-covered maypole");
-    replicaCheck("wax lips");
+    replicaCheck("miniature gravy-covered maypole"); # no tile
+    replicaCheck("wax lips"); # no tile
 
     // 2006 
-    replicaCheck("Tome of Snowcone Summoning");
-    replicaCheck("jewel-eyed wizard hat");
-    replicaCheck("plastic pumpkin bucket");
+    
+	// This won't show up for the natural tome, because you never have the tome item in your inventory. Just pings for replica.
+    replicaCheck("Tome of Snowcone Summoning"); # handled in tomes.ash
+    replicaCheck("jewel-eyed wizard hat"); # no tile
+    replicaCheck("plastic pumpkin bucket"); # no tile; fixed in passive damage engines
 
     // 2007
-    replicaCheck("V for Vivala mask");
-    replicaCheck("navel ring of navel gazing");
-    replicaCheck("bottle-rocket crossbow");
+    replicaCheck("V for Vivala mask"); # handled in Misc Items.ash
+    replicaCheck("navel ring of navel gazing"); # handled in Misc Items.ash
+    replicaCheck("bottle-rocket crossbow"); # no tile
 
     // 2008
-    replicaCheck("little box of fireworks");
-    replicaCheck("haiku katana");
+    replicaCheck("little box of fireworks"); # no tile
+    replicaCheck("haiku katana"); # no tile
 
     // 2009
-    replicaCheck("Elvish Sunglasses");
+    replicaCheck("Elvish Sunglasses"); # no tile
 
     // 2010
-    replicaCheck("Juju Mojo Mask");
-    replicaCheck("Greatest American Pants");
+    replicaCheck("Juju Mojo Mask"); # no tile
+    replicaCheck("Greatest American Pants"); # handled in Misc Items.ash
 
     // 2011
-    replicaCheck("Operation Patriot Shield");
-    replicaCheck("plastic vampire fangs");
+    replicaCheck("Operation Patriot Shield"); # no tile
+    replicaCheck("plastic vampire fangs"); # handled in own tile
 
     // 2012
-    replicaCheck("Libram of Resolutions");
-    replicaCheck("Camp Scout backpack");
+    replicaCheck("Libram of Resolutions"); # handled in tomes.ash
+    replicaCheck("Camp Scout backpack"); # no tile
 
     // 2013
-    replicaCheck("over-the-shoulder Folder Holder");
-    replicaCheck("Smith's Tome");
+    replicaCheck("over-the-shoulder Folder Holder"); # no tile
+    replicaCheck("Smith's Tome"); # handled in tomes.ash
 
     // 2014
-    replicaCheck("Little Geneticist DNA-Splicing Lab");
+    replicaCheck("Little Geneticist DNA-Splicing Lab");  # handled in DNA.ash; already used __iotms_usable!
 
     // 2015
     if (get_property_boolean("replicaChateauAvailable")):
-        __iotms_usable[$item[Chateau Mantegna room key]] = true;
-    replicaCheck("Deck of Every Card");
+        __iotms_usable[$item[Chateau Mantegna room key]] = true; # handled in daily + state
+    replicaCheck("Deck of Every Card"); # handled in tile & lvl8
 
     // 2016
     if (get_property_boolean("replicaWitchessSetAvailable")):

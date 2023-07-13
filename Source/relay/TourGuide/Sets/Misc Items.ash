@@ -108,7 +108,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             navel_percent_chance_of_runaway = navel_ring_runaway_chance[navel_runaway_progress];
     }
     boolean have_navel_type_equipment = false;
-    if ($item[navel ring of navel gazing].available_amount() > 0 && $item[navel ring of navel gazing].is_unrestricted()) {
+    if (__iotms_usable[lookupItem("navel ring of navel gazing")]) {
         have_navel_type_equipment = true;
         string name = "Navel Ring runaways";
         
@@ -120,7 +120,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend(navel_percent_chance_of_runaway + "% chance of free runaway.");
         resource_entries.listAppend(ChecklistEntryMake("__item navel ring of navel gazing", url, ChecklistSubentryMake(name, "", description)).ChecklistEntrySetIDTag("Navel ring of navel gazing"));
     }
-    if ($item[greatest american pants].available_amount() > 0 && $item[greatest american pants].is_unrestricted()) {
+    if (__iotms_usable[lookupItem("Greatest American Pants")]) {
         have_navel_type_equipment = true;
         string name = "Greatest American Pants";
         
@@ -1025,7 +1025,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item tonic djinn", "inventory.php?ftext=tonic+djinn", ChecklistSubentryMake("Tonic djinn", "", description), importance_level_unimportant_item).ChecklistEntrySetIDTag("Tonic djinn resource"));
     }
     
-    if ($item[V for Vivala mask].have() && $item[V for Vivala mask].is_unrestricted()) {
+    // Removed an is_unrestricted check; I think this actually is fine, since this checks ownership, and 
+    //   you can't own it unless you are in a path where you can use it or the replica.
+
+    if (__iotms_usable[lookupItem("V for Vivala mask")]) {
         if (!get_property_boolean("_vmaskBanisherUsed")) {
             string url;
             string [int] description;
@@ -1035,8 +1038,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
                 description.listAppend("Once/day banisher. (combat skill)");
 
             if ($item[V for Vivala mask].equipped_amount() == 0) {
-                description.listAppend("Equip V for Vivala mask first.");
-                url = "inventory.php?ftext=v+for+vivala";
+                if ($item[replica V for Vivala mask].equipped_amount() == 0) {
+                    description.listAppend("Equip V for Vivala mask first.");
+                    url = "inventory.php?ftext=v+for+vivala";
+                }
             }
             string line = "Costs ";
             if (my_mp() < 30)
@@ -1052,8 +1057,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             int critAdvs_remaining = 10 - get_property_int("_vmaskAdv");
 
             if ($item[V for Vivala mask].equipped_amount() == 0) {
-                description.listAppend("Equip V for Vivala mask first.");
-                url = "inventory.php?ftext=v+for+vivala";
+                if ($item[replica V for Vivala mask].equipped_amount() == 0) {
+                    description.listAppend("Equip V for Vivala mask first.");
+                    url = "inventory.php?ftext=v+for+vivala";
+                }
             }
             description.listAppend("Land critical hits for chance of getting adventures.");
             description.listAppend("Also a pseudopickpocket.");

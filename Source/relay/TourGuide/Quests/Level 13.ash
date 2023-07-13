@@ -1180,7 +1180,7 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 		subentry.modifiers.listAppend("+HP");
 		subentry.modifiers.listAppend("+" + total_initiative_needed + "% init");
 		subentry.header = "Fight your shadow";
-        foreach it in $items[attorney's badge, navel ring of navel gazing]
+        foreach it in $items[attorney's badge, navel ring of navel gazing, replica navel ring of navel gazing]
         {
             if (it.available_amount() > 0 && it.equipped_amount() == 0)
                 subentry.entries.listAppend("Possibly equip your " + it + ". (blocks shadow)");

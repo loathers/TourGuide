@@ -193,3 +193,53 @@ void IOTMTomesGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(entry);
 	}
 }
+
+RegisterResourceGenerationFunction("ReplicaBookshelfGenerateResource");
+void ReplicaBookshelfGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	// You need separate handling because replica tome/librams work differently. Instead of summon skills, you use
+	//   the replica item and receive your daily guys. This relies on three boolean entries:
+	//		_replicaSnowconeTomeUsed
+	//		_replicaResolutionLibramUsed
+	//		_replicaSmithsTomeUsed
+
+	ChecklistSubentry [int] subentries;
+	string name;
+	string description;
+	string url;
+
+	if (__iotms_usable[lookupItem("Tome of Snowcone Summoning")]) {
+		if (!get_property_boolean("_replicaSnowconeTomeUsed")) {
+			name = "Use your replica Tome of Snowcone Summoning";
+			description = "<b>SNOWCONES</b>: Potential potions for +5 familiar weight, 50% meat, or 25% items.";
+			url = "inventory.php?ftext=snowcone+summoning";
+			subentries.listAppend(ChecklistSubentryMake(name,url,description));
+		}
+	}
+
+	if (__iotms_usable[lookupItem("Libram of Resolutions")]) {
+		if (!get_property_boolean("_replicaResolutionLibramUsed")) {
+			name = "Use your replica Libram of Resolutions";
+			description = "<b>RESOLUTIONS</b>: Potential potions for +5 familiar weight, 50% meat, or 25% items.";
+			url = "inventory.php?ftext=libram+of+resolutions";
+			subentries.listAppend(ChecklistSubentryMake(name,url,description));
+		}
+	}
+
+	if (__iotms_usable[lookupItem("Smith's Tome")]) {
+		if (!get_property_boolean("_replicaSmithsTomeUsed")) {
+			name = "Use your replica Smith's Tome";
+			description = "<b>SMITH'S</b>: 6x free-run banishes, with 3 equips as well";
+			url = "inventory.php?ftext=smith's+tome";
+			subentries.listAppend(ChecklistSubentryMake(name,url,description));
+		}
+	}
+	
+	if (subentries.count() > 0) {
+
+        ChecklistEntry entry = ChecklistEntryMake("__item smith's tome", url, subentries);
+		entry.tags.id = "Replica bookshelf resource";
+        entry.should_indent_after_first_subentry = true;
+        resource_entries.listAppend(entry);
+	}
+}
