@@ -9,10 +9,12 @@ void replicaCheck(string iotmName) {
     int amountItem = lookupItem(iotmName).available_amount();
     int amountReplica = lookupItem("replica "+iotmName).available_amount();
 
-    if ((amountItem + amountReplica) > 0):
+    if ((amountItem + amountReplica) > 0) {
         __iotms_usable[lookupItem(iotmName)] = true;
-    else: 
+    }
+    else {
         __iotms_usable[lookupItem(iotmName)] = false;
+    }
 }
 
 void initialiseIOTMsUsable()
