@@ -2,13 +2,30 @@ import "relay/TourGuide/Support/Campground.ash"
 
 boolean [item] __iotms_usable;
 
+void replicaCheck(string iotmName) {
+    // helper function for checking ownership of either the item or the 
+    //   legacy of loathing replica of said item
+
+    amountItem = lookupItem(iotmName).available_amount();
+    amountReplica = lookupItem("replica "+iotmName).available_amount();
+
+    if (amountItem + amountReplica) > 0:
+        __iotms_usable[lookupItem(iotmName)] = true;
+    else: 
+        __iotms_usable[lookupItem(iotmName)] = false;
+}
+
 void initialiseIOTMsUsable()
 {
     foreach key in __iotms_usable
         remove __iotms_usable[key];
+
     if (in_bad_moon())
         return;
     
+    // ... for futureproofing, we should probably just make a thing in the library that explicitly denotes no-campground paths
+    //   and incorporate them here. Not really sure why ezan didn't, it's possible mafia tracking is just uniquely wrong in ed?
+
     if (my_path().id != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         //Campground items:
@@ -49,8 +66,8 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[bottle of lovebug pheromones]] = true;
     if (get_property_boolean("stenchAirportAlways") || get_property_boolean("_stenchAirportToday")) //Apr 2015
         __iotms_usable[$item[airplane charter: Dinseylandfill]] = true;
-    if (lookupItem("Deck of Every Card").available_amount() > 0) //Jul 2015
-        __iotms_usable[$item[Deck of Every Card]] = true;
+    // if (lookupItem("Deck of Every Card").available_amount() > 0) //Jul 2015
+    //     __iotms_usable[$item[Deck of Every Card]] = true;
     if (get_property_boolean("hotAirportAlways") || get_property_boolean("_hotAirportToday")) //Aug 2015
         __iotms_usable[$item[Airplane charter: That 70s Volcano]] = true;
     if (get_property_boolean("barrelShrineUnlocked")) //Sep 2015
@@ -77,12 +94,12 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("kremlin's greatest briefcase")] = true;
     if (get_property_boolean("horseryAvailable")) //Aug 2017-18
         __iotms_usable[lookupItem("Horsery contract")] = true;
-    if (lookupItem("genie bottle").available_amount() > 0) //Sep 2017
-        __iotms_usable[lookupItem("genie bottle")] = true;
+    // if (lookupItem("genie bottle").available_amount() > 0) //Sep 2017
+    //     __iotms_usable[lookupItem("genie bottle")] = true;
     if (lookupItem("portable pantogram").available_amount() > 0) //Nov 2017
         __iotms_usable[lookupItem("portable pantogram")] = true;
-    if (lookupItem("January's Garbage Tote").available_amount() > 0) //Jan 2018
-        __iotms_usable[lookupItem("January's Garbage Tote")] = true;
+    // if (lookupItem("January's Garbage Tote").available_amount() > 0) //Jan 2018
+    //     __iotms_usable[lookupItem("January's Garbage Tote")] = true;
     if (get_property_boolean("_frToday") || get_property_boolean("frAlways")) //Apr 2018
         __iotms_usable[lookupItem("FantasyRealm membership packet")] = true;
     if (get_property_boolean("_neverendingPartyToday") || get_property_boolean("neverendingPartyAlways")) //Sep 2018
@@ -95,10 +112,10 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Boxing Day care package")] = true;
     if (lookupItem("vampyric cloake").available_amount() > 0) //Mar 2019
         __iotms_usable[lookupItem("vampyric cloake")] = true;
-    if (lookupItem("Fourth of May Cosplay Saber").available_amount() > 0) //May 2019
-        __iotms_usable[lookupItem("Fourth of May Cosplay Saber")] = true;    
-    if (lookupItem("hewn moon-rune spoon").available_amount() > 0) //Jun 2019
-        __iotms_usable[lookupItem("hewn moon-rune spoon")] = true; 
+    // if (lookupItem("Fourth of May Cosplay Saber").available_amount() > 0) //May 2019
+    //     __iotms_usable[lookupItem("Fourth of May Cosplay Saber")] = true;    
+    // if (lookupItem("hewn moon-rune spoon").available_amount() > 0) //Jun 2019
+    //     __iotms_usable[lookupItem("hewn moon-rune spoon")] = true; 
     if (get_property_boolean("getawayCampsiteUnlocked")) //Aug 2019
         __iotms_usable[lookupItem("Distant Woods Getaway Brochure")] = true;
     if (lookupItem("Eight Days a Week Pill Keeper").available_amount() > 0) //Oct 2019
@@ -139,6 +156,101 @@ void initialiseIOTMsUsable()
     {
         __iotms_usable[lookupItem("Spacegate access badge")] = false;
     }
+
+    // Legacy of Loathing introduced a whole host of replica IOTMs. In order 
+    //   to properly support LoL, it was decided that the easiest way to work
+    //   this is to reinstitute __iotms_usable for the last few years of IOTMs 
+    //   and make it so that ownership of the replica flags as ownership of the
+    //   real deal. Alternative would've been to make every item check a boolean
+    //   that checks ownership of either/or, and this feels... less bad, to me.
+
+    // One note -- familiars are the same as the real deal, so they don't need 
+    //   checks (I don't think?). This only applies for items explicitly formatted
+    //   as "replica [itemname]". Another note -- we did not add a path check here,
+    //   mostly owing to the fact that the replicaCheck function also works for 
+    //   the real iotms, which means it'll properly populate __iotms_usable...
+    //   even outside of LoL. 
+
+    // 2005
+    replicaCheck("miniature gravy-covered maypole");
+    replicaCheck("wax lips");
+
+    // 2006 
+    replicaCheck("Tome of Snowcone Summoning");
+    replicaCheck("jewel-eyed wizard hat");
+    replicaCheck("plastic pumpkin bucket");
+
+    // 2007
+    replicaCheck("V for Vivala mask");
+    replicaCheck("navel ring of navel gazing");
+    replicaCheck("bottle-rocket crossbow");
+
+    // 2008
+    replicaCheck("little box of fireworks");
+    replicaCheck("haiku katana");
+
+    // 2009
+    replicaCheck("Elvish Sunglasses");
+
+    // 2010
+    replicaCheck("Juju Mojo Mask");
+    replicaCheck("Greatest American Pants");
+
+    // 2011
+    replicaCheck("Operation Patriot Shield");
+    replicaCheck("plastic vampire fangs");
+
+    // 2012
+    replicaCheck("Libram of Resolutions");
+    replicaCheck("Camp Scout backpack");
+
+    // 2013
+    replicaCheck("over-the-shoulder Folder Holder");
+    replicaCheck("Smith's Tome");
+
+    // 2014
+    replicaCheck("Little Geneticist DNA-Splicing Lab");
+
+    // 2015
+    if (get_property_boolean("replicaChateauAvailable")):
+        __iotms_usable[$item[Chateau Mantegna room key]] = true;
+    replicaCheck("Deck of Every Card");
+
+    // 2016
+    if (get_property_boolean("replicaWitchessSetAvailable")):
+        __iotms_usable[$item[Witchess Set]] = true;
+    replicaCheck("Source terminal");
+
+    // 2017
+    replicaCheck("genie bottle");
+
+    // 2018
+    replicaCheck("January's Garbage Tote");
+    if (get_property_boolean("replicaNeverendingPartyAlways")):
+        __iotms_usable[$item[Neverending Party invitation envelope]] = true;
+
+    // 2019
+    replicaCheck("Kramco Sausage-o-Matic");
+    replicaCheck("Fourth of May Cosplay Saber");
+    replicaCheck("hewn moon-rune spoon");
+
+    // 2020
+    replicaCheck("Powerful Glove");
+    replicaCheck("Cargo Cultist Shorts");
+    
+    // 2021
+    replicaCheck("miniature crystal ball");
+    replicaCheck("emotion chip");
+    replicaCheck("industrial fire extinguisher");
+
+    // 2022
+    replicaCheck("designer sweatpants");
+    replicaCheck("Jurassic Parka");
+
+    // 2023
+    replicaCheck("Cincho de Mayo");
+    replicaCheck("2002 Mr. Store Catalog");
+
     //Remove non-standard:
     foreach it in __iotms_usable
     {
