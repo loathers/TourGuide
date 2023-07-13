@@ -1,7 +1,7 @@
 RegisterResourceGenerationFunction("IOTMGenieBottleGenerateResource");
 void IOTMGenieBottleGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (lookupItem("genie bottle").item_amount() + lookupItem("pocket wish").item_amount() + lookupItem("replica genie bottle") == 0) return;
+    if (lookupItem("genie bottle").item_amount() + lookupItem("pocket wish").item_amount() + lookupItem("replica genie bottle").item_amount() == 0) return;
     
     int wishes_left = 0;
     if (__misc_state["in run"] && in_ronin())
@@ -20,7 +20,7 @@ void IOTMGenieBottleGenerateResource(ChecklistEntry [int] resource_entries)
 
         // Change URL if they have a replica available
         if (lookupItem("replica genie bottle").item_amount() > 0) {
-            url = "inv_use.php?pwd="+my_hash()+"&whichitem=11234"
+            url = "inv_use.php?pwd="+my_hash()+"&whichitem=11234";
         }
 
         // Change URL to pocket wishes if all wishes are used

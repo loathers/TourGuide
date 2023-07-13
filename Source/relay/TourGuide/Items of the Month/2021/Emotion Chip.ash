@@ -5,13 +5,13 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
     string url = invSearch("emotion chip");
     
     // User does not have emotionally chipped or replica emotionally chipped, but we think they should, and we flag it.
-    if (!lookupSkill("Emotionally Chipped").have_skill() && !lookupSkill("replica Emotionally Chipped") && __iotms_usable[$item[emotion chip]]) {
+    if (!lookupSkill("Emotionally Chipped").have_skill() && !lookupSkill("replica Emotionally Chipped").have_skill() && __iotms_usable[$item[emotion chip]]) {
         resource_entries.listAppend(ChecklistEntryMake("__skill feel excitement", url, ChecklistSubentryMake("Emotion Chip Usable", "", "Feel new emotions and use your shiny chip!")).ChecklistEntrySetIDTag("Use emotion chip"));
         return;
     }
     
     // Exit out of the tile if they have neither skill and we don't actually think they should, either
-    if (!lookupSkill("Emotionally Chipped").have_skill() && !lookupSkill("replica Emotionally Chipped") && !__iotms_usable[$item[emotion chip]]) return;
+    if (!lookupSkill("Emotionally Chipped").have_skill() && !lookupSkill("replica Emotionally Chipped").have_skill() && !__iotms_usable[$item[emotion chip]]) return;
 
     // Otherwise, feel your feelings and get your emotions in check.
     ChecklistSubentry getEmotions() {

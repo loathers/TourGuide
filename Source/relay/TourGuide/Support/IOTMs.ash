@@ -6,10 +6,10 @@ void replicaCheck(string iotmName) {
     // helper function for checking ownership of either the item or the 
     //   legacy of loathing replica of said item
 
-    amountItem = lookupItem(iotmName).available_amount();
-    amountReplica = lookupItem("replica "+iotmName).available_amount();
+    int amountItem = lookupItem(iotmName).available_amount();
+    int amountReplica = lookupItem("replica "+iotmName).available_amount();
 
-    if (amountItem + amountReplica) > 0:
+    if ((amountItem + amountReplica) > 0):
         __iotms_usable[lookupItem(iotmName)] = true;
     else: 
         __iotms_usable[lookupItem(iotmName)] = false;
@@ -157,6 +157,14 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Spacegate access badge")] = false;
     }
 
+    // Remove non-standard. Do this prior to replicaChecks, since replicas allow
+    //   usage of non-standard IOTMs. 
+    foreach it in __iotms_usable
+    {
+        if (!it.is_unrestricted() || it == $item[none])
+            remove __iotms_usable[it];
+    }
+
     // Legacy of Loathing introduced a whole host of replica IOTMs. In order 
     //   to properly support LoL, it was decided that the easiest way to work
     //   this is to reinstitute __iotms_usable for the last few years of IOTMs 
@@ -218,51 +226,45 @@ void initialiseIOTMsUsable()
     replicaCheck("Little Geneticist DNA-Splicing Lab");  # handled in DNA.ash; already used __iotms_usable!
 
     // 2015
-    if (get_property_boolean("replicaChateauAvailable")):
+    if (get_property_boolean("replicaChateauAvailable"))
         __iotms_usable[$item[Chateau Mantegna room key]] = true; # handled in daily + state
     replicaCheck("Deck of Every Card"); # handled in tile & lvl8
 
     // 2016
-    if (get_property_boolean("replicaWitchessSetAvailable")):
-        __iotms_usable[$item[Witchess Set]] = true;
-    replicaCheck("Source terminal");
+    if (get_property_boolean("replicaWitchessSetAvailable"))
+        __iotms_usable[$item[Witchess Set]] = true; # handled in own tile
+    replicaCheck("Source terminal"); # handled in own tile
 
     // 2017
-    replicaCheck("genie bottle");
+    replicaCheck("genie bottle"); # handled in own tile
 
     // 2018
-    replicaCheck("January's Garbage Tote");
-    if (get_property_boolean("replicaNeverendingPartyAlways")):
-        __iotms_usable[$item[Neverending Party invitation envelope]] = true;
+    replicaCheck("January's Garbage Tote"); # handled in own tile
+    if (get_property_boolean("replicaNeverendingPartyAlways"))
+        __iotms_usable[$item[Neverending Party invitation envelope]] = true; # handled in own tile
 
     // 2019
-    replicaCheck("Kramco Sausage-o-Matic");
-    replicaCheck("Fourth of May Cosplay Saber");
-    replicaCheck("hewn moon-rune spoon");
+    replicaCheck("Kramco Sausage-o-Matic"); # handled in own tile
+    replicaCheck("Fourth of May Cosplay Saber"); # handled in own tile & lvl 12
+    replicaCheck("hewn moon-rune spoon"); # handled in own tile
 
     // 2020
-    replicaCheck("Powerful Glove");
-    replicaCheck("Cargo Cultist Shorts");
+    replicaCheck("Powerful Glove"); # handled in own tile
+    replicaCheck("Cargo Cultist Shorts"); # handled in own tile
     
     // 2021
-    replicaCheck("miniature crystal ball");
-    replicaCheck("emotion chip");
-    replicaCheck("industrial fire extinguisher");
+    replicaCheck("miniature crystal ball"); # handled in own tile
+    replicaCheck("emotion chip"); # handled in own (annoying) tile
+    replicaCheck("industrial fire extinguisher"); # handled in own tile & lvl 11
 
     // 2022
-    replicaCheck("designer sweatpants");
-    replicaCheck("Jurassic Parka");
+    replicaCheck("designer sweatpants"); # handled in own tile
+    replicaCheck("Jurassic Parka"); # handled in own tile
 
     // 2023
-    replicaCheck("Cincho de Mayo");
+    replicaCheck("Cincho de Mayo"); # handled in own tile & sneaks.ash
     replicaCheck("2002 Mr. Store Catalog");
 
-    //Remove non-standard:
-    foreach it in __iotms_usable
-    {
-        if (!it.is_unrestricted() || it == $item[none])
-            remove __iotms_usable[it];
-    }
 }
 
 initialiseIOTMsUsable();
