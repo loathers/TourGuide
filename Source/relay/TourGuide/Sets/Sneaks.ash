@@ -114,7 +114,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.sourceName = `fiesta exits`;
         final.url = '';
         final.imageLookupName = "__skill Cincho: Fiesta Exit";
-        final.sneakCondition = lookupItem("Cincho de Mayo").have();
+        final.sneakCondition = __iotms_usable[$item[Cincho de Mayo]];
 
         // _cinchUsed is a weird preference that actually means distance from 100% you are at in your current cinch.
 

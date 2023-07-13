@@ -88,6 +88,9 @@ void IOTMPocketProfessorResource(ChecklistEntry [int] resource_entries)
             }
 
             string [int] potential_targets;
+
+            // we don't need to support replicas here because you'll never have pocket prof + replica kramco!
+
             if (lookupItem("kramco sausage-o-matic").available_amount() > 0)
             {
                 potential_targets.listAppend(scalerMessage("Sausage goblin", 11, 10000));

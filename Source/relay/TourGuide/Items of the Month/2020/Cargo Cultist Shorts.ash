@@ -1,7 +1,7 @@
 RegisterResourceGenerationFunction("IOTMCargoCultistShortsGenerateResource");
 void IOTMCargoCultistShortsGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (available_amount($item[cargo cultist shorts]) < 1 || !is_unrestricted($item[cargo cultist shorts])) return;
+	if (!__iotms_usable[$item[Cargo Cultist Shorts]]) return;
  
 	if (!get_property_boolean("_cargoPocketEmptied")) {
         string image_name = "__item cargo cultist shorts";

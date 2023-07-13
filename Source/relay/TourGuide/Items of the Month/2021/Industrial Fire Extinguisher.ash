@@ -2,8 +2,8 @@
 RegisterResourceGenerationFunction("IOTMFireExtinguisherGenerateResource");
 void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!(available_amount($item[industrial fire extinguisher]) > 0)) return;
-		// Title
+    if (!__iotms_usable[$item[industrial fire extinguisher]]) return;
+	
 	string [int] description;
 	string [int] options;
 

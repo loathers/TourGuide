@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTMGarbageToteGenerateTasks");
 void IOTMGarbageToteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (lookupItem("January's Garbage Tote").available_amount() == 0) return;
+	if (!__iotms_usable[$item[January's Garbage Tote]]) return;
 	boolean [item] relevant_items;
 	if (get_property_int("garbageTreeCharge") > 0)
 		relevant_items[lookupItem("deceased crimbo tree")] = true;
@@ -23,8 +23,10 @@ void IOTMGarbageToteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
         if (get_property_int("garbageChampagneCharge") > 0)
         	description.listAppend("Broken champagne bottle (double +item for " + pluralise(get_property_int("garbageChampagneCharge"), "more turn", "more turns") + ".)");
         
-        
-        optional_task_entries.listAppend(ChecklistEntryMake("__item January's Garbage Tote", "inv_use.php?pwd=" + my_hash() + "&whichitem=9690", ChecklistSubentryMake("Collect a garbage tote item", "", description), 1).ChecklistEntrySetIDTag("Garbage tote should switch item"));
+        // Use the right item ID depending on if you are using a replica or a non-replica
+        string activeToteID = lookupItem("replica January's Garbage Tote").available_amount() > 0 ? "11238" : "9690";
+
+        optional_task_entries.listAppend(ChecklistEntryMake("__item January's Garbage Tote", "inv_use.php?pwd=" + my_hash() + "&whichitem=" + activeToteID, ChecklistSubentryMake("Collect a garbage tote item", "", description), 1).ChecklistEntrySetIDTag("Garbage tote should switch item"));
 	}
 }
 
@@ -54,9 +56,12 @@ void IOTMGarbageToteGenerateResource(ChecklistEntry [int] resource_entries)
     item_charge_property[lookupItem("deceased crimbo tree")] = "garbageTreeCharge";
     item_effect_description[lookupItem("deceased crimbo tree")] = "Absorbs damage";
     item_charge_default[lookupItem("deceased crimbo tree")] = 1000;
+
+    // Use the right item ID depending on if you are using a replica or a non-replica
+    string activeToteID = lookupItem("replica January's Garbage Tote").available_amount() > 0 ? "11238" : "9690";
 	
 	ChecklistEntry entry;
-	entry.url = "inv_use.php?pwd=" + my_hash() + "&whichitem=9690";
+	entry.url = "inv_use.php?pwd=" + my_hash() + "&whichitem="+activeToteID;
 	entry.importance_level = 8;
     entry.tags.id = "Garbage tote items resource";
 	
@@ -81,7 +86,7 @@ void IOTMGarbageToteGenerateResource(ChecklistEntry [int] resource_entries)
         } else {
             title = HTMLGenerateSpanFont("No charges of " + it, "red");
             description.listAppend(outdatedGarbage ? "Interact with Tote to refill charges." : "Switch out for something else.");
-            url = "inv_use.php?pwd=" + my_hash() + "&whichitem=9690";
+            url = "inv_use.php?pwd=" + my_hash() + "&whichitem="+activeToteID;
         }
         if (entry.image_lookup_name == "")
 	        entry.image_lookup_name = "__item " + it;
