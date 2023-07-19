@@ -136,3 +136,5 @@ import "relay/TourGuide/Items of the Month/2023/SIT Course Certificate.ash";
 import "relay/TourGuide/Items of the Month/2023/Closed Circuit Pay Phone.ash";
 import "relay/TourGuide/Items of the Month/2023/Cursed Monkey Paw.ash";
 import "relay/TourGuide/Items of the Month/2023/Cincho de Mayo.ash";
+import "relay/TourGuide/Items of the Month/2023/2002 Catalog.ash";
+import "relay/TourGuide/Items of the Month/2023/Patriotic Eagle.ash";
