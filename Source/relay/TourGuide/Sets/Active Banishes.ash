@@ -60,7 +60,7 @@ string DescribeThisBanish(Banish b) {
 // Due to the world being the way it is, need to enumerate this twice to handle both record types.
 string DescribeThisBanish(BanishedPhylum b) {
 
-    string banishedPhy = b.banished_phylum.to_string();
+    string banishedPhy = b.banished_phylum.to_string().to_upper_case();
     string source = b.banish_source;
     int banishTurn = b.turn_banished;
     int banishLength = b.banish_turn_length;
@@ -79,9 +79,11 @@ string DescribeThisBanish(BanishedPhylum b) {
     }
 
     if (turnsOfBanishLeft >= 300) banishLengthString = " until rollover.";
-    if (turnsOfBanishLeft <= 300) banishLengthString = ` for {pluralise(turnsOfBanishLeft,"more turn","more turns")}.`;
+    if (turnsOfBanishLeft <= 300) banishLengthString = ` for {pluralise(turnsOfBanishLeft,"more turn","more turns")}!`;
 
-    string textReturn = "<b>"+banishedPhy+"</b> is banished by "+source+banishLengthString;
+    // If a new source is introduced, just add "by "+source" as in the above monster example. 
+
+    string textReturn = "The entire <b>"+banishedPhy+"</b> phylum is banished"+banishLengthString;
     
     return textReturn;
     
@@ -183,7 +185,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
             }
         }
         name += "("+monsterCount+")";
-		subentries.listAppend(ChecklistSubentryMake(name,,description));
+		subentries.listAppend(ChecklistSubentryMake(name,"",description));
 
 	}
 	
