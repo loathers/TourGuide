@@ -12,7 +12,7 @@ Record Banish
 
 Record BanishedPhylum
 {
-    monster banished_phylum;
+    phylum banished_phylum;
     string banish_source;
     int turn_banished;
     int banish_turn_length;
@@ -276,7 +276,7 @@ static
 	__phylum_to_monster[$phylum[goblin]]        = "__monster "+$monster[Knob Goblin Very Mad Scientist].to_string().to_lower_case();
 	__phylum_to_monster[$phylum[hippy]]         = "__monster "+$monster[Neil].to_string().to_lower_case();
 	__phylum_to_monster[$phylum[humanoid]]      = "__monster "+$monster[yeti].to_string().to_lower_case();
-	__phylum_to_monster[$phylum[horror]]        = "__monster "+$monster[The Guy Made Of Bees].to_string().to_lower_case();
+	__phylum_to_monster[$phylum[horror]]        = "__monster "+$monster[Guy Made Of Bees].to_string().to_lower_case();
 	__phylum_to_monster[$phylum[mer-kin]]       = "__monster "+$monster[Ringogeorge, the Bladeswitcher].to_string().to_lower_case();
 	__phylum_to_monster[$phylum[orc]]           = "__monster "+$monster[Danglin' Chad].to_string().to_lower_case();
 	__phylum_to_monster[$phylum[penguin]]       = "__monster "+$monster[Mob Penguin Arsonist].to_string().to_lower_case();
@@ -285,6 +285,15 @@ static
 	__phylum_to_monster[$phylum[slime]]         = "__monster "+$monster[fan slime].to_string().to_lower_case();
 	__phylum_to_monster[$phylum[undead]]        = "__monster "+$monster[the ghost of Phil Bunion].to_string().to_lower_case();
 	__phylum_to_monster[$phylum[weird]]         = "__monster "+$monster[loaf of Bread of Wonder].to_string().to_lower_case();
+}
+
+// Due to import issues, pluralise isn't actually established when this tile is being read. Alas.
+string pluralise(int value, string non_plural, string plural)
+{
+	if (value == 1)
+		return value + " " + non_plural;
+	else
+		return value + " " + plural;
 }
 
 // In order to make the for loop a bit nicer, generate the string in a helper function.
@@ -319,7 +328,7 @@ string DescribeThisBanish(Banish b) {
 
 string DescribeThisBanish(BanishedPhylum b) {
 
-    phylum banishedPhy = b.banished_phylum.to_string();
+    string banishedPhy = b.banished_phylum.to_string();
     string source = b.banish_source;
     int banishTurn = b.turn_banished;
     int banishLength = b.banish_turn_length;
@@ -417,7 +426,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
 
         int screechCharge = get_property_int("screechCombats");
         if (screechCharge == 0) subtitle = "can clear with your patriotic eagle";
-        if (screechCharge > 0) subtitle = `spend {pluralise(screechCharge),"turn/run","turns/runs"} with your eagle to clear this banish`;
+        if (screechCharge > 0) subtitle = `spend {pluralise(screechCharge,"turn/run","turns/runs")} with your eagle to clear this banish`;
         
         foreach key, banish in phylaResult {
             if (banishDescribed != "") {
