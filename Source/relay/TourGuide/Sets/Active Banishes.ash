@@ -51,7 +51,7 @@ string DescribeThisBanish(Banish b) {
     if (turnsOfBanishLeft >= 300) banishLengthString = " until rollover.";
     if (turnsOfBanishLeft <= 300) banishLengthString = ` for {pluralise(turnsOfBanishLeft,"more turn","more turns")}.`;
 
-    string textReturn = "<b>"+banishedMon+"</b> is banished by "+source+banishLengthString;
+    string textReturn = "🠞 <b>"+banishedMon+"</b>, via "+source+banishLengthString+"<hr>|*";
 
     return textReturn;
 
@@ -170,12 +170,12 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
                 monsterIcon = __phylum_to_monster[banish.banished_phylum];
             }
         }
-		subentries.listAppend(ChecklistSubentryMake(name,subtitle,description+"|*<hr>"));
+		subentries.listAppend(ChecklistSubentryMake(name,subtitle,description));
 	}
 
 	if (monsterResult.length() > 0) {
+        description = "";
 		
-		name = "Current Monsters Banished";
         foreach key, banish in monsterResult {
             banishDescribed = DescribeThisBanish(banish);
             if (banishDescribed != "") {
@@ -184,7 +184,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
                 monsterCount += 1;
             }
         }
-        name += " ("+monsterCount+")";
+        name = `{pluralise(monsterCount,"monster banished", "monsters banished")}`;
 		subentries.listAppend(ChecklistSubentryMake(name,"",description));
 
 	}
