@@ -42,7 +42,7 @@ string DescribeThisBanish(Banish b) {
     }
 
     int turnsSinceBanish = my_turncount() - banishTurn;
-    int turnsOfBanishLeft = turnsSinceBanish - banishLength;
+    int turnsOfBanishLeft = banishLength - turnsSinceBanish;
 
     if (turnsOfBanishLeft < 0) {
         return "";
@@ -72,7 +72,7 @@ string DescribeThisBanish(BanishedPhylum b) {
     }
 
     int turnsSinceBanish = my_turncount() - banishTurn;
-    int turnsOfBanishLeft = turnsSinceBanish - banishLength;
+    int turnsOfBanishLeft = banishLength - turnsSinceBanish;
 
     if (turnsOfBanishLeft < 0) {
         return "";
@@ -170,7 +170,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
                 monsterIcon = __phylum_to_monster[banish.banished_phylum];
             }
         }
-		subentries.listAppend(ChecklistSubentryMake(name,subtitle,description));
+		subentries.listAppend(ChecklistSubentryMake(name,subtitle,description+"|*<hr>"));
 	}
 
 	if (monsterResult.length() > 0) {
@@ -179,12 +179,12 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
         foreach key, banish in monsterResult {
             banishDescribed = DescribeThisBanish(banish);
             if (banishDescribed != "") {
-                description += "|*"+banishDescribed+"<hr>|*";
+                description += "|*"+banishDescribed+"|*";
                 monsterIcon = "__monster "+banish.banished_monster.to_string().to_lower_case();
                 monsterCount += 1;
             }
         }
-        name += "("+monsterCount+")";
+        name += " ("+monsterCount+")";
 		subentries.listAppend(ChecklistSubentryMake(name,"",description));
 
 	}
