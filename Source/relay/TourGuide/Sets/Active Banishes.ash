@@ -162,8 +162,9 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
         if (screechCharge > 0) subtitle = `spend {pluralise(screechCharge,"turn/run","turns/runs")} with your eagle to clear this banish`;
         
         foreach key, banish in phylaResult {
+            banishDescribed = DescribeThisBanish(banish);
             if (banishDescribed != "") {
-                description += "|*"+DescribeThisBanish(banish)+"<hr>|*";
+                description += "|*"+banishDescribed+"<hr>|*";
                 monsterIcon = __phylum_to_monster[banish.banished_phylum];
             }
         }
@@ -174,14 +175,15 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
 		
 		name = "Current Monsters Banished";
         foreach key, banish in monsterResult {
+            banishDescribed = DescribeThisBanish(banish);
             if (banishDescribed != "") {
-                description += "|*"+DescribeThisBanish(banish)+"<hr>|*";
+                description += "|*"+banishDescribed+"<hr>|*";
                 monsterIcon = "__monster "+banish.banished_monster.to_string().to_lower_case();
                 monsterCount += 1;
             }
         }
         name += "("+monsterCount+")";
-		subentries.listAppend(ChecklistSubentryMake(name,subtitle,description));
+		subentries.listAppend(ChecklistSubentryMake(name,,description));
 
 	}
 	
