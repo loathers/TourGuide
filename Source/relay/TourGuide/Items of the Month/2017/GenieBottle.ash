@@ -2,8 +2,13 @@ RegisterResourceGenerationFunction("IOTMGenieBottleGenerateResource");
 void IOTMGenieBottleGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (lookupItem("genie bottle").item_amount() + lookupItem("pocket wish").item_amount() + lookupItem("replica genie bottle").item_amount() == 0) return;
+
+    // Detect replica versus genie classic for the purposes of the URL
+    string activeGenieID = lookupItem("replica genie bottle").available_amount() > 0 ? "11234" : "9529";
     
     int wishes_left = 0;
+
+    // Add up all possible wish sources; pocket wishes, replicas, and genie bottles
     if (__misc_state["in run"] && in_ronin())
         wishes_left += lookupItem("pocket wish").item_amount();
     if (lookupItem("genie bottle").item_amount() > 0 && mafiaIsPastRevision(18219) && my_path().id != PATH_BEES_HATE_YOU)
@@ -15,18 +20,11 @@ void IOTMGenieBottleGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (wishes_left > 0)
     {
-        // Start with URL to the classic genie bottle
-        string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=9529";
 
-        // Change URL if they have a replica available
-        if (lookupItem("replica genie bottle").item_amount() > 0) {
-            url = "inv_use.php?pwd="+my_hash()+"&whichitem=11234";
-        }
-
-        // Change URL to pocket wishes if all wishes are used
-        if (get_property_int("_genieWishesUsed") >= 3) { 
-            url = "inv_use.php?pwd=" + my_hash() + "&whichitem=9537";
-        }
+        activeGenieID = get_property_int("_genieWishesUsed") >= 3 ? "9537" : activeGenieID;
+        
+        // URL to the correct genie as per activeGenieID
+        string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + activeGenieID;
         
         string potential_monsters = SFaxGeneratePotentialFaxes(true, $monsters[ninja snowman assassin,modern zmobie,giant swarm of ghuol whelps, screambat]).listJoinComponents("|<hr>");
         if (potential_monsters != "")
