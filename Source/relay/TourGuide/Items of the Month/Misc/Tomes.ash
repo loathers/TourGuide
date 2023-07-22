@@ -213,7 +213,7 @@ void ReplicaBookshelfGenerateResource(ChecklistEntry [int] resource_entries)
 			name = "Use your replica Tome of Snowcone Summoning";
 			description = "<b>SNOWCONES</b>: Potential potions for +5 familiar weight, 50% meat, or 25% items.";
 			url = "inventory.php?ftext=snowcone+summoning";
-			subentries.listAppend(ChecklistSubentryMake(name,url,description));
+			subentries.listAppend(ChecklistSubentryMake(name,"",description));
 		}
 	}
 
@@ -222,7 +222,7 @@ void ReplicaBookshelfGenerateResource(ChecklistEntry [int] resource_entries)
 			name = "Use your replica Libram of Resolutions";
 			description = "<b>RESOLUTIONS</b>: Potential potions for +5 familiar weight, 50% meat, or 25% items.";
 			url = "inventory.php?ftext=libram+of+resolutions";
-			subentries.listAppend(ChecklistSubentryMake(name,url,description));
+			subentries.listAppend(ChecklistSubentryMake(name,"",description));
 		}
 	}
 
@@ -231,7 +231,7 @@ void ReplicaBookshelfGenerateResource(ChecklistEntry [int] resource_entries)
 			name = "Use your replica Smith's Tome";
 			description = "<b>SMITH'S</b>: 6x free-run banishes, with 3 equips as well";
 			url = "inventory.php?ftext=smith's+tome";
-			subentries.listAppend(ChecklistSubentryMake(name,url,description));
+			subentries.listAppend(ChecklistSubentryMake(name,"",description));
 		}
 	}
 	
@@ -239,7 +239,6 @@ void ReplicaBookshelfGenerateResource(ChecklistEntry [int] resource_entries)
 
         ChecklistEntry entry = ChecklistEntryMake("__item smith's tome", url, subentries);
 		entry.tags.id = "Replica bookshelf resource";
-        entry.should_indent_after_first_subentry = true;
         resource_entries.listAppend(entry);
 	}
 }

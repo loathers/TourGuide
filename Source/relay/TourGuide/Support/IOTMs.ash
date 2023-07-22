@@ -46,6 +46,12 @@ void initialiseIOTMsUsable()
         if (__campground[lookupItem("model train set")] > 0)
             __iotms_usable[lookupItem("model train set")] = true;
 
+        // This didn't appear in my LoL test run; I am making this more explicit and hopefully this works.
+        if (__campground[lookupItem("Little Geneticist DNA-Splicing Lab")] > 0)
+            __iotms_usable[lookupItem("Little Geneticist DNA-Splicing Lab")] = true;
+        if (__campground[lookupItem("Replica Little Geneticist DNA-Splicing Lab")] > 0)
+            __iotms_usable[lookupItem("Little Geneticist DNA-Splicing Lab")] = true;
+
         // __iotms_usable for gardens tracks whether the user has the garden installed.
         // Gardens start returning 0 instead of 1 when the items are picked, so checking
         // presence of the key is more useful than checking the value.

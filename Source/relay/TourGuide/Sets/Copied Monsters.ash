@@ -354,7 +354,7 @@ void SCopiedMonstersGenerateResource(ChecklistEntry [int] resource_entries)
     ChecklistEntry copy_source_entry;
     copy_source_entry.tags.id = "Copy options resource";
     
-    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
+    if ( __iotms_usable[$item[Chateau Mantegna room key]] && !get_property_boolean("_chateauMonsterFought") && mafiaIsPastRevision(15115))
     {
         string url = "place.php?whichplace=chateau";
         string header = "Chateau painting copy";
