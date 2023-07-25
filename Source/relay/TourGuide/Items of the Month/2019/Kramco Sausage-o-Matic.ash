@@ -53,7 +53,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
             entry.url = "inventory.php?action=grind";
         }
     } else {
-        main_title = round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of sausage goblin this turn";
+        main_title = round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of Kramco fight this turn";
         main_description.listAppend(pluralise(fight_information.turns_to_next_guaranteed_fight, "turn", "turns") + " until next guaranteed goblin fight.");
         if (kramcosEquipped == 0) {
             main_description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));

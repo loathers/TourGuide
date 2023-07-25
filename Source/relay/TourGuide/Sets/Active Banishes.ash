@@ -100,6 +100,10 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
     Banish [int] monsterResult;
     BanishedPhylum [int] phylaResult;
 
+    // Save the banished monsters to compare later for snapper/eagle checks, with snapper phylum.
+    monster [int] banishedMonsterList;
+    phylum snapperPhylum = get_property("redSnapperPhylum").to_phylum();
+
     // Banishes are in the format "thing:source:###" where # is turncount of banished. This splits it.    
     string [int] banishedMonstersParsed = banishedMonstersUnparsed.split_string(":");    
     string [int] banishedPhylumParsed = banishedPhylumUnparsed.split_string(":");
@@ -116,6 +120,9 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
         b.banished_monster = banishedMonstersParsed[key + 0].to_monster();
         b.banish_source = banishedMonstersParsed[key + 1];
         b.turn_banished = banishedMonstersParsed[key + 2].to_int();
+
+        // Add the banished monster to the banishedMonsterList
+        banishedMonsterList.listAppend(b.banished_monster);
 
         // Populate the turn length by referencing the source above.
         b.banish_turn_length = 0;
@@ -161,7 +168,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
 
         int screechCharge = get_property_int("screechCombats");
         if (screechCharge == 0) subtitle = "can clear with your patriotic eagle";
-        if (screechCharge > 0) subtitle = `spend {pluralise(screechCharge,"turn/run","turns/runs")} with your eagle to clear this banish`;
+        if (screechCharge > 0) subtitle = `spend {pluralise(screechCharge,"turn/run","turns/runs")} with your eagle to cast screech again`;
         
         foreach key, banish in phylaResult {
             banishDescribed = DescribeThisBanish(banish);

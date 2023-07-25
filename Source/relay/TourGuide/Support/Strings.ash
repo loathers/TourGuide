@@ -261,15 +261,13 @@ string pluralise(float value, string non_plural, string plural)
 		return value_out + " " + plural;
 }
 
-// Due to problems, I am defining this in Banishers.ash. 
-
-// string pluralise(int value, string non_plural, string plural)
-// {
-// 	if (value == 1)
-// 		return value + " " + non_plural;
-// 	else
-// 		return value + " " + plural;
-// }
+string pluralise(int value, string non_plural, string plural)
+{
+	if (value == 1)
+		return value + " " + non_plural;
+	else
+		return value + " " + plural;
+}
 
 string pluralise(int value, item i)
 {
