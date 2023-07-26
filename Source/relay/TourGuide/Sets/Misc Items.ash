@@ -344,7 +344,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         }
             
         if ($item[soft green echo eyedrop antidote].available_amount() > 0 && $skill[Transcendent Olfaction].skill_is_usable())
-            resource_entries.listAppend(ChecklistEntryMake("__item soft green echo eyedrop antidote", "", ChecklistSubentryMake(pluralise($item[soft green echo eyedrop antidote]), "", "Removes on the trail, teleportitis"), importance_level_unimportant_item).ChecklistEntrySetIDTag("SGEEA resource"));
+            resource_entries.listAppend(ChecklistEntryMake("__item soft green echo eyedrop antidote", "", ChecklistSubentryMake(pluralise($item[soft green echo eyedrop antidote]), "", "Removes unwanted effects; teleportitis-likes, debuffs, etc."), importance_level_unimportant_item).ChecklistEntrySetIDTag("SGEEA resource"));
             
         if ($item[sack lunch].available_amount() > 0) {
             string [int] description;

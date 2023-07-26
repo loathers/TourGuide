@@ -162,7 +162,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 subentry.entries.listAppend("25 total turns of delay.");
             else if (turns_spent < 25)
                 subentry.entries.listAppend(pluralise(25 - turns_spent, "turn", "turns") + " total delay remaining.");
-            if ($skill[Transcendent Olfaction].skill_is_usable() && !($effect[on the trail].have_effect() > 0 && get_property("olfactedMonster") == "Quiet Healer") && !have_more_than_enough_sgeeas)
+            if ($skill[Transcendent Olfaction].skill_is_usable() && !(get_property("olfactedMonster") == "Quiet Healer") && !have_more_than_enough_sgeeas)
                 subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
             
             if ($items[amulet of extreme plot significance,mohawk wig].items_missing().count() > 0 && $familiar[slimeling].familiar_is_usable())

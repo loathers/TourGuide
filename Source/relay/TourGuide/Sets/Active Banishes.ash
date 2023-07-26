@@ -3,7 +3,7 @@
 static
 {
     string [phylum] __phylum_to_monster;
-    // I am crazy for this one, dogg.
+    // This is my best attempt to associate a funny monster with each phylum. Some are better than others.
     __phylum_to_monster[$phylum[beast]]         = "__monster "+$monster[fluffy bunny].to_string().to_lower_case();
 	__phylum_to_monster[$phylum[bug]]           = "__monster "+$monster[Spant soldier].to_string().to_lower_case();
 	__phylum_to_monster[$phylum[constellation]] = "__monster "+$monster[Astrologer of Shub-Jigguwatt].to_string().to_lower_case();

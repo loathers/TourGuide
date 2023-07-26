@@ -242,7 +242,7 @@ void PathBugbearInvasionGenerateTasks(ChecklistEntry [int] task_entries, Checkli
                 string this_url = l2.getClickableURLForLocation();
                 if (this_url != "" && !do_not_override_url && l2.locationAvailable())
                     url = this_url;
-                if ($effect[on the trail].have_effect() > 0 && get_property_monster("olfactedMonster") == bugbears_to_hunt_for_location[l])
+                if (get_property_monster("olfactedMonster") == bugbears_to_hunt_for_location[l])
                 {
                     do_not_override_url = true;
                 }
