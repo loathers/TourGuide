@@ -13222,8 +13222,9 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             if (__shen_start_day_to_assignments contains ++daycount)
                 subentry.entries.listAppend("Tomorrow will instead be:|*• " + __shen_start_day_to_assignments[daycount].shenAssignmentsJoinLocations().listJoinComponents("|*• "));
         }
-        if (my_daycount() == 1 && my_path().id != PATH_EXPLOSIONS)
-            subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
+        // This used to be true in old metas, but hasn't been true for a while. Commenting it out.
+        // if (my_daycount() == 1 && my_path().id != PATH_EXPLOSIONS)
+        //     subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
     } else {
         int club_turns_spent = $location[the copperhead club].turns_spent;
         int next_guaranteed_meeting = base_quest_state.state_int["Shen meetings"] * 5;
@@ -40493,7 +40494,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     else if (l == $location[the defiled niche])
     {
         int evilness = __quest_state["Level 7"].state_int["niche evilness"];
-        if (evilness > 25)
+        if (evilness > 13)
         {
             monsters_that_we_cannot_encounter[$monster[gargantulihc]] = "evilness too high";
         }
@@ -40507,7 +40508,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     else if (l == $location[the defiled cranny])
     {
         int evilness = __quest_state["Level 7"].state_int["cranny evilness"];
-        if (evilness > 25)
+        if (evilness > 13)
         {
             monsters_that_we_cannot_encounter[$monster[huge ghuol]] = "evilness too high";
         }
@@ -40520,7 +40521,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     else if (l == $location[the defiled nook])
     {
         int evilness = __quest_state["Level 7"].state_int["nook evilness"];
-        if (evilness > 25)
+        if (evilness > 13)
         {
             monsters_that_we_cannot_encounter[$monster[giant skeelton]] = "evilness too high";
         }
@@ -40533,7 +40534,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     else if (l == $location[the defiled alcove])
     {
         int evilness = __quest_state["Level 7"].state_int["alcove evilness"];
-        if (evilness > 25)
+        if (evilness > 13)
         {
             monsters_that_we_cannot_encounter[$monster[conjoined zmombie]] = "evilness too high";
         }
@@ -52645,6 +52646,7 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	if ($item[tiny stillsuit].item_amount() == 1) {
 		title = HTMLGenerateSpanFont("Equip the stillsuit", "purple");
 		description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
+		url = "familiar.php";
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
 	else if ($item[tiny stillsuit].equipped_amount() == 1) {
@@ -53852,6 +53854,19 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] description;
     string [int] cinchUses;
 
+    // If not equipped, link to the inventory.
+    string url = "inventory.php?ftext=cincho";
+
+    // If equipped, link to skills.
+    if ($item[Cincho de Mayo].equipped_amount() == 1) {
+        url = 'skills.php';
+
+        // ... unless you have <60 cinch lol
+        if (totalCinch < 60) {
+            url = 'campground.php';
+        }
+    }
+
     // For each use, check that there's enough cinch remaining to use it before appending.
     if (totalCinch > 25) {
         cinchUses.listAppend("<strong>Dispense Salt & Lime (25%):</strong> Add stats to your next drink."); 
@@ -53883,7 +53898,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("You do "+HTMLGenerateSpanOfClass("not", "r_element_hot")+" have a mother's necklace yet, so you're missing 5 free rests. Be careful of overusing the combat skills!");
     }
 
-    resource_entries.listAppend(ChecklistEntryMake("__item cincho de mayo", "", ChecklistSubentryMake(`{currentCinch}% belt cinch`, "", description), 3).ChecklistEntrySetIDTag("Cincho de Mayo resource"));
+    resource_entries.listAppend(ChecklistEntryMake("__item cincho de mayo", url, ChecklistSubentryMake(`{currentCinch}% belt cinch`, "", description), 3).ChecklistEntrySetIDTag("Cincho de Mayo resource"));
 }
 
 
