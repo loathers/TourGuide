@@ -308,8 +308,9 @@ void QLevel11ShenGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
             if (__shen_start_day_to_assignments contains ++daycount)
                 subentry.entries.listAppend("Tomorrow will instead be:|*• " + __shen_start_day_to_assignments[daycount].shenAssignmentsJoinLocations().listJoinComponents("|*• "));
         }
-        if (my_daycount() == 1 && my_path().id != PATH_EXPLOSIONS)
-            subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
+        // This used to be true in old metas, but hasn't been true for a while. Commenting it out.
+        // if (my_daycount() == 1 && my_path().id != PATH_EXPLOSIONS)
+        //     subentry.entries.listAppend("Perhaps wait until tomorrow before starting this; day 2's shen bosses are more favourable.");
     } else {
         int club_turns_spent = $location[the copperhead club].turns_spent;
         int next_guaranteed_meeting = base_quest_state.state_int["Shen meetings"] * 5;

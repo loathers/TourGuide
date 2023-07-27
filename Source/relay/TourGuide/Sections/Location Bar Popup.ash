@@ -692,7 +692,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     else if (l == $location[the defiled niche])
     {
         int evilness = __quest_state["Level 7"].state_int["niche evilness"];
-        if (evilness > 25)
+        if (evilness > 13)
         {
             monsters_that_we_cannot_encounter[$monster[gargantulihc]] = "evilness too high";
         }
@@ -706,7 +706,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     else if (l == $location[the defiled cranny])
     {
         int evilness = __quest_state["Level 7"].state_int["cranny evilness"];
-        if (evilness > 25)
+        if (evilness > 13)
         {
             monsters_that_we_cannot_encounter[$monster[huge ghuol]] = "evilness too high";
         }
@@ -719,7 +719,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     else if (l == $location[the defiled nook])
     {
         int evilness = __quest_state["Level 7"].state_int["nook evilness"];
-        if (evilness > 25)
+        if (evilness > 13)
         {
             monsters_that_we_cannot_encounter[$monster[giant skeelton]] = "evilness too high";
         }
@@ -732,7 +732,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
     else if (l == $location[the defiled alcove])
     {
         int evilness = __quest_state["Level 7"].state_int["alcove evilness"];
-        if (evilness > 25)
+        if (evilness > 13)
         {
             monsters_that_we_cannot_encounter[$monster[conjoined zmombie]] = "evilness too high";
         }

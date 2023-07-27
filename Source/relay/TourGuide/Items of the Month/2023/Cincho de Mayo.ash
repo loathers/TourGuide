@@ -35,6 +35,19 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] description;
     string [int] cinchUses;
 
+    // If not equipped, link to the inventory.
+    string url = "inventory.php?ftext=cincho";
+
+    // If equipped, link to skills.
+    if ($item[Cincho de Mayo].equipped_amount() == 1) {
+        url = 'skills.php';
+
+        // ... unless you have <60 cinch lol
+        if (totalCinch < 60) {
+            url = 'campground.php';
+        }
+    }
+
     // For each use, check that there's enough cinch remaining to use it before appending.
     if (totalCinch > 25) {
         cinchUses.listAppend("<strong>Dispense Salt & Lime (25%):</strong> Add stats to your next drink."); 
@@ -66,5 +79,5 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("You do "+HTMLGenerateSpanOfClass("not", "r_element_hot")+" have a mother's necklace yet, so you're missing 5 free rests. Be careful of overusing the combat skills!");
     }
 
-    resource_entries.listAppend(ChecklistEntryMake("__item cincho de mayo", "", ChecklistSubentryMake(`{currentCinch}% belt cinch`, "", description), 3).ChecklistEntrySetIDTag("Cincho de Mayo resource"));
+    resource_entries.listAppend(ChecklistEntryMake("__item cincho de mayo", url, ChecklistSubentryMake(`{currentCinch}% belt cinch`, "", description), 3).ChecklistEntrySetIDTag("Cincho de Mayo resource"));
 }
