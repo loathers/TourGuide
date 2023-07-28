@@ -54,6 +54,7 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	if ($item[tiny stillsuit].item_amount() == 1) {
 		title = HTMLGenerateSpanFont("Equip the stillsuit", "purple");
 		description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
+		url = "familiar.php";
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
 	else if ($item[tiny stillsuit].equipped_amount() == 1) {
