@@ -25,7 +25,7 @@ void IOTMPatrioticEagleGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 
         description.listAppend("Copied by your eagle's blast. Will appear when you adventure in " + possible_appearance_locations.listJoinComponents(", ", "or") + ".");
 
-        phylum eaglePhylumBanished = get_property("banishedPhyla") == "" ? get_property("banishedPhyla").split_string(":")[1].to_phylum : $phylum[none];
+        phylum eaglePhylumBanished = get_property("banishedPhyla") == "" ? get_property("banishedPhyla").split_string(":")[1].to_phylum() : $phylum[none];
 
         if (RWB_monster.phylum == eaglePhylumBanished) {
             description.listAppend(HTMLGenerateSpanFont("<b>WARNING!</b> This monster will not appear, it's banished by your eagle screech!", "red"));
@@ -44,7 +44,7 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
     if (!lookupFamiliar("Patriotic Eagle").familiar_is_usable()) return;
     
     // Gross one-liner that parses for the currently banished phylum. 
-    phylum eaglePhylumBanished = get_property("banishedPhyla") == "" ? get_property("banishedPhyla").split_string(":")[1].to_phylum : $phylum[none];
+    phylum eaglePhylumBanished = get_property("banishedPhyla") == "" ? get_property("banishedPhyla").split_string(":")[1].to_phylum() : $phylum[none];
 
 	int screechRecharge = get_property_int("screechCombats");
 	
@@ -68,7 +68,7 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
     meatPledges.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ninja Snowmen Lair", $location[Lair of the Ninja Snowmen]));
     meatPledges.listAppend(HTMLGenerateFutureTextByLocationAvailability("Hidden Hospital", $location[The Hidden Hospital]));
     meatPledges.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Bathroom", $location[The Haunted Bathroom]));
-    meatPledges.listAppend(HTMLGenerateFutureTextByLocationAvailability("the Oasis", $location[an oasis]));
+    meatPledges.listAppend(HTMLGenerateFutureTextByLocationAvailability("the Oasis", $location[the oasis]));
 
     string [int] initPledges;
     initPledges.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Kitchen", $location[the haunted kitchen]));
@@ -88,7 +88,7 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
 	
     string [int] dudeOptions;
     if ( __quest_state["Level 11"].mafia_internal_step < 2)
-        dudeOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Black Forest (2/5)", $location[Black Forest]));
+        dudeOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Black Forest (2/5)", $location[The Black Forest]));
     if (__quest_state["Level 9"].state_int["twin peak progress"] < 15) 
         dudeOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Twin Peak (5/8)", $location[Twin Peak]));
     if (!__quest_state["Level 11 Palindome"].state_boolean["dr. awkward's office unlocked"]) 
