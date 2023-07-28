@@ -73,6 +73,8 @@ void generateRandomMessageLocation(string [int] random_messages)
             message = "oh look! rocks!";
         case $location[hell]:
             message = "that's a clean burning hell, I'll tell you what"; break;
+        case $location[The Neverending Party]:
+            message = "duffo was lit"; break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -222,6 +224,8 @@ void generateRandomMessageFamiliar(string [int] random_messages)
             message = "he doesn't drink... wine"; break;
         case $familiar[grey goose]:
             message = "gooso is lit"; break;
+        case $familiar[patriotic eagle]:
+            message = "proud to be a loather"; break;
     }
     if (message != "")
         random_messages.listAppend(message);

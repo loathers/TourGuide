@@ -51,7 +51,7 @@ string DescribeThisBanish(Banish b) {
     if (turnsOfBanishLeft >= 300) banishLengthString = " until rollover.";
     if (turnsOfBanishLeft <= 300) banishLengthString = ` for {pluralise(turnsOfBanishLeft,"more turn","more turns")}.`;
 
-    string textReturn = "🠞 <b>"+banishedMon+"</b>, via "+source+banishLengthString+"<hr>|*";
+    string textReturn = "<b>"+banishedMon+"</b>, via "+source+banishLengthString+"<hr>|*";
 
     return textReturn;
 
@@ -159,40 +159,57 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
 	string name;
 	string description;
     string monsterIcon;
-    string subtitle;
+    string phylaSubtitle;
+    string monsterSubtitle;
+    string monsterSymbol; // 🠞 for normal monster, 🞮 for un-banished monster
     string banishDescribed;
+    phylum phylumBanished = $phylum[none];
     int monsterCount = 0;
 
 	if (phylaResult.length() > 0) {
 		name = "Current Phyla Banished";
 
         int screechCharge = get_property_int("screechCombats");
-        if (screechCharge == 0) subtitle = "can clear with your patriotic eagle";
-        if (screechCharge > 0) subtitle = `spend {pluralise(screechCharge,"turn/run","turns/runs")} with your eagle to cast screech again`;
+        if (screechCharge == 0) phylaSubtitle = "can clear with your patriotic eagle";
+        if (screechCharge > 0) phylaSubtitle = `spend {pluralise(screechCharge,"turn/run","turns/runs")} with your eagle to cast screech again`;
         
         foreach key, banish in phylaResult {
             banishDescribed = DescribeThisBanish(banish);
             if (banishDescribed != "") {
                 description += "|*"+banishDescribed+"<hr>|*";
                 monsterIcon = __phylum_to_monster[banish.banished_phylum];
+                phylumBanished = banish.banished_phylum;
             }
         }
-		subentries.listAppend(ChecklistSubentryMake(name,subtitle,description));
+		subentries.listAppend(ChecklistSubentryMake(name,phylaSubtitle,description));
 	}
 
 	if (monsterResult.length() > 0) {
         description = "";
+        monsterSubtitle = "";
+
+        // If your snapper is active, show the snapper phylum.
+        phylum snapperTarget = my_familiar() == lookupFamiliar("Red Nosed Snapper") ? get_property("redSnapperPhylum").to_phylum() : $phylum[none];
+
+        if (snapperTarget != $phylum[none]) {
+            monsterSubtitle = `your snapper is un-banishing {snapperTarget.to_string()} targets, marked with <span style="color:red;font-size:0.8em">🞮</span>`;
+        }
 		
         foreach key, banish in monsterResult {
             banishDescribed = DescribeThisBanish(banish);
+            monsterSymbol = "🠞 ";
             if (banishDescribed != "") {
-                description += "|*"+banishDescribed+"|*";
+                // add an icon for snapper unbanishing the monster
+                if (banish.banished_monster.phylum == snapperTarget) {
+                    monsterSymbol = `<span style="color:red;font-size:0.8em">🞮 </span>`;
+                }
+                description += "|*"+monsterSymbol+banishDescribed;
                 monsterIcon = "__monster "+banish.banished_monster.to_string().to_lower_case();
                 monsterCount += 1;
             }
         }
         name = `{pluralise(monsterCount,"monster banished", "monsters banished")}`;
-		subentries.listAppend(ChecklistSubentryMake(name,"",description));
+		subentries.listAppend(ChecklistSubentryMake(name,monsterSubtitle,description));
 
 	}
 	
