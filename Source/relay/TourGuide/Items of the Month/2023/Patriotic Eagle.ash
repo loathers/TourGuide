@@ -25,8 +25,11 @@ void IOTMPatrioticEagleGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 
         description.listAppend("Copied by your eagle's blast. Will appear when you adventure in " + possible_appearance_locations.listJoinComponents(", ", "or") + ".");
 
-        phylum eaglePhylumBanished = get_property("banishedPhyla") == "" ? get_property("banishedPhyla").split_string(":")[1].to_phylum() : $phylum[none];
+        phylum eaglePhylumBanished = $phylum[none];
 
+        if (get_property("banishedPhyla") != "")
+            eaglePhylumBanished = get_property("banishedPhyla").split_string(":")[1].to_phylum();
+            
         if (RWB_monster.phylum == eaglePhylumBanished) {
             description.listAppend(HTMLGenerateSpanFont("<b>WARNING!</b> This monster will not appear, it's banished by your eagle screech!", "red"));
         } 
@@ -43,9 +46,11 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!lookupFamiliar("Patriotic Eagle").familiar_is_usable()) return;
     
-    // Gross one-liner that parses for the currently banished phylum. 
-    phylum eaglePhylumBanished = get_property("banishedPhyla") == "" ? get_property("banishedPhyla").split_string(":")[1].to_phylum() : $phylum[none];
+    phylum eaglePhylumBanished = $phylum[none];
 
+    if (get_property("banishedPhyla") != "")
+        eaglePhylumBanished = get_property("banishedPhyla").split_string(":")[1].to_phylum();
+            
 	int screechRecharge = get_property_int("screechCombats");
 	
     string title;
@@ -58,8 +63,8 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend(HTMLGenerateSpanFont("SCREEEE", "red") + HTMLGenerateSpanFont("EEEEE", "grey") + HTMLGenerateSpanFont("EEEEE!,", "blue"));
     }
 
+    // Color the pledge zones by zone availability
     string [int] itemPledges;
-
     itemPledges.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Library", $location[the haunted library]));
     itemPledges.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Laundry Room", $location[the haunted laundry room]));
     itemPledges.listAppend(HTMLGenerateFutureTextByLocationAvailability("Whitey's Grove", $location[Whitey's Grove]));
@@ -77,14 +82,14 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
     
 	if ($effect[Citizen of A Zone].have_effect() == 0) {
         description.listAppend(HTMLGenerateSpanFont("Pledge ", "red") + HTMLGenerateSpanFont("allegiance ", "grey") + HTMLGenerateSpanFont("to a zone!", "blue"));
-        if (itemPledges.count() > 0) description.listAppend(HTMLGenerateSpanOfClass("+30% Item:", "r_bold") + itemPledges.listJoinComponents(", ", "or ") + ".");
-        if (meatPledges.count() > 0) description.listAppend(HTMLGenerateSpanOfClass("+50% Meat:", "r_bold") + meatPledges.listJoinComponents(", ", "or ") + ".");
-        if (initPledges.count() > 0) description.listAppend(HTMLGenerateSpanOfClass("+100% Init:", "r_bold") + initPledges.listJoinComponents(", ", "or ") + ".");
+        if (itemPledges.count() > 0) description.listAppend("|*"+HTMLGenerateSpanOfClass("+30% item: ", "r_bold") + itemPledges.listJoinComponents(", ", "or ") + ".");
+        if (meatPledges.count() > 0) description.listAppend("|*"+HTMLGenerateSpanOfClass("+50% meat: ", "r_bold") + meatPledges.listJoinComponents(", ", "or ") + ".");
+        if (initPledges.count() > 0) description.listAppend("|*"+HTMLGenerateSpanOfClass("+100% init: ", "r_bold") + initPledges.listJoinComponents(", ", "or ") + ".");
 	}
 
     // Making option frames for the phylums you want to banish, with if statements that should remove them 
-    //   when you have completed the task. Additionally, the location availability should ensure these do not
-    //   show up unless you can actually access the zones.
+    //   when you have completed the task. Additionally, the location availability should ensure these show 
+    //   in gray if you cannot access the zone.
 	
     string [int] dudeOptions;
     if ( __quest_state["Level 11"].mafia_internal_step < 2)
@@ -124,7 +129,6 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
     
 
     string [int] options;
-    #if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE) 
 	{
         if (dudeOptions.count() > 0) options.listAppend(HTMLGenerateSpanOfClass("Dude: ", "r_bold") + dudeOptions.listJoinComponents(", ")); 
         if (beastOptions.count() > 0) options.listAppend(HTMLGenerateSpanOfClass("Beast: ", "r_bold") + beastOptions.listJoinComponents(", "));
