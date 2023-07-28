@@ -384,7 +384,7 @@ void SneakActiveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] opt
     entry.tags.id = "Active sneak reminder";
     entry.importance_level = -11;
 
-    entry.subentries.listAppend("Noncombat up next","","You're feeling sneaky; a noncombat will occur in the next zone where an NC is available. Don't waste it!"); 
-    
+    entry.subentries.listAppend(ChecklistSubentryMake("Noncombat up next","","You're feeling sneaky; a noncombat will occur in the next zone where an NC is available. Don't waste it!")); 
+
     task_entries.listAppend(entry);
 }
