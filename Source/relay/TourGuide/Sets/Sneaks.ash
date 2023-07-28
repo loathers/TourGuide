@@ -17,7 +17,6 @@
         string tileDescription;
     };
 
-
 RegisterResourceGenerationFunction("SocialDistanceGenerator");
 void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 {
@@ -369,4 +368,23 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     if (entry.subentries.count() > 0) resource_entries.listAppend(entry);
 
+}
+
+RegisterTaskGenerationFunction("SneakActiveTask");
+void SneakActiveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    // Use the new preference to tell if there's an NC forcer active
+    if (!get_property_boolean("noncombatForcerActive")) return;
+    
+    // If you are forcing an NC, build the reminder
+    ChecklistEntry entry;
+    
+	entry.url = "";
+	entry.image_lookup_name = "__effect Feeling Sneaky";
+    entry.tags.id = "Active sneak reminder";
+    entry.importance_level = -11;
+
+    entry.subentries.listAppend("Noncombat up next","","You're feeling sneaky; a noncombat will occur in the next zone where an NC is available. Don't waste it!"); 
+    
+    task_entries.listAppend(entry);
 }
