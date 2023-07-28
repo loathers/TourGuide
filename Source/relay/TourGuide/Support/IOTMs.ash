@@ -271,7 +271,7 @@ void initialiseIOTMsUsable()
 
     // 2023
     replicaCheck("Cincho de Mayo"); # handled in own tile & sneaks.ash
-    replicaCheck("2002 Mr. Store Catalog");
+    replicaCheck("2002 Mr. Store Catalog"); # handled in own tile
 
 }
 

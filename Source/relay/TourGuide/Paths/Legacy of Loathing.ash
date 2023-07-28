@@ -1,14 +1,15 @@
 RegisterTaskGenerationFunction("PathLegacyOfLoathingGenerateTasks");
 void PathLegacyOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    // Only generate tile if the user has replicas and is in-path.
-    if (replicasAvailable + momsCreditCardAvailable == 0) return;
-    if (my_path() != $path[Legacy of Loathing]) return;
 
     // Variables re: replicas available and path currency available.
     int replicasAvailable = $item[replica mr. accessory].available_amount();
     int momsCreditCardAvailable = $item[replica ten dollars].available_amount();
     int momsCreditCardUsed = $path[legacy of loathing].points;
+    
+    // Only generate tile if the user has replicas and is in-path.
+    if (replicasAvailable + momsCreditCardAvailable == 0) return;
+    if (my_path() != $path[Legacy of Loathing]) return;
 
     ChecklistEntry entry;
     string [int] description;
