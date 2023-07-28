@@ -43,11 +43,12 @@ void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
 		int availableVHSes = available_amount($item[Spooky VHS Tape]);
 		
 		// List out the mics from least to most charged
-		item [int] listOfMics = $items[Loathing Idol Microphone (25% charged),Loathing Idol Microphone (50% charged),Loathing Idol Microphone (75% charged),Loathing Idol Microphone];
+		item [int] listOfMics = listMake($item[Loathing Idol Microphone (25% charged)],$item[Loathing Idol Microphone (50% charged)],$item[Loathing Idol Microphone (75% charged)],$item[Loathing Idol Microphone]);
+		int totalIdolCharge;
 
 		foreach i, micItem in listOfMics {
 			// Add # of charge based on index of the above list to the total charge.
-			IdolMicTotalCharge += i*available_amount(micItem);
+			totalIdolCharge += i*available_amount(micItem);
 		}
 
 		boolean McTwistUsed = get_property_boolean("_epicMcTwistUsed");
@@ -56,17 +57,17 @@ void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
 		// Ascension stuff
 		if (!__misc_state["in run"] ||
 			my_path().id == PATH_COMMUNITY_SERVICE ||
-			availableVHSes + IdolMicTotalCharge + FLUDAdousesLeft == 0)
+			availableVHSes + totalIdolCharge + FLUDAdousesLeft == 0)
 			return;
 
 		// Generate useful VHS copy list
 		string [int] optionsVHS;
 
-		if (__quest_state["Level 12"].state_int["hippies left on battlefield"] > 5) options.listAppend("War monsters; especially GROPs");
-		if (!__quest_state["Level 7"].state_boolean["cranny finished"]) options.listAppend("Giant swarm of ghuol whelps");
-		if (!__quest_state["Level 8"].state_boolean["Mountain climbed"]) options.listAppend("Ninja snowman assassin");
-		if ($item[amulet of extreme plot significance].available_amount() == 0) options.listAppend("Quiet Healer");
-		if ($item[mohawk wig].available_amount() == 0) options.listAppend("Burly Sidekick");
+		if (__quest_state["Level 12"].state_int["hippies left on battlefield"] > 5) optionsVHS.listAppend("War monsters; especially GROPs");
+		if (!__quest_state["Level 7"].state_boolean["cranny finished"]) optionsVHS.listAppend("Giant swarm of ghuol whelps");
+		if (!__quest_state["Level 8"].state_boolean["Mountain climbed"]) optionsVHS.listAppend("Ninja snowman assassin");
+		if ($item[amulet of extreme plot significance].available_amount() == 0) optionsVHS.listAppend("Quiet Healer");
+		if ($item[mohawk wig].available_amount() == 0) optionsVHS.listAppend("Burly Sidekick");
 
 		if (availableVHSes > 0 && $item[Spooky VHS Tape].item_is_usable())
 		{
@@ -76,9 +77,9 @@ void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
 			}
 			description.listAppend(VHSDescription);
 		}
-		if (IdolMicTotalCharge > 0 && $item[Loathing Idol Microphone].item_is_usable())
+		if (totalIdolCharge > 0)
 		{
-			description.listAppend("Have " + IdolMicTotalCharge + " Loathing Idol microphone uses. (50% item, 5% com, or 100% init.)");
+			description.listAppend("Have " + totalIdolCharge + " Loathing Idol microphone uses. (50% item, 5% com, or 100% init.)");
 		}
 
 		string [int] optionsMcTwist;
@@ -111,7 +112,7 @@ void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
 		if (available_amount($item[Flash Liquidizer Ultra Dousing Accessory]) > 0 && FLUDAdousesLeft > 0) {
 			string fludaDescription = "Can waterpocket " + FLUDAdousesLeft + " more foes with FLUDA.";
 			if (optionsFLUDA.count() > 0) {
-				fludaDescription += " Try stealing some "+optionsFLUDA.listJonComponents(", ", "or ")+".";
+				fludaDescription += " Try stealing some "+optionsFLUDA.listJoinComponents(", ", "or ")+".";
 			}
 			description.listAppend(fludaDescription);
 		}
