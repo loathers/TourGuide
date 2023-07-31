@@ -11,9 +11,13 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 	url = "inventory.php?ponder=1";
 	string [int] description;
 	description.listAppend("The future foretells... dickstabbing!");
-	if (available_amount($item[miniature crystal ball]) > 0) 
+
+	// Adding replica handling for LOL
+    int ballsEquipped = lookupItem("miniature crystal ball").equipped_amount() + lookupItem("replica miniature crystal ball").equipped_amount();
+
+	if (__iotms_usable[$item[miniature crystal ball]]) 
 	{
-		if (!have_equipped($item[miniature crystal ball])) //when mcb is not equipped
+		if (ballsEquipped == 0) //when mcb is not equipped
 		{
 			if (crystalBall != "")
 			{

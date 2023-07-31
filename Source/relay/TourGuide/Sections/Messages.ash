@@ -73,6 +73,8 @@ void generateRandomMessageLocation(string [int] random_messages)
             message = "oh look! rocks!";
         case $location[hell]:
             message = "that's a clean burning hell, I'll tell you what"; break;
+        case $location[The Neverending Party]:
+            message = "duffo was lit"; break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -222,6 +224,8 @@ void generateRandomMessageFamiliar(string [int] random_messages)
             message = "he doesn't drink... wine"; break;
         case $familiar[grey goose]:
             message = "gooso is lit"; break;
+        case $familiar[patriotic eagle]:
+            message = "proud to be a loather"; break;
     }
     if (message != "")
         random_messages.listAppend(message);
@@ -318,6 +322,7 @@ string generateRandomMessage()
     equipment_messages[$item[numberwang]] = "simply everyone";
     equipment_messages[$item[Mark V Steam-Hat]] = "girl genius";
     equipment_messages[$item[mr. accessory]] = "you can equip mr. accessories?";
+    equipment_messages[$item[replica haiku katana]] = "a haiku state of mind";
     equipment_messages[$item[white hat hacker T-shirt]] = "hack the planet";
     equipment_messages[$item[heart necklace]] = "&#x2665;&#xfe0e;"; //♥︎
     equipment_messages[$item[fleetwood chain]] = "running in the shadows";
@@ -336,6 +341,7 @@ string generateRandomMessage()
     equipment_messages[$item[retrospecs]] = "cleesh is love, cleesh is life";
     equipment_messages[$item[tiny stillsuit]] = "it's called fashion sweaty";
     equipment_messages[$item[jurassic parka]] = "so preoccupied with whether you could, never stopped to think if you should";
+    equipment_messages[$item[replica jurassic parka]] = "so preoccupied with whether you replica could, never stopped to think if you replica should";
 
     foreach it in equipment_messages
     {
@@ -920,6 +926,18 @@ string generateRandomMessage()
         random_messages.listAppend("a superstitious, cowardly lot");
     }
     
+    // Adding a few Legacy of Loathing replica messages
+
+    if (my_path() == $path[Legacy of Loathing])
+    {
+        random_messages.listAppend("make sure you get your hand turkey");
+        random_messages.listAppend("hot legacy summer");
+        random_messages.listAppend("living like the richy-rich");
+        random_messages.listAppend("it's one banana, " + lowercase_player_name + ". what could it cost, replica ten bucks?");
+        random_messages.listAppend("replicas are like any other machine -- they're either a benefit or a hazard");
+        random_messages.listAppend("claimin' respect, just to get a rep... lica");
+    }
+
     // There's no way I could determine for mafia to tell that you -just- cast Feel Disappointed.
     //   Therefore, for this silly set of disappointment messages, they only show in the pool if 
     //   you've cast it exactly two times. This is silly, but I think it's fine.

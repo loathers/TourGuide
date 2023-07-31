@@ -1,38 +1,50 @@
 RegisterResourceGenerationFunction("IOTMPlasticVampireFangsGenerateResource");
 void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!$item[plastic vampire fangs].is_unrestricted())
-        return;
-    if ($items[plastic vampire fangs,Interview With You (a Vampire)].available_amount() == 0)
+    // Commenting out since the replica is unrestricted. I think ownership handles this.
+    
+    // if (!$item[plastic vampire fangs].is_unrestricted())
+    //     return;
+    if ($items[replica plastic vampire fangs, plastic vampire fangs, Interview With You (a Vampire)].available_amount() == 0)
         return;
     item fang_source = $item[plastic vampire fangs];
     string url = "";
     string separator = " " + __html_right_arrow_character + " ";
-    if ($item[plastic vampire fangs].available_amount() == 0) {
-        fang_source = $item[Interview With You (a Vampire)];
-            url = "inventory.php?ftext=interview+with+you";
+
+    // Detect if your access is through the replica, the book, or the O.G. 
+
+    if ($item[replica plastic vampire fangs].available_amount() > 0) {
+        fang_source = $item[replica plastic vampire fangs];
+        url = "place.php?whichplace=town";
+        if ($item[plastic vampire fangs].equipped_amount() == 0) {
+            url = "inventory.php?ftext=plastic+vampire+fangs";
+        }
     }
+
+    else if ($item[Interview With You (a Vampire)].available_amount() > 0) {
+        fang_source = $item[Interview With You (a Vampire)];
+        url = "inventory.php?ftext=interview+with+you";
+    }
+
     else {
         url = "place.php?whichplace=town";
         if ($item[plastic vampire fangs].equipped_amount() == 0) {
             url = "inventory.php?ftext=plastic+vampire+fangs";
         }
     }
+
+    // Show the Isabella interview option if it is valid for the user.
     
     if (!get_property_boolean("_interviewIsabella") && __misc_state["in run"] && __misc_state["need to level"]) {
         string [int] description;
         int stats_gained = MIN(500, 4 * my_basestat(my_primestat())) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
         
         description.listAppend(stats_gained + " " + my_primestat().to_lower_case() + " gained, one adventure cost.");
-        if ($item[plastic vampire fangs].available_amount() == 0) {
+        if ($item[Interview With You (a Vampire)].available_amount() > 0) {
             description.listAppend("Vamp out via Interview With You (a Vampire).");
         }
         else {
-            if ($item[plastic vampire fangs].equipped_amount() == 0) {
-                description.listAppend("Equip plastic vampire fangs, then vamp out in Seaside Town.");
-            }
-            else
-                description.listAppend("Vamp out in Seaside Town.");
+            description.listAppend("Vamp out in Seaside Town, with fangs equipped.");
         }
         
         if (my_primestat() == $stat[muscle])
@@ -49,15 +61,11 @@ void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entri
 
     if (!__misc_state["in run"]) {
         string [int] description;
-        if ($item[plastic vampire fangs].available_amount() == 0) {
+        if ($item[Interview With You (a Vampire)].available_amount() > 0) {
             description.listAppend("Vamp out via Interview With You (a Vampire).");
         }
         else {
-            if ($item[plastic vampire fangs].equipped_amount() == 0) {
-                description.listAppend("Equip plastic vampire fangs, then vamp out in Seaside Town.");
-            }
-            else
-                description.listAppend("Vamp out in Seaside Town.");
+            description.listAppend("Vamp out in Seaside Town, with fangs equipped.");
         }
         
         int vamp_outs_remaining = 0;

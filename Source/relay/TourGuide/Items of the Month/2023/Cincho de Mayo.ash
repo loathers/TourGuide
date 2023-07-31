@@ -1,7 +1,7 @@
 RegisterResourceGenerationFunction("IOTMCinchoDeMayoGenerateResource");
 void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (lookupItem("Cincho de Mayo").available_amount() == 0) return;
+    if (!__iotms_usable[$item[Cincho de Mayo]]) return;
     
     // _cinchUsed is a weird preference that actually means distance from 100% you are at in your current cinch.
     int freeRests = __misc_state_int["free rests remaining"];

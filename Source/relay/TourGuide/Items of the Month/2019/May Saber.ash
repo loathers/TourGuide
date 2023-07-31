@@ -37,13 +37,16 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!__iotms_usable[$item[Fourth of May Cosplay Saber]])
 		return;
 
+        
+    int sabersEquipped = lookupItem("Fourth of May Cosplay Saber").equipped_amount() + lookupItem("replica Fourth of May Cosplay Saber").equipped_amount();
+
     int uses_remaining = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
 
     if (uses_remaining > 0) {
         if (true) {
             //The section that will be sent as a stand-alone resource
             string url;
-            if (!lookupItem("Fourth of May Cosplay Saber").equipped())
+            if (sabersEquipped == 0)
                 url = "inventory.php?ftext=fourth+of+may+cosplay+saber";
 
             string [int] description;
@@ -54,14 +57,13 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
             if (my_path().id == PATH_COMMUNITY_SERVICE && $skill[Meteor Lore].have_skill())
                 description.listAppend("Bonus! Use Meteor Shower + lightsaber skill to save a bunch of turns on weapon damage/spell damage/familiar weight tests.");
 
-            //description.listAppend("Choose one of:|*" + options.listJoinComponents("|*"));
             resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", url, ChecklistSubentryMake(uses_remaining.pluralise("force use", "forces uses"), "", description)).ChecklistEntrySetIDTag("Fourth may saber force resource")); //"forces uses"? typo or reference/joke?
         }
 
         if (true) {
             //The section that will be sent as a "banish" tile
             string [int] description;
-            if (!lookupItem("Fourth of May Cosplay Saber").equipped())
+            if (sabersEquipped == 0)
                 description.listAppend(HTMLGenerateSpanFont("Equip the Fourth of May saber first", "red"));
             else
                 description.listAppend("Rollover runaway-like/banish");

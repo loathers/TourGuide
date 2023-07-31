@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("IOTMKramcoSausageOMaticGenerateTasks");
 void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if (lookupItem("Kramco Sausage-o-Matic&trade;").available_amount() == 0) return;
+    if (!__iotms_usable[lookupItem("Kramco Sausage-o-Matic")]) return;
     
     //If goblin is up, display reminder:
     KramcoSausageFightInformation fight_information = KramcoCalculateSausageFightInformation();
@@ -11,7 +11,9 @@ void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, Che
         string url = "";
         string [int] description;
         string title = "Fight sausage goblin ";
-        if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0) {
+        int kramcosEquipped = lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() + lookupItem("replica Kramco Sausage-o-Matic&trade;").equipped_amount();
+
+        if (kramcosEquipped == 0) {
             description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
             url = "inventory.php?ftext=kramco+sausage-o-matic";
         }
@@ -29,7 +31,7 @@ void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, Che
 RegisterResourceGenerationFunction("IOTMKramcoSausageOMaticGenerateResource");
 void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!lookupItem("Kramco Sausage-o-Matic&trade;").have() || my_path().id == PATH_LIVE_ASCEND_REPEAT) return;
+    if (!__iotms_usable[lookupItem("Kramco Sausage-o-Matic")] || my_path().id == PATH_LIVE_ASCEND_REPEAT) return;
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Kramco Sausage-o-Matic&trade;";
@@ -41,17 +43,19 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
     string main_title;
     
     KramcoSausageFightInformation fight_information = KramcoCalculateSausageFightInformation();
+    
+    int kramcosEquipped = lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() + lookupItem("replica Kramco Sausage-o-Matic&trade;").equipped_amount();
 
     if (fight_information.turns_to_next_guaranteed_fight == 0) {
         main_title = "Sausage goblin fight available";
-        if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0) {
+        if (kramcosEquipped == 0) {
             main_description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
             entry.url = "inventory.php?action=grind";
         }
     } else {
-        main_title = round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of sausage goblin this turn";
+        main_title = round(fight_information.probability_of_sausage_fight * 100.0) + "% chance of Kramco fight this turn";
         main_description.listAppend(pluralise(fight_information.turns_to_next_guaranteed_fight, "turn", "turns") + " until next guaranteed goblin fight.");
-        if (lookupItem("Kramco Sausage-o-Matic&trade;").equipped_amount() == 0) {
+        if (kramcosEquipped == 0) {
             main_description.listAppend(HTMLGenerateSpanFont("Equip the Kramco Sausage-o-Matic&trade; first.", "red"));
             entry.url = "inventory.php?action=grind";
         }

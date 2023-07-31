@@ -46,8 +46,8 @@ void generateDailyResources(Checklist [int] checklists)
                 options.listAppend(generateHotDogLine("One with everything", "+50% mysticality, 50 turns.", 2));
             if (my_primestat() == $stat[moxie])
                 options.listAppend(generateHotDogLine("Sly Dog", "+50% moxie, 50 turns.", 2));
-            if (__misc_state["need to level"] && __misc_state["Chateau Mantegna available"] && !$skill[Dog Tired].have_skill())
-                options.listAppend(generateHotDogLine("Sleeping dog", "5 free rests/day (stats at chateau)", 2));
+            if (__misc_state["Chateau Mantegna available"] && !$skill[Dog Tired].have_skill())
+                options.listAppend(generateHotDogLine("Sleeping dog", "5 free rests/day (stats at chateau or cinch rests)", 2));
         }
             
         description.listAppend(HTMLGenerateSimpleTableLines(options));
@@ -640,7 +640,7 @@ void generateDailyResources(Checklist [int] checklists)
         }
     }
     
-    if (__misc_state["Chateau Mantegna available"] && !get_property_boolean("_chateauDeskHarvested")) {
+    if ( __iotms_usable[$item[Chateau Mantegna room key]] && !get_property_boolean("_chateauDeskHarvested")) {
         string image_name = "__item fancy calligraphy pen";
         resource_entries.listAppend(ChecklistEntryMake(image_name, "place.php?whichplace=chateau", ChecklistSubentryMake("Chateau desk openable", "", "Daily collectable."), 8).ChecklistEntrySetIDTag("Chateau Mantegna desk resource"));
     }

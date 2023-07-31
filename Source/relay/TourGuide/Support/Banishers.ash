@@ -10,7 +10,26 @@ Record Banish
     string custom_reset_conditions;
 };
 
+// Added due to reasons, those reasons being "now you can banish phyla"
+Record BanishedPhylum
+{
+    phylum banished_phylum;
+    string banish_source;
+    int turn_banished;
+    int banish_turn_length;
+    string custom_reset_conditions;
+};
+
 void listAppend(Banish [int] list, Banish entry)
+{
+    int position = list.count();
+    while (list contains position)
+        position += 1;
+    list[position] = entry;
+}
+
+// It is annoying that I have to re-add this for the new record lol
+void listAppend(BanishedPhylum [int] list, BanishedPhylum entry)
 {
     int position = list.count();
     while (list contains position)
@@ -53,6 +72,7 @@ static
     __banish_source_length["stinky cheese eye"] = 10;
     __banish_source_length["thunder clap"] = 40;
     __banish_source_length["v for vivala mask"] = 10;
+    __banish_source_length["replica v for vivala mask"] = 10;
     __banish_source_length["walk away from explosion"] = 30;
     __banish_source_length["tennis ball"] = 30;
     __banish_source_length["curse of vacation"] = -1;
@@ -77,6 +97,7 @@ static
 	__banish_source_length["system sweep"] = -1;
 	__banish_source_length["feel hatred"] = 50;
 	__banish_source_length["show your boring familiar pictures"] = 100;
+	__banish_source_length["patriotic screech"] = 100;
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;
@@ -122,7 +143,7 @@ Banish [int] BanishesActive()
         b.banish_turn_length = 0;
         if (__banish_source_length contains b.banish_source.to_lower_case())
             b.banish_turn_length = __banish_source_length[b.banish_source.to_lower_case()];
-        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell" || b.banish_source == "beancannon")
+        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell" || b.banish_source == "beancannon" || b.banish_source == "monkey slap")
             b.custom_reset_conditions = "rollover";
         if (b.banish_source == "ice house" && (!$item[ice house].is_unrestricted() || in_bad_moon())) //not relevant
             continue;

@@ -84,7 +84,7 @@ void QLevel11DesertGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
             description.listAppend("Adventure in the Oasis.");
             if ($items[11-leaf clover].available_amount() > 0)
                 description.listAppend("Potentially clover for 20 turns, versus 5.");
-            if (!get_property_boolean("fireExtinguisherDesertUsed") && !(available_amount($item[industrial fire extinguisher]) > 0) && get_property_int("_fireExtinguisherCharge") > 20)
+            if (!get_property_boolean("fireExtinguisherDesertUsed") && __iotms_usable[$item[industrial fire extinguisher]] && get_property_int("_fireExtinguisherCharge") > 20)
                 description.listAppend("Or, use 20% fire extinguisher charge in the desert to drink the foam.");
             task_entries.listAppend(ChecklistEntryMake("__effect ultrahydrated", "place.php?whichplace=desertbeach", ChecklistSubentryMake("Acquire ultrahydrated effect", "", description), -11).ChecklistEntrySetIDTag("Council L11 quest desert ultrahydrated"));
         }

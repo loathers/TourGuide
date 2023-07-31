@@ -482,7 +482,9 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
                 }
             }
 
-            if (lookupItem("Fourth of May Cosplay Saber").available_amount() > 0 && get_property_int("_saberForceUses") < 5 && gunpowder_needed > 1)
+            int sabersOwned = lookupItem("Fourth of May Cosplay Saber").available_amount() + lookupItem("replica Fourth of May Cosplay Saber").available_amount();
+
+            if (sabersOwned > 0 && get_property_int("_saberForceUses") < 5 && gunpowder_needed > 1)
             {
                 int saber_fights_left = MIN(get_property_int("_saberForceMonsterCount"), 3);
                 boolean already_sabering_lfm = get_property_monster("_saberForceMonster") == $monster[lobsterfrogman] && saber_fights_left > 0;

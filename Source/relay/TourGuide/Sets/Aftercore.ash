@@ -232,7 +232,8 @@ void SAftercoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     //Campground items:
     if (__campground[$item[clockwork maid]] == 0)
     {
-        optional_task_entries.listAppend(ChecklistEntryMake("__item sprocket", "", ChecklistSubentryMake("Install a clockwork maid", "", listMake("+8 adventures/day.", "Buy from mall."))).ChecklistEntrySetIDTag("Aftercore task clockwork maid"));
+        string url = "mall.php?pudnuggler=%22clockwork+maid";
+        optional_task_entries.listAppend(ChecklistEntryMake("__item sprocket", url, ChecklistSubentryMake("Install a clockwork maid", "", listMake("+8 adventures/day.", "Buy from mall."))).ChecklistEntrySetIDTag("Aftercore task clockwork maid"));
     }
     if (__campground[$item[pagoda plans]] == 0 && $location[Pandamonium Slums].locationAvailable())
     {

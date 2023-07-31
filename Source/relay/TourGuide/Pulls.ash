@@ -233,8 +233,8 @@ void generatePullList(Checklist [int] checklists)
 			pullable_item_list.listAppend(GPItemMake($item[mafia middle finger ring], "one free runaway/banish/day", 1));
     }
 	//pullable_item_list.listAppend(GPItemMake($item[haiku katana], "?", 1));
-	if ($item[bottle-rocket crossbow].item_is_usable())
-        pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
+	// if ($item[bottle-rocket crossbow].item_is_usable())
+    //     pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
 	if ($item[jekyllin hide belt].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[jekyllin hide belt], "+variable% item", 3));
     

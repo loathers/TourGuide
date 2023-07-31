@@ -1,8 +1,8 @@
-//Designer sweatpants
+//ants
 RegisterResourceGenerationFunction("IOTMDesignerSweatpantsResource");
 void IOTMDesignerSweatpantsResource(ChecklistEntry [int] resource_entries)
 {
-    if (!lookupItem("designer sweatpants").have()) return;
+    if (!__iotms_usable[$item[designer sweatpants]]) return;
 
     int sweat_o_meter = get_property_int("sweat");
     int booze_sweats_left = clampi(3 - get_property_int("_sweatOutSomeBoozeUsed"), 0, 3);

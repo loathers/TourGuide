@@ -111,7 +111,8 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				potential_ore_sources.listAppend("Earthen Fist will allow mining." + have_skill_text);
 				need_outfit = false;
 			}
-            if ($item[Deck of every card].available_amount() > 0 && $item[Deck of every card].is_unrestricted())
+            // changed this to remove an is_unrestricted check; i think this still should work without it? 
+            if (__iotms_usable[$item[Deck of Every Card]])
                 potential_ore_sources.listAppend("Deck of Every Card - Mine card");
 			ore_lines.listAppend("Potential sources of ore:" + HTMLGenerateIndentedText(potential_ore_sources));
 			if (skill_is_usable($skill[unaccompanied miner]))

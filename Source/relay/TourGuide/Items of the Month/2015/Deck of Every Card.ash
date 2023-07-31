@@ -316,9 +316,13 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
                 line += " (may cost turns)";
             description.listAppend(line);
         }
+
+        
+        // Detect replica versus genie classic for the purposes of the URL
+        string activeDeckID = lookupItem("replica deck of every card").available_amount() > 0 ? "11230" : "8382";
         
         if (card_table.count() > 0)
             description.listAppend(HTMLGenerateSimpleTableLines(card_table));
-		resource_entries.listAppend(ChecklistEntryMake("__item deck of every card", "inv_use.php?cheat=1&pwd=" + my_hash() + "&whichitem=8382", ChecklistSubentryMake(title, "", description), 1).ChecklistEntrySetIDTag("Deck of every card resource"));
+		resource_entries.listAppend(ChecklistEntryMake("__item deck of every card", "inv_use.php?cheat=1&pwd=" + my_hash() + "&whichitem="+activeDeckID, ChecklistSubentryMake(title, "", description), 1).ChecklistEntrySetIDTag("Deck of every card resource"));
     }
 }

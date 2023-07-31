@@ -1,14 +1,13 @@
 void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    // I am keeping the recommender logic here because I like (most) of these suggestions. However, 
+    //   taking out the actual creating-the-tile shit until we refactor to the new olfaction limit 
+    //   and turn this into a resource thing rather than a highlighted task.
+
     if (!$skill[Transcendent Olfaction].skill_is_usable())
         return;
-    if ($effect[On the trail].have_effect() == 0)
-        return;
-    if ($item[soft green echo eyedrop antidote].available_amount() == 0) //no removal method
-        return;
-    
+
     //Add in some basic reminders to remove olfaction if adventuring in certain areas.
-    
     monster olfacted_monster = get_property_monster("olfactedMonster");
     if (olfacted_monster == $monster[none] || __last_adventure_location == $location[none])
         return;
@@ -107,8 +106,11 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         description.listAppend(line);
         
         
-        //Suggestion time!
-        task_entries.listAppend(ChecklistEntryMake("__item " + $item[soft green echo eyedrop antidote], "inventory.php?ftext=soft+green+echo+eyedrop+antidote", ChecklistSubentryMake("Remove " + $effect[on the trail], "", description), -11).ChecklistEntrySetIDTag("Olfaction better suggestion")); //TODO could differentiate by suggestion
+        // Old suggestion recommendation; removing this bit because it isn't needed or necessary. We need to factor this
+        //   as a "top" recommendation thing, with the relevant idea from your most recent zone and a few other ideas
+        //   alongside the # of olfactions remaining. 
+
+        // task_entries.listAppend(ChecklistEntryMake("__item " + $item[soft green echo eyedrop antidote], "inventory.php?ftext=soft+green+echo+eyedrop+antidote", ChecklistSubentryMake("Remove " + $effect[on the trail], "", description), -11).ChecklistEntrySetIDTag("Olfaction better suggestion")); //TODO could differentiate by suggestion
         
         break;
     }

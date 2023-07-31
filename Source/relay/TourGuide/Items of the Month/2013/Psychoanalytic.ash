@@ -133,8 +133,7 @@ void IOTMPOldManGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
     
     
     monster olfacted_monster = get_property_monster("olfactedMonster");
-    if ($effect[on the trail].have_effect() == 0)
-        olfacted_monster = $monster[none];
+
     boolean olfacted_relevant_monster = ($monsters[ferocious roc,giant man-eating shark,Bristled Man-O-War,The Cray-Kin,Deadly Hydra] contains olfacted_monster);
     
     if (__misc_state["have olfaction equivalent"] && !olfacted_relevant_monster)

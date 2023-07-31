@@ -24,6 +24,7 @@ void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTMPowerfulGloveTask");
 void IOTMPowerfulGloveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    // This doesn't have replica handling, but I don't really care -- you really only need this for Plumber now, and otherwise it's meh.
     if (!__misc_state["in run"] || !$item[Powerful Glove].have() || $item[Powerful Glove].have_equipped()) return;
 
     boolean is_plumber = my_path().id == PATH_OF_THE_PLUMBER;

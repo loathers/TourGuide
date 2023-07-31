@@ -352,6 +352,8 @@ void setUpState()
 		free_runs_available = true;
 	if ($item[V for Vivala mask].available_amount() > 0 && !get_property_boolean("_vmaskBanisherUsed"))
 		free_runs_available = true;
+	if ($item[replica V for Vivala mask].available_amount() > 0 && !get_property_boolean("_vmaskBanisherUsed"))
+		free_runs_available = true;
 	if (blank_outs_usable)
 	{
 		if ($item[bottle of Blank-Out].available_amount() > 0 || get_property_int("blankOutUsed") > 0)
@@ -742,6 +744,12 @@ void setUpState()
     }
 
     if (get_property_boolean("chateauAvailable") && !in_bad_moon() && $item[Chateau Mantegna room key].is_unrestricted()) {
+        __misc_state["Chateau Mantegna available"] = true;
+        __misc_state_string["resting url Chateau Mantegna"] = "place.php?whichplace=chateau";
+    }
+
+    // you can also use the chateau in LoL, if you have it
+    if (get_property_boolean("chateauAvailable") && my_path() == $path[Legacy of Loathing]) {
         __misc_state["Chateau Mantegna available"] = true;
         __misc_state_string["resting url Chateau Mantegna"] = "place.php?whichplace=chateau";
     }
