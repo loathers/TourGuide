@@ -252,7 +252,7 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[Neverending Party invitation envelope]] = true; # handled in own tile
 
     // 2019
-    replicaCheck("Kramco Sausage-o-Matic"); # handled in own tile
+    replicaCheck("Kramco Sausage-o-Matic &trade;"); # handled in own tile
     replicaCheck("Fourth of May Cosplay Saber"); # handled in own tile & lvl 12
     replicaCheck("hewn moon-rune spoon"); # handled in own tile
 
