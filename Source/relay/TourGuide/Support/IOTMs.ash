@@ -231,7 +231,10 @@ void initialiseIOTMsUsable()
     replicaCheck("Smith's Tome"); # handled in tomes.ash
 
     // 2014
-    replicaCheck("Little Geneticist DNA-Splicing Lab");  # handled in DNA.ash; already used __iotms_usable!
+    // replicaCheck("");  # handled in DNA.ash; already used __iotms_usable!
+    // 2015
+    if (lookupItem("replica Little Geneticist DNA-Splicing Lab").available_amount() > 0)
+        __iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] = true;
 
     // 2015
     if (get_property_boolean("replicaChateauAvailable"))

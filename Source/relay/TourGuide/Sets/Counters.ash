@@ -263,8 +263,15 @@ void SCountersGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [i
             if (get_property_int("_sourceTerminalDigitizeMonsterCount") >= 2 && digitisations < digitisation_limit)
                 subentry.entries.listAppend("Could re-digitise to reset the window.");
         }
-        if (window_name == "Rain Monster" && my_path().id == PATH_HEAVY_RAINS)
+        if (window_name == "Rain Monster" && my_path() == $path[Heavy Rains])
         {
+            // Adding a note here -- there was a bug report that multiple people hit 
+            //   this counter outside of heavy rains. I have no idea what was going 
+            //   wrong here; feels like a mafia pref issue of something? Dunno.
+
+            // Still adding a big note so that it's easier to find this file if
+            //   this recurs for a user. 
+            
             subentry.entries = SCountersGenerateDescriptionForRainMonster();
         }
         if (fighting_monster != $monster[none])
