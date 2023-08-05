@@ -48269,8 +48269,9 @@ void IOTMGenieBottleGenerateResource(ChecklistEntry [int] resource_entries)
         
         // URL to the correct genie as per activeGenieID
         string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=" + activeGenieID;
-        
-        string potential_monsters = SFaxGeneratePotentialFaxes(true, $monsters[ninja snowman assassin,modern zmobie,giant swarm of ghuol whelps, screambat]).listJoinComponents("|<hr>");
+
+        boolean [monster] invalid_monsters = $monsters[ninja snowman assassin, modern zmobie, giant swarm of ghuol whelps, screambat, monstrous boiler];
+        string potential_monsters = SFaxGeneratePotentialFaxes(true, invalid_monsters).listJoinComponents("|<hr>");
         if (potential_monsters != "")
 	        description.listAppend("Could fight a monster:<br>" + potential_monsters);
         resource_entries.listAppend(ChecklistEntryMake("__item genie bottle", url, ChecklistSubentryMake(pluralise(wishes_left, "wish", "wishes"), "", description), 1).ChecklistEntrySetIDTag("Genie bottle resource"));
