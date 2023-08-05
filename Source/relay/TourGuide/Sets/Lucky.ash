@@ -33,7 +33,22 @@ string [int] luckyOptions(int cloversAvailable) {
     int explorationRemaining = 100 - exploration;
 	int roughUHTurnsNeeded = ceil(explorationRemaining.to_float()/2.0);
 	
-	// Append the lucky thing you can get, if you actually need it
+	// Append the lucky thing you can get, if you actually need it. Priority is because:
+
+	//   - Ore is an early clover dump that (in modern meta) generally wants either an early MM or an 
+	//       early clover. If you can't solve ore otherwise, this saves an absurd amount of turns
+	//   - Zeppelin is the most important clover dump in-run traditionally; saves a good 5-6 turns 
+	//       apiece, more in some paths
+	//   - Wand is necessary in almost every path, and next-most-important after zepp/ore. Saves a
+	//       good 3-ish turns on having to lose an NS fight and find the wand in the cemetary
+	//   - Ultrahydrated saves 2-ish turns in some paths
+	//   - Mick's saves about 2 turns in some paths as well, but less so generally
+	//   - A-Boo clues save half a turn apiece because you save 1 turn on a two clover a-boo
+
+	// Beyond these, there is a mild case for some of the elemental damage clovers, but I 
+	//   don't think they warrant adding. Possibly worth adding to the actual tower test
+	//   tile if you're at the tower test, but even then. Meh.
+	
 	if (!__quest_state["Level 8"].state_boolean["Past mine"] && $location[Itznotyerzitz Mine].locationAvailable()) 
 		allTheLuckyStuff.listAppend("Ore");
 	if (protestorsRemaining > 10 && protestorsPerClover > 10)
@@ -41,11 +56,13 @@ string [int] luckyOptions(int cloversAvailable) {
 		cloversAdjusted = MAX(cloversAdjusted - projectedZeppClovers, 3);
 	if (__misc_state["wand of nagamar needed"] && lettersStillNeeded > 0)
 		allTheLuckyStuff.listAppend("Wand of Nagamar");
+	if (roughUHTurnsNeeded > 5)
+		allTheLuckyStuff.listAppend("Ultrahydrated");
+	if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
+		allTheLuckyStuff.listAppend("Mick's Icyvapohotness Inhaler");
 	if (aBooHauntedness > 0)
 		allTheLuckyStuff.listAppend("A-Boo Clues (x"+aBooCloversNeeded+")");
 		cloversAdjusted = MAX(cloversAdjusted - aBooCloversNeeded, 3);
-	if (roughUHTurnsNeeded > 5)
-		allTheLuckyStuff.listAppend("Ultrahydrated");
 
 	string [int] selectedOptions;
 
