@@ -31,7 +31,7 @@ void IOTMKramcoSausageOMaticGenerateTasks(ChecklistEntry [int] task_entries, Che
 RegisterResourceGenerationFunction("IOTMKramcoSausageOMaticGenerateResource");
 void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__iotms_usable[lookupItem("Kramco Sausage-o-Matic &trade;")] || my_path().id == PATH_LIVE_ASCEND_REPEAT) return;
+    if (!__iotms_usable[lookupItem("Kramco Sausage-o-Matic&trade;")] || my_path().id == PATH_LIVE_ASCEND_REPEAT) return;
 
     ChecklistEntry entry;
     entry.image_lookup_name = "__item Kramco Sausage-o-Matic&trade;";
