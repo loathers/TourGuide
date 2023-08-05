@@ -112,7 +112,7 @@ def bundle(path_to_file,path_to_folder,resulting_file = """""",imported_files = 
 
       #search for "import" here
       #order: script => notify => since => import(s)
-      new_line_stripped = new_line.lstrip().lower()
+      new_line_stripped = new_line.lstrip()
       if new_line_stripped == '':
         resulting_file += new_line + part_to_append
         continue
