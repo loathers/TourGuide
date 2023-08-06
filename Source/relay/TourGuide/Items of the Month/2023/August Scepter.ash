@@ -50,6 +50,7 @@ int mainstatAugustSkill() {
         case $stat[moxie]:
             return 23; // "Aug. 23rd: Ride the Wind Day!"
     }
+    return 12; // "return muscle if you can't "
 }
 
 // Helper function to grab the first # in the string
@@ -126,7 +127,7 @@ void IOTMAugustScepterGenerateResource(ChecklistEntry [int] resource_entries)
         // +ITEM BUFFS; food/booze/base, with 31, 16, and 7. 20/31 skills
 
         boolean manorCheck = __quest_state["Level 11 Manor"].mafia_internal_step < 3 && __quest_state["Level 11 Manor"].state_boolean["Can use fast route"];
-        string blastingAddendum = manorCheck && $item[blasting soda].available_amount() == 0 ? HTMLGenerateSpanFont("(blasting soda!)", "gray", "0.9em") : "";
+        string blastingAddendum = manorCheck && $item[blasting soda].available_amount() == 0 ? ""+HTMLGenerateSpanFont("(blasting soda!)", "gray", "0.9em") : "";
         
         // I suppose -1 fullness is always good for turnbloat?
         if (augSkillNumber == 16) usefulAugustSkills[16] = "-1 fullness, +100% food drop "+blastingAddendum;
@@ -139,33 +140,58 @@ void IOTMAugustScepterGenerateResource(ChecklistEntry [int] resource_entries)
 
         } 
 
-        // +item is always good times
+        // +item/meat is always good times
         if (augSkillNumber == 7) usefulAugustSkills[7] = "+50% item, +100% meat "+HTMLGenerateSpanFont("(30 turns)", "gray", "0.9em");
 
         // LUCKY!; 2, but important! 21/31 skills
+        if (augSkillNumber == 2) usefulAugustSkills[2] = "get Lucky!";
 
         // WAFFLES!; 24, but the best guy here. 22/31
+        if (augSkillNumber == 24) usefulAugustSkills[24] = "3 waffles, for monster replacement";
 
         // SERENDIPITY; cannot believe august 18th is the new meta 23/31
+        if (augSkillNumber == 18) usefulAugustSkills[18] = "random end-of-fight items";
 
         // FREE TOOTH MONSTER; lol what the actual heck (22) 24/31 
+        if (augSkillNumber == 22) usefulAugustSkills[22] = "free fight for teeeeeeeeeeeth";
 
         // +COM FOR NINJAS; kind of a crock but why not (6) 25/31
+        if (!__quest_state["Level 8"].state_boolean["Mountain climbed"]) {
+            if (augSkillNumber == 6) usefulAugustSkills[6] = "+10% combat "+HTMLGenerateSpanFont("(30 turns)", "gray", "0.9em");
+        }
 
         // HAND HOLDING; we still don't know exactly what this does (9) 26/31
+        if (augSkillNumber == 9) usefulAugustSkills[9] = "hold hands for a minor sniff";
 
         // LION BANISH; definitely worth calling out; NOT a killbanish (10) 27/31
+        if (augSkillNumber == 10) usefulAugustSkills[10] = "non-free reusable banishes"+HTMLGenerateSpanFont("(30 turns)", "gray", "0.9em");
 
         // OFFHAND DOUBLER; wild stuff folks (13) 28/31
+        int usefulOffhands = $item[deck of lewd playing cards].available_amount();
+        int protestorsRemaining = clampi(80 - get_property_int("zeppelinProtestors"), 0, 80);
 
-        // SAVE 1000 MEAT; barely useful only show if they're strapped (17) 29/31
+        if (usefulOffhands > 0 && protestorsRemaining > 10) {
+            // you could probably add a few other things to this, like -ML for goo or big smithsness. but eh.
+            if (augSkillNumber == 13) usefulAugustSkills[13] = "double offhand enchantments "+HTMLGenerateSpanOfClass("(sleaze for protestors)", "r_element_sleaze_desaturated");
+        }
+
+        // SAVE 1000 MEAT; barely useful, only show if they're strapped (17) 29/31
 
         // CRAZY HORSE RETURNS; just because (27) 30/31
+        string randomInRainbow = HTMLGenerateSpanOfClass("r", "r_element_hot_desaturated")+HTMLGenerateSpanOfClass("a", "r_element_stench_desaturated")+HTMLGenerateSpanOfClass("n", "r_element_sleaze_desaturated")+HTMLGenerateSpanOfClass("d", "r_element_cold_desaturated")+HTMLGenerateSpanOfClass("o", "r_element_spooky_desaturated")+HTMLGenerateSpanOfClass("m", "r_element_hot_desaturated");
+        if (augSkillNumber == 27) usefulAugustSkills[27] = "+3 "+randomInRainbow+" effects"+HTMLGenerateSpanFont("(30 turns)", "gray", "0.9em");
 
         // +10 FAM WEIGHT; this won't appear in modern standard lol (28) 31/31 
+        if (__misc_state["free runs usable"] && ($familiar[pair of stomping boots].familiar_is_usable() || ($skill[the ode to booze].skill_is_usable() && $familiar[Frumious Bandersnatch].familiar_is_usable()))) {
+            if ($item[astral pet sweater].available_amount() == 0) {
+                if (augSkillNumber == 28) usefulAugustSkills[28] = "+10 weight familiar equipment"+HTMLGenerateSpanFont("(melting)", "gray", "0.9em");
+            }
+        }
     }
 
     string [int][int] table;
+    string [int] description;
+
     table.listAppend(listMake(HTMLGenerateSpanOfClass("Day", "r_bold"), HTMLGenerateSpanOfClass("Result", "r_bold")));
 
     foreach day, reason in usefulAugustSkills {
@@ -185,7 +211,7 @@ void IOTMAugustScepterGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend(summarizeAugust);
 
     string title = "Cast "+pluralise(skillsAvailable, "August Scepter skill", "August Scepter skills");
-    
+
     resource_entries.listAppend(ChecklistEntryMake("__item August Scepter", "skillz.php", ChecklistSubentryMake(title, "", description), -1).ChecklistEntrySetIDTag("August Scepter resource"));
 
 }
