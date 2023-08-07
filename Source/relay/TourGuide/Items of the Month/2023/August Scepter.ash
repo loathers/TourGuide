@@ -50,7 +50,7 @@ static {
         __augSkillsToValue["Aug. 4th: Water Balloon Day!"] = "three water balloons";
         __augSkillsToValue["Aug. 5th: Oyster Day!"] = "some oyster eggs";
         __augSkillsToValue["Aug. 6th: Fresh Breath Day!"] = "a +com buff";
-        __augSkillsToValue["Aug. 7th: Lighthouse Day!"] = "a item/meat buff";
+        __augSkillsToValue["Aug. 7th: Lighthouse Day!"] = "an item/meat buff";
         __augSkillsToValue["Aug. 8th: Cat Day!"] = "a catfight, meow";
         __augSkillsToValue["Aug. 9th: Hand Holding Day!"] = "a foe's hand held";
         __augSkillsToValue["Aug. 10th: World Lion Day!"] = "roars like a lion";

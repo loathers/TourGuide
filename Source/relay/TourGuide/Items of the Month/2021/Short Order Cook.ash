@@ -10,6 +10,6 @@ void IOTMShortCookGenerateResource(ChecklistEntry [int] resource_entries)
     if (shartCookCharge < 11)
     {
         description.listAppend("Use the short cook to get a +10 famwt potion.");
-        resource_entries.listAppend(ChecklistEntryMake("__familiar shorter-order cook", url, ChecklistSubentryMake(shartCookCharge + "/11 Shorter-Order Cook charge", "", description), 8));
+        resource_entries.listAppend(ChecklistEntryMake("__familiar shorter-order cook", url, ChecklistSubentryMake(shartCookCharge + "/11 Shorter-Order Cook charge", subtitle, description), 8));
     }    
 }
