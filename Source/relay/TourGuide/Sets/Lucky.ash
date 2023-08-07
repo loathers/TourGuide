@@ -7,7 +7,8 @@ string [int] luckyOptions(int cloversAvailable) {
 	// Very basic protestors calculations with rough amounts for certain 
 	//   weird paths. Assumption in standard/unrestricted is 3-clover mob.
 	int protestorsRemaining = clampi(80 - get_property_int("zeppelinProtestors"), 0, 80);
-	int protestorsPerClover = 27;
+	if (__quest_state["Level 11"].mafia_internal_step < 3) protestorsRemaining = 80;
+	int protestorsPerClover = 27; // 3 clover mob
 	
 	switch (my_path()) {
 		case $path[Legacy of Loathing]:
@@ -25,7 +26,7 @@ string [int] luckyOptions(int cloversAvailable) {
 
 	// Variables needed for a-boo nonsense 
 	int aBooHauntedness = __quest_state["Level 9"].state_int["a-boo peak hauntedness"];
-    int cluesNeeded = ceil(MIN(aBooHauntedness, 90).to_float() / 30.0);
+    int cluesNeeded = ceil(MIN(aBooHauntedness, 100).to_float() / 30.0);
 	int aBooCloversNeeded = ceil(cluesNeeded/2);
 
 	// Desert ultrahydrated remaining
@@ -51,7 +52,7 @@ string [int] luckyOptions(int cloversAvailable) {
 	
 	if (!__quest_state["Level 8"].state_boolean["Past mine"] && $location[Itznotyerzitz Mine].locationAvailable()) 
 		allTheLuckyStuff.listAppend("Ore");
-	if (protestorsRemaining > 10 && protestorsPerClover > 10)
+	if (protestorsRemaining > 10 && protestorsPerClover > 15)
 		allTheLuckyStuff.listAppend("Zeppelin Mob (x"+projectedZeppClovers+")");
 		cloversAdjusted = MAX(cloversAdjusted - projectedZeppClovers, 3);
 	if (__misc_state["wand of nagamar needed"] && lettersStillNeeded > 0)
@@ -67,7 +68,7 @@ string [int] luckyOptions(int cloversAvailable) {
 	string [int] selectedOptions;
 
 	foreach key, luckyStuff in allTheLuckyStuff {
-		if (key < cloversAdjusted + 1) selectedOptions.listAppend(luckyStuff);
+		if (key < cloversAdjusted) selectedOptions.listAppend(luckyStuff);
 	}
 
 	return selectedOptions;
