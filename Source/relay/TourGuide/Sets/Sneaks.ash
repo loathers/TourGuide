@@ -86,7 +86,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
         int spikosLeft = clampi(5 - get_property_int("_spikolodonSpikeUses"), 0, 5);
         
-        final.sneakCondition = lookupItem("jurassic parka").have();
+        final.sneakCondition = __iotms_usable[$item[Jurassic Parka]];
         final.sneakCount = spikosLeft;
         final.tileDescription = `<b>{spikosLeft}x spikolodon spikes</b> left`;
         return final;

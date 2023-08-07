@@ -159,7 +159,12 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
         10:"279",
         11:"358",
         12:"449",
-        13:"553",};
+        13:"553",
+        14:"670",
+        15:"801",
+        16:"946",
+        17:"1106",
+        18:"1282",};
 
     foreach advs, drams in advDramsTable {
       // Only append it if the user hasn't yet reached that # of drams

@@ -68,6 +68,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         description.listAppend(pluraliseWordy(turns_remaining, "more turn", "more turns").capitaliseFirstLetter() + " until the boss.");
     if (turns_remaining == 0 || ltt_quest.mafia_internal_step == 5)
     {
+        string url = "inventory.php?ftext=plaintive+telegram";	
         monster boss = boss_for_quest[quest_name];
         if (boss == $monster[none])
             description.listAppend("Defeat the boss.");
@@ -126,6 +127,10 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             frigidalmatian_eligible = true;
         }
         
+        // This already existed but it was in the wrong ash file lol.
+        string image_name = "__monster " + boss;
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake("Defeat " + boss + "!", modifiers, description), -11));
+
         if (frigidalmatian_eligible)
         {
             string [int] tasks;
