@@ -259,9 +259,18 @@ void IOTMAugustScepterGenerateResource(ChecklistEntry [int] resource_entries)
 
     allSkills.listAppend(listMake(HTMLGenerateSpanOfClass("Day", "r_bold"), HTMLGenerateSpanOfClass("Gives you...", "r_bold")));
 
+
+    // Have to do this to ensure the tooltip orders appropriately
+    string [int] allAugustSkills;
+
     foreach augSkill, augSkillValue in __augSkillsToValue {
+        allAugustSkills[grabNumber(augSkill)] = augSkill;
+    }
+
+    // Now that it is correctly iterating in order, color appropriately and build the allSkill table.
+    foreach augSkillNumber, augSkill in allAugustSkills {
         string lineColor = "black";
-        int augSkillNumber = grabNumber(augSkill);
+        string augSkillValue = __augSkillsToValue[augSkill];
 
         // Color the "free" skill in blue if they're in aftercore 
         if (!__misc_state["in run"] && augSkillNumber == todaySkillInt) lineColor = "blue";
@@ -272,9 +281,9 @@ void IOTMAugustScepterGenerateResource(ChecklistEntry [int] resource_entries)
 
     // give a tip of the cap to the ol tools here
 	buffer tooltip;
-	tooltip.append(HTMLGenerateTagWrap("div", "No, TourGuide, show me ALL the skills", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+	tooltip.append(HTMLGenerateTagWrap("div", "Well, you asked for it!", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
 	tooltip.append(HTMLGenerateSimpleTableLines(allSkills));
-	string tooltipEnumerated = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "ALL the dang skills", "r_tooltip_outer_class");
+	string tooltipEnumerated = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "No, TourGuide, show me ALL the skills.", "r_tooltip_outer_class");
 	description.listAppend(tooltipEnumerated);
 
     resource_entries.listAppend(ChecklistEntryMake("__item August Scepter", "skillz.php", ChecklistSubentryMake(title, subtitle, description), -1).ChecklistEntrySetIDTag("August Scepter resource"));

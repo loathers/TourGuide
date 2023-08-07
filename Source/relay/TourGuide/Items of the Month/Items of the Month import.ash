@@ -105,7 +105,7 @@ import "relay/TourGuide/Items of the Month/2021/Miniature Crystal Ball.ash";
 import "relay/TourGuide/Items of the Month/2021/Emotion Chip.ash";
 import "relay/TourGuide/Items of the Month/2021/Potted Power Plant.ash";
 import "relay/TourGuide/Items of the Month/2021/Backup Camera.ash";
-// Missing: Shortest-Order Cook
+import "relay/TourGuide/Items of the Month/2021/Short Order Cook.ash";
 import "relay/TourGuide/Items of the Month/2021/Familiar Scrapbook.ash";
 import "relay/TourGuide/Items of the Month/2021/Underground Fireworks Shop.ash";
 // Missing: Candles
