@@ -1,5 +1,5 @@
 import "relay/TourGuide/Support/Library.ash";
-import "relay/TourGuide/Sets/Semi-rare.ash";
+import "relay/TourGuide/Sets/Lucky.ash";
 import "relay/TourGuide/Sets/Hole in the Sky.ash";
 import "relay/TourGuide/Sets/Familiars.ash";
 import "relay/TourGuide/Sets/Dispensary.ash";

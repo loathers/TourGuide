@@ -97,7 +97,10 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
                 string url = "";
                 if (my_familiar() != $familiar[gelatinous cubeling])
                     url = "familiar.php";
-				subentry.header = "Bring your gelatinous cubeling ("+gelatinousCubelingProgress+"/12)";
+
+				// Cubeling progress added to the tile
+				int progress = get_property_int("cubelingProgress");
+				subentry.header = (12 - progress).pluralise("Gelatinous Cubeling kill", "Gelatinous Cubeling kills") + " remaining";
 			
 				subentry.entries.listAppend("Acquire " + missing_items.listJoinComponents(", ", "and") + " to speed up the daily dungeon.");
                 

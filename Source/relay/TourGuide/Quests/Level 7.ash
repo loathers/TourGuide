@@ -267,7 +267,7 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 		{
             subentry.modifiers.listAppend("+850% init");
             subentry.modifiers.listAppend("-combat");
-			int zmobies_needed = ceil((evilness.to_float() - CYRPT_BOSS_EVILNESS.to_float() + 1.0) / 5.0);
+			int zmobies_needed = ceil((evilness.to_float() - CYRPT_BOSS_EVILNESS.to_float()) / 5.0); // used to be a +1 there; hope this is OK?
 			float zmobie_chance = min(100.0, 15.0 + initiative_modifier_for_location($location[the defiled alcove]) / 10.0);
 			
 			subentry.entries.listAppend(pluralise(zmobies_needed, "modern zmobie", "modern zmobies") + " needed (" + roundForOutput(zmobie_chance, 0) + "% chance of appearing)");

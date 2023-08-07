@@ -98,6 +98,8 @@ static
 	__banish_source_length["feel hatred"] = 50;
 	__banish_source_length["show your boring familiar pictures"] = 100;
 	__banish_source_length["patriotic screech"] = 100;
+	__banish_source_length["bowl a curveball"] = get_property_int("cosmicBowlingBallReturnCombats");
+	__banish_source_length["monkey slap"] = 1234567; // this, for some reason, was not properly respecting the reset condition. so imma just do this to hopefully solve it.
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;

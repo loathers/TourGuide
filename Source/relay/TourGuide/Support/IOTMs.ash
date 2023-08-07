@@ -231,7 +231,10 @@ void initialiseIOTMsUsable()
     replicaCheck("Smith's Tome"); # handled in tomes.ash
 
     // 2014
-    replicaCheck("Little Geneticist DNA-Splicing Lab");  # handled in DNA.ash; already used __iotms_usable!
+    // replicaCheck("");  # handled in DNA.ash; already used __iotms_usable!
+    // 2015
+    if (lookupItem("replica Little Geneticist DNA-Splicing Lab").available_amount() > 0)
+        __iotms_usable[$item[Little Geneticist DNA-Splicing Lab]] = true;
 
     // 2015
     if (get_property_boolean("replicaChateauAvailable"))
@@ -252,7 +255,7 @@ void initialiseIOTMsUsable()
         __iotms_usable[$item[Neverending Party invitation envelope]] = true; # handled in own tile
 
     // 2019
-    replicaCheck("Kramco Sausage-o-Matic"); # handled in own tile
+    replicaCheck("Kramco Sausage-o-Matic&trade;"); # handled in own tile
     replicaCheck("Fourth of May Cosplay Saber"); # handled in own tile & lvl 12
     replicaCheck("hewn moon-rune spoon"); # handled in own tile
 
@@ -272,6 +275,7 @@ void initialiseIOTMsUsable()
     // 2023
     replicaCheck("Cincho de Mayo"); # handled in own tile & sneaks.ash
     replicaCheck("2002 Mr. Store Catalog"); # handled in own tile
+    replicaCheck("August Scepter"); # handled in own tile
 
 }
 

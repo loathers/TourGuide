@@ -133,7 +133,7 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
         if (dudeOptions.count() > 0) options.listAppend(HTMLGenerateSpanOfClass("Dude: ", "r_bold") + dudeOptions.listJoinComponents(", ")); 
         if (beastOptions.count() > 0) options.listAppend(HTMLGenerateSpanOfClass("Beast: ", "r_bold") + beastOptions.listJoinComponents(", "));
         if (constructOptions.count() > 0) options.listAppend(HTMLGenerateSpanOfClass("Construct: ", "r_bold") + constructOptions.listJoinComponents(", "));
-        if (undeadOptions.count() > 0) options.listAppend(HTMLGenerateSpanOfClass("Construct: ", "r_bold") + undeadOptions.listJoinComponents(", "));
+        if (undeadOptions.count() > 0) options.listAppend(HTMLGenerateSpanOfClass("Undead: ", "r_bold") + undeadOptions.listJoinComponents(", "));
     }
     if (options.count() > 0)
         description.listAppend("Screech these phylums away to banish a fraction of monsters from a relevant zone:" + options.listJoinComponents("<hr>").HTMLGenerateIndentedText());

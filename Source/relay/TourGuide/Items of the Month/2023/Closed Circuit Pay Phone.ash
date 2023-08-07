@@ -113,8 +113,10 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
 
     if ($effect[Shadow Affinity].have_effect() > 0) {
         int shadowRiftFightsDoableRightNow = $effect[Shadow Affinity].have_effect();
+        int riftAdvsUntilNC = get_property_int("encountersUntilSRChoice");
         string [int] affinityDescription;
         affinityDescription.listAppend(HTMLGenerateSpanFont("Shadow Rift fights are free!", "purple"));
+        affinityDescription.listAppend(HTMLGenerateSpanFont(riftAdvsUntilNC + " encounters until NC/boss.", "black"));
         affinityDescription.listAppend(HTMLGenerateSpanFont("(don't use other free kills in there)", "black"));
         task_entries.listAppend(ChecklistEntryMake("__effect Shadow Affinity", url, ChecklistSubentryMake(shadowRiftFightsDoableRightNow + " Shadow Rift free fights", "", affinityDescription), -11));
     }
