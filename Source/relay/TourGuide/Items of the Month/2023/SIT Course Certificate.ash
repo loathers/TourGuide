@@ -42,8 +42,8 @@ void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if (lookupSkill("Psychogeologist").have_skill())    subtitle = "you have ML; consider <b>Insectology</b>, for meat?";
         if (lookupSkill("Insectologist").have_skill())      subtitle = "you have Meat; consider <b>Psychogeology</b>, for ML?";
         if (lookupSkill("Cryptobotanist").have_skill())     subtitle = "you have Init; consider <b>Insectology</b>, for meat?";
-        description.listAppend(HTMLGenerateSpanFont("You've already got one... but you could swap your S.I.T. skill to get new items!","gray"));
-        optional_task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), 3).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
+        main_title = "Could change your S.I.T. skill, for new items...";
+        optional_task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), 1).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
     } 
     else {
         // If they don't have a skill, generate a supernag.
