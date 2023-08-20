@@ -110,8 +110,6 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] constructOptions;
     if (!__quest_state["Level 11 Palindome"].state_boolean["dr. awkward's office unlocked"]) 
         constructOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Whitey's Grove (1/4)", $location[Whitey's Grove]));
-    if (!$location[The Haunted Library].locationAvailable()) 
-        constructOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Billiards Room (1/2)", $location[The Haunted Billiards Room]));
     if (!$location[The Castle in the Clouds in the Sky (Basement)].locationAvailable())
         beastOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Airship (1/7)", $location[The Penultimate Fantasy Airship]));
 
@@ -120,9 +118,9 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Library (1/3)", $location[The Haunted Library]));
     if (__quest_state["Level 11 Ron"].mafia_internal_step <= 4)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Red Zeppelin (1/5)", $location[The Red Zeppelin]));
-    if (__quest_state["Level 11 Manor"].mafia_internal_step < 3)
+    if (__quest_state["Level 11 Manor"].mafia_internal_step < 4)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Wine Cellar (1/3)", $location[The Haunted Wine Cellar]));
-    if (__quest_state["Level 11 Manor"].mafia_internal_step < 3)
+    if (__quest_state["Level 11 Manor"].mafia_internal_step < 4)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Boiler (1/3)", $location[The Haunted Boiler Room]));
     if (!__quest_state["Level 11 Pyramid"].finished)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Pyramid Middle (1/3)", $location[The Middle Chamber]));
