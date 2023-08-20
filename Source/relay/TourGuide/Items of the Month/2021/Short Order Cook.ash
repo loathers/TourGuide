@@ -3,6 +3,7 @@ RegisterResourceGenerationFunction("IOTMShortCookGenerateResource");
 void IOTMShortCookGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["in run"]) return;
+    if (!lookupFamiliar("Shorter-Order Cook").familiar_is_usable()) return;
     int shartCookCharge = get_property_int("_shortOrderCookCharge");
     string [int] description;
     string url = "familiar.php";
