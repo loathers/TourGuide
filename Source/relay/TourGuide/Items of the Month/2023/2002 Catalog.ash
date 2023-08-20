@@ -8,7 +8,11 @@ void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
 
 	string main_title = (Mr2002Credits + " 2002 Mr. Store credits");
 	string [int] description;
-	string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem=11280";
+
+    // Use the right item ID depending on if you are using a replica or a non-replica
+    string active2002ID = lookupItem("Replica 2002 Mr. Store Catalog").available_amount() > 0 ? "11280" : "11257";
+
+	string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem="+active2002ID;
 
     if (Mr2002Credits > 0) {
     description.listAppend("Spend credits on prehistoric IotMs!");
