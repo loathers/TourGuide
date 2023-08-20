@@ -38,12 +38,21 @@ void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     string [int] skillNames = {"Psychogeologist", "Insectologist", "Cryptobotanist"};
     
     if (hasAnySkillOf(skillNames)) {    
-        // If they already have a skill, generate an optional task.
+        // If they already have a skill, generate an optional task or a less-shiny supernag
         if (lookupSkill("Psychogeologist").have_skill())    subtitle = "you have ML; consider <b>Insectology</b>, for meat?";
         if (lookupSkill("Insectologist").have_skill())      subtitle = "you have Meat; consider <b>Psychogeology</b>, for ML?";
         if (lookupSkill("Cryptobotanist").have_skill())     subtitle = "you have Init; consider <b>Insectology</b>, for meat?";
-        main_title = "Could change your S.I.T. skill, for new items...";
-        optional_task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), 1).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
+        
+        if (__misc_state["in run"]) {
+            // If in-run, generate a supernag
+            description.listAppend("Try changing your S.I.T. course to accumulate different items.");
+            task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
+        } 
+        else {
+            // If not, generate an optional task
+            main_title = "Could change your S.I.T. skill, for new items...";
+            optional_task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), 1).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
+        }
     } 
     else {
         // If they don't have a skill, generate a supernag.
