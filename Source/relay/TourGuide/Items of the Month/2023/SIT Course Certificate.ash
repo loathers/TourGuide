@@ -13,6 +13,9 @@ void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     // Don't generate a tile if the user doesn't have SIT.
     if (!lookupItem("S.I.T. Course Completion Certificate").have()) return;
 
+    // Cannot use S.I.T. in G-Lover    
+    if (my_path().id == PATH_G_LOVER) return;
+
     boolean completedSITToday = get_property_boolean("_sitCourseCompleted");
 
     // Don't generate a tile if the user has completed SIT already today.
