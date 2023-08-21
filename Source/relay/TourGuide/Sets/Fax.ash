@@ -5,7 +5,8 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
     boolean can_arrow = false;
     if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])))
         can_arrow = true;
-    
+
+    if (my_path().id == PATH_G_LOVER) can_arrow = false; // cannot use arrow skills/fams in g-lover
     
     if (get_auto_attack() != 0)
     {
@@ -307,6 +308,8 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
 
 void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries)
 {
+    if (my_path().id == PATH_G_LOVER) return; // cannot use fax machine in g-lover
+
     string url = "clan_viplounge.php?action=faxmachine";
     
     if (get_auto_attack() != 0)

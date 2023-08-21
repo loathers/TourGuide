@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTMUndergroundFireworksShopGenerateTasks");
 void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__misc_state["in run"] && __misc_state["can eat just about anything"] && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean())
+	if (__misc_state["in run"] && __misc_state["can eat just about anything"] && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path().id != PATH_G_LOVER)
 	{
 		if ($effect[Ready to Eat].have_effect() > 0) 
 		{
@@ -40,7 +40,8 @@ void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries
 RegisterResourceGenerationFunction("IOTMUndergroundFireworksShopGenerateResource");
 void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!get_property_boolean("_fireworksShopEquipmentBought") && my_path().id != PATH_G_LOVER && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path() != $path[Legacy of Loathing])
+	if (my_path().id == PATH_G_LOVER) return; // none of this stuff has G in it
+	if (!get_property_boolean("_fireworksShopEquipmentBought") && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path() != $path[Legacy of Loathing])
 		{
 			string [int] description;
 			description.listAppend("Can buy one of the following (1000 meat):");
@@ -49,7 +50,7 @@ void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_
 			description.listAppend("Rocket boots: +100% initiative accessory");
 			resource_entries.listAppend(ChecklistEntryMake("__item oversized sparkler", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Explosive equipment", description), 8).ChecklistEntrySetIDTag("Clan fireworks equipment resource"));
 		}
-	if (!get_property_boolean("_fireworksShopHatBought") && my_path().id != PATH_G_LOVER && available_amount($item[Clan VIP Lounge key]) > 0 && my_path() != $path[Legacy of Loathing])
+	if (!get_property_boolean("_fireworksShopHatBought") && available_amount($item[Clan VIP Lounge key]) > 0 && my_path() != $path[Legacy of Loathing])
 		{
 			string [int] description;
 			description.listAppend("Can buy one of the following (500 meat):");

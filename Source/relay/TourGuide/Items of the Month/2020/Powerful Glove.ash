@@ -2,6 +2,7 @@ RegisterResourceGenerationFunction("IOTMPowerfulGloveGenerateResource");
 void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__iotms_usable[$item[Powerful Glove]]) return;
+    if (my_path().id == PATH_G_LOVER) return; // while you can equip the glove, you can use none of the skills lol
 
     int chargeLeft = 100 - get_property_int("_powerfulGloveBatteryPowerUsed");
 

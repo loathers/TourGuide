@@ -117,7 +117,7 @@ void IOTMSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
 		smithsnessGenerateCoalSuggestions(coal_suggestions);
 		resource_entries.listAppend(ChecklistEntryMake("__item lump of Brituminous coal", "", ChecklistSubentryMake(pluralise($item[lump of Brituminous coal]), "", coal_suggestions.listJoinComponents("<hr>")), 10).ChecklistEntrySetIDTag("Smithsness brituminous suggestions"));
 	}
-	if ($item[flaskfull of hollow].available_amount() > 0 && $effect[Merry Smithsness].have_effect() < 25 && __misc_state["in run"])
+	if ($item[flaskfull of hollow].available_amount() > 0 && $effect[Merry Smithsness].have_effect() < 25 && __misc_state["in run"] && my_path().id != PATH_G_LOVER)
 	{
 		int turns_left = $effect[Merry Smithsness].have_effect();
 		string [int] details;

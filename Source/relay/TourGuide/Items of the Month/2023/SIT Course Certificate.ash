@@ -61,4 +61,4 @@ void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
     }
 
-    }
+}

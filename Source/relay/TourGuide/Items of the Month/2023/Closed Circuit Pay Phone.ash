@@ -61,6 +61,8 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
     if (!lookupItem("closed-circuit pay phone").have())
         return;
 
+    if (my_path().id == PATH_G_LOVER) return; // cannot use payphone in g-lover
+
     string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem=11169";
     QuestState state = parseRufusQuestState();
 
@@ -144,6 +146,8 @@ void IOTMClosedCircuitPayPhoneGenerateResource(ChecklistEntry [int] resource_ent
 
     if (!lookupItem("closed-circuit pay phone").have())
         return;
+    
+    if (my_path().id == PATH_G_LOVER) return; // cannot use payphone in g-lover
 
     string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem=11169";
 

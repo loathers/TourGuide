@@ -1,6 +1,6 @@
 void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task)
 {
-	if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])) && my_path().id != PATH_LIVE_ASCEND_REPEAT)
+	if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])) && my_path().id != PATH_LIVE_ASCEND_REPEAT && my_path().id != PATH_G_LOVER)
 	{
         if (!__misc_state["in aftercore"] && !from_task)
             return;
@@ -48,7 +48,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
 	}
     
     
-    if ($familiar[Crimbo Shrub].familiar_is_usable())
+    if ($familiar[Crimbo Shrub].familiar_is_usable() && my_path().id != PATH_G_LOVER)
     {
         boolean should_output = false;
         if (__misc_state["in run"])
@@ -83,8 +83,9 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
 
 void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__misc_state["in run"])
-        return;
+    if (!__misc_state["in run"]) return;
+    if (my_path().id == PATH_G_LOVER) return; // cannot use puck (or submarine/yellow pixels) in g-lover
+
     ChecklistSubentry [int] puck_subentries;
     item yellow_pixel = $item[yellow pixel];
     string url = "";
@@ -247,7 +248,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 	{
 		int hipster_fights_available = __misc_state_int["hipster fights available"];
 			
-		if (($familiar[artistic goth kid].familiar_is_usable() || $familiar[Mini-Hipster].familiar_is_usable()) && hipster_fights_available > 0 && my_path().id != PATH_LIVE_ASCEND_REPEAT)
+		if (($familiar[artistic goth kid].familiar_is_usable() || $familiar[Mini-Hipster].familiar_is_usable()) && hipster_fights_available > 0 && my_path().id != PATH_LIVE_ASCEND_REPEAT && my_path().id != PATH_G_LOVER)
 		{
 			string name = "";
 			string [int] description;
@@ -284,7 +285,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 	
 	
-	if ($familiar[nanorhino].familiar_is_usable() && get_property_int("_nanorhinoCharge") == 100)
+	if ($familiar[nanorhino].familiar_is_usable() && get_property_int("_nanorhinoCharge") == 100 && my_path().id != PATH_G_LOVER)
 	{
 		ChecklistSubentry [int] subentries;
 		string [int] description_banish;
@@ -458,7 +459,7 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 		optional_task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "")).ChecklistEntrySetIDTag("Bring familiar reminder"));
 	}
     
-    if ($familiar[Crimbo Shrub].familiar_is_usable())
+    if ($familiar[Crimbo Shrub].familiar_is_usable() && my_path().id != PATH_G_LOVER)
     {
         boolean configured = get_property("shrubGarland") != "" || get_property("shrubGifts") != "" || get_property("shrubLights") != "" || get_property("shrubTopper") != "";
         if (my_daycount() == 1 && get_property("_shrubDecorated") == "false") //default configuration exists, but

@@ -261,7 +261,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item polka pop", "", ChecklistSubentryMake(pluralise($item[polka pop]), "10 turns", description), importance_level_item).ChecklistEntrySetIDTag("Polka pop resource"));
     }
         
-    if ($item[frost flower].available_amount() > 0 && in_run) {
+    if ($item[frost flower].available_amount() > 0 && in_run && my_path().id != PATH_G_LOVER) {
         string [int] description;
         description.listAppend("+100% item, +200% meat, +25 ML, +100% init");
         resource_entries.listAppend(ChecklistEntryMake("__item frost flower", "inventory.php?ftext=frost+flower", ChecklistSubentryMake($item[frost flower].pluralise(), "50 turns", description), importance_level_item).ChecklistEntrySetIDTag("Frost flower resource"));

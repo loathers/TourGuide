@@ -5,6 +5,8 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
 	if (my_path() == $path[Legacy of Loathing]) return;
+	if (my_path().id == PATH_G_LOVER) return; // you can technically use it to bank buffs but the buffs don't work
+
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
 	int bowlingCooldown2 = bowlingUses * 2 + 5;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
@@ -37,6 +39,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
 	if (my_path() == $path[Legacy of Loathing]) return;
+	if (my_path().id == PATH_G_LOVER) return; // not generating tiles when nothing works right
 
 	// Entries
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
