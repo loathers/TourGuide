@@ -2,6 +2,33 @@
 string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boolean [monster] blocked_monsters)
 {
     string [int] potential_faxes;
+
+    record potential_fax {
+        monster target;
+        string reason;
+        // Faxes that will be useful, but not yet for some reason (i.e. quest not started).
+        boolean unready;
+        string unready_reason;
+    };
+
+    void add_fax(potential_fax it)
+    {
+        if (blocked_monsters[it.target]) {
+            return;
+        }
+
+        string line = it.target.to_string().capitalisefirstletter() + " " + it.reason;
+        if (it.unready)
+        {
+            if (it.unready_reason != "")
+            {
+                line += " (" + it.unready_reason + ")";
+            }
+            line = HTMLGenerateSpanFont(line, "gray");
+        }
+        potential_faxes.listAppend(line);
+    }
+
     boolean can_arrow = false;
     if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])))
         can_arrow = true;
@@ -22,11 +49,11 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
             //It's time for a g-g-g-ghost! zoinks!
             if (!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
             {
-                string line = "Ghost - only if you can copy it.";
+                string line = "- only if you can copy it.";
                 if (can_arrow)
                     line += " (arrow?)";
                 line += "|*5 white pixels drop per ghost, speeds up digital key. Run +150% item.";
-                potential_faxes.listAppend(line);
+                add_fax(new potential_fax($monster[ghost], line));
             }
         }
         //sleepy mariachi
@@ -49,8 +76,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                     fax += "Makes hatrack into superfairy";
                 fax += ".";
                 
-                fax = "sleepy mariachi" + HTMLGenerateIndentedText(fax);
-                potential_faxes.listAppend(fax);
+                add_fax(new potential_fax($monster[sleepy mariachi], HTMLGenerateIndentedText(fax)));
             }
         }
         
@@ -75,34 +101,30 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                 if ($familiar[obtuse angel].familiar_is_usable() && $familiar[reanimated reanimator].familiar_is_usable())
                     fax += "<br>Make sure to copy with angel, not the reanimator.";
                 
-            
-                fax = "ninja snowman assassin" + HTMLGenerateIndentedText(fax);
-                potential_faxes.listAppend(fax);
+                add_fax(new potential_fax($monster[ninja snowman assassin], HTMLGenerateIndentedText(fax)));
             }
         }
         
         int missing_ore = MAX(0, 3 - __quest_state["Level 8"].state_string["ore needed"].to_item().available_amount());
         if (!__quest_state["Level 8"].state_boolean["Past mine"] && missing_ore > 0)// && !$skill[unaccompanied miner].skill_is_usable())
         {
-            string fax = "";			
-            fax += ChecklistGenerateModifierSpan("+150% item or ideally YR");
-            fax += "Mining ores. Try to copy a few times.";
+            string line = "";
+            line += ChecklistGenerateModifierSpan("+150% item or ideally YR");
+            line += "Mining ores. Try to copy a few times.";
             if (__misc_state_string["obtuse angel name"] != "")
             {
                 string arrow_text = " (arrow?)";
                 if (get_property_int("_badlyRomanticArrows") > 0)
                     arrow_text = HTMLGenerateSpanFont(arrow_text, "gray");
-                fax += arrow_text;
+                line += arrow_text;
             }
-        
-            fax = "mountain man" + HTMLGenerateIndentedText(fax);
-            potential_faxes.listAppend(fax);
+            add_fax(new potential_fax($monster[mountain man], HTMLGenerateIndentedText(line)));
         }
         
         
         if (!(__quest_state["Level 12"].finished || __quest_state["Level 12"].state_boolean["Lighthouse Finished"] || $item[barrel of gunpowder].available_amount() == 5))
         {
-            string line = "Lobsterfrogman (lighthouse quest";
+            string line = "(lighthouse quest";
             if ($item[barrel of gunpowder].available_amount() < 4)
             {
                     line += "; copy";
@@ -110,7 +132,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                     line += "/arrow";
             }
             line += ")";
-            potential_faxes.listAppend(line);
+            add_fax(new potential_fax($monster[Lobsterfrogman], line));
         }
         
         //orcish frat boy spy / war hippy
@@ -124,12 +146,16 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
             //Suggest kge, miner, baabaaburan:
             if (!dispensary_available() && !have_outfit_components("Knob Goblin Elite Guard Uniform"))
             {
-                potential_faxes.listAppend("Knob Goblin Elite Guard Captain - ???");
+                add_fax(new potential_fax($monster[Knob Goblin Elite Guard Captain], "- ???"));
             }
             if (!__quest_state["Level 8"].state_boolean["Past mine"] && !have_outfit_components("Mining Gear") && __misc_state["can equip just about any weapon"])
-                potential_faxes.listAppend("7-Foot Dwarf Foreman - Mining gear for level 8 quest. Need YR or +234% items.");
+            {
+                add_fax(new potential_fax($monster[7-Foot Dwarf Foreman], "- Mining gear for level 8 quest. Need YR or +234% items."));
+            }
             if (!locationAvailable($location[the hidden park]) && $item[stone wool].available_amount() < ($item[the nostril of the serpent].available_amount() == 0 && !get_property_ascension("lastTempleButtonsUnlock") ? 2 : 1))
-                potential_faxes.listAppend("Baa'baa'bu'ran - Stone wool for hidden city unlock. Need +100% items (or as much as you can get for extra wool)");
+            {
+                add_fax(new potential_fax($monster[Baa'baa'bu'ran], "- Stone wool for hidden city unlock. Need +100% items (or as much as you can get for extra wool)"));
+            }
         }
         
         /*if (to_item("7301").available_amount() == 0 && get_property("questM20Necklace") != "finished" && $item[Lady Spookyraven's necklace].available_amount() == 0)
@@ -139,20 +165,20 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                 effective_writing_desks_encountering += get_property_int("_romanticFightsLeft");
             if (effective_writing_desks_encountering < 5)
             {
-                string line = "Writing desk - <strong>only if you can copy it four times</strong>. Skips the manor's first floor if you fight five total.";
+                string line = "- <strong>only if you can copy it four times</strong>. Skips the manor's first floor if you fight five total.";
                 
                 if ($item[telegram from Lady Spookyraven].available_amount() > 0)
                     line += HTMLGenerateSpanFont("<br>Read the telegram from Lady Spookyraven first.", "red");
-                potential_faxes.listAppend(line);
+                add_fax(new potential_fax($monster[Writing desk], line));
             }
         }*/
         
         if (!__misc_state["can reasonably reach -25% combat"] && in_hardcore() && $item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path().id != PATH_BUGBEAR_INVASION)))
         {
-            string line = "Bram the Stoker - drops a -5% combat accessory.";
+            string line = "- drops a -5% combat accessory.";
             if (my_basestat($stat[mysticality]) < 50)
                 line += " (requires 50 myst)";
-            potential_faxes.listAppend(line);
+            add_fax(new potential_fax($monster[Bram the Stoker], line));
         }
         
         if (!in_hardcore() && $item[richard's star key].available_amount() + $item[richard's star key].creatable_amount() == 0 && !__quest_state["Level 13"].state_boolean["Richard's star key used"] && !($item[star].available_amount() >= 8 && $item[line].available_amount() >= 7))
@@ -160,7 +186,7 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
             string copy_type = "arrow";
             if (my_path().id == PATH_HEAVY_RAINS) //arrows mean washaway in flooded areas
                 copy_type = "copy";
-            potential_faxes.listAppend("Skinflute - +234% item, fight 4 times (" + copy_type + ") to skip HITS with pulls.");
+            add_fax(new potential_fax($monster[skinflute], "- +234% item, fight 4 times (" + copy_type + ") to skip HITS with pulls."));
         }
         
         if (suggest_less_powerful_faxes)
@@ -168,30 +194,31 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
             //giant swarm of ghuol whelps
             if (__quest_state["Level 7"].state_boolean["cranny needs speed tricks"] && !blocked_monsters[$monster[giant swarm of ghuol whelps]])
             {
-                string line = "Giant swarm of ghuol whelps - +ML - with a copy possibly";
+                potential_fax fax = new potential_fax($monster[giant swarm of ghuol whelps], "- +ML - with a copy possibly");
                 if (!__quest_state["Level 7"].started)
                 {
-                    line = HTMLGenerateSpanFont(line + " (wait until quest started)", "gray");
+                    fax.unready = true;
+                    fax.unready_reason = "wait until quest started";
                 }
-                potential_faxes.listAppend(line);
+                add_fax(fax);
             }
             //modern zmobie
             if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"] && !blocked_monsters[$monster[modern zmobie]])
             {
-                string line = "Modern zmobie - with copies/arrows";
+                potential_fax fax = new potential_fax($monster[modern zmobie], "- +ML - with a copy possibly");
                 if (!__quest_state["Level 7"].started)
                 {
-                    line = HTMLGenerateSpanFont(line + " (wait until quest started)", "gray");
+                    fax.unready = true;
+                    fax.unready_reason = "wait until quest started";
                 }
-                
-                potential_faxes.listAppend(line);
+                add_fax(fax);
             }
             //gaudy pirate (use for insults!) (now obsolete)
             /*if (!__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2 && my_path().id != PATH_G_LOVER && __quest_state["Pirate Quest"].state_boolean["valid"])
             {
-                string description = "Gaudy pirate - two fights for talisman o' nam. (copy once)";
+                string description = "- two fights for talisman o' nam. (copy once)";
                 if ($items[snakehead charrrm,gaudy key].available_amount() == 1)
-                    description = "Gaudy pirate - one fight for talisman o' nam.";
+                    description = "- one fight for talisman o' nam.";
                 if (__quest_state["Pirate Quest"].mafia_internal_step < 6 && __quest_state["Pirate Quest"].state_int["insult count"] < 8)
                 {
                     string l = "Pirate insult them!";
@@ -200,40 +227,42 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                     
                     description += HTMLGenerateIndentedText(l);
                 }
-                potential_faxes.listAppend(description);
+                add_fax(new potential_fax($monster[gaudy pirate], description));
             }*/
             
             //screambat for sonar replacement
             if ((3 - __quest_state["Level 4"].state_int["areas unlocked"]) > $item[sonar-in-a-biscuit].available_amount())
             {
-                string description = "Screambat - unlocks a single bat lair area";
+                potential_fax fax = new potential_fax($monster[screambat], "- unlocks a single bat lair area");
                 if (!__quest_state["Level 4"].in_progress)
-                    description = HTMLGenerateSpanFont(description, "gray");
-                potential_faxes.listAppend(description);
+                {
+                    fax.unready = true;
+                    fax.unready_reason = "quest not started";
+                }
+                add_fax(fax);
             }
             //drunken half-orc hobo (smiths)
             if (in_hardcore() && $skill[summon smithsness].skill_is_usable() && $items[dirty hobo gloves,hand in glove].available_amount() == 0 && false) //umm... I don't think this matters anymore
             {
-                string hobo_name = "Drunken half-orc hobo";
+                monster hobo = $monster[drunken half-orc hobo];
                 if (my_ascensions() % 2 == 1)
-                    hobo_name = "Hung-over half-orc hobo";
-                potential_faxes.listAppend(hobo_name + " - run +234% item to make +ML smithness accessory.");
+                {
+                    hobo = $monster[hung-over half-orc hobo];
+                }
+                add_fax(new potential_fax(hobo, "- run +234% item to make +ML smithness accessory."));
             }
             //nuns bandit for trickery
             /*if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
             {
-                string description = "Dirty thieving brigand - nuns trick.";
+                string description = "- nuns trick.";
                 if (!__quest_state["Level 12"].state_boolean["War started"])
                     description = HTMLGenerateSpanFont(description, "gray");
-                potential_faxes.listAppend(description);
+                add_fax(new potential_fax($monster[dirty thieving brigand], description));
             }*/
             //monstrous boiler
             if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && $item[wine bomb].available_amount() == 0)
             {
-                string description = "Monstrous boiler - charge up unstable fulminate.";
-                if ($item[unstable fulminate].available_amount() == 0)
-                    description = HTMLGenerateSpanFont(description, "gray");
-                potential_faxes.listAppend(description);
+                add_fax(new potential_fax($monster[monstrous boiler], "- charge up unstable fulminate.", $item[unstable fulminate].available_amount() == 0));
             }
             if (true) //not sure about this
             {
@@ -261,12 +290,12 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
             //blur
             if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && $item[drum machine].available_amount() == 0 && !__quest_state["Level 11 Desert"].state_boolean["Wormridden"] && in_hardcore())
             {
-                potential_faxes.listAppend("Blur - +234% item " + (item_drop_modifier() >= 234 ? "(have) " : "(don't have) ") + "for drum machine for possible desert exploration route.");
+                add_fax(new potential_fax($monster[blur], "- +234% item " + (item_drop_modifier() >= 234 ? "(have) " : "(don't have) ") + "for drum machine for possible desert exploration route."));
             }
             
             if (in_hardcore() && knoll_available() && __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"] && $item[forest tears].available_amount() == 0)
             {
-                potential_faxes.listAppend("forest spirit - +234% item - forest tears can meatsmith into a muculent machete for dense liana" + (($familiar[intergnat].familiar_is_usable() && my_level() <= 11) ? " (or use intergnat summon)" : ""));
+                add_fax(new potential_fax($monster[forest spirit], "- +234% item - forest tears can meatsmith into a muculent machete for dense liana" + (($familiar[intergnat].familiar_is_usable() && my_level() <= 11) ? " (or use intergnat summon)" : "")));
             }
             //green ops
             //baa'baa'bu'ran
@@ -293,8 +322,8 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
     {
         //aftercore:
         //potential_faxes.listAppend("Adventurer Echo - event chroner");
-        potential_faxes.listAppend("Clod Hopper (YR/+item) - floaty sand");
-        potential_faxes.listAppend("Swarm of fudgewasps - fudge");
+        add_fax(new potential_fax($monster[Clod Hopper], "(YR/+item) - floaty sand"));
+        add_fax(new potential_fax($monster[swarm of fudgewasps], "- fudge"));
     }
     
     return potential_faxes;
