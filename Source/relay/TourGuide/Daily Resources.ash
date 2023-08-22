@@ -329,7 +329,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
 
     //Not sure how I feel about this. It's kind of extraneous?
-    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path().id != PATH_NUCLEAR_AUTUMN) {
+    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_G_LOVER) {
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
         description.listAppend("+" + (percentage == 25 ? "35% or +25" : percentage) + "% to all attributes. (10 turns)");

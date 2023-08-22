@@ -2,6 +2,7 @@ RegisterTaskGenerationFunction("IOTMMaySaberPartyGenerateTasks");
 void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (!__iotms_usable[$item[Fourth of May Cosplay Saber]]) return;
+    if (my_path().id == PATH_G_LOVER) return; // cannot use saber in g-lover
 
     if (get_property_int("_saberMod") == 0) {
         string [int] options;
@@ -37,7 +38,8 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!__iotms_usable[$item[Fourth of May Cosplay Saber]])
 		return;
 
-        
+    if (my_path().id == PATH_G_LOVER) return; // cannot use saber in g-lover
+
     int sabersEquipped = lookupItem("Fourth of May Cosplay Saber").equipped_amount() + lookupItem("replica Fourth of May Cosplay Saber").equipped_amount();
 
     int uses_remaining = clampi(5 - get_property_int("_saberForceUses"), 0, 5);

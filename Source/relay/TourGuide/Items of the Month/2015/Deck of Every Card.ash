@@ -35,6 +35,8 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (!mafiaIsPastRevision(16018))
         return;
+
+    if (my_path().id == PATH_G_LOVER) return; // cannot use in glover
     
     int card_summons_left = clampi(15 - get_property_int("_deckCardsDrawn"), 0, 15);
     

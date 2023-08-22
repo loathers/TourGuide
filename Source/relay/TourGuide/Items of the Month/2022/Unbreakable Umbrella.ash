@@ -2,7 +2,8 @@
 RegisterResourceGenerationFunction("IOTMUnbreakableUmbrellaGenerateResource");
 void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    item unbrella = lookupItem("unbreakable umbrella");
+    if (my_path().id == PATH_G_LOVER) return; // no umbrella in glover
+	item unbrella = lookupItem("unbreakable umbrella");
     if (!unbrella.have()) return;
     if (!__misc_state["in run"] && $item[unbreakable umbrella].equipped_amount() == 0) return; 
     string url;

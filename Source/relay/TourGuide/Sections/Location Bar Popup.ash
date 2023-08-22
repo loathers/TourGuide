@@ -220,12 +220,16 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             float effective_drop_rate = adjusted_base_drop_rate;
             float item_modifier = l.item_drop_modifier_for_location();
             Error error;
-            if (it.fullness > 0 || (__items_that_craft_food contains it))
+            // if (it.fullness > 0 || (__items_that_craft_food contains it)) // Switching to use mixable/cookable
+            if (it.fullness > 0 || it.cookable)
             {
-                item_modifier += numeric_modifier("Food Drop");
-                item_drop_modifiers_to_display.listAppend("+food");
+                // need exception for chateau de vinegar; booze drop only impacts it
+                if (it != $item[bottle of chateau de vinegar]) {
+                    item_modifier += numeric_modifier("Food Drop");
+                    item_drop_modifiers_to_display.listAppend("+food");   
+                }
             }
-            if (it.inebriety > 0)
+            if (it.inebriety > 0 || it.mixable || it == $item[bottle of chateau de vinegar])
             {
                 item_modifier += numeric_modifier("Booze Drop");
                 item_drop_modifiers_to_display.listAppend("+booze");

@@ -188,8 +188,6 @@ void IOTMAugustScepterGenerateResource(ChecklistEntry [int] resource_entries)
         // WAFFLES!; 24, but the best guy here. 22/31
         if (augSkillNumber == 24) usefulAugustSkills[24] = "3 waffles, for monster replacement";
 
-        // SERENDIPITY; cannot believe august 18th is the new meta 23/31
-        if (augSkillNumber == 18) usefulAugustSkills[18] = "random end-of-fight items";
 
         // FREE TOOTH MONSTER; lol what the actual heck (22) 24/31 
         if (augSkillNumber == 22) usefulAugustSkills[22] = "free fight for teeeeeeeeeeeth";

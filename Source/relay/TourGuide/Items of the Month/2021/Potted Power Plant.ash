@@ -4,6 +4,11 @@ void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 {
   if (!lookupItem("potted power plant").have())
     return;
+  
+  // cannot use plant batteries in g-lover. if the user is at d7 of g-lover they probably
+  //   should pick them but i don't want to enable this tile only if it's >d7.
+  if (my_path().id == PATH_G_LOVER) return; 
+
   // Title
   string [int] description;
   string batteriesToHarvest = (get_property("_pottedPowerPlant"));
