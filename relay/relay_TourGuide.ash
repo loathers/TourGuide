@@ -25753,7 +25753,7 @@ void QHitsGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
 
 void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, boolean from_task)
 {
-	if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])) && my_path().id != PATH_LIVE_ASCEND_REPEAT)
+	if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])) && my_path().id != PATH_LIVE_ASCEND_REPEAT && my_path().id != PATH_G_LOVER)
 	{
         if (!__misc_state["in aftercore"] && !from_task)
             return;
@@ -25801,7 +25801,7 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
 	}
     
     
-    if ($familiar[Crimbo Shrub].familiar_is_usable())
+    if ($familiar[Crimbo Shrub].familiar_is_usable() && my_path().id != PATH_G_LOVER)
     {
         boolean should_output = false;
         if (__misc_state["in run"])
@@ -25836,8 +25836,9 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
 
 void SFamiliarsPuckGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__misc_state["in run"])
-        return;
+    if (!__misc_state["in run"]) return;
+    if (my_path().id == PATH_G_LOVER) return; // cannot use puck (or submarine/yellow pixels) in g-lover
+
     ChecklistSubentry [int] puck_subentries;
     item yellow_pixel = $item[yellow pixel];
     string url = "";
@@ -26000,7 +26001,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 	{
 		int hipster_fights_available = __misc_state_int["hipster fights available"];
 			
-		if (($familiar[artistic goth kid].familiar_is_usable() || $familiar[Mini-Hipster].familiar_is_usable()) && hipster_fights_available > 0 && my_path().id != PATH_LIVE_ASCEND_REPEAT)
+		if (($familiar[artistic goth kid].familiar_is_usable() || $familiar[Mini-Hipster].familiar_is_usable()) && hipster_fights_available > 0 && my_path().id != PATH_LIVE_ASCEND_REPEAT && my_path().id != PATH_G_LOVER)
 		{
 			string name = "";
 			string [int] description;
@@ -26037,7 +26038,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 	
 	
-	if ($familiar[nanorhino].familiar_is_usable() && get_property_int("_nanorhinoCharge") == 100)
+	if ($familiar[nanorhino].familiar_is_usable() && get_property_int("_nanorhinoCharge") == 100 && my_path().id != PATH_G_LOVER)
 	{
 		ChecklistSubentry [int] subentries;
 		string [int] description_banish;
@@ -26211,7 +26212,7 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 		optional_task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "")).ChecklistEntrySetIDTag("Bring familiar reminder"));
 	}
     
-    if ($familiar[Crimbo Shrub].familiar_is_usable())
+    if ($familiar[Crimbo Shrub].familiar_is_usable() && my_path().id != PATH_G_LOVER)
     {
         boolean configured = get_property("shrubGarland") != "" || get_property("shrubGifts") != "" || get_property("shrubLights") != "" || get_property("shrubTopper") != "";
         if (my_daycount() == 1 && get_property("_shrubDecorated") == "false") //default configuration exists, but
@@ -26839,7 +26840,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item polka pop", "", ChecklistSubentryMake(pluralise($item[polka pop]), "10 turns", description), importance_level_item).ChecklistEntrySetIDTag("Polka pop resource"));
     }
         
-    if ($item[frost flower].available_amount() > 0 && in_run) {
+    if ($item[frost flower].available_amount() > 0 && in_run && my_path().id != PATH_G_LOVER) {
         string [int] description;
         description.listAppend("+100% item, +200% meat, +25 ML, +100% init");
         resource_entries.listAppend(ChecklistEntryMake("__item frost flower", "inventory.php?ftext=frost+flower", ChecklistSubentryMake($item[frost flower].pluralise(), "50 turns", description), importance_level_item).ChecklistEntrySetIDTag("Frost flower resource"));
@@ -29452,7 +29453,8 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
     boolean can_arrow = false;
     if (get_property_int("_badlyRomanticArrows") == 0 && (familiar_is_usable($familiar[obtuse angel]) || familiar_is_usable($familiar[reanimated reanimator])))
         can_arrow = true;
-    
+
+    if (my_path().id == PATH_G_LOVER) can_arrow = false; // cannot use arrow skills/fams in g-lover
     
     if (get_auto_attack() != 0)
     {
@@ -29754,6 +29756,8 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes)
 
 void SFaxGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries)
 {
+    if (my_path().id == PATH_G_LOVER) return; // cannot use fax machine in g-lover
+
     string url = "clan_viplounge.php?action=faxmachine";
     
     if (get_auto_attack() != 0)
@@ -37373,7 +37377,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
 
     //Not sure how I feel about this. It's kind of extraneous?
-    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path().id != PATH_NUCLEAR_AUTUMN) {
+    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_G_LOVER) {
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
         description.listAppend("+" + (percentage == 25 ? "35% or +25" : percentage) + "% to all attributes. (10 turns)");
@@ -40577,12 +40581,16 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
             float effective_drop_rate = adjusted_base_drop_rate;
             float item_modifier = l.item_drop_modifier_for_location();
             Error error;
-            if (it.fullness > 0 || (__items_that_craft_food contains it))
+            // if (it.fullness > 0 || (__items_that_craft_food contains it)) // Switching to use mixable/cookable
+            if (it.fullness > 0 || it.cookable)
             {
-                item_modifier += numeric_modifier("Food Drop");
-                item_drop_modifiers_to_display.listAppend("+food");
+                // need exception for chateau de vinegar; booze drop only impacts it
+                if (it != $item[bottle of chateau de vinegar]) {
+                    item_modifier += numeric_modifier("Food Drop");
+                    item_drop_modifiers_to_display.listAppend("+food");   
+                }
             }
-            if (it.inebriety > 0)
+            if (it.inebriety > 0 || it.mixable || it == $item[bottle of chateau de vinegar])
             {
                 item_modifier += numeric_modifier("Booze Drop");
                 item_drop_modifiers_to_display.listAppend("+booze");
@@ -43219,7 +43227,7 @@ void IOTMSmithsnessGenerateResource(ChecklistEntry [int] resource_entries)
 		smithsnessGenerateCoalSuggestions(coal_suggestions);
 		resource_entries.listAppend(ChecklistEntryMake("__item lump of Brituminous coal", "", ChecklistSubentryMake(pluralise($item[lump of Brituminous coal]), "", coal_suggestions.listJoinComponents("<hr>")), 10).ChecklistEntrySetIDTag("Smithsness brituminous suggestions"));
 	}
-	if ($item[flaskfull of hollow].available_amount() > 0 && $effect[Merry Smithsness].have_effect() < 25 && __misc_state["in run"])
+	if ($item[flaskfull of hollow].available_amount() > 0 && $effect[Merry Smithsness].have_effect() < 25 && __misc_state["in run"] && my_path().id != PATH_G_LOVER)
 	{
 		int turns_left = $effect[Merry Smithsness].have_effect();
 		string [int] details;
@@ -45787,6 +45795,8 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
     
     if (!mafiaIsPastRevision(16018))
         return;
+
+    if (my_path().id == PATH_G_LOVER) return; // cannot use in glover
     
     int card_summons_left = clampi(15 - get_property_int("_deckCardsDrawn"), 0, 15);
     
@@ -50071,6 +50081,7 @@ RegisterTaskGenerationFunction("IOTMMaySaberPartyGenerateTasks");
 void IOTMMaySaberPartyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (!__iotms_usable[$item[Fourth of May Cosplay Saber]]) return;
+    if (my_path().id == PATH_G_LOVER) return; // cannot use saber in g-lover
 
     if (get_property_int("_saberMod") == 0) {
         string [int] options;
@@ -50106,7 +50117,8 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!__iotms_usable[$item[Fourth of May Cosplay Saber]])
 		return;
 
-        
+    if (my_path().id == PATH_G_LOVER) return; // cannot use saber in g-lover
+
     int sabersEquipped = lookupItem("Fourth of May Cosplay Saber").equipped_amount() + lookupItem("replica Fourth of May Cosplay Saber").equipped_amount();
 
     int uses_remaining = clampi(5 - get_property_int("_saberForceUses"), 0, 5);
@@ -50148,7 +50160,7 @@ void IOTMRuneSpoonGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	item spoon = lookupItem("hewn moon-rune spoon");
 	if (!__iotms_usable[lookupItem("hewn moon-rune spoon")] && spoon.closet_amount() == 0 || my_sign().to_lower_case() == "bad moon") return;
-
+    if (my_path().id == PATH_G_LOVER) return; // glover does not get spoon tuning
     
     // Use the right item ID depending on if you are using a replica or a non-replica
     string activeSpoonID = lookupItem("replica hewn moon-rune spoon").available_amount() > 0 ? "11242" : "10254";
@@ -51188,6 +51200,7 @@ RegisterResourceGenerationFunction("IOTMPowerfulGloveGenerateResource");
 void IOTMPowerfulGloveGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__iotms_usable[$item[Powerful Glove]]) return;
+    if (my_path().id == PATH_G_LOVER) return; // while you can equip the glove, you can use none of the skills lol
 
     int chargeLeft = 100 - get_property_int("_powerfulGloveBatteryPowerUsed");
 
@@ -52066,6 +52079,11 @@ void IOTMPowerPlantGenerateResource(ChecklistEntry [int] resource_entries)
 {
   if (!lookupItem("potted power plant").have())
     return;
+  
+  // cannot use plant batteries in g-lover. if the user is at d7 of g-lover they probably
+  //   should pick them but i don't want to enable this tile only if it's >d7.
+  if (my_path().id == PATH_G_LOVER) return; 
+
   // Title
   string [int] description;
   string batteriesToHarvest = (get_property("_pottedPowerPlant"));
@@ -52151,6 +52169,9 @@ RegisterResourceGenerationFunction("IOTMShortCookGenerateResource");
 void IOTMShortCookGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["in run"]) return;
+    if (!lookupFamiliar("Shorter-Order Cook").familiar_is_usable()) return;
+    if (my_path().id == PATH_G_LOVER) return; // no cook in glover
+    
     int shartCookCharge = get_property_int("_shortOrderCookCharge");
     string [int] description;
     string url = "familiar.php";
@@ -52195,7 +52216,7 @@ void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries
 RegisterTaskGenerationFunction("IOTMUndergroundFireworksShopGenerateTasks");
 void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__misc_state["in run"] && __misc_state["can eat just about anything"] && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean())
+	if (__misc_state["in run"] && __misc_state["can eat just about anything"] && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path().id != PATH_G_LOVER)
 	{
 		if ($effect[Ready to Eat].have_effect() > 0) 
 		{
@@ -52233,7 +52254,8 @@ void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries
 RegisterResourceGenerationFunction("IOTMUndergroundFireworksShopGenerateResource");
 void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!get_property_boolean("_fireworksShopEquipmentBought") && my_path().id != PATH_G_LOVER && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path() != $path[Legacy of Loathing])
+	if (my_path().id == PATH_G_LOVER) return; // none of this stuff has G in it
+	if (!get_property_boolean("_fireworksShopEquipmentBought") && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path() != $path[Legacy of Loathing])
 		{
 			string [int] description;
 			description.listAppend("Can buy one of the following (1000 meat):");
@@ -52242,7 +52264,7 @@ void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_
 			description.listAppend("Rocket boots: +100% initiative accessory");
 			resource_entries.listAppend(ChecklistEntryMake("__item oversized sparkler", "clan_viplounge.php?action=fwshop&whichfloor=2", ChecklistSubentryMake("Explosive equipment", description), 8).ChecklistEntrySetIDTag("Clan fireworks equipment resource"));
 		}
-	if (!get_property_boolean("_fireworksShopHatBought") && my_path().id != PATH_G_LOVER && available_amount($item[Clan VIP Lounge key]) > 0 && my_path() != $path[Legacy of Loathing])
+	if (!get_property_boolean("_fireworksShopHatBought") && available_amount($item[Clan VIP Lounge key]) > 0 && my_path() != $path[Legacy of Loathing])
 		{
 			string [int] description;
 			description.listAppend("Can buy one of the following (500 meat):");
@@ -52775,6 +52797,8 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
 	if (my_path() == $path[Legacy of Loathing]) return;
+	if (my_path().id == PATH_G_LOVER) return; // you can technically use it to bank buffs but the buffs don't work
+
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
 	int bowlingCooldown2 = bowlingUses * 2 + 5;
 	int bowlingCooldown = get_property_int("cosmicBowlingBallReturnCombats");
@@ -52807,6 +52831,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 	if (!get_property_boolean("hasCosmicBowlingBall") == true)
 		return;
 	if (my_path() == $path[Legacy of Loathing]) return;
+	if (my_path().id == PATH_G_LOVER) return; // not generating tiles when nothing works right
 
 	// Entries
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
@@ -53064,7 +53089,8 @@ void IOTMGreyGooseGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterResourceGenerationFunction("IOTMUnbreakableUmbrellaGenerateResource");
 void IOTMUnbreakableUmbrellaGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    item unbrella = lookupItem("unbreakable umbrella");
+    if (my_path().id == PATH_G_LOVER) return; // no umbrella in glover
+	item unbrella = lookupItem("unbreakable umbrella");
     if (!unbrella.have()) return;
     if (!__misc_state["in run"] && $item[unbreakable umbrella].equipped_amount() == 0) return; 
     string url;
@@ -53473,6 +53499,7 @@ void IOTMJurassicParkaGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__iotms_usable[$item[Jurassic Parka]]) return;
     if (!__misc_state["in run"]) return; 
+	if (my_path().id == PATH_G_LOVER) return; // cannot use parka in g-lover
 
     string url;
 	string parkaMode = get_property("parkaMode");
@@ -53509,9 +53536,11 @@ void IOTMJurassicParkaGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTMAutumnatonGenerateTasks");
 void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	#if (!__misc_state["in run"]) return; 
-	if (!get_property_boolean("hasAutumnaton")) return;
-	if (my_path() == $path[Legacy of Loathing]) return;
+	# if (!__misc_state["in run"]) return; // Turned off because TES likes this tile to appear in aftercore
+	if (!get_property_boolean("hasAutumnaton")) return; // Don't show if they don't actually have Fall-E
+	if (my_path() == $path[Legacy of Loathing]) return; // Cannot use fall-e in LoL
+    if (my_path().id == PATH_G_LOVER) return; // Cannot use fall-e in G-Lover 
+
 	int autobotsToday = get_property_int("_autumnatonQuests");
 	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");
 	
@@ -54005,29 +54034,23 @@ boolean hasAnySkillOf(string [int] skillNames) {
     return false;
 }
 
-// Prompt to register which SIT course you took
 RegisterTaskGenerationFunction("IOTMSITCertificateGenerateTasks");
 void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-    if (!lookupItem("S.I.T. Course Completion Certificate").have())
-        return;
+    // Don't generate a tile if the user doesn't have SIT.
+    if (!lookupItem("S.I.T. Course Completion Certificate").have()) return;
+
+    // Cannot use S.I.T. in G-Lover    
+    if (my_path().id == PATH_G_LOVER) return;
 
     boolean completedSITToday = get_property_boolean("_sitCourseCompleted");
 
-    // Nag if we haven't picked a skill during this ascension. Adding a daycount
-    //   piece to the nag that ensures this shows up on D2, prompting users to
-    //   change out their skill on D2. Not prompting on D3 or later, because
-    //   there's really only two good ones.
-    string [int] skillNames = {"Psychogeologist", "Insectologist", "Cryptobotanist"};
-    if (hasAnySkillOf(skillNames) && my_daycount() >= 3) {
-        return;
-    }
-
-    // Don't generate a tile if the user has completed SIT already today
+    // Don't generate a tile if the user has completed SIT already today.
     if (completedSITToday) return;
 
     string [int] description;
     string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem=11116";
-    string main_title = "S.I.T. Course Enrollment";
+    string main_title = "S.I.T. Course Enrollment";    
+    string subtitle = "";
 
     string [int] miscPhrases = {
         "Don't play hooky!",
@@ -54035,23 +54058,36 @@ void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         "This one time in college...",
         "Bright college days, oh, carefree days that fly.", // <3 tom lehrer
         "No child of mine is leaving here without a degree!",
-        "Make like a tree and leaf (through your papers)",
+        "Make like a tree and leaf (through your papers).",
     };
 
-    string miscPhrase = miscPhrases[random(count(miscPhrases))];
-    description.listAppend(HTMLGenerateSpanFont(miscPhrase + " Take your S.I.T. course!", "red"));
-
-    string subtitle = "";
-
-    if (hasAnySkillOf(skillNames)) {
+    string [int] skillNames = {"Psychogeologist", "Insectologist", "Cryptobotanist"};
+    
+    if (hasAnySkillOf(skillNames)) {    
+        // If they already have a skill, generate an optional task or a less-shiny supernag
         if (lookupSkill("Psychogeologist").have_skill())    subtitle = "you have ML; consider <b>Insectology</b>, for meat?";
         if (lookupSkill("Insectologist").have_skill())      subtitle = "you have Meat; consider <b>Psychogeology</b>, for ML?";
         if (lookupSkill("Cryptobotanist").have_skill())     subtitle = "you have Init; consider <b>Insectology</b>, for meat?";
+        
+        if (__misc_state["in run"]) {
+            // If in-run, generate a supernag
+            description.listAppend("Try changing your S.I.T. course to accumulate different items.");
+            task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
+        } 
+        else {
+            // If not, generate an optional task
+            main_title = "Could change your S.I.T. skill, for new items...";
+            optional_task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), 1).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
+        }
+    } 
+    else {
+        // If they don't have a skill, generate a supernag.
+        string miscPhrase = miscPhrases[random(count(miscPhrases))];
+        description.listAppend(HTMLGenerateSpanFont(miscPhrase + " Take your S.I.T. course!", "red"));
+        task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
     }
 
-    task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
 }
-
 QuestState parseRufusQuestState() {
     /*
     Below description from Veracity's PR introducing Rufus quest tracking:
@@ -54114,6 +54150,8 @@ RegisterTaskGenerationFunction("IOTMClosedCircuitPayPhoneGenerateTasks");
 void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
     if (!lookupItem("closed-circuit pay phone").have())
         return;
+
+    if (my_path().id == PATH_G_LOVER) return; // cannot use payphone in g-lover
 
     string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem=11169";
     QuestState state = parseRufusQuestState();
@@ -54198,6 +54236,8 @@ void IOTMClosedCircuitPayPhoneGenerateResource(ChecklistEntry [int] resource_ent
 
     if (!lookupItem("closed-circuit pay phone").have())
         return;
+    
+    if (my_path().id == PATH_G_LOVER) return; // cannot use payphone in g-lover
 
     string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem=11169";
 
@@ -54619,7 +54659,11 @@ void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
 
 	string main_title = (Mr2002Credits + " 2002 Mr. Store credits");
 	string [int] description;
-	string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem=11280";
+
+    // Use the right item ID depending on if you are using a replica or a non-replica
+    string active2002ID = lookupItem("Replica 2002 Mr. Store Catalog").available_amount() > 0 ? "11280" : "11257";
+
+	string url = "inv_use.php?pwd=" + my_hash() + "&which=3&whichitem="+active2002ID;
 
     if (Mr2002Credits > 0) {
     description.listAppend("Spend credits on prehistoric IotMs!");
@@ -54842,8 +54886,6 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] constructOptions;
     if (!__quest_state["Level 11 Palindome"].state_boolean["dr. awkward's office unlocked"]) 
         constructOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Whitey's Grove (1/4)", $location[Whitey's Grove]));
-    if (!$location[The Haunted Library].locationAvailable()) 
-        constructOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Billiards Room (1/2)", $location[The Haunted Billiards Room]));
     if (!$location[The Castle in the Clouds in the Sky (Basement)].locationAvailable())
         beastOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Airship (1/7)", $location[The Penultimate Fantasy Airship]));
 
@@ -54852,9 +54894,9 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Library (1/3)", $location[The Haunted Library]));
     if (__quest_state["Level 11 Ron"].mafia_internal_step <= 4)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Red Zeppelin (1/5)", $location[The Red Zeppelin]));
-    if (__quest_state["Level 11 Manor"].mafia_internal_step < 3)
+    if (__quest_state["Level 11 Manor"].mafia_internal_step < 4)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Wine Cellar (1/3)", $location[The Haunted Wine Cellar]));
-    if (__quest_state["Level 11 Manor"].mafia_internal_step < 3)
+    if (__quest_state["Level 11 Manor"].mafia_internal_step < 4)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Haunted Boiler (1/3)", $location[The Haunted Boiler Room]));
     if (!__quest_state["Level 11 Pyramid"].finished)
         undeadOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Pyramid Middle (1/3)", $location[The Middle Chamber]));
@@ -55062,8 +55104,6 @@ void IOTMAugustScepterGenerateResource(ChecklistEntry [int] resource_entries)
         // WAFFLES!; 24, but the best guy here. 22/31
         if (augSkillNumber == 24) usefulAugustSkills[24] = "3 waffles, for monster replacement";
 
-        // SERENDIPITY; cannot believe august 18th is the new meta 23/31
-        if (augSkillNumber == 18) usefulAugustSkills[18] = "random end-of-fight items";
 
         // FREE TOOTH MONSTER; lol what the actual heck (22) 24/31 
         if (augSkillNumber == 22) usefulAugustSkills[22] = "free fight for teeeeeeeeeeeth";
@@ -56078,7 +56118,7 @@ void PathAvatarOfWestOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, 
     class_points[$class[Snake Oiler]] += get_property_int("awolPointsSnakeoiler");
     
     item [class] tale_for_class;
-    tale_for_class[$class[Cow Puncher]] = $item[Tales of the West: \ Cow Punching];
+    tale_for_class[$class[Cow Puncher]] = $item[Tales of the West: Cow Punching];
     tale_for_class[$class[Beanslinger]] = $item[Tales of the West: Beanslinging];
     tale_for_class[$class[Snake Oiler]] = $item[Tales of the West: Snake Oiling];
     
