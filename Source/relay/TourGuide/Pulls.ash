@@ -30,7 +30,18 @@ int pullable_amount(item it, int maximum_total_wanted)
 		amount = maximum_total_wanted - it.available_amount();
 	}
 	
-	if (amount < 0) amount = 0;
+    // Code by MadCarew to limit your pull # to just 1, not > 1.
+    if (in_ronin() && amount > 0 )
+	{
+        // Hooray for removing already-pulled stuff!
+	    string ronin_storage_pulls = get_property("_roninStoragePulls");
+	    string[int] already_pulled = split_string(ronin_storage_pulls);
+	    int requested_item = it.to_int();
+        
+        // Using the one-line if statement logic because I like it slightly better for this.
+	    amount = already_pulled contains requested_item ? 0 : 1;
+	}
+
 	return min(__misc_state_int["pulls available"], amount);
 }
 
@@ -84,6 +95,36 @@ void listAppend(GPItem [int] list, GPItem entry)
 	list[position] = entry;
 }
 
+// PULLS NOT YET ENUMERATED:
+//   - book of matches
+//   - star key stuff (star chart, greasy desk bell, star pops)
+//   - mick's inhaler
+//   - enchanted bean
+//   - tangle of rat tails
+//   - surgeon gear
+//   - sonar-in-a-biscuit
+//   - clusterbombs
+//   - disposable instant camera
+//   - bowling ball
+//   - dice gear
+//   - eleven-leaf clover
+//   - patent invisibility
+//   - PYEC, if they have a wand
+//   - batteries (car/lantern/9-volt)
+//   - glitch season reward name
+//   - guilty sprout
+//   - blueberry/bran muffin
+//   - mafia thumb ring
+//   - breathitin
+//   - carnivorous potted plant
+//   - extrovermectin
+//   - mafia middle finger ring
+//   - claw of the infernal seal (if SC)
+//   - 4-d camera
+//   - homebodyl
+//   - teacher's pen OR grey down vest
+//   - repaid diaper, in unrestricted
+
 void generatePullList(Checklist [int] checklists)
 {
     //Needs improvement.
@@ -107,6 +148,7 @@ void generatePullList(Checklist [int] checklists)
     
     if (my_path().id == PATH_COMMUNITY_SERVICE)
     	pullable_item_list.listAppend(GPItemMake($item[pocket wish], "Saves turns on everything in Community Service.", 20));
+
     if (__misc_state["need to level"])
     {
         if (my_primestat() == $stat[muscle])
@@ -221,8 +263,11 @@ void generatePullList(Checklist [int] checklists)
 	
 	if (my_primestat() == $stat[mysticality] && my_path().id != PATH_HEAVY_RAINS) //should we only suggest this for mysticality classes?
 		pullable_item_list.listAppend(GPItemMake($item[Jarlsberg's Pan], "?", 1)); //"
+
 	pullable_item_list.listAppend(GPItemMake($item[loathing legion knife], "?", 1));
+
 	pullable_item_list.listAppend(GPItemMake($item[greatest american pants], "navel runaways|others", 1));
+
 	if ($item[juju mojo mask].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[juju mojo mask], "?", 1));
     if (__misc_state["free runs usable"])
@@ -286,13 +331,19 @@ void generatePullList(Checklist [int] checklists)
 	boolean have_super_fairy = false;
 	if ((familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0) || (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0))
 		have_super_fairy = true;
-	if (!have_super_fairy && my_path().id != PATH_HEAVY_RAINS && false)
-	{
-		if (familiar_is_usable($familiar[fancypants scarecrow]))
-			pullable_item_list.listAppend(GPItemMake($item[spangly mariachi pants], "2x fairy on fancypants scarecrow", 1));
-		else if (familiar_is_usable($familiar[mad hatrack]))
-			pullable_item_list.listAppend(GPItemMake($item[spangly sombrero], "2x fairy on mad hatrack", 1));
-	}
+    
+    // This never showed up because it had an added false in the condition. I am commenting it out
+    //   because I don't think anyone in unrestricted would ever want to do this?
+	
+    // if (!have_super_fairy && my_path().id != PATH_HEAVY_RAINS)
+	// {
+	// 	if (familiar_is_usable($familiar[fancypants scarecrow]))
+	// 		pullable_item_list.listAppend(GPItemMake($item[spangly mariachi pants], "2x fairy on fancypants scarecrow", 1));
+	// 	else if (familiar_is_usable($familiar[mad hatrack]))
+	// 		pullable_item_list.listAppend(GPItemMake($item[spangly sombrero], "2x fairy on mad hatrack", 1));
+	// }
+
+    // These all suck now lol
 	//pullable_item_list.listAppend(GPItemMake($item[jewel-eyed wizard hat], "a wizard is you!", 1));
 	//pullable_item_list.listAppend(GPItemMake($item[origami riding crop], "+5 stats/fight, but only if the monster dies quickly", 1)); //not useful?
 	//pullable_item_list.listAppend(GPItemMake($item[plastic pumpkin bucket], "don't know", 1)); //not useful?
@@ -306,7 +357,7 @@ void generatePullList(Checklist [int] checklists)
 	{
         string [int] food_selections;
         
-        if (__misc_state_int["fat loot tokens needed"] > 0)
+        if (__misc_state_int["fat loot tokens needed"] > 0 && my_path() != $path[A Shrunken Adventurer am I])
         {
             string [int] which_pies;
             if ($items[boris's key,boris's key lime pie].available_amount() == 0 && $item[boris's key lime pie].item_is_usable())
@@ -323,24 +374,30 @@ void generatePullList(Checklist [int] checklists)
                 line += "s";
             food_selections.listAppend(line);
         }
-        if (availableFullness() >= 5)
+        if (availableFullness() >= 5 && my_path() != $path[A Shrunken Adventurer am I])
         {
             if (my_level() >= 13 && my_path().id != PATH_G_LOVER)
                 food_selections.listAppend("hi meins");
             else if ($item[moon pie].is_unrestricted() && $item[moon pie].item_is_usable())
                 food_selections.listAppend("moon pies");
-            
             if ($item[fleetwood mac 'n' cheese].item_is_usable())
 	            food_selections.listAppend("fleetwood mac 'n' cheese" + (my_level() < 8 ? " (level 8)" : ""));
             if ($item[karma shawarma].is_unrestricted() && $item[karma shawarma].item_is_usable())
                 food_selections.listAppend("karma shawarma? (expensive" + (my_level() < 7 ? ", level 7" : "") + ")");
-            //FIXME maybe the new pasta?
         }
+        
+        // adding the legendary cookbookbat foods
+        if ($item[Deep Dish of Legend].item_is_usable() && storage_amount($item[Deep Dish of Legend]) > 0)
+	        food_selections.listAppend("Deep Dish of Legend" + (my_level() < 5 ? " (level 5)" : ""));
+        if ($item[Calzone of Legend].item_is_usable() && storage_amount($item[Calzone of Legend]) > 0)
+	        food_selections.listAppend("Calzone of Legend" + (my_level() < 5 ? " (level 5)" : ""));
+        if ($item[Pizza of Legend].item_is_usable() && storage_amount($item[Pizza of Legend]) > 0)
+	        food_selections.listAppend("Pizza of Legend" + (my_level() < 5 ? " (level 5)" : ""));
         
         string description;
         if (food_selections.count() > 0)
             description = food_selections.listJoinComponents(", ") + ", etc.";
-		pullable_item_list.listAppend(GPItemMake("Food", "hell ramen", description));
+		pullable_item_list.listAppend(GPItemMake("Food", "Deep Dish of Legend", description));
 	}
 	if (__misc_state["can drink just about anything"] && availableDrunkenness() >= 0 && inebriety_limit() >= 5)
 	{
@@ -452,21 +509,6 @@ void generatePullList(Checklist [int] checklists)
         }
     }
     
-    //alas, now obsolete
-    /*if (($item[talisman o' namsilat].available_amount() == 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && !have_outfit_components("Swashbuckling Getup") && $item[pirate fledges].available_amount() == 0 && !__quest_state["Pirate Quest"].finished)
-    {
-        item [int] missing_outfit_components = missing_outfit_components("Swashbuckling Getup");
-        if (missing_outfit_components.count() > 0)
-        {
-            string entry = missing_outfit_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
-            if ($item[eyepatch].available_amount() == 0)
-                entry += "|Or NPZR head/clockwork pirate skull to untinker for eyepatch/clockwork maid.";
-            if (!__quest_state["Pirate Quest"].state_boolean["valid"])
-            	entry += "|No, really! You can get a free bridge!";
-            pullable_item_list.listAppend(GPItemMake("Swashbuckling Getup", "__item " + missing_outfit_components[0], entry));
-        }
-    }*/
-    
     //FIXME suggest machetito?
     //FIXME suggest super marginal stuff in SCO or S&S
     //Ideas: Goat cheese, keepsake box, √spooky-gro fertilizer, harem outfit, perfume, rusty hedge trimmers, bowling ball, surgeon gear, tomb ratchets or tangles, all the other pies
@@ -515,18 +557,20 @@ void generatePullList(Checklist [int] checklists)
 	}
 	if (scrip_needed > 0 && my_path().id != PATH_COMMUNITY_SERVICE && my_path().id != PATH_EXPLOSIONS)
 	{
-		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each.|" + scrip_reasons.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", scrip_needed));
+		pullable_item_list.listAppend(GPItemMake($item[Shore Inc. Ship Trip Scrip], "Saves three turns each. (One per day?)|" + scrip_reasons.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", scrip_needed));
 	}
     //FIXME add hat/stuffing fluffer/blank-out
     if (availableSpleen() >= 2 && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_G_LOVER && my_path().id != PATH_COMMUNITY_SERVICE)
     {
 		pullable_item_list.listAppend(GPItemMake($item[turkey blaster], "Burns five turns of delay in last adventured area. Costs spleen, limited uses/day.", MIN(3 - get_property_int("_turkeyBlastersUsed"), MIN(availableSpleen() / 2, 3)))); //FIXME learn what this limit is. also suggest in advance?
     }
-    if (__quest_state["Level 7"].state_boolean["alcove needs speed tricks"]) //only area that realistically could use it
+
+    if (__quest_state["Level 7"].in_progress) // this used to be an unreasonable pull but is actually pretty good now 
     {
-        pullable_item_list.listAppend(GPItemMake($item[gravy boat], "Wear to save two turns in the cyrpt.")); //marginal, especially since you're pulling a bunch of turkey blasters, but...
+        pullable_item_list.listAppend(GPItemMake($item[gravy boat], "Wear to save 3-4 turns in the cyrpt.")); 
         
     }
+
     if (!__quest_state["Level 12"].finished && __quest_state["Level 12"].state_int["frat boys left on battlefield"] >= 936 && __quest_state["Level 12"].state_int["hippies left on battlefield"] >= 936)
     {
         pullable_item_list.listAppend(GPItemMake($item[stuffing fluffer], "Saves eight turns if you use two at the start of fighting in the war.", 2));
@@ -541,6 +585,7 @@ void generatePullList(Checklist [int] checklists)
         if (!__quest_state["Level 11 Desert"].state_boolean["Black Paint Given"] && my_path().id == PATH_NUCLEAR_AUTUMN)
             pullable_item_list.listAppend(GPItemMake($item[can of black paint], "15% desert exploration.", 1));
     }
+
     if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
     {
         item [int] missing_freebird_components = items_missing( __misc_state["Torso aware"] ? $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches,lynyrd musk] : $items[lynyrdskin cap,lynyrdskin breeches,lynyrd musk] );
@@ -563,51 +608,40 @@ void generatePullList(Checklist [int] checklists)
         
     }
     
-    if (__misc_state["need to level"] && __misc_state["Chateau Mantegna available"] && __misc_state_int["free rests remaining"] > 0 && false)
-    {
-        //This is not currently suggested because I'm not sure if it's worth it for anyone but unrestricted or the very high end speed ascension.
-        //It seems to give about as much stats as a good clover, which you can also pull, and are much cheaper.
-        //Unrestricted has up to 17 free rests. That's around 680 extra stats, which is fairly good. But leveling isn't as much of a problem either... or is it?
-        item dis_item = $item[none];
-        if (my_primestat() == $stat[muscle])
-            dis_item = $item[baobab sap];
-        else if (my_primestat() == $stat[mysticality])
-            dis_item = $item[desktop zen garden];
-        else if (my_primestat() == $stat[moxie])
-            dis_item = $item[Marvin's marvelous pill];
-        int ideal_extra_stats_worth = 20 * (__misc_state_int["free rests remaining"] + total_free_rests());
-        if (dis_item != $item[none] && dis_item.to_effect().have_effect() == 0)
-            pullable_item_list.listAppend(GPItemMake(dis_item, "+20% mainstat gain.|Use with Chateau resting; at the end of the day, rest with this potion active to gain extra stats.<br>Then rest again after rollover.<br>Worth up to " + ideal_extra_stats_worth + " " + my_primestat() + ".", 1));
-        
-    }
+    // Ezan had some cruft here for pulling XP% things for chateau rest improved stats. I removed it because it 
+    //   didn't even show and isn't relevant to unrestricted anymore, high or low end. Sorry Ezan.
+
     if ($item[Mr. Cheeng's spectacles] != $item[none])
         pullable_item_list.listAppend(GPItemMake($item[Mr. Cheeng's spectacles], "+15% item, +30% spell damage, acquire random potions in-combat.|Not particularly optimal, but fun."));
+
     if (availableSpleen() > 0 && $item[stench jelly].item_is_usable() && my_path().id != PATH_LIVE_ASCEND_REPEAT)
 	    pullable_item_list.listAppend(GPItemMake($item[stench jelly], "Skips ahead to an NC, saves 2.5? turns each.", 20));
      
     if ($item[pocket wish].item_is_usable())
 	    pullable_item_list.listAppend(GPItemMake($item[pocket wish], "Saves turns?", 20));   
     
-    //int pills_pullable = clampi(20 - (get_property_int("_powerPillUses") + $item[power pill].available_amount()), 0, 20);
     int pills_pullable = clampi(20 - get_property_int("_powerPillUses"), 0, 20);
+
     if (pills_pullable > 0 && ($familiar[ms. puck man].have_familiar() || $familiar[puck man].have_familiar()))
     {
         pullable_item_list.listAppend(GPItemMake($item[power pill], "Saves one turn each.", pills_pullable));
     }
-    if (my_meat() < 1000)
-        pullable_item_list.listAppend(GPItemMake($item[1\,970 carat gold], "Autosells for 19700 meat.|Not optimal in the slightest.", 1));
-	if ($skill[ancestral recall].have_skill() && my_adventures() < 10)
+    
+    // Commenting out the volcano gold and instead suggesting gold wedding ring or facsimilie dictionary as permastandard options
+    if (my_meat() < 5000)
+        item meatyItem = $item[gold wedding ring];
+        if (storage_amount($item[facsimile dictionary]) > 0) {
+            meatyItem = $item[facsimile dictionary];
+        }
+        pullable_item_list.listAppend(GPItemMake(meatyItem, "Autosells for "+autosell_price(meatyItem)+" meat.|Likely non-optimal.", 1));
+	
+    if ($skill[ancestral recall].have_skill() && my_adventures() < 10)
     {
         int casts = get_property_int("_ancestralRecallCasts");
         if (casts < 10)
             pullable_item_list.listAppend(GPItemMake($item[blue mana], "+3 adventures each.|Probably a bad idea.", clampi(10 - casts, 0, 10)));
     }
-    // Turning off because these are now useless.
     
-    // if (my_path().id == PATH_GELATINOUS_NOOB || my_path().id == PATH_NUCLEAR_AUTUMN)
-    // {
-    //     pullable_item_list.listAppend(GPItemMake($item[filthy lucre], "Turn into odor extractors for olfaction.", 6));
-    // }
     if (my_path().id != PATH_SLOW_AND_STEADY)
     {
     	//unify these... later...
