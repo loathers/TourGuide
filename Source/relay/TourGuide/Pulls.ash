@@ -95,59 +95,124 @@ void listAppend(GPItem [int] list, GPItem entry)
 	list[position] = entry;
 }
 
-// PULLS NOT YET ENUMERATED:
-//   - book of matches
-//   - star key stuff (star chart, greasy desk bell, star pops)
-//   - mick's inhaler
-//   - enchanted bean
-//   - tangle of rat tails
-//   - surgeon gear
-//   - sonar-in-a-biscuit
-//   - clusterbombs
-//   - disposable instant camera
-//   - bowling ball
-//   - dice gear
-//   - eleven-leaf clover
-//   - patent invisibility
-//   - PYEC, if they have a wand
-//   - batteries (car/lantern/9-volt)
-//   - glitch season reward name
-//   - guilty sprout
-//   - blueberry/bran muffin
-//   - mafia thumb ring
-//   - breathitin
-//   - carnivorous potted plant
-//   - extrovermectin
-//   - mafia middle finger ring
-//   - claw of the infernal seal (if SC)
-//   - 4-d camera
-//   - homebodyl
-//   - teacher's pen OR grey down vest
-//   - repaid diaper, in unrestricted
 
 void generatePullList(Checklist [int] checklists)
 {
-    //Needs improvement.
+    // Start out pull list generation with some general bookkeeping
 	ChecklistEntry [int] pulls_entries;
 	
+    // Return in the event that the user has no pulls available
 	int pulls_available = __misc_state_int["pulls available"];
 	if (pulls_available <= 0)
 		return;
 	if (pulls_available > 0)
 		pulls_entries.listAppend(ChecklistEntryMake("special subheader", "", ChecklistSubentryMake(pluralise(pulls_available, "pull", "pulls") + " remaining")).ChecklistEntrySetIDTag("Pulls special subheader"));
 	
+    // Establish your base lists & variables
 	item [int] pullable_list_item;
 	int [int] pullable_list_max_wanted;
 	string [int] pullable_list_reason;
-	
 	GPItem [int] pullable_item_list;
-    
     boolean combat_items_usable = true;
+
+    // Set a single path-related variable
     if (my_path().id == PATH_POCKET_FAMILIARS)
     	combat_items_usable = false;
+
+
+    // =====================================================================
+    // ------ SECTION #1: 3+ TURNS -----------------------------------------
+    // =====================================================================
     
-    if (my_path().id == PATH_COMMUNITY_SERVICE)
-    	pullable_item_list.listAppend(GPItemMake($item[pocket wish], "Saves turns on everything in Community Service.", 20));
+    // Pulls in this category are highly valuable turnsave pulls that can 
+    //   either bypass certain quests entirely or save entire chunks of 
+    //   quests. Everything here is stupid valuable.
+
+    //   - 3+ turns: star key stuff (star chart, greasy desk bell, star pops)
+    //   - 3+ turns: PYEC, if they have a wand
+    //   - 3+ turns: batteries (car/lantern/9-volt); assuming in standard you use the buff well + get 1-2 bombs out of each
+    //   - 3+ turns: breathitin
+    //   - 3+ turns: carnivorous potted plant
+    //   - 3+ turns: extrovermectin
+    //   - 3+ turns: homebodyl (if no cookbookbat)
+    //   - 3+ turns: repaid diaper, in unrestricted
+
+    // Rain-Doh & Spooky Putty; 5 copies is roughly 3+ turns in value, even without going in delay.
+	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0 && $item[can of rain-doh].item_is_usable())
+		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
+	if ($items[empty rain-doh can,can of rain-doh,spooky putty monster].available_amount() == 0 && $item[spooky putty sheet].item_is_usable())
+		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
+
+    // This is a catch-all for familiar weight pulls, which are only useful if the user can use boots/bander
+    if (!__misc_state["familiars temporarily blocked"] && $familiar[pair of stomping boots].is_unrestricted() && __misc_state["free runs usable"] && __misc_state["free runs available"]) {
+
+        // Sort of a pain, but if they have it, it's a nice +4 runs...
+        if ($item[snow suit].item_is_usable()) pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while, +4 free runs", 1));
+    }
+
+
+    // =====================================================================
+    // ------ SECTION #2: 1-2 TURNS ----------------------------------------
+    // =====================================================================
+    
+    // Not as valuable as the section #1 pulls, but better than average. In
+    //   general, these pulls should be considered above quest misses and 
+    //   are less related to explicit in-run findings.
+    
+    //   - 1-2 turn: eleven-leaf clover
+    //   - 1-2 turn: mick's inhaler
+    //   - 1-2 turn: milestone
+    //   - 1-2 turn: patent invisibility
+    //   - 1-2 turn: mafia middle finger ring
+    //   - 1-2 turn: claw of the infernal seal (if SC)
+    //   - 1-2 turn: 4-d camera
+    //   - 1-2 turn: teacher's pen OR grey down vest
+    //   - 1-2 turn: shadow brick
+    //   - 1-2 turn: groveling gravel
+
+    if ($item[v for vivala mask].item_is_usable()) pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "1 free banish per day", 1));
+
+    // =====================================================================
+    // ------ SECTION #3: QUEST MISSES -------------------------------------
+    // =====================================================================
+    
+    // Most pulls in here can be (relatively) painlessly routed into your 
+    //   run. However, if you don't have them, they're good pulls, just not
+    //   universally valuable like the 1/2 tier pulls. A few of these end
+    //   up being better than pulls above if you miss them, too.
+
+    //   - QUEST MISS: book of matches
+    //   - QUEST MISS: enchanted bean
+    //   - QUEST MISS: tangle of rat tails
+    //   - QUEST MISS: surgeon gear
+    //   - QUEST MISS: sonar-in-a-biscuit
+    //   - QUEST MISS: clusterbombs
+    //   - QUEST MISS: disposable instant camera
+    //   - QUEST MISS: bowling ball
+    
+    if (__quest_state["Level 10"].mafia_internal_step >= 8)
+    {
+    	if (__quest_state["Level 10"].mafia_internal_step == 8 && $item[amulet of extreme plot significance].available_amount() == 0)
+        {
+        	pullable_item_list.listAppend(GPItemMake($item[amulet of extreme plot significance], "Speeds up castle basement.", 1));
+        }
+        if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0 && (!lookupSkill("Comprehensive Cartography").skill_is_usable() || $item[model airship].available_amount() == 0))
+        {
+            pullable_item_list.listAppend(GPItemMake($item[mohawk wig], "Speeds up top floor of castle.", 1));
+        }
+    }
+
+    // =====================================================================
+    // ------ SECTION #4: LEVELING -----------------------------------------
+    // =====================================================================
+    
+    // Pulls in this category aren't really measured by turn-value; they're
+    //   measured by how many stats they give the user. Ergo, in cases where
+    //   it's possible, try to include the # of expected stats in the desc
+
+    //   - LEVELING: glitch season reward name
+    //   - LEVELING guilty sprout
+    //   - LEVELING/TURNBLOAT: blueberry/bran muffin
 
     if (__misc_state["need to level"])
     {
@@ -181,88 +246,142 @@ void generatePullList(Checklist [int] checklists)
             if (my_path().id == PATH_THE_SOURCE)
                 pullable_item_list.listAppend(GPItemMake($item[wal-mart overalls], "+4 mainstat/fight"));
         }
+
+        int vampingStats = MIN(500, 4 * my_basestat(my_primestat())) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
+        pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Gain"+vampingStats+" mainstat, once/day; costs a turn!", 1));
     }
-	
-	//IOTMs:
-	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0 && $item[can of rain-doh].item_is_usable())
-		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
-	if ($items[empty rain-doh can,can of rain-doh,spooky putty monster].available_amount() == 0 && $item[spooky putty sheet].item_is_usable())
-		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
-    if (true)
-    {
-        string line = "So many things!";
-        if ($item[over-the-shoulder folder holder].storage_amount() > 0 && $item[over-the-shoulder folder holder].item_is_usable())
-        {
-            string [int] description;
-            string [item] folder_descriptions;
-            
-            folder_descriptions[$item[folder (red)]] = "+20 muscle";
-            folder_descriptions[$item[folder (blue)]] = "+20 myst";
-            folder_descriptions[$item[folder (green)]] = "+20 moxie";
-            folder_descriptions[$item[folder (magenta)]] = "+15 muscle +15 myst";
-            folder_descriptions[$item[folder (cyan)]] = "+15 myst +15 moxie";
-            folder_descriptions[$item[folder (yellow)]] = "+15 muscle +15 moxie";
-            folder_descriptions[$item[folder (smiley face)]] = "+2 muscle stat/fight";
-            folder_descriptions[$item[folder (wizard)]] = "+2 myst stat/fight";
-            folder_descriptions[$item[folder (space skeleton)]] = "+2 moxie stat/fight";
-            folder_descriptions[$item[folder (D-Team)]] = "+1 stat/fight";
-            folder_descriptions[$item[folder (Ex-Files)]] = "+5% combat";
-            folder_descriptions[$item[folder (skull and crossbones)]] = "-5% combat";
-            folder_descriptions[$item[folder (Knight Writer)]] = "+40% init";
-            folder_descriptions[$item[folder (Jackass Plumber)]] = "+25 ML";
-            folder_descriptions[$item[folder (holographic fractal)]] = "+4 all res";
-            folder_descriptions[$item[folder (barbarian)]] = "stinging damage";
-            folder_descriptions[$item[folder (rainbow unicorn)]] = "prismatic stinging damage";
-            folder_descriptions[$item[folder (Seawolf)]] = "-pressure penalty";
-            folder_descriptions[$item[folder (dancing dolphins)]] = "+50% item (underwater)";
-            folder_descriptions[$item[folder (catfish)]] = "+15 familiar weight (underwater)";
-            folder_descriptions[$item[folder (tranquil landscape)]] = "15 DR / 15 HP & MP regen";
-            folder_descriptions[$item[folder (owl)]] = "+500% item (dreadsylvania)";
-            folder_descriptions[$item[folder (Stinky Trash Kid)]] = "passive stench damage";
-            folder_descriptions[$item[folder (sports car)]] = "+5 adv";
-            folder_descriptions[$item[folder (sportsballs)]] = "+5 PVP fights";
-            folder_descriptions[$item[folder (heavy metal)]] = "+5 familiar weight";
-            folder_descriptions[$item[folder (Yedi)]] = "+50% spell damage";
-            folder_descriptions[$item[folder (KOLHS)]] = "+50% item (KOLHS)";
-            
-            foreach s in $slots[folder1,folder2,folder3]
-            {
-                item folder = s.equipped_item();
-                if (folder == $item[none]) continue;
-                
-                if (folder_descriptions contains folder)
-                    description.listAppend(folder_descriptions[folder]);
-            }
-            if (description.count() > 0)
-                line = description.listJoinComponents(" / ");
-        }
-        pullable_item_list.listAppend(GPItemMake($item[over-the-shoulder folder holder], line, 1));
-    }
+
     
-	pullable_item_list.listAppend(GPItemMake($item[pantsgiving], "5x banish/day|+2 stats/fight|+15% items|2 extra fullness (realistically)", 1));
-    if (!__misc_state["familiars temporarily blocked"] && $item[snow suit].item_is_usable()) //relevant in heavy rains, on the +item/+meat underwater familiars
-        pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while" + (($familiar[pair of stomping boots].is_unrestricted() && __misc_state["free runs usable"]) ? ", +4 free runs" : "") + "|+10% item|spleen items", 1));
-    if (!__misc_state["familiars temporarily blocked"] && ($item[protonic accelerator pack].available_amount() == 0 || $familiar[machine elf].familiar_is_usable())) //if you have a machine elf, it might be worth pulling a bjorn with a protonic pack anyways
-    {
-        if ($item[Buddy Bjorn].storage_amount() > 0)
-            pullable_item_list.listAppend(GPItemMake($item[Buddy Bjorn], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
-        else if ($item[buddy bjorn].available_amount() == 0)
-            pullable_item_list.listAppend(GPItemMake($item[crown of thrones], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
+    // =====================================================================
+    // ------ SECTION #5: PATH-SPECIFIC ------------------------------------
+    // =====================================================================
+    
+    // Pulls in this category are path-specific pulls that are useful in a 
+    //   particular challenge path context and not particularly useful in
+    //   other situations. 
+
+    if (my_path().id == PATH_COMMUNITY_SERVICE)
+    	pullable_item_list.listAppend(GPItemMake($item[pocket wish], "Saves turns on everything in Community Service.", 20));
+
+    if (my_path().id == PATH_AVATAR_OF_BORIS) {
+        if ($item[boris's helm].item_is_usable()) pullable_item_list.listAppend(GPItemMake($item[boris's helm], "+15ML/+5 familiar weight/+init/+mp regeneration/+weapon damage", 1));
     }
-    if ($item[boris's helm].item_is_usable())
-	    pullable_item_list.listAppend(GPItemMake($item[boris's helm], "+15ML/+5 familiar weight/+init/+mp regeneration/+weapon damage", 1));
-    if (__misc_state["need to level"])
-    {
-        pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Large stat gain, once/day.", 1));
-	if ($item[operation patriot shield].item_is_usable())
-            pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "+america", 1));
-        pullable_item_list.listAppend(GPItemMake($item[the crown of ed the undying], "Various in-run modifiers. (init, HP, ML/item/meat/etc)", 1));
+
+    if (my_path().id == PATH_AVATAR_OF_JARLSBERG) {
+        pullable_item_list.listAppend(GPItemMake($item[Jarlsberg's Pan], "Cook up some cool Jarlsberg potions!", 1));
     }
-    if ($item[v for vivala mask].item_is_usable())
-        pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "?", 1));
 	
-	if (my_primestat() == $stat[mysticality] && my_path().id != PATH_HEAVY_RAINS) //should we only suggest this for mysticality classes?
-		pullable_item_list.listAppend(GPItemMake($item[Jarlsberg's Pan], "?", 1)); //"
+    // =====================================================================
+    // ------ SECTION #6: TURNBLOAT ----------------------------------------
+    // =====================================================================
+    
+    // Pulls in this category are only really worth it if they help you make
+    //   daycount. You probably ignore it in most unrestricted contexts, but 
+    //   instead of flat ignoring it I think you just throw these at the
+    //   absolute bottom of the list.
+    
+    // PANTSGIVING: banishes aren't really turnsaving anymore, you'd only pull it for unrestricted bloat.
+    pullable_item_list.listAppend(GPItemMake($item[pantsgiving], "5x non-free banishes|+2 stats/fight|+15% items|2 extra fullness (realistically)", 1));
+    
+    
+    // =====================================================================
+    // ------ SECTION #7: MARGINAL GRAVEYARD -------------------------------
+    // =====================================================================
+    
+    // Pulls in this category are pretty bad. Most of them are leftover from 
+    //   old metas where the were mildly useful. Commenting them out... for
+    //   now, mostly because there's possibly some future use case I'm not 
+    //   seeing and it's largely good stuff to at least remember that we 
+    //   once considered a good pull.
+    
+    // At best, folder holder represents a minor leveling boost and +/- combat. Better than red shoe, but not dramatically...
+    // if (true)
+    // {
+    //     string line = "So many things!";
+    //     if ($item[over-the-shoulder folder holder].storage_amount() > 0 && $item[over-the-shoulder folder holder].item_is_usable())
+    //     {
+    //         string [int] description;
+    //         string [item] folder_descriptions;
+            
+    //         folder_descriptions[$item[folder (red)]] = "+20 muscle";
+    //         folder_descriptions[$item[folder (blue)]] = "+20 myst";
+    //         folder_descriptions[$item[folder (green)]] = "+20 moxie";
+    //         folder_descriptions[$item[folder (magenta)]] = "+15 muscle +15 myst";
+    //         folder_descriptions[$item[folder (cyan)]] = "+15 myst +15 moxie";
+    //         folder_descriptions[$item[folder (yellow)]] = "+15 muscle +15 moxie";
+    //         folder_descriptions[$item[folder (smiley face)]] = "+2 muscle stat/fight";
+    //         folder_descriptions[$item[folder (wizard)]] = "+2 myst stat/fight";
+    //         folder_descriptions[$item[folder (space skeleton)]] = "+2 moxie stat/fight";
+    //         folder_descriptions[$item[folder (D-Team)]] = "+1 stat/fight";
+    //         folder_descriptions[$item[folder (Ex-Files)]] = "+5% combat";
+    //         folder_descriptions[$item[folder (skull and crossbones)]] = "-5% combat";
+    //         folder_descriptions[$item[folder (Knight Writer)]] = "+40% init";
+    //         folder_descriptions[$item[folder (Jackass Plumber)]] = "+25 ML";
+    //         folder_descriptions[$item[folder (holographic fractal)]] = "+4 all res";
+    //         folder_descriptions[$item[folder (barbarian)]] = "stinging damage";
+    //         folder_descriptions[$item[folder (rainbow unicorn)]] = "prismatic stinging damage";
+    //         folder_descriptions[$item[folder (Seawolf)]] = "-pressure penalty";
+    //         folder_descriptions[$item[folder (dancing dolphins)]] = "+50% item (underwater)";
+    //         folder_descriptions[$item[folder (catfish)]] = "+15 familiar weight (underwater)";
+    //         folder_descriptions[$item[folder (tranquil landscape)]] = "15 DR / 15 HP & MP regen";
+    //         folder_descriptions[$item[folder (owl)]] = "+500% item (dreadsylvania)";
+    //         folder_descriptions[$item[folder (Stinky Trash Kid)]] = "passive stench damage";
+    //         folder_descriptions[$item[folder (sports car)]] = "+5 adv";
+    //         folder_descriptions[$item[folder (sportsballs)]] = "+5 PVP fights";
+    //         folder_descriptions[$item[folder (heavy metal)]] = "+5 familiar weight";
+    //         folder_descriptions[$item[folder (Yedi)]] = "+50% spell damage";
+    //         folder_descriptions[$item[folder (KOLHS)]] = "+50% item (KOLHS)";
+            
+    //         foreach s in $slots[folder1,folder2,folder3]
+    //         {
+    //             item folder = s.equipped_item();
+    //             if (folder == $item[none]) continue;
+                
+    //             if (folder_descriptions contains folder)
+    //                 description.listAppend(folder_descriptions[folder]);
+    //         }
+    //         if (description.count() > 0)
+    //             line = description.listJoinComponents(" / ");
+    //     }
+    //     pullable_item_list.listAppend(GPItemMake($item[over-the-shoulder folder holder], line, 1));
+    // }
+    
+    // As with folder holder, this just isn't really a great pull anymore. Minor back slot is just not useful at all.
+
+    // if (!__misc_state["familiars temporarily blocked"] && ($item[protonic accelerator pack].available_amount() == 0 || $familiar[machine elf].familiar_is_usable())) //if you have a machine elf, it might be worth pulling a bjorn with a protonic pack anyways
+    // {
+    //     if ($item[Buddy Bjorn].storage_amount() > 0)
+    //         pullable_item_list.listAppend(GPItemMake($item[Buddy Bjorn], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
+    //     else if ($item[buddy bjorn].available_amount() == 0)
+    //         pullable_item_list.listAppend(GPItemMake($item[crown of thrones], "+10ML/+lots MP hat|or +item/+init/+meat/etc", 1));
+    // }
+
+    // At best, this is +5 fam weight; not worth a pull at all.
+	// if ($item[operation patriot shield].item_is_usable())
+    //         pullable_item_list.listAppend(GPItemMake($item[operation patriot shield], "+america", 1));
+    //     pullable_item_list.listAppend(GPItemMake($item[the crown of ed the undying], "Various in-run modifiers. (init, HP, ML/item/meat/etc)", 1));
+    // }
+
+	//pullable_item_list.listAppend(GPItemMake($item[haiku katana], "?", 1));
+	// if ($item[bottle-rocket crossbow].item_is_usable())
+    //     pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
+
+    // This never showed up because it had an added false in the condition. I am commenting it out
+    //   because I don't think anyone in unrestricted would ever want to do this?
+	
+    // if (!have_super_fairy && my_path().id != PATH_HEAVY_RAINS)
+	// {
+	// 	if (familiar_is_usable($familiar[fancypants scarecrow]))
+	// 		pullable_item_list.listAppend(GPItemMake($item[spangly mariachi pants], "2x fairy on fancypants scarecrow", 1));
+	// 	else if (familiar_is_usable($familiar[mad hatrack]))
+	// 		pullable_item_list.listAppend(GPItemMake($item[spangly sombrero], "2x fairy on mad hatrack", 1));
+	// }
+
+    // These all suck now lol
+	//pullable_item_list.listAppend(GPItemMake($item[jewel-eyed wizard hat], "a wizard is you!", 1));
+	//pullable_item_list.listAppend(GPItemMake($item[origami riding crop], "+5 stats/fight, but only if the monster dies quickly", 1)); //not useful?
+	//pullable_item_list.listAppend(GPItemMake($item[plastic pumpkin bucket], "don't know", 1)); //not useful?
+	//pullable_item_list.listAppend(GPItemMake($item[packet of mayfly bait], "why let it go to waste?", 1));
 
 	pullable_item_list.listAppend(GPItemMake($item[loathing legion knife], "?", 1));
 
@@ -277,9 +396,6 @@ void generatePullList(Checklist [int] checklists)
 		if (my_path().id != PATH_ZOMBIE_SLAYER) // can't use due to MP cost
 			pullable_item_list.listAppend(GPItemMake($item[mafia middle finger ring], "one free runaway/banish/day", 1));
     }
-	//pullable_item_list.listAppend(GPItemMake($item[haiku katana], "?", 1));
-	// if ($item[bottle-rocket crossbow].item_is_usable())
-    //     pullable_item_list.listAppend(GPItemMake($item[bottle-rocket crossbow], "?", 1));
 	if ($item[jekyllin hide belt].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[jekyllin hide belt], "+variable% item", 3));
     
@@ -306,17 +422,7 @@ void generatePullList(Checklist [int] checklists)
                     pullable_item_list.listAppend(GPItemMake($item[cane-mail shirt], "+20ML shirt", 1));
         }
     }
-    if (__quest_state["Level 10"].mafia_internal_step >= 8)
-    {
-    	if (__quest_state["Level 10"].mafia_internal_step == 8 && $item[amulet of extreme plot significance].available_amount() == 0)
-        {
-        	pullable_item_list.listAppend(GPItemMake($item[amulet of extreme plot significance], "Speeds up castle basement.", 1));
-        }
-        if (!__quest_state["Level 10"].finished && $item[mohawk wig].available_amount() == 0 && (!lookupSkill("Comprehensive Cartography").skill_is_usable() || $item[model airship].available_amount() == 0))
-        {
-            pullable_item_list.listAppend(GPItemMake($item[mohawk wig], "Speeds up top floor of castle.", 1));
-        }
-    }
+
     if ($item[Clara's Bell].item_is_usable())
 	    pullable_item_list.listAppend(GPItemMake($item[Clara's Bell], "Forces a non-combat, once/day.", 1));
     if (combat_items_usable && $item[replica bat-oomerang].item_is_usable())
@@ -331,23 +437,6 @@ void generatePullList(Checklist [int] checklists)
 	boolean have_super_fairy = false;
 	if ((familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0) || (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0))
 		have_super_fairy = true;
-    
-    // This never showed up because it had an added false in the condition. I am commenting it out
-    //   because I don't think anyone in unrestricted would ever want to do this?
-	
-    // if (!have_super_fairy && my_path().id != PATH_HEAVY_RAINS)
-	// {
-	// 	if (familiar_is_usable($familiar[fancypants scarecrow]))
-	// 		pullable_item_list.listAppend(GPItemMake($item[spangly mariachi pants], "2x fairy on fancypants scarecrow", 1));
-	// 	else if (familiar_is_usable($familiar[mad hatrack]))
-	// 		pullable_item_list.listAppend(GPItemMake($item[spangly sombrero], "2x fairy on mad hatrack", 1));
-	// }
-
-    // These all suck now lol
-	//pullable_item_list.listAppend(GPItemMake($item[jewel-eyed wizard hat], "a wizard is you!", 1));
-	//pullable_item_list.listAppend(GPItemMake($item[origami riding crop], "+5 stats/fight, but only if the monster dies quickly", 1)); //not useful?
-	//pullable_item_list.listAppend(GPItemMake($item[plastic pumpkin bucket], "don't know", 1)); //not useful?
-	//pullable_item_list.listAppend(GPItemMake($item[packet of mayfly bait], "why let it go to waste?", 1));
 	
 	if ($items[greatest american pants, navel ring of navel gazing].available_amount() + pullable_amount($item[greatest american pants]) + pullable_amount($item[navel ring of navel gazing]) == 0)
 		pullable_item_list.listAppend(GPItemMake($item[peppermint parasol], "free runaways", 1));
