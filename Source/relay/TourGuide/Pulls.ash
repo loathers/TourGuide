@@ -214,8 +214,7 @@ void generatePullList(Checklist [int] checklists)
             if ($items[sneaky pete's key,sneaky pete's key lime pie].available_amount() == 0) which_accessories.listAppend("Sneaky Pete's Breath Spray");
             if (which_accessories.count() > 0)
                 line += which_accessories.listJoinComponents(", ")+" ... get a wand and zap them!";
-            hero_key_selections.listAppend(line)
-
+            hero_key_selections.listAppend(line);
         }
         else if (__misc_state["can eat just about anything"] && availableFullness() > 0)
         {       
@@ -665,17 +664,16 @@ void generatePullList(Checklist [int] checklists)
     //   seeing and it's largely good stuff to at least remember that we 
     //   once considered a good pull.
  
-    // ... however, pre-commenting-out, I will include one meaty item at the
-    //   end of the recommendations. It doesn't save turns, really, but it's
-    //   certainly comfortable!
+    // ... however, pre-commenting-out, I will include one meat-generating 
+    //   item at the end of the recommendations. It doesn't save turns, 
+    //   really, but it's certainly comfortable!
 
-    if (my_meat() < 5000)
+    if (my_meat() < 5000) 
+    {
         item meatyItem = $item[gold wedding ring];
-        if (storage_amount($item[facsimile dictionary]) > 0) {
-            meatyItem = $item[facsimile dictionary];
-        }
+        if (storage_amount($item[facsimile dictionary]) > 0) meatyItem = $item[facsimile dictionary];
         pullable_item_list.listAppend(GPItemMake(meatyItem, "Autosells for "+autosell_price(meatyItem)+" meat.|Likely non-optimal.", 1));
-    
+    }
     
     // At best, folder holder represents a minor leveling boost and +/- combat. Better than red shoe, but not dramatically...
     // if (true)
