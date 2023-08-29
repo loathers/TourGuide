@@ -137,7 +137,7 @@ void generatePullList(Checklist [int] checklists)
 
     // Breathitin is virtually always good. Absurdly nice pull.
     if (canUseHeavySpleeners)
-		pullable_item_list.listAppend(GPItemMake($item[Breathitin™], "5 outdoor free kills for 2 spleen", 7));
+		pullable_item_list.listAppend(GPItemMake($item[Breathitin&trade;], "5 outdoor free kills for 2 spleen", 7));
     
     // Bat-oomerang is a great freekill pull
     if (combat_items_usable && $item[replica bat-oomerang].item_is_usable())
@@ -203,7 +203,7 @@ void generatePullList(Checklist [int] checklists)
 		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
 
     // Extro: the modern stuffer/blaster lol.
-    if (canUseHeavySpleeners) pullable_item_list.listAppend(GPItemMake($item[Extrovermectin™], "3 copies (as wanderers) for 2 spleen", 7));
+    if (canUseHeavySpleeners) pullable_item_list.listAppend(GPItemMake($item[Extrovermectin&trade;], "3 copies (as wanderers) for 2 spleen", 7));
 
     // Stuffers and blasters are still good, though blaster is strictly inferior to a breath
     if (availableSpleen() >= 2 && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_COMMUNITY_SERVICE)
@@ -231,12 +231,12 @@ void generatePullList(Checklist [int] checklists)
     else if (lookupSkill("Expert Corner-Cutter").skill_is_usable()) {
        hasAnyFreeCrafts = true;
     }    
-    else if (get_property_int("homebodylCharges") > 0 || $item[Homebodyl™].available_amount() > 0) {
+    else if (get_property_int("homebodylCharges") > 0 || $item[Homebodyl&trade;].available_amount() > 0) {
        hasAnyFreeCrafts = true;
     }
 
     if (!hasAnyFreeCrafts)
-		pullable_item_list.listAppend(GPItemMake($item[Homebodyl], "11 free crafts for 2 spleen", 1));
+		pullable_item_list.listAppend(GPItemMake($item[Homebodyl&trade;], "11 free crafts for 2 spleen", 1));
 
     // Hero key generators save 3+ turns apiece, but if you have a zap wand, you should pull accessories instead
     if (__misc_state_int["fat loot tokens needed"] > 0) {
@@ -635,16 +635,18 @@ void generatePullList(Checklist [int] checklists)
        pullable_item_list.listAppend(GPItemMake($item[enchanted bean], "Grow it in the Nearby Plains for the Level 10 quest", 1));
     }
 
-    int hospital_progress = get_property_int("hiddenHospitalProgress");;
+    int hospital_progress = get_property_int("hiddenHospitalProgress");
 
     if (hospital_progress < 7) {
-        if (__misc_state["Torso aware"]) item [int] missingSurgeonComponents = items_missing($items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel,surgical apron]);
-        if (!__misc_state["Torso aware"]) item [int] missingSurgeonComponents = items_missing($items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]);
+        if (__misc_state["Torso aware"]) item [int] 
+            missingSurgeonComponents = items_missing($items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel,surgical apron]);
+        if (!__misc_state["Torso aware"]) item [int] 
+            missingSurgeonComponents = items_missing($items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]);
         
         if (missingSurgeonComponents.count() > 0)
         {
             string description = "Still need: " + missingSurgeonComponents.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
-            pullable_item_list.listAppend(GPItemMake("Surgeon disguise for the Hidden Hospital", "__item " + missing_ninja_components[0], description));
+            pullable_item_list.listAppend(GPItemMake("Surgeon disguise for the Hidden Hospital", "__item " + missingSurgeonComponents[0], description));
         }
 
     }
@@ -696,7 +698,7 @@ void generatePullList(Checklist [int] checklists)
 
             if (__iotms_usable[$item[emotion chip]] && clampi(3 - get_property_int("_feelPrideUsed"), 0, 3) > 0) glitchDesc += "|Consider using Feel Pride to get 3x that total of stats.";
 
-            pullable_item_list.listAppend(GPItemMake(lookupItem("[glitch season reward name]", glitchDesc)));
+            pullable_item_list.listAppend(GPItemMake(lookupItem("[glitch season reward name]"), glitchDesc));
         }
 
         if (my_primestat() == $stat[muscle])
@@ -732,7 +734,7 @@ void generatePullList(Checklist [int] checklists)
 
         // If the user can use a red rocket, and user doesn't have a cleaver, suggest pulling a guilty sprout
         if (__misc_state["in run"] && __misc_state["can eat just about anything"] && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path().id != PATH_G_LOVER) {
-            if (!__iotms_usable["June Cleaver"]) {
+            if (!__iotms_usable[$item["June Cleaver"]]) {
                 int sproutStats = MAX(0, 4 * 225 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0)); 
                 pullable_item_list.listAppend(GPItemMake($item[guilty sprout],"Food; gain "+sproutStats+" stats with a red-rocketed sprout!"));
             }
