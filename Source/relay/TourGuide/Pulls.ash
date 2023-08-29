@@ -8,7 +8,7 @@ int pullable_amount(item it, int maximum_total_wanted)
 	boolean buyable_in_run = false;
 	if (__pulls_reasonable_to_buy_in_run contains it)
 		buyable_in_run = true;
-    if (it.tradeable && it.historical_price() > 0 && it.historical_price() < 50000)
+    if (it.tradeable && it.historical_price() > 0 && it.historical_price() < 75000)
     	buyable_in_run = true;
 	if (maximum_total_wanted == 0)
 		maximum_total_wanted = __misc_state_int["pulls available"] + it.available_amount();
@@ -114,17 +114,12 @@ void generatePullList(Checklist [int] checklists)
 	string [int] pullable_list_reason;
 	GPItem [int] pullable_item_list;
     boolean combat_items_usable = true;
-    boolean have_super_fairy = false;
+    boolean combat_skills_usable = true;
 
     // Set a single path-related variable
     if (my_path().id == PATH_POCKET_FAMILIARS)
     	combat_items_usable = false;
-
-    // Pretty sure I deleted the places that use this, but in case I didn't...
-	if ((familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0) || (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0))
-		have_super_fairy = true;
-
-
+    	combat_skills_usable = false;
 
     // =====================================================================
     // ------ SECTION #1: 3+ TURNS -----------------------------------------
@@ -132,27 +127,49 @@ void generatePullList(Checklist [int] checklists)
     
     // Pulls in this category are highly valuable turnsave pulls that can 
     //   either bypass certain quests entirely or save entire chunks of 
-    //   quests. Everything here is stupid valuable.
+    //   quests. Everything here is stupid valuable. Ordering is:
+    //     1. Free kills
+    //     2. Free runs
+    //     3. Copiers
+    //     4. Quest-y pulls
 
-    //   - 3+ turns: star key stuff (star chart, greasy desk bell, star pops)
-    //   - 3+ turns: PYEC, if they have a wand
-    //   - 3+ turns: batteries (car/lantern/9-volt); assuming in standard you use the buff well + get 1-2 bombs out of each
-    //   - 3+ turns: carnivorous potted plant
-    //   - 3+ turns: extrovermectin
-    //   - 3+ turns: homebodyl (if no cookbookbat)
-    //   - 3+ turns: repaid diaper, in unrestricted
+    boolean canUseHeavySpleeners = availableSpleen() >= 2 && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_COMMUNITY_SERVICE;
 
-    // Rain-Doh & Spooky Putty; 5 copies is roughly 3+ turns in value, even without going in delay.
-	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0 && $item[can of rain-doh].item_is_usable())
-		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
-	if ($items[empty rain-doh can,can of rain-doh,spooky putty monster].available_amount() == 0 && $item[spooky putty sheet].item_is_usable())
-		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
+    // Breathitin is virtually always good. Absurdly nice pull.
+    if (canUseHeavySpleeners)
+		pullable_item_list.listAppend(GPItemMake($item[Breathitin™], "5 outdoor free kills for 2 spleen", 7));
+    
+    // Bat-oomerang is a great freekill pull
+    if (combat_items_usable && $item[replica bat-oomerang].item_is_usable())
+    	pullable_item_list.listAppend(GPItemMake($item[replica bat-oomerang], "3 daily free kills", 1));
+    
+    // Carnivorous Potted Plant is frustrating when you have lots of offhands, but it's
+    //   unambiguously good... so long as you have enough combats left. Going to say
+    //   that after 250 turns spent, it's unlikely you want this. 
+    pullable_item_list.listAppend(GPItemMake($item[carnivorous potted plant], "offhand; +25 ML, 4% chance of turning any given combat free", 1));
+
+    // Part of me kind of wants to make one pull tile that concatenates the 3 battery
+    //   types, but this is good enough.
+
+    if (combat_skills_usable) {
+    	pullable_item_list.listAppend(GPItemMake($item[battery (car)], "1 yellow ray + freekill|30 turns of 100% item/meat", 2));
+    	pullable_item_list.listAppend(GPItemMake($item[battery (lantern)], "1 yellow ray + freekill|30 turns of 100% item", 2));
+    	pullable_item_list.listAppend(GPItemMake($item[battery (9-volt)], "1 yellow ray + freekill", 2));
+    }
+
+    boolean freeRunFamiliarUsable = familiar_is_usable($familiar[pair of stomping boots]) || ($skill[the ode to booze].skill_is_usable() && familiar_is_usable($familiar[Frumious Bandersnatch]));
 
     // This is a catch-all for familiar weight pulls, which are only useful if the user can use boots/bander
-    if (!__misc_state["familiars temporarily blocked"] && $familiar[pair of stomping boots].is_unrestricted() && __misc_state["free runs usable"] && __misc_state["free runs available"]) {
+    if (!__misc_state["familiars temporarily blocked"] && $familiar[pair of stomping boots].is_unrestricted() && freeRunFamiliarUsable) {
 
         // Sort of a pain, but if they have it, it's a nice +4 runs...
-        if ($item[snow suit].item_is_usable()) pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while, +4 free runs", 1));
+        if ($item[snow suit].item_is_usable()) pullable_item_list.listAppend(GPItemMake($item[snow suit], "+20 familiar weight for a while, +4 free runs (boots/bander)", 1));
+
+        // If they've got a free-run fam, this is a dope pull
+        if ($item[repaid diaper].item_is_usable()) pullable_item_list.listAppend(GPItemMake($item[repaid diaper], "+3 free runs (boots/bander)", 1));
+        
+        // If they've got a free-run fam, this is a dope pull
+        if ($item[silver face paint].item_is_usable()) pullable_item_list.listAppend(GPItemMake($item[silver face paint], "+4 free runs (boots/bander)|only lasts 1 turn; extend w/ wool or PYEC?", 1));
     }
 
     // Generic free-run based pulls
@@ -173,23 +190,24 @@ void generatePullList(Checklist [int] checklists)
 		    pullable_item_list.listAppend(GPItemMake($item[peppermint parasol], "3+ free runaways", 1));
         }
 
-        if (my_path().id != PATH_ZOMBIE_SLAYER) // can't use due to MP cost in zombie slayer
-			pullable_item_list.listAppend(GPItemMake($item[mafia middle finger ring], "1 freerun banish, every day", 1));
-
         if (!get_property_boolean("_blankoutUsed") && $item[bottle of blank-out].item_is_usable())
             pullable_item_list.listAppend(GPItemMake($item[bottle of blank-out], "5 free runaways|flee your problems", 1));
 
     }
 
-    // Generic free-kill based pulls, though breaths go a little below
-    if (combat_items_usable && $item[replica bat-oomerang].item_is_usable())
-    	pullable_item_list.listAppend(GPItemMake($item[replica bat-oomerang], "3 daily free kills", 1));
+    // Rain-Doh & Spooky Putty; 5 copies is roughly 3+ turns in value, even without going in delay.
+	if ($item[empty rain-doh can].available_amount() == 0 && $item[can of rain-doh].available_amount() == 0 && $item[can of rain-doh].item_is_usable())
+		pullable_item_list.listAppend(GPItemMake($item[can of rain-doh], "5 copies/day|everything really", 1));
+
+	if ($items[empty rain-doh can,can of rain-doh,spooky putty monster].available_amount() == 0 && $item[spooky putty sheet].item_is_usable())
+		pullable_item_list.listAppend(GPItemMake($item[spooky putty sheet], "5 copies/day", 1));
+
+    // Extro: the modern stuffer/blaster lol.
+    if (canUseHeavySpleeners) pullable_item_list.listAppend(GPItemMake($item[Extrovermectin™], "3 copies (as wanderers) for 2 spleen", 7));
 
     // Stuffers and blasters are still good, though blaster is strictly inferior to a breath
     if (availableSpleen() >= 2 && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_COMMUNITY_SERVICE)
     {
-		pullable_item_list.listAppend(GPItemMake($item[Breathitin™], "5 outdoor free kills", 1));
-        
         pullable_item_list.listAppend(GPItemMake($item[turkey blaster], "Burns five turns of delay in last adventured area. Costs spleen, limited uses/day.", MIN(3 - get_property_int("_turkeyBlastersUsed"), MIN(availableSpleen() / 2, 3))));
 
         if (!__quest_state["Level 12"].finished && __quest_state["Level 12"].state_int["frat boys left on battlefield"] >= 936 && __quest_state["Level 12"].state_int["hippies left on battlefield"] >= 936)
@@ -197,6 +215,28 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake($item[stuffing fluffer], "Saves eight turns if you use two at the start of fighting in the war.", 2));
         }
     }
+
+    // Homebodyl is a pretty good pull if the user doesn't have free crafts.
+    boolean hasAnyFreeCrafts = false;
+
+    if ($item[recording of Inigo's Incantation of Inspiration].available_amount() > 0) {
+       hasAnyFreeCrafts = true;
+    }
+    else if ($item[cuppa Craft tea].available_amount() > 0) {
+       hasAnyFreeCrafts = true;
+    }
+    else if ($skill[rapid prototyping].skill_is_usable()) {
+       hasAnyFreeCrafts = true;
+    }
+    else if (lookupSkill("Expert Corner-Cutter").skill_is_usable()) {
+       hasAnyFreeCrafts = true;
+    }    
+    else if (get_property_int("homebodylCharges") > 0 || $item[Homebodyl™].available_amount() > 0) {
+       hasAnyFreeCrafts = true;
+    }
+
+    if (!hasAnyFreeCrafts)
+		pullable_item_list.listAppend(GPItemMake($item[Homebodyl], "11 free crafts for 2 spleen", 1));
 
     // Hero key generators save 3+ turns apiece, but if you have a zap wand, you should pull accessories instead
     if (__misc_state_int["fat loot tokens needed"] > 0) {
@@ -215,6 +255,9 @@ void generatePullList(Checklist [int] checklists)
             if (which_accessories.count() > 0)
                 line += which_accessories.listJoinComponents(", ")+" ... get a wand and zap them!";
             hero_key_selections.listAppend(line);
+
+            // If they're pulling accessories, should also probably pull PYEC
+            pullable_item_list.listAppend(GPItemMake($item[Platinum Yendorian Express Card], "recharge your zap wand, extend some effects"));
         }
         else if (__misc_state["can eat just about anything"] && availableFullness() > 0)
         {       
@@ -238,6 +281,44 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake("Hero Key Generators", "Boris's key", description));
         }
     }
+
+    // Being able to skip HITS entirely is pretty strong, much like Whitey's skip. 
+    int starChartsNeeded = MAX(1 - $item[star chart].available_amount(), 0);
+    int starsNeeded = MAX(8 - $item[star].available_amount(), 0);
+    int linesNeeded = MAX(7 - $item[line].available_amount(), 0);
+
+    boolean haveStarKey = __quest_state["Level 13"].state_boolean["Richard\'s star key used"] || $item[richard\'s star key].available_amount() > 0;
+
+    if (!haveStarKey) {
+        // First, if they don't have a star chart, recommend a chart or a greasy desk bell.
+        if (starChartsNeeded > 0) {
+            if ($item[greasy desk bell].is_unrestricted()) {
+                pullable_item_list.listAppend(GPItemMake($item[greasy desk bell], "get a star chart + 2 stars & 2 lines|free (but difficult) fight", 1));
+            }
+            else {
+                pullable_item_list.listAppend(GPItemMake($item[star chart], "for Richard's Star Key", 1));
+            }
+        }
+
+        // Next, suggest star pops
+        if (__misc_state["can eat just about anything"] && my_path() != $path[A Shrunken Adventurer am I]) {
+            if (availableFullness() > 0 ) {
+                string starPopDesc = "3-4 stars & lines";
+                if (starsNeeded < 4 && linesNeeded < 4) starPopDesc += ", will finish your key"; 
+                if (starsNeeded > 3 && linesNeeded > 3) starPopDesc += ", of the "+starsNeeded+" stars & "+linesNeeded+" lines you still need";
+                pullable_item_list.listAppend(GPItemMake($item[star pop], starPopDesc));
+            }
+
+        // Next, suggest star KLPs; if we've already suggested star pops, don't suggest KLPs, as they're strictly worse
+            if (availableFullness() > 3 && !$item[star pop].is_unrestricted()) {
+                string starKLPDesc = "2-4 stars & lines";
+                if (starsNeeded < 3 && linesNeeded < 3) starKLPDesc += ", will finish your key"; 
+                if (starsNeeded > 2 && linesNeeded > 2) starKLPDesc += ", of the "+starsNeeded+" stars & "+linesNeeded+" lines you still need";
+                pullable_item_list.listAppend(GPItemMake($item[star key lime pie], starKLPDesc));
+            }
+        }
+    }
+
 	
     // Wet stew is just an eternally great pull, Whitey's sucks
 	if (!__quest_state["Level 11 Palindome"].finished && $item[mega gem].available_amount() == 0 && ($item[wet stew].available_amount() + $item[wet stunt nut stew].available_amount() + $item[wet stew].creatable_amount() == 0) && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING)
@@ -341,7 +422,6 @@ void generatePullList(Checklist [int] checklists)
         
     }
 
-
     // Gravy Boat used to be an unreasonable pull, but in 37 evil per zone era, this is a good one now    
     if (__quest_state["Level 7"].in_progress) 
     {
@@ -357,47 +437,51 @@ void generatePullList(Checklist [int] checklists)
     //   general, these pulls should be considered above quest misses and 
     //   are less related to explicit in-run findings.
     
-    //   - 1-2 turn: mick's inhaler
-    //   - 1-2 turn: patent invisibility
-    //   - 1-2 turn: claw of the infernal seal (if SC)
-    //   - 1-2 turn: 4-d camera
-    //   - 1-2 turn: teacher's pen OR grey down vest
-    //   - 1-2 turn: shadow brick
-    //   - 1-2 turn: groveling gravel
-    
     // Generic free-run based pulls, but these are less valuable than those in section #1 
     if (__misc_state["free runs usable"])
     {
-	
-        if ($item[v for vivala mask].item_is_usable()) pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "1 free banish per day", 1));
+        // Middle finger ring is straight up good!
+        if (my_path().id != PATH_ZOMBIE_SLAYER && combat_skills_usable) // can't use due to MP cost in zombie slayer
+			pullable_item_list.listAppend(GPItemMake($item[mafia middle finger ring], "1 free 80-turn banish, per day", 1));
+
+        // I did not realize vivala mask gave a 10-turn banish until Legacy of Loathing. I was unfamiliar with its game.
+        if ($item[v for vivala mask].item_is_usable()) pullable_item_list.listAppend(GPItemMake($item[v for vivala mask], "1 free 10-turn banish, per day", 1));
     }
 
-    // Generic free-kill based pulls, but less valuable than section #1
+    // Generic free-kill based pulls, but less valuable than tier 1 pulls
     int pills_pullable = clampi(20 - get_property_int("_powerPillUses"), 0, 20);
     if (pills_pullable > 0 && ($familiar[ms. puck man].have_familiar() || $familiar[puck man].have_familiar()))
     {
-        pullable_item_list.listAppend(GPItemMake($item[power pill], "Saves one turn each.", pills_pullable));
+        pullable_item_list.listAppend(GPItemMake($item[power pill], "1 free kill, with your puck", pills_pullable));
     }
 
+    if (combat_items_usable) {
+        // Shadow bricks are pretty much fine as a pull; certainly better than writs/GSBs
+        pullable_item_list.listAppend(GPItemMake($item[shadow brick], "1 free kill", 13));
 
+        // Powdered Madness is expensive but fine
+        pullable_item_list.listAppend(GPItemMake($item[powdered madness], "1 free kill",5));
+
+        // Groveling Gravel is worse, but it's... fine
+        pullable_item_list.listAppend(GPItemMake($item[groveling gravel], "1 free kill|destroys item drops, buyer beware!",5));
+    }
+
+    // NC forcers are great! Clara's is nice because it's 2 in a 2-day run.
     if ($item[Clara's Bell].item_is_usable())
 	    pullable_item_list.listAppend(GPItemMake($item[Clara's Bell], "Forces a non-combat, once/day.", 1));
     
+    // ... but one stench jelly is also fine!
     if (availableSpleen() > 0 && $item[stench jelly].item_is_usable() && my_path().id != PATH_LIVE_ASCEND_REPEAT)
-	    pullable_item_list.listAppend(GPItemMake($item[stench jelly], "Skips ahead to an NC, saves 2.5? turns each.", 20));
+	    pullable_item_list.listAppend(GPItemMake($item[stench jelly], "Skips ahead to an NC, saves 2-3 turns each.", 20));
 
-	if ($familiar[Intergnat].familiar_is_usable() && $item[infinite BACON machine].item_is_usable())
-    {
-        pullable_item_list.listAppend(GPItemMake($item[infinite BACON machine], "One copy/day with ~seven turns of intergnat.", 1));
-    }
-
+    // Quest-y pull; just save searching for an NC, like an NC forcer, but also save the turn spent!
     if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && $item[spooky-gro fertilizer].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2-ish turns while unlocking temple."));
 	
     if (my_path().id != PATH_COMMUNITY_SERVICE && $item[11-leaf clover].item_is_usable())
-		pullable_item_list.listAppend(GPItemMake($item[11-leaf clover], "Various turn saving.|Generic pull."));
+		pullable_item_list.listAppend(GPItemMake($item[11-leaf clover], "Various turn saving applications|Zeppelin Mob, Wand of Nagamar, etc."));
     
-    // If you can't hit 25% combat, all of these are actually pretty dope.
+    // If you can't hit 25% combat, all of these are actually pretty dope...
     if (!__misc_state["can reasonably reach -25% combat"])
     {
         if ((my_primestat() == $stat[moxie] || my_basestat($stat[moxie]) >= 35) && $item[iFlail].item_is_usable())
@@ -411,9 +495,47 @@ void generatePullList(Checklist [int] checklists)
         if (($item[red shoe].can_equip() || my_path().id == PATH_GELATINOUS_NOOB) && $item[red shoe].item_is_usable())
             pullable_item_list.listAppend(GPItemMake($item[red shoe], "-combat"));
     }
+
+    // ... but even if you CAN hit 25% combat, invisibility tonic is actually pretty great
+    if (my_path().id != PATH_LIVE_ASCEND_REPEAT) {
+	    pullable_item_list.listAppend(GPItemMake($item[patent invisibility tonic], "30 turns of -15% combat|If you route 30 turns of NC hunting together, this is solid value"));  
+    }
+
+    // If they have grey goose, they should (perhaps) consider pulling some of the familiar XP gear
+    if ($familiar[grey goose].familiar_is_usable() && my_path() != $path[Legacy of Loathing]) {
+        int extraVestXP = $item[tiny stillsuit].available_amount() > 0 ? 1 : 2;
+	    pullable_item_list.listAppend(GPItemMake($item[grey down vest], "Equip for +"+extraVestXP+" goose XP over your next best option")); 
+
+        if ($item[teacher's pen].available_amount() < 3) {
+    	    pullable_item_list.listAppend(GPItemMake($item[teacher's pen], "Equip for +2 goose XP per fight"));  
+        }
+
+    }
+
+    // Speaking of goose, Claw of the Infernal Seal is a nice pull for 5 free-ish fights
+    if (my_class() == $class[seal clubber] && $item[Claw of the Infernal Seal].available_amount() == 0) {
+	    pullable_item_list.listAppend(GPItemMake($item[Claw of the Infernal Seal], "Fight 5 more free seals per day|Familiar turns, XP, and other fight-advanced goodies")); 
+    }
     
+    // Sure, why not; pocket wishes are fine
     if ($item[pocket wish].item_is_usable())
 	    pullable_item_list.listAppend(GPItemMake($item[pocket wish], "Save turns with meat/item wishes, monster summons, and more", 20));  
+
+    // If nuns is still needed, recommend pulling an inhaler.
+    if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && my_path().id != PATH_2CRS) {
+        pullable_item_list.listAppend(GPItemMake($item[Mick's IcyVapoHotness Inhaler], "10 turns of +200% meat|Worth anywhere from 1-3 turns on the nuns war sidequest"));
+    }
+        
+    // One copy is kind of marginal but it's fine to include right at the end.
+	if ($familiar[Intergnat].familiar_is_usable() && $item[infinite BACON machine].item_is_usable())
+    {
+        pullable_item_list.listAppend(GPItemMake($item[infinite BACON machine], "One copy/day with ~seven turns of your intergnat.", 1));
+    }
+
+    // Speaking of one copy, fine, we'll suggest a 4-d camera
+    if (combat_items_usable) {
+        pullable_item_list.listAppend(GPItemMake($item[4-d camera], "Use in a fight to copy a monster", 1));
+    }
 
     // =====================================================================
     // ------ SECTION #3: QUEST MISSES -------------------------------------
@@ -423,15 +545,13 @@ void generatePullList(Checklist [int] checklists)
     //   run. However, if you don't have them, they're good pulls, just not
     //   universally valuable like the 1/2 tier pulls. A few of these end
     //   up being better than pulls above if you miss them, too.
+    
+    // I have not included the following 3 pulls because although they sort
+    //   of belong, the logic is complex enough that I didn't want to hassle
 
-    //   - QUEST MISS: book of matches
-    //   - QUEST MISS: enchanted bean
     //   - QUEST MISS: tangle of rat tails
-    //   - QUEST MISS: surgeon gear
     //   - QUEST MISS: sonar-in-a-biscuit
-    //   - QUEST MISS: clusterbombs
     //   - QUEST MISS: disposable instant camera
-    //   - QUEST MISS: bowling ball
     
     if (__quest_state["Level 10"].mafia_internal_step >= 8)
     {
@@ -454,18 +574,18 @@ void generatePullList(Checklist [int] checklists)
         if (__iotms_usable[lookupItem("model train set")]) boxes_needed = 0; // you REALLY do not need to pull this if you have a train lol
 		
 		if (boxes_needed > 0 && $item[smut orc keepsake box].item_is_usable())
-			pullable_item_list.listAppend(GPItemMake($item[smut orc keepsake box], "Skip level 9 bridge building.", boxes_needed));
+			pullable_item_list.listAppend(GPItemMake($item[smut orc keepsake box], "Skip a few turns in building your smut orc bridge.", boxes_needed));
 	}
 
     if (__quest_state["Level 9"].state_int["peak tests remaining"] > 0)
     {
         int trimmers_needed = clampi(__quest_state["Level 9"].state_int["peak tests remaining"], 0, 4);
         if (trimmers_needed > 0)
-			pullable_item_list.listAppend(GPItemMake($item[rusty hedge trimmers], "Speed up twin peak, burn delay.|Saves ~2 turns each?", trimmers_needed));
+			pullable_item_list.listAppend(GPItemMake($item[rusty hedge trimmers], "Speed up twin peak, burn delay.|Saves ~2 turns each", trimmers_needed));
     }
 
     if (__quest_state["Level 11"].mafia_internal_step < 2)
-        pullable_item_list.listAppend(GPItemMake($item[blackberry galoshes], "speed up black forest by 2-3? turns", 1));
+        pullable_item_list.listAppend(GPItemMake($item[blackberry galoshes], "Speed up Black Forest by 2-3 turns", 1));
         
     //OUTFITS: √War outfit
     if (!__quest_state["Level 12"].finished && (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues")))
@@ -508,7 +628,47 @@ void generatePullList(Checklist [int] checklists)
             pullable_item_list.listAppend(GPItemMake($item[can of black paint], "15% desert exploration.", 1));
         
         // Adding milestone, as it's valuable enough to warrant a mention.
-        pullable_item_list.listAppend(GPItemMake($item[milestone], "5% desert exploration; can use as many as you get!", 1));
+        pullable_item_list.listAppend(GPItemMake($item[milestone], "5% desert exploration; can use as many as you get!", 10));
+    }
+
+    if (!__quest_state["Level 10"].state_boolean["beanstalk grown"] && $item[enchanted bean].available_amount() == 0) {
+       pullable_item_list.listAppend(GPItemMake($item[enchanted bean], "Grow it in the Nearby Plains for the Level 10 quest", 1));
+    }
+
+    int hospital_progress = get_property_int("hiddenHospitalProgress");;
+
+    if (hospital_progress < 7) {
+        if (__misc_state["Torso aware"]) item [int] missingSurgeonComponents = items_missing($items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel,surgical apron]);
+        if (!__misc_state["Torso aware"]) item [int] missingSurgeonComponents = items_missing($items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]);
+        
+        if (missingSurgeonComponents.count() > 0)
+        {
+            string description = "Still need: " + missingSurgeonComponents.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
+            pullable_item_list.listAppend(GPItemMake("Surgeon disguise for the Hidden Hospital", "__item " + missing_ninja_components[0], description));
+        }
+
+    }
+
+    boolean hiddenTavernUnlocked = get_property_ascension("hiddenTavernUnlock");
+    
+    if ($item[book of matches].available_amount() == 0 && !hiddenTavernUnlocked) {
+       pullable_item_list.listAppend(GPItemMake($item[book of matches], "Unlock Cursed Punch & Bowl of Scorpions for Hidden City turnsaving", bowlingBallsNeeded));
+    }
+
+    // Can pull a bowling ball, I guess.
+    int bowling_progress = get_property_int("hiddenBowlingAlleyProgress");
+    int numberOfRollsLeft = 6 - bowling_progress;
+    int bowlingBallsNeeded = numberOfRollsLeft - $item[bowling ball].available_amount_including_closet();
+    int bowlingBallsInInventory = $item[bowling ball].available_amount();
+
+    if (bowling_progress < 7 && bowlingBallsNeeded > 0) {
+        pullable_item_list.listAppend(GPItemMake($item[bowling ball], "Could pull a bowling ball for the Hidden Bowling Alley", bowlingBallsNeeded));
+    }
+
+    if ($item[electric boning knife].available_amount() == 0 && __quest_state["Level 13"].state_boolean["wall of bones will need to be defeated"] && my_path().id != PATH_POCKET_FAMILIARS) {
+        if (!$skill[garbage nova].skill_is_usable() && !in_bad_moon() && !__quest_state["Level 13"].state_boolean["past tower level 2"] && $location[the castle in the clouds in the sky (top floor)].locationAvailable()) {
+            pullable_item_list.listAppend(GPItemMake("Can pull a clusterbomb to crumble the wall of bones", "__ item sleaze clusterbomb", "Unbelievably expensive pull that will save you a few turns if you cannot towerkill the wall of bones"));
+        }
     }
 
 
@@ -520,12 +680,25 @@ void generatePullList(Checklist [int] checklists)
     //   measured by how many stats they give the user. Ergo, in cases where
     //   it's possible, try to include the # of expected stats in the desc
 
-    //   - LEVELING: glitch season reward name
-    //   - LEVELING: guilty sprout
-    //   - LEVELING/TURNBLOAT: blueberry/bran muffin
-
     if (__misc_state["need to level"])
     {
+        // Best stat pull is the glitch, so put it at the top. But only show it at a critical mass of implementations.
+        int glitchMonsterStats = MAX(10, 5 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0 ) * get_property_int("glitchItemImplementationCount") / 4);
+
+        // Below this, you might as well just pull sprout or whatever.
+        if (glitchMonsterStats > 400) {
+            string glitchDesc = "Difficult free fight, but massive meat/stat gains!";
+
+            // Display meat if it actually matters
+            if (my_meat() < 7500) glitchDesc += "|Will gain "+get_property_int("glitchItemImplementationCount")*5+" meat from your glitch.";
+            
+            glitchDesc += "|Will gain "+glitchMonsterStats+" stats from your glitch.";
+
+            if (__iotms_usable[$item[emotion chip]] && clampi(3 - get_property_int("_feelPrideUsed"), 0, 3) > 0) glitchDesc += "|Consider using Feel Pride to get 3x that total of stats.";
+
+            pullable_item_list.listAppend(GPItemMake(lookupItem("[glitch season reward name]", glitchDesc)));
+        }
+
         if (my_primestat() == $stat[muscle])
         {
             if ($item[fake washboard].item_is_usable())
@@ -557,6 +730,15 @@ void generatePullList(Checklist [int] checklists)
                 pullable_item_list.listAppend(GPItemMake($item[wal-mart overalls], "+4 mainstat/fight"));
         }
 
+        // If the user can use a red rocket, and user doesn't have a cleaver, suggest pulling a guilty sprout
+        if (__misc_state["in run"] && __misc_state["can eat just about anything"] && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path().id != PATH_G_LOVER) {
+            if (!__iotms_usable["June Cleaver"]) {
+                int sproutStats = MAX(0, 4 * 225 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0)); 
+                pullable_item_list.listAppend(GPItemMake($item[guilty sprout],"Food; gain "+sproutStats+" stats with a red-rocketed sprout!"));
+            }
+        }
+
+        // Vamp stats are pretty stupid but they're plausible I guess.
         int vampingStats = MIN(500, 4 * my_basestat(my_primestat())) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
         pullable_item_list.listAppend(GPItemMake($item[plastic vampire fangs], "Gain"+vampingStats+" mainstat, once/day; costs a turn!", 1));
     }
@@ -570,7 +752,8 @@ void generatePullList(Checklist [int] checklists)
     //   particular challenge path context and not particularly useful in
     //   other situations. 
 
-    // PATH-SPECIFIC: +100 stat potions for tower test in shrunken adv
+    if (my_path().id == $path[A Shrunken Adventurer am I])
+        pullable_item_list.listAppend(GPItemMake("Flat +100 stat potion", "__item bottle of pirate juice", "The tower stat test is really, really tough in this path!|Once at the tower, pull a bottle of pirate juice for moxie, teeny-tiny magic scroll for myst, or a bottle of rhinoceros hormones for muscle."));
 
     if (my_path().id == PATH_COMMUNITY_SERVICE)
     	pullable_item_list.listAppend(GPItemMake($item[pocket wish], "Saves turns on everything in Community Service.", 20));
@@ -631,6 +814,10 @@ void generatePullList(Checklist [int] checklists)
                 drink_selections.listAppend("wrecked generators");
             if ($item[Ice Island Long Tea].is_unrestricted() && $item[Ice Island Long Tea].item_is_usable())
                 drink_selections.listAppend("Ice Island Long Tea");
+            if ($item[Boris's beer].is_unrestricted() && $item[Boris's beer].item_is_usable())
+                drink_selections.listAppend("Boris's beer");
+            if ($item[vintage smart drink].is_unrestricted() && $item[vintage smart drink].item_is_usable())
+                drink_selections.listAppend("vintage smart drink");
             
             string description;
             if (drink_selections.count() > 0)
@@ -750,6 +937,11 @@ void generatePullList(Checklist [int] checklists)
     // This never showed up because it had an added false in the condition. I am commenting it out
     //   because I don't think anyone in unrestricted would ever want to do this?
 	
+    // boolean have_super_fairy = false;
+    // // Pretty sure I deleted the places that use this, but in case I didn't...
+	// if ((familiar_is_usable($familiar[fancypants scarecrow]) && $item[spangly mariachi pants].available_amount() > 0) || (familiar_is_usable($familiar[mad hatrack]) && $item[spangly sombrero].available_amount() > 0))
+	// 	have_super_fairy = true;
+
     // if (!have_super_fairy && my_path().id != PATH_HEAVY_RAINS)
 	// {
 	// 	if (familiar_is_usable($familiar[fancypants scarecrow]))
