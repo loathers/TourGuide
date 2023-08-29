@@ -638,9 +638,10 @@ void generatePullList(Checklist [int] checklists)
     int hospital_progress = get_property_int("hiddenHospitalProgress");
 
     if (hospital_progress < 7) {
-        if (__misc_state["Torso aware"]) item [int] 
+        item [int] missingSurgeonComponents;
+        if (__misc_state["Torso aware"])  
             missingSurgeonComponents = items_missing($items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel,surgical apron]);
-        if (!__misc_state["Torso aware"]) item [int] 
+        if (!__misc_state["Torso aware"])
             missingSurgeonComponents = items_missing($items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel]);
         
         if (missingSurgeonComponents.count() > 0)
@@ -654,7 +655,7 @@ void generatePullList(Checklist [int] checklists)
     boolean hiddenTavernUnlocked = get_property_ascension("hiddenTavernUnlock");
     
     if ($item[book of matches].available_amount() == 0 && !hiddenTavernUnlocked) {
-       pullable_item_list.listAppend(GPItemMake($item[book of matches], "Unlock Cursed Punch & Bowl of Scorpions for Hidden City turnsaving", bowlingBallsNeeded));
+       pullable_item_list.listAppend(GPItemMake($item[book of matches], "Unlock Cursed Punch & Bowl of Scorpions for Hidden City turnsaving", 1));
     }
 
     // Can pull a bowling ball, I guess.
@@ -734,7 +735,7 @@ void generatePullList(Checklist [int] checklists)
 
         // If the user can use a red rocket, and user doesn't have a cleaver, suggest pulling a guilty sprout
         if (__misc_state["in run"] && __misc_state["can eat just about anything"] && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path().id != PATH_G_LOVER) {
-            if (!__iotms_usable[$item["June Cleaver"]]) {
+            if (!__iotms_usable[$item[June Cleaver]]) {
                 int sproutStats = MAX(0, 4 * 225 * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0)); 
                 pullable_item_list.listAppend(GPItemMake($item[guilty sprout],"Food; gain "+sproutStats+" stats with a red-rocketed sprout!"));
             }

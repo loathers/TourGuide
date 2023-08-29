@@ -166,7 +166,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
     phylum phylumBanished = $phylum[none];
     int monsterCount = 0;
 
-	if (phylaResult.length() > 0) {
+	if (phylaResult.count() > 0) {
 		name = "Current Phyla Banished";
 
         int screechCharge = get_property_int("screechCombats");
