@@ -97,8 +97,8 @@ static
 	__banish_source_length["system sweep"] = -1;
 	__banish_source_length["feel hatred"] = 50;
 	__banish_source_length["show your boring familiar pictures"] = 100;
+	__banish_source_length["bowl a curveball"] = 5;
 	__banish_source_length["patriotic screech"] = 100;
-	__banish_source_length["bowl a curveball"] = get_property_int("cosmicBowlingBallReturnCombats");
 	__banish_source_length["monkey slap"] = 1234567; // this, for some reason, was not properly respecting the reset condition. so imma just do this to hopefully solve it.
     
     int [string] __banish_simultaneous_limit;
@@ -145,6 +145,7 @@ Banish [int] BanishesActive()
         b.banish_turn_length = 0;
         if (__banish_source_length contains b.banish_source.to_lower_case())
             b.banish_turn_length = __banish_source_length[b.banish_source.to_lower_case()];
+            if (b.banish_source == "bowl a curveball") b.banish_turn_length = get_property_int("cosmicBowlingBallReturnCombats");
         if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell" || b.banish_source == "beancannon" || b.banish_source == "monkey slap")
             b.custom_reset_conditions = "rollover";
         if (b.banish_source == "ice house" && (!$item[ice house].is_unrestricted() || in_bad_moon())) //not relevant

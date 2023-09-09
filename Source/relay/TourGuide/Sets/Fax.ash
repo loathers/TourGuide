@@ -15,20 +15,20 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
     
     if (__misc_state["in run"])
     {
-        
-        if (!familiar_is_usable($familiar[angry jung man]))
-        {
-            //Can't pull for jar of psychoses, no jung man...
-            //It's time for a g-g-g-ghost! zoinks!
-            if (!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
-            {
-                string line = "Ghost - only if you can copy it.";
-                if (can_arrow)
-                    line += " (arrow?)";
-                line += "|*5 white pixels drop per ghost, speeds up digital key. Run +150% item.";
-                potential_faxes.listAppend(line);
-            }
-        }
+        // Remove Ghost because it is now bad now that you don't actually need white pixels.
+        // if (!familiar_is_usable($familiar[angry jung man]))
+        // {
+        //     //Can't pull for jar of psychoses, no jung man...
+        //     //It's time for a g-g-g-ghost! zoinks!
+        //     if (!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
+        //     {
+        //         string line = "Ghost - only if you can copy it.";
+        //         if (can_arrow)
+        //             line += " (arrow?)";
+        //         line += "|*5 white pixels drop per ghost, speeds up digital key. Run +150% item.";
+        //         potential_faxes.listAppend(line);
+        //     }
+        // }
         //sleepy mariachi
         if (familiar_is_usable($familiar[fancypants scarecrow]) || familiar_is_usable($familiar[mad hatrack]))
         {
