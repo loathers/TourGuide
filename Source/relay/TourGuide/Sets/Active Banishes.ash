@@ -44,7 +44,7 @@ string DescribeThisBanish(Banish b) {
     int turnsSinceBanish = my_turncount() - banishTurn;
     int turnsOfBanishLeft = banishLength - turnsSinceBanish;
 
-    if (source = "Bowl a Curveball") {
+    if (source == "Bowl a Curveball") {
         turnsOfBanishLeft = get_property_int("cosmicBowlingBallReturnCombats");
     }
 
