@@ -837,7 +837,7 @@ string generateRandomMessage()
         }
         while (commands.count() > 6)
             remove commands[commands.listKeyForIndex(0)];
-        set_property("__voices", commands.listJoinComponents(",") + "|"); //we add an ending sentinel because set_property() will remove ";" if it's at the end of the string. set_property() is not guaranteed to keep data integrity
+        set_property("__voices", commands.listJoinComponents(", ") + "|"); //we add an ending sentinel because set_property() will remove ";" if it's at the end of the string. set_property() is not guaranteed to keep data integrity
         
         random_messages.listClear();
         
