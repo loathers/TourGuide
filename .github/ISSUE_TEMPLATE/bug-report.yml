@@ -34,7 +34,7 @@ body:
     id: commit-version
     attributes:
       label: TourGuide Commit
-      description: Please paste your TourGuide Commit, via (`ash git_info("tourguide")`).
-      placeholder: ex. "Seal Clubber in Grey Goo"
+      description: Please paste your TourGuide Commit hash, via (`ash git_info("tourguide")`).
+      placeholder: ex. "925e68c5af96edd52b482887aa07758c5284dc47"
     validations:
       required: false
