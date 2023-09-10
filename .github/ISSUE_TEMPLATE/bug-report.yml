@@ -1,0 +1,42 @@
+name: Bug Report
+about: Create a report to help us fix TourGuide bugs
+title: "[Bug]: "
+labels: bug
+assignees: ''
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out a bug report! As a heads up -- if your Mafia or TourGuide version is out of date when posting this issue, it may already be resolved and your issue may be closed. Please keep your things up to date!
+  - type: textarea
+    id: whats-the-bug
+    attributes:
+      label: What's the bug?
+      description: Tell us the bug you encountered. Please include an account of the incorrect behavior, as well as what you would deem as the "correct" behavior.
+      placeholder: Tell us what you see!
+  - type: dropdown
+    id: class
+    attributes:
+      label: user-state
+      description: Were you in Standard or Unrestricted?
+      options:
+        - Standard (In-Run)
+        - Unrestricted (In-Run)
+        - Aftercore
+      default: Aftercore
+  - type: input
+    id: classpath
+    attributes:
+      label: In-Game Path & Class
+      description: Please put your in-game path & class.
+      placeholder: ex. "Seal Clubber in Grey Goo"
+    validations:
+      required: false
+  - type: input
+    id: commit-version
+    attributes:
+      label: TourGuide Commit
+      description: Please paste your TourGuide Commit, via (`ash git_info("tourguide")`).
+      placeholder: ex. "Seal Clubber in Grey Goo"
+    validations:
+      required: false
