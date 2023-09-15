@@ -208,16 +208,6 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                 }
                 add_fax(fax);
             }
-            //drunken half-orc hobo (smiths)
-            if (in_hardcore() && $skill[summon smithsness].skill_is_usable() && $items[dirty hobo gloves,hand in glove].available_amount() == 0 && false) //umm... I don't think this matters anymore
-            {
-                monster hobo = $monster[drunken half-orc hobo];
-                if (my_ascensions() % 2 == 1)
-                {
-                    hobo = $monster[hung-over half-orc hobo];
-                }
-                add_fax(new potential_fax(hobo, "- run +234% item to make +ML smithness accessory."));
-            }
             //monstrous boiler
             if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && $item[wine bomb].available_amount() == 0)
             {
