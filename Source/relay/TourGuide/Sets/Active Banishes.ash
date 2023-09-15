@@ -44,6 +44,10 @@ string DescribeThisBanish(Banish b) {
     int turnsSinceBanish = my_turncount() - banishTurn;
     int turnsOfBanishLeft = banishLength - turnsSinceBanish;
 
+    if (source == "Bowl a Curveball") {
+        turnsOfBanishLeft = get_property_int("cosmicBowlingBallReturnCombats");
+    }
+
     if (turnsOfBanishLeft < 0) {
         return "";
     }
@@ -73,7 +77,7 @@ string DescribeThisBanish(BanishedPhylum b) {
 
     int turnsSinceBanish = my_turncount() - banishTurn;
     int turnsOfBanishLeft = banishLength - turnsSinceBanish;
-
+    
     if (turnsOfBanishLeft < 0) {
         return "";
     }
@@ -166,7 +170,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
     phylum phylumBanished = $phylum[none];
     int monsterCount = 0;
 
-	if (phylaResult.length() > 0) {
+	if (phylaResult.count() > 0) {
 		name = "Current Phyla Banished";
 
         int screechCharge = get_property_int("screechCombats");

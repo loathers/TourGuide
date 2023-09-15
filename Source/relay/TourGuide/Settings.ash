@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "2.1.0";
+string __version = "2.2.0"; // pushed to 2.2.0 on new pull list refactor
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";

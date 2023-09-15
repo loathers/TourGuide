@@ -476,7 +476,22 @@ void setUpState()
 	//monster.monster_initiative() is usually what you need, but just in case:
     __misc_state_float["init ML penalty"] = monsterExtraInitForML(monster_level_adjustment_ignoring_plants());
 
-	
+    // Make a state variable re: zap wand ownership
+    __misc_state["zap wand owned"] = false;
+
+    item zap_wand_owned;
+
+    if (true) {
+        zap_wand_owned = $item[none];
+        foreach wand in $items[aluminum wand,ebony wand,hexagonal wand,marble wand,pine wand] {
+            if (wand.available_amount() > 0) {
+                zap_wand_owned = wand;
+                break;
+            }
+        }
+    }
+
+    if (zap_wand_owned != $item[none]) __misc_state["zap wand owned"] = true;
 	
 	int ngs_needed = 0;
 	
