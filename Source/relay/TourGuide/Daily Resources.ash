@@ -30,7 +30,7 @@ void generateDailyResources(Checklist [int] checklists)
         string image_name = "basic hot dog";
         
         string [int][int] options;
-        options.listAppend(generateHotDogLine("Optimal Dog", "Semi-rare next adventure.", 1));
+        options.listAppend(generateHotDogLine("Optimal Dog", "Get Lucky!", 1));
         
         if (__misc_state["in run"]) {
             options.listAppend(generateHotDogLine("Ghost Dog", "-combat, 30 turns.", 3));

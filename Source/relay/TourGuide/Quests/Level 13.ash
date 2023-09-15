@@ -153,7 +153,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     }
     else if (__misc_state["can eat just about anything"] || (__misc_state["can drink just about anything"] && __misc_state["VIP available"]))
     {
-        weight_modifiers.listAppend(TFWMInternalModifierMake("irradiated pet snacks (semi-rare, menagerie level 2)", false, false, true, 10.0));
+        weight_modifiers.listAppend(TFWMInternalModifierMake("irradiated pet snacks (lucky adventure, menagerie level 2)", false, false, true, 10.0));
     }
     if (__misc_state["VIP available"] && __misc_state["can drink just about anything"])
     {

@@ -26,8 +26,7 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     string [int][int] options;
     
     options.listAppend(listMake("<strong>Drink</strong>", "<strong>Size</strong>", "<strong>Description</strong>"));
-    if (CounterLookup("Semi-rare").CounterIsRange())
-        options.listAppend(listMake("Lucky Lindy", "1", "Semi-rare number"));
+    options.listAppend(listMake("Lucky Lindy", "1", "Get Lucky!"));
     
     //FIXME every drink
     //FIXME gray out drinks we can't drink at the moment (drunkenness, meat)

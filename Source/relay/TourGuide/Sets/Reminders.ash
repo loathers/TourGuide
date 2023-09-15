@@ -350,18 +350,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     if (__last_adventure_location == $location[the haunted ballroom] && $item[dance card].available_amount() > 0 && __misc_state["need to level"] && my_primestat() == $stat[moxie] && CounterLookup("Dance Card").CounterGetNextExactTurn() == -1)
     {
-        boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(3, 3);
-        
-        if (delay_for_semirare)
-            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "", ChecklistSubentryMake(HTMLGenerateSpanFont("Avoid using " + $item[dance card], "red"), "", HTMLGenerateSpanFont("You have a semi-rare coming up then, wait a turn first.", "red")), -11).ChecklistEntrySetIDTag("Powerleveling dance card wait"));
-        else
-        {
-            string [int] description;
-            description.listAppend("Gives ~" + __misc_state_float["dance card average stats"].round() + " mainstat in four turns.");
-            if ($item[dance card].available_amount() > 1)
-                description.listAppend("Have " + $item[dance card].pluraliseWordy() + ".");
-            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?ftext=dance+card", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11).ChecklistEntrySetIDTag("Powerleveling dance card reminder"));
-        }
+        string [int] description;
+        description.listAppend("Gives ~" + __misc_state_float["dance card average stats"].round() + " mainstat in four turns.");
+        if ($item[dance card].available_amount() > 1)
+            description.listAppend("Have " + $item[dance card].pluraliseWordy() + ".");
+        task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?ftext=dance+card", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11).ChecklistEntrySetIDTag("Powerleveling dance card reminder"));
     }
     if (!__quest_state["Level 11 Hidden City"].finished && (__quest_state["Level 11 Hidden City"].state_boolean["Apartment finished"] || get_property_int("hiddenApartmentProgress") >= 7) && $effect[thrice-cursed].have_effect() > 0 && my_path().id != PATH_G_LOVER)
     {
@@ -405,31 +398,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             task_entries.listAppend(ChecklistEntryMake("__item miniature life preserver", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Equip miniature life preserver", "red"), "", description), -11).ChecklistEntrySetIDTag("Heavy rains path life preserver reminder"));
         }
     }
-    
-    Counter semirare_counter = CounterLookup("Semi-rare");
-    if (semirare_counter.CounterIsRange() && semirare_counter.range_start_turn <= 3 && semirare_counter.range_start_turn >= 1)
-    {
-        //can we reasonably discover the secret?
-        string [int] description;
-        int upcoming_in = semirare_counter.range_start_turn;
-        description.listAppend("Window starts after " + pluraliseWordy(upcoming_in, "turn", "turns") + ".");
-        
-        string [int] options;
-        if (__misc_state["can eat just about anything"] && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_G_LOVER)
-        {
-            options.listAppend("eat a fortune cookie");
-        }
-        if (__misc_state["VIP available"] && __misc_state["can drink just about anything"] && $item[Clan speakeasy].is_unrestricted())
-        {
-            options.listAppend("drink a lucky lindy");
-        }
-        
-        description.listAppend(options.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
-        
-        if (options.count() > 0)
-            task_entries.listAppend(ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Learn semi-rare number", "red"), "", description), -11).ChecklistEntrySetIDTag("Semi-rare learn reminder"));
-    }
-    
+
     if (__last_adventure_location == $location[a maze of sewer tunnels] && $item[hobo code binder].equipped_amount() == 0 && haveAtLeastXOfItemEverywhere($item[hobo code binder], 1))
     {
         task_entries.listAppend(ChecklistEntryMake("__item hobo code binder", "inventory.php?ftext=hobo+code+binder", ChecklistSubentryMake(HTMLGenerateSpanFont("Equip hobo code binder", "red"), "", "Speeds up sewer tunnel exploration."), -11).ChecklistEntrySetIDTag("Sewer maze hobo binder reminder"));

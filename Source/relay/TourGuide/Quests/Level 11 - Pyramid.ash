@@ -138,18 +138,11 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             next_position_needed = 1;
             additional_turns_after_that = 0;
             
-            boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
-            if (delay_for_semirare)
-            {
-                task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red");
-            }
-            else
-            {
-                int ed_ml = 180 + monster_level_adjustment_for_location($location[the lower chambers]);
-                task = "fight Ed in the lower chambers";
-                if (ed_ml > my_buffedstat($stat[moxie]))
-                    task += " (" + ed_ml + " attack)";
-            }
+            int ed_ml = 180 + monster_level_adjustment_for_location($location[the lower chambers]);
+            task = "fight Ed in the lower chambers";
+            if (ed_ml > my_buffedstat($stat[moxie]))
+                task += " (" + ed_ml + " attack)";
+            
             if (ed_chamber_open)
                 done_with_wheel_turning = true;
         }
