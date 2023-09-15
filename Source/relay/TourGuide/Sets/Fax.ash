@@ -213,22 +213,6 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                 }
                 add_fax(fax);
             }
-            //gaudy pirate (use for insults!) (now obsolete)
-            /*if (!__quest_state["Level 11 Palindome"].finished && $item[talisman o' namsilat].available_amount() == 0 && $items[snakehead charrrm,gaudy key].available_amount() < 2 && $items[Copperhead Charm,Copperhead Charm (rampant)].available_amount() < 2 && my_path().id != PATH_G_LOVER && __quest_state["Pirate Quest"].state_boolean["valid"])
-            {
-                string description = "- two fights for talisman o' nam. (copy once)";
-                if ($items[snakehead charrrm,gaudy key].available_amount() == 1)
-                    description = "- one fight for talisman o' nam.";
-                if (__quest_state["Pirate Quest"].mafia_internal_step < 6 && __quest_state["Pirate Quest"].state_int["insult count"] < 8)
-                {
-                    string l = "Pirate insult them!";
-                    if ($item[the big book of pirate insults].available_amount() == 0)
-                        l += " (get the big book of pirate insults first)";
-                    
-                    description += HTMLGenerateIndentedText(l);
-                }
-                add_fax(new potential_fax($monster[gaudy pirate], description));
-            }*/
             
             //screambat for sonar replacement
             if ((3 - __quest_state["Level 4"].state_int["areas unlocked"]) > $item[sonar-in-a-biscuit].available_amount())
