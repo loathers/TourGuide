@@ -138,8 +138,6 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
         //orcish frat boy spy / war hippy
         if (!have_outfit_components("War Hippy Fatigues") && !have_outfit_components("Frat Warrior Fatigues") && !__quest_state["Level 12"].finished)
             potential_faxes.listAppend("Bailey's Beetle (YR) / Hippy spy (30% drop) / Orcish frat boy spy (30% drop) - war outfit");
-            
-        //dirty thieving brigand...? 
         
         if (!__misc_state["can eat just about anything"]) //can't eat, can't fortune cookie
         {
@@ -157,21 +155,6 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                 add_fax(new potential_fax($monster[Baa'baa'bu'ran], "- Stone wool for hidden city unlock. Need +100% items (or as much as you can get for extra wool)"));
             }
         }
-        
-        /*if (to_item("7301").available_amount() == 0 && get_property("questM20Necklace") != "finished" && $item[Lady Spookyraven's necklace].available_amount() == 0)
-        {
-            int effective_writing_desks_encountering = get_property_int("writingDesksDefeated");
-            if (get_property_monster("romanticTarget") == $monster[writing desk])
-                effective_writing_desks_encountering += get_property_int("_romanticFightsLeft");
-            if (effective_writing_desks_encountering < 5)
-            {
-                string line = "- <strong>only if you can copy it four times</strong>. Skips the manor's first floor if you fight five total.";
-                
-                if ($item[telegram from Lady Spookyraven].available_amount() > 0)
-                    line += HTMLGenerateSpanFont("<br>Read the telegram from Lady Spookyraven first.", "red");
-                add_fax(new potential_fax($monster[Writing desk], line));
-            }
-        }*/
         
         if (!__misc_state["can reasonably reach -25% combat"] && in_hardcore() && $item[Bram's choker].available_amount() == 0 && combat_rate_modifier() > -25.0 && !(__quest_state["Level 13"].in_progress || (__quest_state["Level 13"].finished && my_path().id != PATH_BUGBEAR_INVASION)))
         {
@@ -235,14 +218,6 @@ string [int] SFaxGeneratePotentialFaxes(boolean suggest_less_powerful_faxes, boo
                 }
                 add_fax(new potential_fax(hobo, "- run +234% item to make +ML smithness accessory."));
             }
-            //nuns bandit for trickery
-            /*if (!__quest_state["Level 12"].state_boolean["Nuns Finished"])
-            {
-                string description = "- nuns trick.";
-                if (!__quest_state["Level 12"].state_boolean["War started"])
-                    description = HTMLGenerateSpanFont(description, "gray");
-                add_fax(new potential_fax($monster[dirty thieving brigand], description));
-            }*/
             //monstrous boiler
             if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && $item[wine bomb].available_amount() == 0)
             {
