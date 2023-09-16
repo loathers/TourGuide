@@ -260,7 +260,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     // Ripping some code from the friars tile to count NCs encountered. First, names of the relevant NCs.
     boolean [string] necks_known_ncs = $strings[How Do We Do It? Quaint and Curious Volume!,Strike One!,Olive My Love To You\, Oh.,Dodecahedrariffic!];
     boolean [string] heart_known_ncs = $strings[Moon Over the Dark Heart,Running the Lode,I\, Martin,Imp Be Nimble\, Imp Be Quick];
-    boolean [string] elbow_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,A Secret\, But Not the Secret You're Looking For,Butter Knife? I'll Take the Knife];
+    boolean [string] elbow_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,A Secret\, But Not the Secret You're Looking For,Butter Knife?  I'll Take the Knife];
     
     // Then, a tiny function to count the NCs found by zone for friars.
     int countFriarNCs(boolean [string] known_ncs, location place) {
