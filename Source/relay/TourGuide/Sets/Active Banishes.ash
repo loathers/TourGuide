@@ -48,6 +48,10 @@ string DescribeThisBanish(Banish b) {
         turnsOfBanishLeft = get_property_int("cosmicBowlingBallReturnCombats");
     }
 
+    if (source == "Roar like a Lion") {
+        turnsOfBanishLeft = have_effect($effect[Hear Me Roar]) - 1; // assuming "active for 0 more turns" means "it will be active on this turn, and then not active"
+    }
+
     if (turnsOfBanishLeft < 0) {
         return "";
     }
