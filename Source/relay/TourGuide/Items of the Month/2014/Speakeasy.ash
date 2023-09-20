@@ -26,7 +26,7 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     string [int][int] options;
     
     options.listAppend(listMake("<strong>Drink</strong>", "<strong>Size</strong>", "<strong>Description</strong>"));
-    options.listAppend(listMake("Lucky Lindy", "1", "Get Lucky!"));
+    options.listAppend(listMake("Lucky Lindy", "6", "Get Lucky!"));
     
     //FIXME every drink
     //FIXME gray out drinks we can't drink at the moment (drunkenness, meat)
