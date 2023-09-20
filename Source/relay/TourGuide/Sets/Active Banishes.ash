@@ -36,13 +36,7 @@ string DescribeThisBanish(Banish b) {
     int banishLength = b.banish_turn_length;
     string banishLengthString = "";
 
-
-    if (b.custom_reset_conditions == "rollover") {
-        banishLength = 1234567;   
-    }
-
-    int turnsSinceBanish = my_turncount() - banishTurn;
-    int turnsOfBanishLeft = banishLength - turnsSinceBanish;
+    int turnsOfBanishLeft = BanishTurnsLeft(b);
 
     if (source == "Bowl a Curveball") {
         turnsOfBanishLeft = get_property_int("cosmicBowlingBallReturnCombats");
@@ -58,6 +52,7 @@ string DescribeThisBanish(Banish b) {
 
     if (turnsOfBanishLeft >= 300) banishLengthString = " until rollover.";
     if (turnsOfBanishLeft <= 300) banishLengthString = ` for {pluralise(turnsOfBanishLeft,"more turn","more turns")}.`;
+    if (source == "ice house") banishLengthString = " forever.";
 
     string textReturn = "<b>"+banishedMon+"</b>, via "+source+banishLengthString+"<hr>|*";
 
@@ -105,7 +100,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
     string banishedMonstersUnparsed = get_property("banishedMonsters");
     string banishedPhylumUnparsed = get_property("banishedPhyla");
     
-    Banish [int] monsterResult;
+    Banish [int] monsterResult = BanishesActive();
     BanishedPhylum [int] phylaResult;
 
     // Save the banished monsters to compare later for snapper/eagle checks, with snapper phylum.
@@ -117,30 +112,9 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
     string [int] banishedPhylumParsed = banishedPhylumUnparsed.split_string(":");
 
     // ... then this reads it.
-    foreach key, parsedString in banishedMonstersParsed {
-        if (parsedString.length() == 0)
-            continue;        // This bypasses if there is no result.
-        if (key % 3 != 0)
-            continue;        // This bypasses when you aren't at a divisible-by-three key.
-
-        // Populate a banish object by referencing the three relevant entries.
-        Banish b;
-        b.banished_monster = banishedMonstersParsed[key + 0].to_monster();
-        b.banish_source = banishedMonstersParsed[key + 1];
-        b.turn_banished = banishedMonstersParsed[key + 2].to_int();
-
+    foreach key, banish in monsterResult {
         // Add the banished monster to the banishedMonsterList
-        banishedMonsterList.listAppend(b.banished_monster);
-
-        // Populate the turn length by referencing the source above.
-        b.banish_turn_length = 0;
-        if (__banish_source_length contains b.banish_source.to_lower_case())
-            b.banish_turn_length = __banish_source_length[b.banish_source.to_lower_case()];
-        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell" || b.banish_source == "beancannon" || b.banish_source == "monkey slap")
-            b.custom_reset_conditions = "rollover";
-        if (b.banish_source == "ice house" && (!$item[ice house].is_unrestricted() || in_bad_moon())) //not relevant
-            continue;
-        monsterResult.listAppend(b);
+        banishedMonsterList.listAppend(banish.banished_monster);
     }
 
     // Now that you've addressed "normal" banishes, address the phylum banish.
