@@ -117,8 +117,8 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
         // _cinchUsed is a weird preference that actually means distance from 100% you are at in your current cinch.
 
-        int freeRests = __misc_state_int["free rests remaining"];
-        int cinchoRests = get_property_int('_cinchRests');
+        int freeRests = __misc_state_int["total free rests possible"];
+        int cinchoRests = get_property_int('_cinchoRests');
         int cinchUsed = get_property_int('_cinchUsed');
 
         // Calculating total available cinch

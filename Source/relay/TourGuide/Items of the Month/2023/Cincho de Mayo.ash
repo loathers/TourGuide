@@ -4,8 +4,8 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__iotms_usable[$item[Cincho de Mayo]]) return;
     
     // _cinchUsed is a weird preference that actually means distance from 100% you are at in your current cinch.
-    int freeRests = __misc_state_int["free rests remaining"];
-    int cinchoRests = get_property_int('_cinchRests');
+    int freeRests = __misc_state_int["total free rests possible"];
+    int cinchoRests = get_property_int('_cinchoRests');
     int cinchUsed = get_property_int('_cinchUsed');
     
     // Since the pref is weird, this tells you your current total cinch
