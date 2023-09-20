@@ -41,6 +41,11 @@ int BanishTurnsLeft(Banish b)
 {
     if (b.banish_turn_length == -1)
         return 2147483647;
+
+    // Some sources depend on effect or a state that is running out, and so the stated length should be returned directly
+    string banish_source = b.banish_source.to_lower_case();
+    if (banish_source == "roar like a lion") return b.banish_turn_length;
+
     return b.turn_banished + b.banish_turn_length - my_turncount();
 }
 
