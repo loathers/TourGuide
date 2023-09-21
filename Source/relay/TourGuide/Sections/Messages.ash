@@ -569,8 +569,6 @@ string generateRandomMessage()
             random_messages.listAppend("it'll be all over soon");
     }
         
-    if (!CounterLookup("Semi-rare").CounterIsRange() && CounterLookup("Semi-rare").CounterExists() && CounterLookup("Semi-rare").exact_turns.count() > 1)
-        random_messages.listAppend("superpositioned semi-rare");
     if (hippy_stone_broken() && pvp_attacks_left() > 0)
         random_messages.listAppend(HTMLGenerateTagWrap("a", "aggressive friendship", generateMainLinkMap("peevpee.php")));
     

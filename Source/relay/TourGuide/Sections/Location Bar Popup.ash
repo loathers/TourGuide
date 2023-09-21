@@ -1007,9 +1007,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         
         //FIXME handle canceling NC
         buffer rate_buffer;
-        if (m.attributes.contains_text("SEMIRARE"))
-            rate_buffer.append("semi-rare ");
-        else if (m.attributes.contains_text("ULTRARARE"))
+        if (m.attributes.contains_text("ULTRARARE"))
             rate_buffer.append("ultra rare ");
         else if (m.boss)
             rate_buffer.append("boss ");

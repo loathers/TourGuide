@@ -156,7 +156,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				kge_modifiers.listAppend("-combat");
                 if ($familiar[slimeling].familiar_is_usable())
                     kge_modifiers.listAppend("slimeling?");
-				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks.|*Or run -combat in barracks";
+				string line = "Need knob goblin elite guard uniform.|*Lucky adventure in barracks.|*Or run -combat in barracks";
 				if (familiar_is_usable($familiar[slimeling]))
 					line += " with slimeling";
                     

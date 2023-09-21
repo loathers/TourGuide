@@ -302,10 +302,6 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         
         
         string final_name = intermediate_name;
-        if (intermediate_name == "Fortune Cookie" || intermediate_name.stringHasPrefix("Semirare"))
-        {
-            final_name = "Semi-rare";
-        }
         final_name = final_name.entity_encode();
         
         //Now create and edit our counter:

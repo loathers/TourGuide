@@ -171,23 +171,13 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         else
         {
-            if (CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0,2))
-            {
-                image_name = "__item fortune cookie";
-                subentry.header = HTMLGenerateSpanFont("Avoid vacationing at the shore", "red");
-                subentry.entries.listAppend("Will override semi-rare.");
-                //subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid vacationing; will override semi-rare.", "red"));
-            }
-            else
-            {
-                url = "place.php?whichplace=desertbeach";
-                subentry.header = "Vacation at the shore";
-                image_name = "__item your father's MacGuffin diary";
-                string diary_owner = "your father's";
-                if (my_path().id == PATH_GELATINOUS_NOOB)
-                    diary_owner = "an archeologist's";
-                subentry.entries.listAppend("To acquire " + diary_owner + " diary.");
-            }
+            url = "place.php?whichplace=desertbeach";
+            subentry.header = "Vacation at the shore";
+            image_name = "__item your father's MacGuffin diary";
+            string diary_owner = "your father's";
+            if (my_path().id == PATH_GELATINOUS_NOOB)
+                diary_owner = "an archeologist's";
+            subentry.entries.listAppend("To acquire " + diary_owner + " diary.");
         }
     }
     else if (base_quest_state.mafia_internal_step < 4)

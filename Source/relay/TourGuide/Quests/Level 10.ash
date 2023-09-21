@@ -241,13 +241,6 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (turn_estimation != -1.0)
                 subentry.entries.listAppend("~" + turn_estimation.roundForOutput(1) + " turns left on average.");
             
-            if (CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(1,1))
-            {
-                subentry.modifiers.listClear();
-                subentry.entries.listClear();
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here; wheel will override semi-rare.", "red"));
-            }
-            
             //Check if Shen is going to send them here (and not to the Hole in the Sky before that)
             int top_floor_index = 0;
             int hole_in_the_sky_index = 0;

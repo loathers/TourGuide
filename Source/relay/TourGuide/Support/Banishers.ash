@@ -41,6 +41,11 @@ int BanishTurnsLeft(Banish b)
 {
     if (b.banish_turn_length == -1)
         return 2147483647;
+
+    // Some sources depend on effect or a state that is running out, and so the stated length should be returned directly
+    string banish_source = b.banish_source.to_lower_case();
+    if (banish_source == "roar like a lion") return b.banish_turn_length;
+
     return b.turn_banished + b.banish_turn_length - my_turncount();
 }
 
@@ -99,6 +104,7 @@ static
 	__banish_source_length["show your boring familiar pictures"] = 100;
 	__banish_source_length["bowl a curveball"] = 5;
 	__banish_source_length["patriotic screech"] = 100;
+    __banish_source_length["roar like a lion"] = 30; // not sure it is needed; it should generally be not more than 30
 	__banish_source_length["monkey slap"] = 1234567; // this, for some reason, was not properly respecting the reset condition. so imma just do this to hopefully solve it.
     
     int [string] __banish_simultaneous_limit;
@@ -143,12 +149,15 @@ Banish [int] BanishesActive()
         b.banish_source = banished_monsters_string_split[key + 1];
         b.turn_banished = banished_monsters_string_split[key + 2].to_int();
         b.banish_turn_length = 0;
-        if (__banish_source_length contains b.banish_source.to_lower_case())
-            b.banish_turn_length = __banish_source_length[b.banish_source.to_lower_case()];
-            if (b.banish_source == "bowl a curveball") b.banish_turn_length = get_property_int("cosmicBowlingBallReturnCombats");
-        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell" || b.banish_source == "beancannon" || b.banish_source == "monkey slap")
+
+        string banish_source = b.banish_source.to_lower_case();
+        if (__banish_source_length contains banish_source)
+            b.banish_turn_length = __banish_source_length[banish_source];
+        if (banish_source == "bowl a curveball") b.banish_turn_length = get_property_int("cosmicBowlingBallReturnCombats");
+        if (banish_source == "roar like a lion") b.banish_turn_length = have_effect($effect[Hear Me Roar]);
+        if (banish_source == "batter up!" || banish_source == "deathchucks" || banish_source == "dirty stinkbomb" || banish_source == "nanorhino" || banish_source == "spooky music box mechanism" || banish_source == "ice hotel bell" || banish_source == "beancannon" || banish_source == "monkey slap")
             b.custom_reset_conditions = "rollover";
-        if (b.banish_source == "ice house" && (!$item[ice house].is_unrestricted() || in_bad_moon())) //not relevant
+        if (banish_source == "ice house" && (!$item[ice house].is_unrestricted() || in_bad_moon())) //not relevant
             continue;
         result.listAppend(b);
     }

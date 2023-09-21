@@ -22,7 +22,7 @@ void IOTMEightDaysAWeekPillsGenerateResource(ChecklistEntry [int] resource_entri
         description.listAppend(HTMLGenerateSpanOfClass("Thursday:", "r_bold") + " +4 all res (30 turns)");
         description.listAppend(HTMLGenerateSpanOfClass("Friday:", "r_bold") + " +100% all stats (30 turns)");
         description.listAppend(HTMLGenerateSpanOfClass("Saturday:", "r_bold") + " Familiars 20 pounds (30 turns)");
-        description.listAppend(HTMLGenerateSpanOfClass("Sunday:", "r_bold") + " Force semi-rare");
+        description.listAppend(HTMLGenerateSpanOfClass("Sunday:", "r_bold") + " Get Lucky!");
         description.listAppend(HTMLGenerateSpanOfClass("Funday:", "r_bold") + " Random adventures (30 turns)");
 
         return ChecklistSubentryMake(main_title, subtitle, description);

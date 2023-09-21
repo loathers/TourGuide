@@ -4,8 +4,9 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__iotms_usable[$item[Cincho de Mayo]]) return;
     
     // _cinchUsed is a weird preference that actually means distance from 100% you are at in your current cinch.
-    int freeRests = __misc_state_int["free rests remaining"];
-    int cinchoRests = get_property_int('_cinchRests');
+    int freeRests = __misc_state_int["total free rests possible"];
+    int freeRestsRemaining = __misc_state_int["free rests remaining"];
+    int cinchoRests = get_property_int('_cinchoRests');
     int cinchUsed = get_property_int('_cinchUsed');
     
     // Since the pref is weird, this tells you your current total cinch
@@ -73,7 +74,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     // Merge the list components together.
     description.listAppend("|*"+ cinchUses.listJoinComponents("<hr>|*"));
 
-    description.listAppend(`You have {totalCinch}% more cinch available, accounting for your {pluralise(freeRests,"free rest","free rests")}.`);
+    description.listAppend(`You have {totalCinch}% more cinch available, accounting for your {pluralise(freeRestsRemaining,"remaining free rest","remaining free rests")}.`);
 
     if (lookupItem("June cleaver").have() && !lookupItem("mother's necklace").have()) {
         description.listAppend("You do "+HTMLGenerateSpanOfClass("not", "r_element_hot")+" have a mother's necklace yet, so you're missing 5 free rests. Be careful of overusing the combat skills!");

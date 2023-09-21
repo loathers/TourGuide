@@ -122,7 +122,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				subentry.modifiers.listAppend("-combat");
                 if ($familiar[slimeling].familiar_is_usable())
                     subentry.modifiers.listAppend("slimeling?");
-				ore_lines.listAppend("Mining outfit not available. Consider acquiring one via -combat in mine or the semi-rare (30% drop)");
+				ore_lines.listAppend("Mining outfit not available. Consider acquiring one via -combat in mine");
 			}
             if (is_wearing_outfit("Mining Gear"))
             {
