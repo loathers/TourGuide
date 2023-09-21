@@ -5786,10 +5786,6 @@ void CountersParseProperty(string property_name, Counter [string] counters, bool
         
         
         string final_name = intermediate_name;
-        if (intermediate_name == "Fortune Cookie" || intermediate_name.stringHasPrefix("Semirare"))
-        {
-            final_name = "Semi-rare";
-        }
         final_name = final_name.entity_encode();
         
         //Now create and edit our counter:
@@ -10575,7 +10571,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				kge_modifiers.listAppend("-combat");
                 if ($familiar[slimeling].familiar_is_usable())
                     kge_modifiers.listAppend("slimeling?");
-				string line = "Need knob goblin elite guard uniform.|*Semi-rare in barracks.|*Or run -combat in barracks";
+				string line = "Need knob goblin elite guard uniform.|*Lucky adventure in barracks.|*Or run -combat in barracks";
 				if (familiar_is_usable($familiar[slimeling]))
 					line += " with slimeling";
                     
@@ -11802,7 +11798,7 @@ void QLevel8GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 				subentry.modifiers.listAppend("-combat");
                 if ($familiar[slimeling].familiar_is_usable())
                     subentry.modifiers.listAppend("slimeling?");
-				ore_lines.listAppend("Mining outfit not available. Consider acquiring one via -combat in mine or the semi-rare (30% drop)");
+				ore_lines.listAppend("Mining outfit not available. Consider acquiring one via -combat in mine");
 			}
             if (is_wearing_outfit("Mining Gear"))
             {
@@ -12906,13 +12902,6 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             if (turn_estimation != -1.0)
                 subentry.entries.listAppend("~" + turn_estimation.roundForOutput(1) + " turns left on average.");
             
-            if (CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(1,1))
-            {
-                subentry.modifiers.listClear();
-                subentry.entries.listClear();
-                subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid adventuring here; wheel will override semi-rare.", "red"));
-            }
-            
             //Check if Shen is going to send them here (and not to the Hole in the Sky before that)
             int top_floor_index = 0;
             int hole_in_the_sky_index = 0;
@@ -13606,18 +13595,11 @@ void QLevel11PyramidGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
             next_position_needed = 1;
             additional_turns_after_that = 0;
             
-            boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0, 6);
-            if (delay_for_semirare)
-            {
-                task = HTMLGenerateSpanFont("Avoid fighting Ed the Undying, semi-rare coming up ", "red");
-            }
-            else
-            {
-                int ed_ml = 180 + monster_level_adjustment_for_location($location[the lower chambers]);
-                task = "fight Ed in the lower chambers";
-                if (ed_ml > my_buffedstat($stat[moxie]))
-                    task += " (" + ed_ml + " attack)";
-            }
+            int ed_ml = 180 + monster_level_adjustment_for_location($location[the lower chambers]);
+            task = "fight Ed in the lower chambers";
+            if (ed_ml > my_buffedstat($stat[moxie]))
+                task += " (" + ed_ml + " attack)";
+            
             if (ed_chamber_open)
                 done_with_wheel_turning = true;
         }
@@ -15374,23 +15356,13 @@ void QLevel11BaseGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
         }
         else
         {
-            if (CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(0,2))
-            {
-                image_name = "__item fortune cookie";
-                subentry.header = HTMLGenerateSpanFont("Avoid vacationing at the shore", "red");
-                subentry.entries.listAppend("Will override semi-rare.");
-                //subentry.entries.listAppend(HTMLGenerateSpanFont("Avoid vacationing; will override semi-rare.", "red"));
-            }
-            else
-            {
-                url = "place.php?whichplace=desertbeach";
-                subentry.header = "Vacation at the shore";
-                image_name = "__item your father's MacGuffin diary";
-                string diary_owner = "your father's";
-                if (my_path().id == PATH_GELATINOUS_NOOB)
-                    diary_owner = "an archeologist's";
-                subentry.entries.listAppend("To acquire " + diary_owner + " diary.");
-            }
+            url = "place.php?whichplace=desertbeach";
+            subentry.header = "Vacation at the shore";
+            image_name = "__item your father's MacGuffin diary";
+            string diary_owner = "your father's";
+            if (my_path().id == PATH_GELATINOUS_NOOB)
+                diary_owner = "an archeologist's";
+            subentry.entries.listAppend("To acquire " + diary_owner + " diary.");
         }
     }
     else if (base_quest_state.mafia_internal_step < 4)
@@ -17058,7 +17030,7 @@ boolean generateTowerFamiliarWeightMethod(string [int] how, string [int] immedia
     }
     else if (__misc_state["can eat just about anything"] || (__misc_state["can drink just about anything"] && __misc_state["VIP available"]))
     {
-        weight_modifiers.listAppend(TFWMInternalModifierMake("irradiated pet snacks (semi-rare, menagerie level 2)", false, false, true, 10.0));
+        weight_modifiers.listAppend(TFWMInternalModifierMake("irradiated pet snacks (lucky adventure, menagerie level 2)", false, false, true, 10.0));
     }
     if (__misc_state["VIP available"] && __misc_state["can drink just about anything"])
     {
@@ -20663,7 +20635,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     string get_fishy, how_to_get_fishy;
     if ($effect[fishy].have_effect() == 0) {
         get_fishy = "Acquire fishy.";
-        how_to_get_fishy = "|*Easy way: Semi-rare in the brinier deeps, 50 turns.";
+        how_to_get_fishy = "|*Easy way: Lucky adventure in the brinier deeps, 50 turns.";
         if ($item[fishy pipe].available_amount() > 0 && !get_property_boolean("_fishyPipeUsed"))
             how_to_get_fishy += "|*Use fishy pipe.";
         if (monkees_quest_state.state_string["skate park status"] == "ice" && !get_property_boolean("_skateBuff1"))
@@ -30378,18 +30350,11 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     if (__last_adventure_location == $location[the haunted ballroom] && $item[dance card].available_amount() > 0 && __misc_state["need to level"] && my_primestat() == $stat[moxie] && CounterLookup("Dance Card").CounterGetNextExactTurn() == -1)
     {
-        boolean delay_for_semirare = CounterLookup("Semi-rare").CounterWillHitExactlyInTurnRange(3, 3);
-        
-        if (delay_for_semirare)
-            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "", ChecklistSubentryMake(HTMLGenerateSpanFont("Avoid using " + $item[dance card], "red"), "", HTMLGenerateSpanFont("You have a semi-rare coming up then, wait a turn first.", "red")), -11).ChecklistEntrySetIDTag("Powerleveling dance card wait"));
-        else
-        {
-            string [int] description;
-            description.listAppend("Gives ~" + __misc_state_float["dance card average stats"].round() + " mainstat in four turns.");
-            if ($item[dance card].available_amount() > 1)
-                description.listAppend("Have " + $item[dance card].pluraliseWordy() + ".");
-            task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?ftext=dance+card", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11).ChecklistEntrySetIDTag("Powerleveling dance card reminder"));
-        }
+        string [int] description;
+        description.listAppend("Gives ~" + __misc_state_float["dance card average stats"].round() + " mainstat in four turns.");
+        if ($item[dance card].available_amount() > 1)
+            description.listAppend("Have " + $item[dance card].pluraliseWordy() + ".");
+        task_entries.listAppend(ChecklistEntryMake("__item " + $item[dance card], "inventory.php?ftext=dance+card", ChecklistSubentryMake("Use " + $item[dance card], "", description), -11).ChecklistEntrySetIDTag("Powerleveling dance card reminder"));
     }
     if (!__quest_state["Level 11 Hidden City"].finished && (__quest_state["Level 11 Hidden City"].state_boolean["Apartment finished"] || get_property_int("hiddenApartmentProgress") >= 7) && $effect[thrice-cursed].have_effect() > 0 && my_path().id != PATH_G_LOVER)
     {
@@ -30433,31 +30398,7 @@ void SRemindersGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             task_entries.listAppend(ChecklistEntryMake("__item miniature life preserver", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Equip miniature life preserver", "red"), "", description), -11).ChecklistEntrySetIDTag("Heavy rains path life preserver reminder"));
         }
     }
-    
-    Counter semirare_counter = CounterLookup("Semi-rare");
-    if (semirare_counter.CounterIsRange() && semirare_counter.range_start_turn <= 3 && semirare_counter.range_start_turn >= 1)
-    {
-        //can we reasonably discover the secret?
-        string [int] description;
-        int upcoming_in = semirare_counter.range_start_turn;
-        description.listAppend("Window starts after " + pluraliseWordy(upcoming_in, "turn", "turns") + ".");
-        
-        string [int] options;
-        if (__misc_state["can eat just about anything"] && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_G_LOVER)
-        {
-            options.listAppend("eat a fortune cookie");
-        }
-        if (__misc_state["VIP available"] && __misc_state["can drink just about anything"] && $item[Clan speakeasy].is_unrestricted())
-        {
-            options.listAppend("drink a lucky lindy");
-        }
-        
-        description.listAppend(options.listJoinComponents(", ", "or").capitaliseFirstLetter() + ".");
-        
-        if (options.count() > 0)
-            task_entries.listAppend(ChecklistEntryMake("__item fortune cookie", "", ChecklistSubentryMake(HTMLGenerateSpanFont("Learn semi-rare number", "red"), "", description), -11).ChecklistEntrySetIDTag("Semi-rare learn reminder"));
-    }
-    
+
     if (__last_adventure_location == $location[a maze of sewer tunnels] && $item[hobo code binder].equipped_amount() == 0 && haveAtLeastXOfItemEverywhere($item[hobo code binder], 1))
     {
         task_entries.listAppend(ChecklistEntryMake("__item hobo code binder", "inventory.php?ftext=hobo+code+binder", ChecklistSubentryMake(HTMLGenerateSpanFont("Equip hobo code binder", "red"), "", "Speeds up sewer tunnel exploration."), -11).ChecklistEntrySetIDTag("Sewer maze hobo binder reminder"));
@@ -30507,6 +30448,11 @@ int BanishTurnsLeft(Banish b)
 {
     if (b.banish_turn_length == -1)
         return 2147483647;
+
+    // Some sources depend on effect or a state that is running out, and so the stated length should be returned directly
+    string banish_source = b.banish_source.to_lower_case();
+    if (banish_source == "roar like a lion") return b.banish_turn_length;
+
     return b.turn_banished + b.banish_turn_length - my_turncount();
 }
 
@@ -30565,6 +30511,7 @@ static
 	__banish_source_length["show your boring familiar pictures"] = 100;
 	__banish_source_length["bowl a curveball"] = 5;
 	__banish_source_length["patriotic screech"] = 100;
+    __banish_source_length["roar like a lion"] = 30; // not sure it is needed; it should generally be not more than 30
 	__banish_source_length["monkey slap"] = 1234567; // this, for some reason, was not properly respecting the reset condition. so imma just do this to hopefully solve it.
     
     int [string] __banish_simultaneous_limit;
@@ -30609,12 +30556,15 @@ Banish [int] BanishesActive()
         b.banish_source = banished_monsters_string_split[key + 1];
         b.turn_banished = banished_monsters_string_split[key + 2].to_int();
         b.banish_turn_length = 0;
-        if (__banish_source_length contains b.banish_source.to_lower_case())
-            b.banish_turn_length = __banish_source_length[b.banish_source.to_lower_case()];
-            if (b.banish_source == "bowl a curveball") b.banish_turn_length = get_property_int("cosmicBowlingBallReturnCombats");
-        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell" || b.banish_source == "beancannon" || b.banish_source == "monkey slap")
+
+        string banish_source = b.banish_source.to_lower_case();
+        if (__banish_source_length contains banish_source)
+            b.banish_turn_length = __banish_source_length[banish_source];
+        if (banish_source == "bowl a curveball") b.banish_turn_length = get_property_int("cosmicBowlingBallReturnCombats");
+        if (banish_source == "roar like a lion") b.banish_turn_length = have_effect($effect[Hear Me Roar]);
+        if (banish_source == "batter up!" || banish_source == "deathchucks" || banish_source == "dirty stinkbomb" || banish_source == "nanorhino" || banish_source == "spooky music box mechanism" || banish_source == "ice hotel bell" || banish_source == "beancannon" || banish_source == "monkey slap")
             b.custom_reset_conditions = "rollover";
-        if (b.banish_source == "ice house" && (!$item[ice house].is_unrestricted() || in_bad_moon())) //not relevant
+        if (banish_source == "ice house" && (!$item[ice house].is_unrestricted() || in_bad_moon())) //not relevant
             continue;
         result.listAppend(b);
     }
@@ -33592,8 +33542,8 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
         // _cinchUsed is a weird preference that actually means distance from 100% you are at in your current cinch.
 
-        int freeRests = __misc_state_int["free rests remaining"];
-        int cinchoRests = get_property_int('_cinchRests');
+        int freeRests = __misc_state_int["total free rests possible"];
+        int cinchoRests = get_property_int('_cinchoRests');
         int cinchUsed = get_property_int('_cinchUsed');
 
         // Calculating total available cinch
@@ -33605,7 +33555,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         int rest = cinchoRests;
 
         // This while loop expands your possible cinch starting at rests you haven't used.
-        while (rest < freeRests+1)
+        while (rest < freeRests)
 			{
                 int cinchAmount = rest > count(cinchLevels) ? 5 : cinchLevels[rest];
                 totalCinch += cinchAmount;
@@ -33735,7 +33685,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     // Ripping some code from the friars tile to count NCs encountered. First, names of the relevant NCs.
     boolean [string] necks_known_ncs = $strings[How Do We Do It? Quaint and Curious Volume!,Strike One!,Olive My Love To You\, Oh.,Dodecahedrariffic!];
     boolean [string] heart_known_ncs = $strings[Moon Over the Dark Heart,Running the Lode,I\, Martin,Imp Be Nimble\, Imp Be Quick];
-    boolean [string] elbow_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,A Secret\, But Not the Secret You're Looking For,Butter Knife? I'll Take the Knife];
+    boolean [string] elbow_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,A Secret\, But Not the Secret You're Looking For,Butter Knife?  I'll Take the Knife];
     
     // Then, a tiny function to count the NCs found by zone for friars.
     int countFriarNCs(boolean [string] known_ncs, location place) {
@@ -33901,24 +33851,23 @@ string DescribeThisBanish(Banish b) {
     int banishLength = b.banish_turn_length;
     string banishLengthString = "";
 
-
-    if (b.custom_reset_conditions == "rollover") {
-        banishLength = 1234567;   
-    }
-
-    int turnsSinceBanish = my_turncount() - banishTurn;
-    int turnsOfBanishLeft = banishLength - turnsSinceBanish;
+    int turnsOfBanishLeft = BanishTurnsLeft(b);
 
     if (source == "Bowl a Curveball") {
         turnsOfBanishLeft = get_property_int("cosmicBowlingBallReturnCombats");
     }
 
-    if (turnsOfBanishLeft < 0) {
+    if (source == "Roar like a Lion") {
+        turnsOfBanishLeft = have_effect($effect[Hear Me Roar]);
+    }
+
+    if (turnsOfBanishLeft <= 0) {
         return "";
     }
 
     if (turnsOfBanishLeft >= 300) banishLengthString = " until rollover.";
     if (turnsOfBanishLeft <= 300) banishLengthString = ` for {pluralise(turnsOfBanishLeft,"more turn","more turns")}.`;
+    if (source == "ice house") banishLengthString = " forever.";
 
     string textReturn = "<b>"+banishedMon+"</b>, via "+source+banishLengthString+"<hr>|*";
 
@@ -33966,7 +33915,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
     string banishedMonstersUnparsed = get_property("banishedMonsters");
     string banishedPhylumUnparsed = get_property("banishedPhyla");
     
-    Banish [int] monsterResult;
+    Banish [int] monsterResult = BanishesActive();
     BanishedPhylum [int] phylaResult;
 
     // Save the banished monsters to compare later for snapper/eagle checks, with snapper phylum.
@@ -33978,30 +33927,9 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
     string [int] banishedPhylumParsed = banishedPhylumUnparsed.split_string(":");
 
     // ... then this reads it.
-    foreach key, parsedString in banishedMonstersParsed {
-        if (parsedString.length() == 0)
-            continue;        // This bypasses if there is no result.
-        if (key % 3 != 0)
-            continue;        // This bypasses when you aren't at a divisible-by-three key.
-
-        // Populate a banish object by referencing the three relevant entries.
-        Banish b;
-        b.banished_monster = banishedMonstersParsed[key + 0].to_monster();
-        b.banish_source = banishedMonstersParsed[key + 1];
-        b.turn_banished = banishedMonstersParsed[key + 2].to_int();
-
+    foreach key, banish in monsterResult {
         // Add the banished monster to the banishedMonsterList
-        banishedMonsterList.listAppend(b.banished_monster);
-
-        // Populate the turn length by referencing the source above.
-        b.banish_turn_length = 0;
-        if (__banish_source_length contains b.banish_source.to_lower_case())
-            b.banish_turn_length = __banish_source_length[b.banish_source.to_lower_case()];
-        if (b.banish_source == "batter up!" || b.banish_source == "deathchucks" || b.banish_source == "dirty stinkbomb" || b.banish_source == "nanorhino" || b.banish_source == "spooky music box mechanism" || b.banish_source == "ice hotel bell" || b.banish_source == "beancannon" || b.banish_source == "monkey slap")
-            b.custom_reset_conditions = "rollover";
-        if (b.banish_source == "ice house" && (!$item[ice house].is_unrestricted() || in_bad_moon())) //not relevant
-            continue;
-        monsterResult.listAppend(b);
+        banishedMonsterList.listAppend(banish.banished_monster);
     }
 
     // Now that you've addressed "normal" banishes, address the phylum banish.
@@ -37478,7 +37406,7 @@ void generateDailyResources(Checklist [int] checklists)
         string image_name = "basic hot dog";
         
         string [int][int] options;
-        options.listAppend(generateHotDogLine("Optimal Dog", "Semi-rare next adventure.", 1));
+        options.listAppend(generateHotDogLine("Optimal Dog", "Get Lucky!", 1));
         
         if (__misc_state["in run"]) {
             options.listAppend(generateHotDogLine("Ghost Dog", "-combat, 30 turns.", 3));
@@ -38690,8 +38618,6 @@ string generateRandomMessage()
             random_messages.listAppend("it'll be all over soon");
     }
         
-    if (!CounterLookup("Semi-rare").CounterIsRange() && CounterLookup("Semi-rare").CounterExists() && CounterLookup("Semi-rare").exact_turns.count() > 1)
-        random_messages.listAppend("superpositioned semi-rare");
     if (hippy_stone_broken() && pvp_attacks_left() > 0)
         random_messages.listAppend(HTMLGenerateTagWrap("a", "aggressive friendship", generateMainLinkMap("peevpee.php")));
     
@@ -41768,9 +41694,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         
         //FIXME handle canceling NC
         buffer rate_buffer;
-        if (m.attributes.contains_text("SEMIRARE"))
-            rate_buffer.append("semi-rare ");
-        else if (m.attributes.contains_text("ULTRARARE"))
+        if (m.attributes.contains_text("ULTRARARE"))
             rate_buffer.append("ultra rare ");
         else if (m.boss)
             rate_buffer.append("boss ");
@@ -45960,8 +45884,7 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     string [int][int] options;
     
     options.listAppend(listMake("<strong>Drink</strong>", "<strong>Size</strong>", "<strong>Description</strong>"));
-    if (CounterLookup("Semi-rare").CounterIsRange())
-        options.listAppend(listMake("Lucky Lindy", "1", "Semi-rare number"));
+    options.listAppend(listMake("Lucky Lindy", "6", "Get Lucky!"));
     
     //FIXME every drink
     //FIXME gray out drinks we can't drink at the moment (drunkenness, meat)
@@ -50991,7 +50914,7 @@ void IOTMEightDaysAWeekPillsGenerateResource(ChecklistEntry [int] resource_entri
         description.listAppend(HTMLGenerateSpanOfClass("Thursday:", "r_bold") + " +4 all res (30 turns)");
         description.listAppend(HTMLGenerateSpanOfClass("Friday:", "r_bold") + " +100% all stats (30 turns)");
         description.listAppend(HTMLGenerateSpanOfClass("Saturday:", "r_bold") + " Familiars 20 pounds (30 turns)");
-        description.listAppend(HTMLGenerateSpanOfClass("Sunday:", "r_bold") + " Force semi-rare");
+        description.listAppend(HTMLGenerateSpanOfClass("Sunday:", "r_bold") + " Get Lucky!");
         description.listAppend(HTMLGenerateSpanOfClass("Funday:", "r_bold") + " Random adventures (30 turns)");
 
         return ChecklistSubentryMake(main_title, subtitle, description);
@@ -54971,8 +54894,9 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__iotms_usable[$item[Cincho de Mayo]]) return;
     
     // _cinchUsed is a weird preference that actually means distance from 100% you are at in your current cinch.
-    int freeRests = __misc_state_int["free rests remaining"];
-    int cinchoRests = get_property_int('_cinchRests');
+    int freeRests = __misc_state_int["total free rests possible"];
+    int freeRestsRemaining = __misc_state_int["free rests remaining"];
+    int cinchoRests = get_property_int('_cinchoRests');
     int cinchUsed = get_property_int('_cinchUsed');
     
     // Since the pref is weird, this tells you your current total cinch
@@ -55040,7 +54964,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     // Merge the list components together.
     description.listAppend("|*"+ cinchUses.listJoinComponents("<hr>|*"));
 
-    description.listAppend(`You have {totalCinch}% more cinch available, accounting for your {pluralise(freeRests,"free rest","free rests")}.`);
+    description.listAppend(`You have {totalCinch}% more cinch available, accounting for your {pluralise(freeRestsRemaining,"remaining free rest","remaining free rests")}.`);
 
     if (lookupItem("June cleaver").have() && !lookupItem("mother's necklace").have()) {
         description.listAppend("You do "+HTMLGenerateSpanOfClass("not", "r_element_hot")+" have a mother's necklace yet, so you're missing 5 free rests. Be careful of overusing the combat skills!");
