@@ -34821,7 +34821,7 @@ void generatePullList(Checklist [int] checklists)
     //   particular challenge path context and not particularly useful in
     //   other situations. 
 
-    if (my_path().id == $path[A Shrunken Adventurer am I])
+    if (my_path() == $path[A Shrunken Adventurer am I])
         pullable_item_list.listAppend(GPItemMake("Flat +100 stat potion", "__item bottle of pirate juice", "The tower stat test is really, really tough in this path!|Once at the tower, pull a bottle of pirate juice for moxie, teeny-tiny magic scroll for myst, or a bottle of rhinoceros hormones for muscle."));
 
     if (my_path().id == PATH_COMMUNITY_SERVICE)
