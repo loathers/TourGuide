@@ -55,9 +55,9 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     
     
     location [int] target_locations;
-    if (amount_needed != -1 && target_monster != $monster[none] && monster_locations.count() > 0)
+    if (amount_needed != 0 && target_monster != $monster[none] && monster_locations.count() > 0)
     {
-        float min_turns_remaining = 100000000.0;
+        float min_turns_remaining = -1.0; // Infinity
         foreach key in monster_locations
         {
             location l = monster_locations[key];
@@ -93,20 +93,23 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                 bounty_appearance_rate += nc_rate;
             }
             
-            
+            // always show at least one location if possible, even if there is no chance to encounter the monster (e.g. it is banished)
+            float turns_remaining = -1.0;
             if (bounty_appearance_rate != 0.0)
             {
-                float turns_remaining = number_remaining.to_float() / bounty_appearance_rate;
-                if (turns_remaining <= min_turns_remaining)
-                {
-                    if (turns_remaining != min_turns_remaining)
-                        target_locations.listClear();
-                    target_locations.listAppend(l);
+                turns_remaining = number_remaining.to_float() / bounty_appearance_rate;
+			}
+			
+            if (min_turns_remaining == -1.0 || turns_remaining <= min_turns_remaining)
+            {
+                if (turns_remaining != min_turns_remaining)
+                    target_locations.listClear();
+                target_locations.listAppend(l);
                     
-                    min_turns_remaining = turns_remaining;
-                    turns_remaining_string = " ~" + pluralise(round(turns_remaining), "turn remains", "turns remain") + ".";
-                }
+                min_turns_remaining = turns_remaining;
+				if (turns_remaining != -1.0) turns_remaining_string = " ~" + pluralise(round(turns_remaining), "turn remains", "turns remain") + ".";
             }
+
             int base_combat_rate = appearance_rates[$monster[none]];
             if (base_combat_rate != 0)
                 base_combat_rate += combat_rate_modifier();
@@ -117,7 +120,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
             else if (!noncombats_skippable && base_combat_rate != 0.0)
             {
                 need_plus_combat = true;
-                plus_combat_needed = base_combat_rate;
+                plus_combat_needed = 100.0 - base_combat_rate;
             }
         }
     }
@@ -139,7 +142,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
     }
     
     
-    if (amount_needed == -1)
+    if (amount_needed == 0)
     {
         subentry.entries.listAppend(amount_found + " found." + turns_remaining_string);
     }
@@ -217,11 +220,6 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     if (!on_bounty)
         return;
     
-    
-    //Load bounty.txt, not sure how else to acquire this data:
-    BountyFileEntry [string] bounty_file;
-    file_to_map("bounty.txt", bounty_file);
-    
     location [int] relevant_locations;
     foreach bounty_name in bounty_properties
     {
@@ -237,16 +235,12 @@ void SBountyHunterHunterGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         
         if (bounty_item_name.length() == 0 || bounty_item_name == "null") //unknown
             bounty_item_name = "unknown";
+
+        bounty bounty_data = to_bounty(bounty_item_name);
         
-        int amount_needed = -1;
-        monster target_monster = $monster[none];
-        
-        if (bounty_file contains bounty_item_name)
-        {
-            BountyFileEntry file_entry = bounty_file[bounty_item_name];
-            amount_needed = file_entry.amount_needed;
-            target_monster = file_Entry.bounty_monster;
-        }
+        int amount_needed = bounty_data.number;
+        monster target_monster = bounty_data.monster;
+
         subentries.listAppend(SBHHGenerateHunt(bounty_item_name, amount_found, amount_needed, target_monster, relevant_locations, url_handle));
         
     }
