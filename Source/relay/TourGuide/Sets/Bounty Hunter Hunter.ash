@@ -100,7 +100,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                 turns_remaining = number_remaining.to_float() / bounty_appearance_rate;
 			}
 			
-            if (min_turns_remaining == -1.0 || turns_remaining <= min_turns_remaining)
+            if (min_turns_remaining == -1.0 || (turns_remaining != -1.0 && turns_remaining <= min_turns_remaining))
             {
                 if (turns_remaining != min_turns_remaining)
                     target_locations.listClear();
