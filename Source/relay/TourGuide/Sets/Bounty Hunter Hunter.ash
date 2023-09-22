@@ -110,10 +110,8 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
 				if (turns_remaining != -1.0) turns_remaining_string = " ~" + pluralise(round(turns_remaining), "turn remains", "turns remain") + ".";
             }
 
-            int base_combat_rate = appearance_rates[$monster[none]];
-            if (base_combat_rate != 0)
-                base_combat_rate += combat_rate_modifier();
-            base_combat_rate = MAX(0.0, base_combat_rate);
+            // Using a fancy function to get the combat percentage, it already accounts for combat modifiers
+            int base_combat_rate = l.combat_percent;
             
             if (noncombats_wanted && base_combat_rate != 0.0)
                 need_minus_combat = true;
