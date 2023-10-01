@@ -57,6 +57,8 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             item [int] bag_types;
             boolean have_a_bag_equipped = false;
+            int saplings_planted = get_property_int('_saplingsPlanted');
+
             foreach it in $items[bag of Crotchety Pine saplings,bag of Saccharine Maple saplings,bag of Laughing Willow saplings]
             {
                 if (it.available_amount() > 0)
@@ -64,17 +66,27 @@ void SHolidayGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 if (it.equipped_amount() > 0)
                     have_a_bag_equipped = true;
             }
+
+            int saplings_needed = 2;
+            if (outfit_pieces_needed.count() > 0)
+                saplings_needed = 100;
+            
+            int saplings_left = saplings_needed - saplings_planted;
+
+            if (saplings_left <= 0) 
+                return; // All done for today
+
             if (!have_a_bag_equipped)
             {
                 description.listAppend("Equip your " + bag_types.listJoinComponents(", ", "or") + ".");
             }
             else if (outfit_pieces_needed.count() > 0)
             {
-                description.listAppend("Adventure for at least one hundred adventures to collect the outfit piece next holiday.");
+                description.listAppend(`Adventure for {pluralise(saplings_left,"more turn","more turns")} to collect the outfit piece next holiday.`);
             }
             else
             {
-                description.listAppend("Adventure for at least two adventures to collect the potion reward next holiday.");
+                description.listAppend(`Adventure for {pluralise(saplings_left,"more turn","more turns")} to collect the potion reward next holiday.`);
             }
         }
         optional_task_entries.listAppend(ChecklistEntryMake("__item spooky sapling", "place.php?whichplace=woods", ChecklistSubentryMake("Plant trees", "", description), 8, $locations[The Arrrboretum]).ChecklistEntrySetIDTag("Holiday arrrbor day"));
