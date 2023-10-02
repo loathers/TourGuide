@@ -514,6 +514,8 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
             return $item[test site key].available_amount() > 0 && __campground[$item[jar of psychoses (The Suspicious-Looking Guy)]] > 0;
         case $location[whitey\'s grove]:
             return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
+        case $location[The Road to the White Citadel]:
+            return questPropertyPastInternalStepNumber("questG02Whitecastle", 2);
         case $location[the Obligatory pirate\'s cove]:
             return get_property_ascension("lastIslandUnlock") && !(QuestState("questL12War").mafia_internal_step >= 2 && !QuestState("questL12War").finished);
         case $location[Inside the Palindome]:
