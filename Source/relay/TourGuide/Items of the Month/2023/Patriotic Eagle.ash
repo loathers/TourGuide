@@ -7,8 +7,7 @@ void IOTMPatrioticEagleGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     monster RWB_monster = get_property_monster("rwbMonster");
 
     if (RWB_monster != $monster[none]) {
-        // Have to subtract 1; mafia pref starts at 3 but only increments on start-of-fight text, which happens on 2 of them.
-        int fights_left = clampi(get_property_int("rwbMonsterCount"), 0, 2) - 1;
+        int fights_left = clampi(get_property_int("rwbMonsterCount"), 0, 2);
 
         // Use ezan's weird location-finding-thing
         location [int] possible_appearance_locations = RWB_monster.getPossibleLocationsMonsterCanAppearInNaturally().listInvert();
