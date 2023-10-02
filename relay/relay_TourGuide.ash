@@ -33552,6 +33552,10 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         int cinchoRests = get_property_int('_cinchoRests');
         int cinchUsed = get_property_int('_cinchUsed');
 
+        // Resting when Cincho is full might burn some of the Cincho rests
+        int freeRestsRemaining = __misc_state_int["free rests remaining"];
+        freeRests = min(freeRests, cinchoRests + freeRestsRemaining);
+
         // Calculating total available cinch
 
         int [int] cinchLevels = listMake(30,30,30,30,30,25,20,15,10,5);
@@ -54913,6 +54917,9 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     int freeRestsRemaining = __misc_state_int["free rests remaining"];
     int cinchoRests = get_property_int('_cinchoRests');
     int cinchUsed = get_property_int('_cinchUsed');
+
+    // Resting when Cincho is full might burn some of the Cincho rests
+    freeRests = min(freeRests, cinchoRests + freeRestsRemaining);
     
     // Since the pref is weird, this tells you your current total cinch
     int currentCinch = 100 - cinchUsed;
