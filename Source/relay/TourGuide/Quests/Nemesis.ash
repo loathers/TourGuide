@@ -534,10 +534,26 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 subentry.entries.listAppend("Acquire a " + starter_item_needed + ".");
             else if ($location[The Unquiet Garves].noncombat_queue.contains_text("Tomb of the Unknown Your Class Here"))
             {
-                subentry.entries.listAppend("Solve the three puzzles at the unknown tomb.");
+                subentry.entries.listAppend("Solve the puzzle at the unknown tomb.");
+                
+                string puzzle_answer;
+                if (my_class() == $class[seal clubber])
+                    puzzle_answer = "The answer is \"Boredom\".";
+                else if (my_class() == $class[turtle tamer])
+                    puzzle_answer = "The answer is \"Friendship\".";
+                else if (my_class() == $class[pastamancer])
+                    puzzle_answer = "The answer is \"Binding pasta thralls\".";
+                else if (my_class() == $class[sauceror])
+                    puzzle_answer = "The answer is \"Power\".";
+                else if (my_class() == $class[disco bandit])
+                    puzzle_answer = "The answer is \"Me. Duh\".";
+                else if (my_class() == $class[accordion thief])
+                    puzzle_answer = "The answer is \"Music\".";
+                string puzzle_answer_html = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(puzzle_answer, "r_tooltip_inner_class") + "Hover over to see the answer.", "r_tooltip_outer_class");
+                subentry.entries.listAppend(puzzle_answer_html);
             }
             else {
-                subentry.entries.listAppend("Adventure in the Unquiet Garves until you unlock the tomb of the unknown, then solve the three puzzles.");
+                subentry.entries.listAppend("Adventure in the Unquiet Garves until you unlock the tomb of the unknown, then solve the puzzle.");
                 if (__quest_state["Level 11 Shen"].state_int.getFutureShenAssignments().listInvert() contains $location[The VERY Unquiet Garves])
                     subentry.entries.listAppend("Could wait before going there? Shen will send you to the garves later.");
             }
