@@ -187,9 +187,19 @@ void QLevel12GenerateTasksSidequests(ChecklistEntry [int] task_entries, Checklis
         modifiers.listAppend("+meat");
         
         string [int] tasks;
-        int ncs_seen = $location[McMillicancuddy's Barn].noncombatTurnsAttemptedInLocation();
+
+        boolean [string] area_known_ncs = $strings[Cornered!,Cornered Again!,How Many Corners Does this Stupid Barn Have!?];
+        int ncs_seen = 0;
+        string [int] location_ncs = $location[McMillicancuddy's Barn].locationSeenNoncombats();
+        foreach key, s in location_ncs
+        {
+            if (area_known_ncs contains s)
+            {
+                ncs_seen += 1;
+            }
+        }
         
-        if (ncs_seen < 3)
+        if (ncs_seen < 3 || my_location() == $location[McMillicancuddy's Barn])
         {
             tasks.listAppend("make a fence out of the barbed wire");
             tasks.listAppend("knock over the lantern");
