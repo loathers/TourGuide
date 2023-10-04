@@ -202,11 +202,11 @@ void QLevel11RonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         }
         
         if ($item[red zeppelin ticket].available_amount() == 0) {
-            if ($item[priceless diamond].available_amount() > 0)
+            if ($item[priceless diamond].available_amount() > 0 && black_market_available())
                 subentry.entries.listAppend("Trade in your priceless diamond for a red zeppelin ticket.");
-            else if (my_meat() >= $item[red zeppelin ticket].npc_price() && my_meat() >= 4000)
+            else if (my_meat() >= $item[red zeppelin ticket].npc_price() && my_meat() >= 4000 && black_market_available())
                 subentry.entries.listAppend("Purchase a red zeppelin ticket in the black market.");
-            else if (!__quest_state["Level 11 Shen"].finished)
+            else if (!__quest_state["Level 11 Shen"].finished && black_market_available())
                 subentry.entries.listAppend("Could adventure in the Copperhead Club first for a ticket. (greatly speeds up area)");
             else
                 subentry.entries.listAppend("No ticket.");
