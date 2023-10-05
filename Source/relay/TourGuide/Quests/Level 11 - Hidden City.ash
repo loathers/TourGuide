@@ -355,7 +355,12 @@ void QLevel11HiddenCityGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             } else if (hospital_progress == 0) {
                 generateHiddenAreaUnlockForShrine(subentry.entries,$location[an overgrown shrine (Southwest)]);
             } else {
-                boolean [item] outfitPieces = $items[bloodied surgical dungarees,surgical mask,head mirror,half-size scalpel].makeConstantItemArrayMutable();
+                boolean [item] outfitPieces = $items[bloodied surgical dungarees,surgical mask,head mirror].makeConstantItemArrayMutable();
+
+                # TODO maybe support it differently, the scalpel will still drop in that case
+                if (__misc_state["can equip just about any weapon"]) {
+                    outfitPieces[$item[half-size scalpel]] = true;
+                }
 
                 if (__misc_state["Torso aware"]) {
                     outfitPieces[$item[surgical apron]] = true;
