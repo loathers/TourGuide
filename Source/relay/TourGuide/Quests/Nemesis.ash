@@ -447,6 +447,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     
     item [class] class_epic_weapons;
     item [class] class_legendary_epic_weapons;
+    item [class] class_legendary_epic_weapon_craftable_sources;
     item [class] class_ultimate_legendary_epic_weapons;
     
     class_epic_weapons[$class[seal clubber]] = $item[bjorn's hammer];
@@ -465,7 +466,15 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     class_legendary_epic_weapons[$class[disco bandit]] = $item[shagadelic disco banjo];
     class_legendary_epic_weapons[$class[accordion thief]] = $item[squeezebox of the ages];
     item legendary_epic_weapon = class_legendary_epic_weapons[my_class()];
-    
+
+
+    class_legendary_epic_weapon_craftable_sources[$class[seal clubber]] = $item[distilled seal blood];
+    class_legendary_epic_weapon_craftable_sources[$class[turtle tamer]] = $item[turtle chain];
+    class_legendary_epic_weapon_craftable_sources[$class[pastamancer]] = $item[high-octane olive oil];
+    class_legendary_epic_weapon_craftable_sources[$class[sauceror]] = $item[peppercorns of power];
+    class_legendary_epic_weapon_craftable_sources[$class[disco bandit]] = $item[vial of mojo];
+    class_legendary_epic_weapon_craftable_sources[$class[accordion thief]] = $item[golden reeds];
+    item legendary_epic_weapon_craftable_source = class_legendary_epic_weapon_craftable_sources[my_class()];
     
     
     class_ultimate_legendary_epic_weapons[$class[seal clubber]] = $item[Sledgehammer of the V&aelig;lkyr];
@@ -581,6 +590,8 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         else
         {
             subentry.entries.listAppend("Make " + legendary_epic_weapon + ".");
+            subentry.entries.listAppend("Recipe is " + epic_weapon +  " + " + legendary_epic_weapon_craftable_source + ".");
+            url = "craft.php?mode=smith";
         }
     }
     else if (base_quest_state.mafia_internal_step == 10)
