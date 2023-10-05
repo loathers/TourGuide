@@ -92,7 +92,7 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
             if (noncombats_skippable)
             {
                 //Recorrect for NC:
-                if (base_combat_rate != 1.0)
+                if (base_combat_rate != 0.0)
                     bounty_appearance_rate /= (base_combat_rate / 100.0);
             }
             else if (noncombats_wanted)
