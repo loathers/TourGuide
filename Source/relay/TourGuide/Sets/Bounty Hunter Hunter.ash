@@ -79,17 +79,26 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
                 url.s = clickable_url;
             
             float bounty_appearance_rate = appearance_rates[target_monster] / 100.0;
+            if (bounty_appearance_rate < 0.0) { // is banished, for instance
+                bounty_appearance_rate = 0.0;
+            }
+
+            float base_combat_rate = 0.0;
+            foreach mon, appearance_rate in appearance_rates {
+                if (mon != $monster[none] && appearance_rate >= 0) {
+                    base_combat_rate += appearance_rate;
+                }
+            }
             if (noncombats_skippable)
             {
                 //Recorrect for NC:
-                float nc_rate = appearance_rates[$monster[none]] / 100.0;
-                if (nc_rate != 1.0)
-                    bounty_appearance_rate /= (1.0 - nc_rate);
+                if (base_combat_rate != 1.0)
+                    bounty_appearance_rate /= (base_combat_rate / 100.0);
             }
             else if (noncombats_wanted)
             {
                 //Recorrect for NC:
-                float nc_rate = appearance_rates[$monster[none]] / 100.0;
+                float nc_rate = (100.0 - base_combat_rate) / 100.0;
                 bounty_appearance_rate += nc_rate;
             }
             
@@ -111,14 +120,14 @@ ChecklistSubentry SBHHGenerateHunt(string bounty_item_name, int amount_found, in
             }
 
             // Using a fancy function to get the combat percentage, it already accounts for combat modifiers
-            int base_combat_rate = l.combat_percent;
+            int combat_rate = l.combat_percent;
             
-            if (noncombats_wanted && base_combat_rate != 0.0)
+            if (noncombats_wanted && combat_rate != 0.0)
                 need_minus_combat = true;
-            else if (!noncombats_skippable && base_combat_rate < 100.0)
+            else if (!noncombats_skippable && combat_rate < 100.0)
             {
                 need_plus_combat = true;
-                plus_combat_needed = 100.0 - base_combat_rate;
+                plus_combat_needed = 100.0 - combat_rate;
             }
         }
     }
