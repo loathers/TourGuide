@@ -515,7 +515,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
         case $location[whitey\'s grove]:
             return questPropertyPastInternalStepNumber("questG02Whitecastle", 1) || questPropertyPastInternalStepNumber("questL11Palindome", 4); //FIXME what step for questL11Palindome?
         case $location[The Road to the White Citadel]:
-            return questPropertyPastInternalStepNumber("questG02Whitecastle", 2);
+            return questPropertyPastInternalStepNumber("questG02Whitecastle", 2) && !questPropertyPastInternalStepNumber("questG02Whitecastle", 11); // the road closes when the White Citadel is found
         case $location[the Obligatory pirate\'s cove]:
             return get_property_ascension("lastIslandUnlock") && !(QuestState("questL12War").mafia_internal_step >= 2 && !QuestState("questL12War").finished);
         case $location[Inside the Palindome]:
