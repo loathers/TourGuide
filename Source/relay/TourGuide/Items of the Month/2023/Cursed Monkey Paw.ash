@@ -277,7 +277,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         new MonkeyWish(
             $item[none],
             $effect[Fifty Ways to Bereave Your Lover],
-            HTMLGenerateSpanFont("sleaze damage race", "gray"),
+            HTMLGenerateSpanFont("sleaze damage race", "purple"),
             !__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && 
                 __quest_state["Level 13"].state_string["Elemental damage race type"] == "sleaze",
 			true
