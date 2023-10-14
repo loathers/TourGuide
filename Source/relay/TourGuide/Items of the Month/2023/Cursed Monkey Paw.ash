@@ -243,6 +243,46 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             true
         ),
         new MonkeyWish(
+            $item[none],
+            $effect[Staying Frosty],
+            HTMLGenerateSpanFont("cold damage race", "blue"),
+            !__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && 
+                __quest_state["Level 13"].state_string["Elemental damage race type"] == "cold",
+			true
+        ),
+        new MonkeyWish(
+            $item[none],
+            $effect[Dragged Through the Coals],
+            HTMLGenerateSpanFont("hot damage race", "red"),
+            !__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && 
+                __quest_state["Level 13"].state_string["Elemental damage race type"] == "hot",
+			true
+        ),
+        new MonkeyWish(
+            $item[none],
+            $effect[Bored Stiff],
+            HTMLGenerateSpanFont("spooky damage race", "gray"),
+            !__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && 
+                __quest_state["Level 13"].state_string["Elemental damage race type"] == "spooky",
+			true
+        ),
+        new MonkeyWish(
+            $item[none],
+            $effect[Sewer-Drenched],
+            HTMLGenerateSpanFont("stench damage race", "green"),
+            !__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && 
+                __quest_state["Level 13"].state_string["Elemental damage race type"] == "stench",
+			true
+        ),
+        new MonkeyWish(
+            $item[none],
+            $effect[Fifty Ways to Bereave Your Lover],
+            HTMLGenerateSpanFont("sleaze damage race", "gray"),
+            !__quest_state["Level 13"].state_boolean["Elemental damage race completed"] && 
+                __quest_state["Level 13"].state_string["Elemental damage race type"] == "sleaze",
+			true
+        ),
+        new MonkeyWish(
             $item[lowercase N],
             $effect[none],
             "summon the nagamar",
