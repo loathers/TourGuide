@@ -136,7 +136,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         // This while loop expands your possible cinch starting at rests you haven't used.
         while (rest < freeRests)
 			{
-                int cinchAmount = rest > count(cinchLevels) ? 5 : cinchLevels[rest];
+                int cinchAmount = rest >= count(cinchLevels) ? 5 : cinchLevels[rest];
                 totalCinch += cinchAmount;
                 rest += 1;
 			}
