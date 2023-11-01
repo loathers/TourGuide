@@ -161,6 +161,8 @@ string int_to_cardinal(int v)
         v = 0 - v;
         result += "minus";
     }
+
+    if (v == 0) return "zero";
     
     if (__short_scale_thousands_to_cardinal_map.count() == 0)
         __short_scale_thousands_to_cardinal_map = {0:"",3:" thousand",6:" million",9:" billion"};
