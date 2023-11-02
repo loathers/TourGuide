@@ -2,7 +2,8 @@
 RegisterTaskGenerationFunction("IOTMGingerbreadCityGenerateTasks");
 void IOTMGingerbreadCityGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	#if (get_property_boolean("gingerbreadCityAvailable") == false) return;
+	if (!__iotms_usable[$item[Build-a-City Gingerbread kit]]) return;
+	
 	string [int] description;
 	string [int] GCTurnsLeftdescription;
 	string [int] trainOptions;
