@@ -1,3 +1,20 @@
+//Spacegate
+RegisterTaskGenerationFunction("IOTMSpacegateGenerateTasks");
+void IOTMSpacegateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!__iotms_usable[lookupItem("Spacegate access badge")])
+        return;
+    string [int] description;
+    string url = "place.php?whichplace=spacegate";
+    {
+        int SpacegateTimer = get_property_int("_spacegateTurnsLeft");
+        description.listAppend("Plan " + get_property("_spacegateCoordinates") + " from Outer Space");
+        
+        if (SpacegateTimer > 0 && __last_adventure_location == $location[through the spacegate]) {
+            task_entries.listAppend(ChecklistEntryMake("__item portable spacegate", url, ChecklistSubentryMake(SpacegateTimer + " Spacegate turns remaining", "", description), -11));
+        }
+    }
+}
 
 RegisterResourceGenerationFunction("IOTMSpacegateGenerateResource");
 void IOTMSpacegateGenerateResource(ChecklistEntry [int] resource_entries)

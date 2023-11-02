@@ -1,4 +1,48 @@
 //2002 Mr. Store
+RegisterTaskGenerationFunction("IOTM2002MrStoreGenerateTasks");
+void IOTM2002MrStoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    {	int nextVHSTurn = get_property_int("spookyVHSTapeMonsterTurn") + 8;
+		int nextVHSTimer = (nextVHSTurn - total_turns_played());
+
+		string image_name = get_property("spookyVHSTapeMonster");
+		string [int] description;
+		string [int] warnings;
+
+		// Adding a few warnings for the sake of it
+		boolean [string] holidayTracker = getHolidaysToday(); 
+
+		if (holidayTracker["El Dia de Los Muertos Borrachos"] == true || holidayTracker["Feast of Boris"] == true) {
+			warnings[1] = 'Be careful -- Borrachos & Feast of Boris wanderers can show up instead of your VHS wanderer!';
+		}
+
+		if (get_property_int("breathitinCharges") > 0) {
+			warnings[2] = 'Breathitin is active; avoid putting your VHS wanderer outdoors, the wanderer is already free!';
+		}
+		
+		if (nextVHSTurn <= total_turns_played() && (image_name != ""))
+		{
+			description.listAppend(HTMLGenerateSpanFont("Free fight + YR!", "black"));
+
+			// Only show warnings if it's right about to happen
+			foreach i, warning in warnings {
+				description.listAppend(HTMLGenerateSpanFont("|* ➾ "+warning, "red"));
+			}
+			task_entries.listAppend(ChecklistEntryMake("__monster " + image_name, "", ChecklistSubentryMake("Spooky VHS: " + get_property("spookyVHSTapeMonster") + HTMLGenerateSpanFont(" now", "red"), "", description), -11));
+		}
+		else if (nextVHSTurn -1 == total_turns_played() && (image_name != ""))
+		{
+			description.listAppend(HTMLGenerateSpanFont("Free fight + YR next turn!", "black"));
+			task_entries.listAppend(ChecklistEntryMake("__monster " + image_name, "", ChecklistSubentryMake("Spooky VHS: " + get_property("spookyVHSTapeMonster") + HTMLGenerateSpanFont(" in 1 more adv", "blue"), "", description), -11));
+		}	
+		else if (image_name != "")
+		{
+			description.listAppend(nextVHSTimer + " adventures until your free fight YR VHS fight.");
+			optional_task_entries.listAppend(ChecklistEntryMake("__monster " + image_name, "", ChecklistSubentryMake("Spooky VHS: " + get_property("spookyVHSTapeMonster") + "", "", description), 10));
+		}
+	}	
+}
+	
 RegisterResourceGenerationFunction("IOTM2002MrStoreGenerateResource");
 void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
 {
