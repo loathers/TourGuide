@@ -46826,6 +46826,7 @@ void IOTMGingerbreadCityGenerateTasks(ChecklistEntry [int] task_entries, Checkli
 {
 	#if (get_property_boolean("gingerbreadCityAvailable") == false) return;
 	string [int] description;
+	string [int] GCTurnsLeftdescription;
 	string [int] trainOptions;
 	string [int] civicOptions;
 	string [int] industrialOptions;
@@ -46838,170 +46839,128 @@ void IOTMGingerbreadCityGenerateTasks(ChecklistEntry [int] task_entries, Checkli
 			//increment gingercity timer by 5 if clock is used
         }
 		
-		if (GingerCityTimer == 9)
+		if (GingerCityTimer < 30)
 		{
-			trainOptions.listAppend("Look for candy.");
-			civicOptions.listAppend("Knock over a sprinkle column (+50 sprinkles).");
-			if ($item[gingerbread blackmail photos].available_amount() == 1) {
-				civicOptions.listAppend("Use the photos to blackmail a politician.");
+			if (GingerCityTimer < 9) {			
+				GCTurnsLeftdescription.listAppend(9 - GingerCityTimer + " combats until Noon.");
 			}
-			if (get_property_int("gingerLawChoice") >= 3) {
-				industrialOptions.listAppend("Buy a teethpick (1000 sprinkles).");
-			}
-			if (get_property_boolean("gingerRetailUnlocked") == false) {
-				civicOptions.listAppend("Build a retail district.");
-			}
-			if (get_property_boolean("gingerSewersUnlocked") == false) {
-				civicOptions.listAppend("Build a sewer... district.");
-			}
-			if (get_property_boolean("gingerRetailUnlocked") == true) {
-				retailOptions.listAppend("Buy some stuff (50-500 sprinkles).");
-			}
-			if ($item[fruit-leather negatives].available_amount() == 1) {
-				retailOptions.listAppend("Develop your fruit-leather negatives.");
-			}
-			if (get_property_boolean("gingerNegativesDropped") == true) {
-				retailOptions.listAppend("Pick up your blackmail photos.");
-			}
-			if (trainOptions.count() > 0) {
-				description.listAppend(HTMLGenerateSpanOfClass("Train Station:", "r_bold") + "|*" + trainOptions.listJoinComponents("|*"));
-			}
-			if (civicOptions.count() > 0) {
-				description.listAppend(HTMLGenerateSpanOfClass("Civic Center:", "r_bold") + "|*" + civicOptions.listJoinComponents("|*"));
-			}
-			if (industrialOptions.count() > 0) {
-				description.listAppend(HTMLGenerateSpanOfClass("Industrial District:", "r_bold") + "|*" + industrialOptions.listJoinComponents("|*"));
-			}
-			if (retailOptions.count() > 0) {
-				description.listAppend(HTMLGenerateSpanOfClass("Retail District:", "r_bold") + "|*" + retailOptions.listJoinComponents("|*"));
-			}
-			task_entries.listAppend(ChecklistEntryMake("__item gingerbread house", url, ChecklistSubentryMake("Gingerbread City Noon noncom available!", "", description), -11));
-		}
-		if (GingerCityTimer == 19)
-		{
-			if (get_property_int("gingerMuscleChoice") < 3) {
-				int gingerTracksLeft = clampi(3 - get_property_int("gingerMuscleChoice"), 0, 3);
-				trainOptions.listAppend("Lay some track (" + gingerTracksLeft + " remaining).");
-			}
-			if (get_property_boolean("gingerSubwayLineUnlocked") == true && !get_property_boolean("gingerBlackmailAccomplished") == true) {
-				trainOptions.listAppend("Get some fruit-leather negatives.");
-			}
-			if ($item[teethpick].available_amount() == 1) {
-				int gingerDigsLeft = clampi(7 - get_property_int("gingerDigCount"), 0, 7);
-				if (gingerDigsLeft > 4) {
-					trainOptions.listAppend("Dig up " + pluralise(gingerDigsLeft -4, " green-iced sweet roll", "green-iced sweet rolls") + ".");
+			if (GingerCityTimer == 9)
+			{
+				trainOptions.listAppend("Look for candy.");
+				civicOptions.listAppend("Knock over a sprinkle column (+50 sprinkles).");
+				if ($item[gingerbread blackmail photos].available_amount() == 1) {
+					civicOptions.listAppend("Use the photos to blackmail a politician.");
 				}
-				else if (gingerDigsLeft > 1) {
-					trainOptions.listAppend("Dig up " + pluralise(gingerDigsLeft -1, " green rock candy", "green rock candies") + ".");
+				if (get_property_int("gingerLawChoice") >= 3) {
+					industrialOptions.listAppend("Buy a teethpick (1000 sprinkles).");
 				}
-				else if (gingerDigsLeft == 1) {
-					trainOptions.listAppend("Dig up a sugar raygun (final).");
+				if (get_property_boolean("gingerRetailUnlocked") == false) {
+					civicOptions.listAppend("Build a retail district.");
 				}
-			}
-			if (get_property_boolean("_gingerbreadColumnDestroyed") == true) {
-				civicOptions.listAppend("Fight Judge Fudge to take his gavel " + HTMLGenerateSpanFont("(no other Civic options available)", "red"));
-			}
-			if (get_property_boolean("_gingerbreadColumnDestroyed") == false) {
-				civicOptions.listAppend("Buy some cigarettes (5 sprinkles).");
-				civicOptions.listAppend("Buy a counterfeit city (300 sprinkles).");
-				if (get_property_int("gingerLawChoice") < 3) {
-					int gingerStudiesLeft = clampi(3 - get_property_int("gingerLawChoice"), 0, 3);
-					civicOptions.listAppend("Study digging laws (" + gingerStudiesLeft + " remaining).");
+				if (get_property_boolean("gingerSewersUnlocked") == false) {
+					civicOptions.listAppend("Build a sewer... district.");
 				}
-			}
-			if (have_outfit_components("Gingerbread Best")) {
-				retailOptions.listAppend("Get some ginger wine (free)");
-				retailOptions.listAppend("Buy a chocolate sculpture (300 sprinkles)");
-				if (!is_wearing_outfit("Gingerbread Best")) {
-					retailOptions.listAppend(HTMLGenerateSpanFont("Retail District options require Gingerbread Best equipped", "red"));
+				if (get_property_boolean("gingerRetailUnlocked") == true) {
+					retailOptions.listAppend("Buy some stuff (50-500 sprinkles).");
 				}
-				else {
-					retailOptions.listAppend(HTMLGenerateSpanFont("Gingerbread Best equipped for Retail District options", "blue"));
+				if ($item[fruit-leather negatives].available_amount() == 1) {
+					retailOptions.listAppend("Develop your fruit-leather negatives.");
 				}
+				if (get_property_boolean("gingerNegativesDropped") == true) {
+					retailOptions.listAppend("Pick up your blackmail photos.");
+				}
+				if (trainOptions.count() > 0) {
+					description.listAppend(HTMLGenerateSpanOfClass("Train Station:", "r_bold") + "|*" + trainOptions.listJoinComponents("|*"));
+				}
+				if (civicOptions.count() > 0) {
+					description.listAppend(HTMLGenerateSpanOfClass("Civic Center:", "r_bold") + "|*" + civicOptions.listJoinComponents("|*"));
+				}
+				if (industrialOptions.count() > 0) {
+					description.listAppend(HTMLGenerateSpanOfClass("Industrial District:", "r_bold") + "|*" + industrialOptions.listJoinComponents("|*"));
+				}
+				if (retailOptions.count() > 0) {
+					description.listAppend(HTMLGenerateSpanOfClass("Retail District:", "r_bold") + "|*" + retailOptions.listJoinComponents("|*"));
+				}
+				task_entries.listAppend(ChecklistEntryMake("__item gingerbread house", url, ChecklistSubentryMake("Gingerbread City Noon noncom available!", "", description), -11));
 			}
-			if (trainOptions.count() > 0) {
-				description.listAppend(HTMLGenerateSpanOfClass("Train Station:", "r_bold") + "|*" + trainOptions.listJoinComponents("|*"));
+			if (GingerCityTimer < 19) {			
+				GCTurnsLeftdescription.listAppend(19 - GingerCityTimer + " combats until Midnight.");
 			}
-			if (civicOptions.count() > 0) {
-				description.listAppend(HTMLGenerateSpanOfClass("Civic Center:", "r_bold") + "|*" + civicOptions.listJoinComponents("|*"));
-			}
-			if (industrialOptions.count() > 0) {
-				description.listAppend(HTMLGenerateSpanOfClass("Industrial District:", "r_bold") + "|*" + industrialOptions.listJoinComponents("|*"));
-			}
-			if (retailOptions.count() > 0) {
-				description.listAppend(HTMLGenerateSpanOfClass("Retail District:", "r_bold") + "|*" + retailOptions.listJoinComponents("|*"));
-			}
+			if (GingerCityTimer == 19)
+			{
+				if (get_property_int("gingerMuscleChoice") < 3) {
+					int gingerTracksLeft = clampi(3 - get_property_int("gingerMuscleChoice"), 0, 3);
+					trainOptions.listAppend("Lay some track (" + gingerTracksLeft + " remaining).");
+				}
+				if (get_property_boolean("gingerSubwayLineUnlocked") == true && !get_property_boolean("gingerBlackmailAccomplished") == true) {
+					trainOptions.listAppend("Get some fruit-leather negatives.");
+				}
+				if ($item[teethpick].available_amount() == 1) {
+					int gingerDigsLeft = clampi(7 - get_property_int("gingerDigCount"), 0, 7);
+					if (gingerDigsLeft > 4) {
+						trainOptions.listAppend("Dig up " + pluralise(gingerDigsLeft -4, " green-iced sweet roll", "green-iced sweet rolls") + ".");
+					}
+					else if (gingerDigsLeft > 1) {
+						trainOptions.listAppend("Dig up " + pluralise(gingerDigsLeft -1, " green rock candy", "green rock candies") + ".");
+					}
+					else if (gingerDigsLeft == 1) {
+						trainOptions.listAppend("Dig up a sugar raygun (final).");
+					}
+				}
+				if (get_property_boolean("_gingerbreadColumnDestroyed") == true) {
+					civicOptions.listAppend("Fight Judge Fudge to take his gavel " + HTMLGenerateSpanFont("(no other Civic options available)", "red"));
+				}
+				if (get_property_boolean("_gingerbreadColumnDestroyed") == false) {
+					civicOptions.listAppend("Buy some cigarettes (5 sprinkles).");
+					civicOptions.listAppend("Buy a counterfeit city (300 sprinkles).");
+					if (get_property_int("gingerLawChoice") < 3) {
+						int gingerStudiesLeft = clampi(3 - get_property_int("gingerLawChoice"), 0, 3);
+						civicOptions.listAppend("Study digging laws (" + gingerStudiesLeft + " remaining).");
+					}
+				}
+				if (have_outfit_components("Gingerbread Best")) {
+					retailOptions.listAppend("Get some ginger wine (free)");
+					retailOptions.listAppend("Buy a chocolate sculpture (300 sprinkles)");
+					if (!is_wearing_outfit("Gingerbread Best")) {
+						retailOptions.listAppend(HTMLGenerateSpanFont("Retail District options require Gingerbread Best equipped", "red"));
+					}
+					else {
+						retailOptions.listAppend(HTMLGenerateSpanFont("Gingerbread Best equipped for Retail District options", "blue"));
+					}
+				}
+				if (trainOptions.count() > 0) {
+					description.listAppend(HTMLGenerateSpanOfClass("Train Station:", "r_bold") + "|*" + trainOptions.listJoinComponents("|*"));
+				}
+				if (civicOptions.count() > 0) {
+					description.listAppend(HTMLGenerateSpanOfClass("Civic Center:", "r_bold") + "|*" + civicOptions.listJoinComponents("|*"));
+				}
+				if (industrialOptions.count() > 0) {
+					description.listAppend(HTMLGenerateSpanOfClass("Industrial District:", "r_bold") + "|*" + industrialOptions.listJoinComponents("|*"));
+				}
+				if (retailOptions.count() > 0) {
+					description.listAppend(HTMLGenerateSpanOfClass("Retail District:", "r_bold") + "|*" + retailOptions.listJoinComponents("|*"));
+				}
 
-			task_entries.listAppend(ChecklistEntryMake("__item gingerbread house", url, ChecklistSubentryMake("Gingerbread City Midnight noncom available!", "", description), -11));
+				task_entries.listAppend(ChecklistEntryMake("__item gingerbread house", url, ChecklistSubentryMake("Gingerbread City Midnight noncom available!", "", description), -11));
+			}
+			if (GingerCityTimer > 19) {			
+				GCTurnsLeftdescription.listAppend("No NCs left.");
+			}
+			
+			if (($locations[Gingerbread Train Station,Gingerbread Civic Center,Gingerbread Industrial Zone,Gingerbread Upscale Retail District,Gingerbread Sewers] contains __last_adventure_location) && GingerCityTimer != 9 && GingerCityTimer != 19)
+				task_entries.listAppend(ChecklistEntryMake("__item gingerbread house", url, ChecklistSubentryMake(30 - GingerCityTimer + " Gingerbread City turns remaining", "", GCTurnsLeftdescription), -11));
+			else
+				if (gingercitytimer == 9) {
+					GCTurnsLeftdescription.listAppend("Noon NC now!");
+					}
+				if (gingercitytimer == 19) {
+					GCTurnsLeftdescription.listAppend("Midnight NC now!");
+				}
+			optional_task_entries.listAppend(ChecklistEntryMake("__item gingerbread house", url, ChecklistSubentryMake(30 - GingerCityTimer + " Gingerbread City turns remaining", "", GCTurnsLeftdescription), 10));
 		}
 	}
 }
 
-RegisterResourceGenerationFunction("IOTMGingerbreadCityGenerateResource");
-void IOTMGingerbreadCityGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if ($skill[Ceci N'Est Pas Un Chapeau].have_skill() && !get_property_boolean("_ceciHatUsed") && my_basestat($stat[moxie]) >= 150 && __misc_state["in run"])
-    {
-        //Umm... I guess?
-        //It doesn't seem amazing in aftercore, so we're not displaying it? Is that the right decision?
-        //Almost all of its enchantments are better on other hats. And you can't choose which one you get, so it'd just be annoying the user.
-        resource_entries.listAppend(ChecklistEntryMake("__skill Ceci N'Est Pas Un Chapeau", "skillz.php", ChecklistSubentryMake("Ceci N'Est Pas Un Chapeau", "", "Random enchantment hat, 300MP."), 10).ChecklistEntrySetIDTag("Gingerbread city not-a-chapeau skill"));
-    }
-    
-    if ($skill[Gingerbread Mob Hit].skill_is_usable() && mafiaIsPastRevision(17566))
-    {
-        if (!get_property_boolean("_gingerbreadMobHitUsed"))
-        {
-            string [int] description;
-            description.listAppend("Combat skill, win a fight without taking a turn.");
-            //FIXME replace with a better image
-            resource_entries.listAppend(ChecklistEntryMake("__item kneecapping stick", "", ChecklistSubentryMake("Gingerbread mob hit", "", description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Gingerbread city mob hit free kill"));
-            
-        }
-    }
-    
-    //http://kol.coldfront.net/thekolwiki/index.php/A_GingerGuide_to_Gingerbread_City
-    
-    //Things to acquire/unlock:
-    //Studying in the library, which lets you acquire the seven-day sugar raygun.
-    //Unlocking various areas.
-    //Chocolate puppy.
-    //Moneybag
-    //gingerbread pistol
-    //chocolate pocketwatch
-    //Two skills...?
-    //Laying track (does this reset on ascension...?) for a briefcase with lots of sprinkles...?
-    //Studying train schedules for ???
-    //Gingerbread Best outfit components.
-    //Um... candy crowbar -> breaking in? Do you ever do this in run? No, I think?
-    //Counterfeit city to sell.
-    //Gingerbread cigarette to sell.
-    //Chocolate sculpture to sell.
-    //Gingerbread gavel
-    //More...?
-    if ($locations[Gingerbread Civic Center,Gingerbread Industrial Zone,Gingerbread Train Station,Gingerbread Sewers,Gingerbread Upscale Retail District] contains __last_adventure_location)
-    {
-        //Show details:
-        /*
-        Unlocks:
-            gingerAdvanceClockUnlocked
-            gingerRetailUnlocked 
-            gingerSewersUnlocked 
-            gingerExtraAdventures - +10 adventures in area
-        
-        gingerSubwayLineUnlocked
-        
-        _gingerBiggerAlligators - a born liverpooler
-        _gingerbreadMobHitUsed - used once/day free kill
-        gingerNegativesDropped
-        gingerTrainScheduleStudies - times studied the schedule
-        gingerDigCount - times went digging at the train station
-        gingerLawChoice - times studied law
-        gingerMuscleChoice - times laid track
-        */
-        //There's no per-turn tracker for this area.
-    }
-}
 RegisterTaskGenerationFunction("IOTMIntergnatGenerateTasks");
 void IOTMIntergnatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -49121,6 +49080,23 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(entry);
 }
 
+//Spacegate
+RegisterTaskGenerationFunction("IOTMSpacegateGenerateTasks");
+void IOTMSpacegateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!__iotms_usable[lookupItem("Spacegate access badge")])
+        return;
+    string [int] description;
+    string url = "place.php?whichplace=spacegate";
+    {
+        int SpacegateTimer = get_property_int("_spacegateTurnsLeft");
+        description.listAppend("Plan " + get_property("_spacegateCoordinates") + " from Outer Space");
+        
+        if (SpacegateTimer > 0 && __last_adventure_location == $location[through the spacegate]) {
+            task_entries.listAppend(ChecklistEntryMake("__item portable spacegate", url, ChecklistSubentryMake(SpacegateTimer + " Spacegate turns remaining", "", description), -11));
+        }
+    }
+}
 
 RegisterResourceGenerationFunction("IOTMSpacegateGenerateResource");
 void IOTMSpacegateGenerateResource(ChecklistEntry [int] resource_entries)
@@ -54974,6 +54950,50 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
 }
 
 //2002 Mr. Store
+RegisterTaskGenerationFunction("IOTM2002MrStoreGenerateTasks");
+void IOTM2002MrStoreGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    {	int nextVHSTurn = get_property_int("spookyVHSTapeMonsterTurn") + 8;
+		int nextVHSTimer = (nextVHSTurn - total_turns_played());
+
+		string image_name = get_property("spookyVHSTapeMonster");
+		string [int] description;
+		string [int] warnings;
+
+		// Adding a few warnings for the sake of it
+		boolean [string] holidayTracker = getHolidaysToday(); 
+
+		if (holidayTracker["El Dia de Los Muertos Borrachos"] == true || holidayTracker["Feast of Boris"] == true) {
+			warnings[1] = 'Be careful -- Borrachos & Feast of Boris wanderers can show up instead of your VHS wanderer!';
+		}
+
+		if (get_property_int("breathitinCharges") > 0) {
+			warnings[2] = 'Breathitin is active; avoid putting your VHS wanderer outdoors, the wanderer is already free!';
+		}
+		
+		if (nextVHSTurn <= total_turns_played() && (image_name != ""))
+		{
+			description.listAppend(HTMLGenerateSpanFont("Free fight + YR!", "black"));
+
+			// Only show warnings if it's right about to happen
+			foreach i, warning in warnings {
+				description.listAppend(HTMLGenerateSpanFont("|* ➾ "+warning, "red"));
+			}
+			task_entries.listAppend(ChecklistEntryMake("__monster " + image_name, "", ChecklistSubentryMake("Spooky VHS: " + get_property("spookyVHSTapeMonster") + HTMLGenerateSpanFont(" now", "red"), "", description), -11));
+		}
+		else if (nextVHSTurn -1 == total_turns_played() && (image_name != ""))
+		{
+			description.listAppend(HTMLGenerateSpanFont("Free fight + YR next turn!", "black"));
+			task_entries.listAppend(ChecklistEntryMake("__monster " + image_name, "", ChecklistSubentryMake("Spooky VHS: " + get_property("spookyVHSTapeMonster") + HTMLGenerateSpanFont(" in 1 more adv", "blue"), "", description), -11));
+		}	
+		else if (image_name != "")
+		{
+			description.listAppend(nextVHSTimer + " adventures until your free fight YR VHS fight.");
+			optional_task_entries.listAppend(ChecklistEntryMake("__monster " + image_name, "", ChecklistSubentryMake("Spooky VHS: " + get_property("spookyVHSTapeMonster") + "", "", description), 10));
+		}
+	}	
+}
+	
 RegisterResourceGenerationFunction("IOTM2002MrStoreGenerateResource");
 void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -55098,6 +55118,7 @@ void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
 
 	resource_entries.listAppend(ChecklistEntryMake("__item mr. accessaturday", url, ChecklistSubentryMake(main_title, description), 8));
 }
+
 //Patriotic Eagle
 RegisterTaskGenerationFunction("IOTMPatrioticEagleGenerateTasks");
 void IOTMPatrioticEagleGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -55527,6 +55548,81 @@ void IOTMAugustScepterGenerateResource(ChecklistEntry [int] resource_entries)
     resource_entries.listAppend(ChecklistEntryMake("__item August Scepter", "skillz.php", ChecklistSubentryMake(title, subtitle, description), -1).ChecklistEntrySetIDTag("August Scepter resource"));
 
 }
+//Book of FActs
+RegisterTaskGenerationFunction("IOTMBookofFactsGenerateTasks");
+void IOTMBookofFactsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    // Exit out of the tile if they have neither skill and we don't actually think they should, either
+    if (!lookupSkill("Just the Facts").have_skill() && !__iotms_usable[$item[book of facts (dog-eared)]]) return;
+	
+	monster habitat_monster = get_property_monster("_monsterHabitatsMonster");
+    int fights_left = clampi(get_property_int("_monsterHabitatsFightsLeft"), 0, 5);
+	string [int] description;
+
+	// If they have an eagle, remind them they can eagle-banish to make it easier to find the habitat guys
+	string eagleString = lookupFamiliar("Patriotic Eagle").familiar_is_usable() ? "; remember, you can phylum-banish with your Patriotic Eagle to make it easier!" : "." ;
+	
+	if (habitat_monster != $monster[none] && fights_left > 0) 
+	{
+        description.listAppend("Neaaaar, faaaaaaar, wherever you spaaaaaaar, I believe that the heart does go onnnnn.");
+		description.listAppend("Appears as a wandering monster in any zone. Try a place with few competing monsters"+eagleString);
+		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + habitat_monster, "", ChecklistSubentryMake("Fight " + pluralise(fights_left, "more non-native " + habitat_monster, "more non-native " + habitat_monster + "s"), "", description), -4));
+    }
+
+	// Moving priority on this down a tiny bit due to in-run mediocrity
+	int circadianAdv = (get_property_int("_circadianRhythmsAdventures"));
+	if ($effect[Recalling Circadian Rhythms].have_effect() > 0 && circadianAdv < 10) {
+        string [int] circadianDescription;
+		string circadianPhylum = (get_property("_circadianRhythmsPhylum"));
+		circadianDescription.listAppend("Fight " + (11 - circadianAdv) + " more " + circadianPhylum + "s to get RO advs.");
+        task_entries.listAppend(ChecklistEntryMake("__item cheap wind-up clock", "", ChecklistSubentryMake("Circadian Rhythms turngen", circadianDescription), -1).ChecklistEntrySetIDTag("Circadian Rhythms turngen"));
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMBookofFactsGenerateResource");
+void IOTMBookofFactsGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (!lookupSkill("Just the Facts").have_skill() && !__iotms_usable[$item[book of facts (dog-eared)]]) return;
+	string [int] description;
+	string [int] circadianDescription;
+
+	// Populating different things based on run state & IOTM availability
+	string constructDescriptor = __iotms_usable[$item[X-32-F snowman crate]] ? " + snojo" : "";
+	if (lookupItem("[glitch season reward name]").item_amount() > 0) constructDescriptor += " + glitch"; 
+	string dudeDescriptor = __iotms_usable[$item[Witchess Set]] ? " + witchess" : "";
+	if (__iotms_usable[lookupItem("Neverending Party invitation envelope")]) dudeDescriptor += " + NEP"; 
+	string horrorDescriptor = lookupItem("closed-circuit pay phone").have() ? " + shadow rifts" : "";
+	
+	if (!get_property_boolean("_circadianRhythmsRecalled")) {
+        circadianDescription.listAppend("Can recall Circadian Rhythms to get +11 RO adv.");
+		circadianDescription.listAppend("Good targets: construct (nightstands"+constructDescriptor+"), dudes (pygmies"+dudeDescriptor+"), horrors (copied tentacles"+horrorDescriptor+")");
+        resource_entries.listAppend(ChecklistEntryMake("__item cheap wind-up clock", "", ChecklistSubentryMake("Circadian Rhythms turngen", circadianDescription), 11).ChecklistEntrySetIDTag("Circadian Rhythms turngen"));
+    }
+	
+	int habitatRecallsLeft = clampi(3 - get_property_int("_monsterHabitatsRecalled"), 0, 3);
+    if (get_property_int("_monsterHabitatsRecalled") < 3) {
+        description.listAppend("Good targets include monsters you want 6 of:");
+		description.listAppend("Fantasy bandit, eldritch tentacle, black crayon orc if the stars align");
+        resource_entries.listAppend(ChecklistEntryMake("__item hey deze map", "", ChecklistSubentryMake(pluralise(habitatRecallsLeft, "Habitat recall", "Habitat recalls"), "", description), 8).ChecklistEntrySetIDTag("habitat recalls"));
+    }
+
+	// TODO: Once mt_rand is exposed, show on-path wishes. Not really doable yet lol
+	string [int] BOFAdropsDescription;
+	int BOFApocketwishes = clampi(3 - get_property_int("_bookOfFactsWishes"), 0, 3);
+	if (get_property_int("_bookOfFactsWishes") < 3) {
+        BOFAdropsDescription.listAppend("" + BOFApocketwishes + " BOFA wishes available.");
+    }
+
+	// Not going to remove this because I think it's valid right now but once mt_rand is 
+	//   properly exposed it would be good to hide this if the user is in a seed where 
+	//   they can't really access tatters...
+	int BOFAtatters = clampi(11 - get_property_int("_bookOfFactsTatters"), 0, 11);
+	if (get_property_int("_bookOfFactsTatters") < 11) {
+        BOFAdropsDescription.listAppend("" + BOFAtatters + " BOFA tatters available.");
+	}
+	resource_entries.listAppend(ChecklistEntryMake("__item book of facts", "", ChecklistSubentryMake(("Miscellaneous valuable BOFA drops"), "", BOFAdropsDescription), 8).ChecklistEntrySetIDTag("bofa tatters"));
+}
+
 
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
