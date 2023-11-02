@@ -2,7 +2,8 @@
 RegisterTaskGenerationFunction("IOTMSpacegateGenerateTasks");
 void IOTMSpacegateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    #if (get_property_boolean("spacegateAlways") == false) return;
+    if (!__iotms_usable[lookupItem("Spacegate access badge")])
+        return;
     string [int] description;
     string url = "place.php?whichplace=spacegate";
     {
@@ -14,6 +15,7 @@ void IOTMSpacegateGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
         }
     }
 }
+
 RegisterResourceGenerationFunction("IOTMSpacegateGenerateResource");
 void IOTMSpacegateGenerateResource(ChecklistEntry [int] resource_entries)
 {

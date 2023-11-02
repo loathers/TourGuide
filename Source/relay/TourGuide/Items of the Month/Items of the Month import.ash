@@ -139,3 +139,4 @@ import "relay/TourGuide/Items of the Month/2023/Cincho de Mayo.ash";
 import "relay/TourGuide/Items of the Month/2023/2002 Catalog.ash";
 import "relay/TourGuide/Items of the Month/2023/Patriotic Eagle.ash";
 import "relay/TourGuide/Items of the Month/2023/August Scepter.ash";
+import "relay/TourGuide/Items of the Month/2023/Book of Facts.ash";
