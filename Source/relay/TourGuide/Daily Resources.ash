@@ -211,7 +211,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
     
     if ((get_property("sidequestOrchardCompleted") == "hippy" || get_property("sidequestOrchardCompleted") == "fratboy") && !get_property_boolean("_hippyMeatCollected") && my_path().id != PATH_WAY_OF_THE_SURPRISING_FIST) {
-        resource_entries.listAppend(ChecklistEntryMake("__item herbs", "island.php", ChecklistSubentryMake("Meat from the hippy store", "", "~4500 free meat."), 5).ChecklistEntrySetIDTag("Island orchard meat cut")); //FIXME consider shop.php?whichshop=hippy
+        resource_entries.listAppend(ChecklistEntryMake("__item herbs", "island.php", ChecklistSubentryMake("Meat from the hippy store", "", "~4500 free meat."), 8).ChecklistEntrySetIDTag("Island orchard meat cut")); //FIXME consider shop.php?whichshop=hippy
     }
     if ((get_property("sidequestArenaCompleted") == "hippy" || get_property("sidequestArenaCompleted") == "fratboy") && !get_property_boolean("concertVisited")) {
         string [int] description;
