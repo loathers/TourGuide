@@ -51976,8 +51976,8 @@ void IOTMCargoCultistShortsGenerateResource(ChecklistEntry [int] resource_entrie
 
         boolean [int] empty_pockets;
         string [int] empty_pocket_list = split_string(get_property("cargoPocketsEmptied"), ",");
-        foreach pocket in split_string(get_property("cargoPocketsEmptied"), ",") {
-            empty_pockets[to_int(empty_pocket_list[i])] = true;
+        foreach _, pocket in empty_pocket_list {
+            empty_pockets[to_int(pocket)] = true;
         }
  
 		string [int] options;
