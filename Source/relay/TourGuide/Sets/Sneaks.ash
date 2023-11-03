@@ -121,6 +121,10 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         int cinchoRests = get_property_int('_cinchoRests');
         int cinchUsed = get_property_int('_cinchUsed');
 
+        // Resting when Cincho is full might burn some of the Cincho rests
+        int freeRestsRemaining = __misc_state_int["free rests remaining"];
+        freeRests = min(freeRests, cinchoRests + freeRestsRemaining);
+
         // Calculating total available cinch
 
         int [int] cinchLevels = listMake(30,30,30,30,30,25,20,15,10,5);
@@ -132,7 +136,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         // This while loop expands your possible cinch starting at rests you haven't used.
         while (rest < freeRests)
 			{
-                int cinchAmount = rest > count(cinchLevels) ? 5 : cinchLevels[rest];
+                int cinchAmount = rest >= count(cinchLevels) ? 5 : cinchLevels[rest];
                 totalCinch += cinchAmount;
                 rest += 1;
 			}

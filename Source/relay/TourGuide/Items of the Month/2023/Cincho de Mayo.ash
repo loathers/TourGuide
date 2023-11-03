@@ -8,6 +8,9 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     int freeRestsRemaining = __misc_state_int["free rests remaining"];
     int cinchoRests = get_property_int('_cinchoRests');
     int cinchUsed = get_property_int('_cinchUsed');
+
+    // Resting when Cincho is full might burn some of the Cincho rests
+    freeRests = min(freeRests, cinchoRests + freeRestsRemaining);
     
     // Since the pref is weird, this tells you your current total cinch
     int currentCinch = 100 - cinchUsed;
@@ -22,7 +25,7 @@ void IOTMCinchoDeMayoGenerateResource(ChecklistEntry [int] resource_entries)
     // This while loop expands your possible cinch starting at rests you haven't used.
     while (rest < freeRests)
         {
-            int cinchAmount = rest > count(cinchLevels) ? 5 : cinchLevels[rest];
+            int cinchAmount = rest >= count(cinchLevels) ? 5 : cinchLevels[rest];
             totalCinch += cinchAmount;
             rest += 1;
         }

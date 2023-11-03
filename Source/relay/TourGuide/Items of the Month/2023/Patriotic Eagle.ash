@@ -7,8 +7,7 @@ void IOTMPatrioticEagleGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     monster RWB_monster = get_property_monster("rwbMonster");
 
     if (RWB_monster != $monster[none]) {
-        // Have to subtract 1; mafia pref starts at 3 but only increments on start-of-fight text, which happens on 2 of them.
-        int fights_left = clampi(get_property_int("rwbMonsterCount"), 0, 2) - 1;
+        int fights_left = clampi(get_property_int("rwbMonsterCount"), 0, 2);
 
         // Use ezan's weird location-finding-thing
         location [int] possible_appearance_locations = RWB_monster.getPossibleLocationsMonsterCanAppearInNaturally().listInvert();
@@ -111,7 +110,7 @@ void IOTMPatrioticEagleGenerateResource(ChecklistEntry [int] resource_entries)
     if (!__quest_state["Level 11 Palindome"].state_boolean["dr. awkward's office unlocked"]) 
         constructOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Whitey's Grove (1/4)", $location[Whitey's Grove]));
     if (!$location[The Castle in the Clouds in the Sky (Basement)].locationAvailable())
-        beastOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Airship (1/7)", $location[The Penultimate Fantasy Airship]));
+        constructOptions.listAppend(HTMLGenerateFutureTextByLocationAvailability("Airship (1/7)", $location[The Penultimate Fantasy Airship]));
 
     string [int] undeadOptions;
     if (!$location[The Haunted Bathroom].locationAvailable()) 

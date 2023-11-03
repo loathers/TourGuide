@@ -35,11 +35,14 @@ int pullable_amount(item it, int maximum_total_wanted)
 	{
         // Hooray for removing already-pulled stuff!
 	    string ronin_storage_pulls = get_property("_roninStoragePulls");
-	    string[int] already_pulled = split_string(ronin_storage_pulls);
+	    string[int] already_pulled = split_string(ronin_storage_pulls, ",");
 	    int requested_item = it.to_int();
         
-        // Using the one-line if statement logic because I like it slightly better for this.
-	    amount = already_pulled contains requested_item ? 0 : 1;
+	    boolean already_pulled_this_item = false;
+		foreach key in already_pulled {
+			if (already_pulled[key] == requested_item) already_pulled_this_item = true;
+		}
+	    amount = already_pulled_this_item ? 0 : 1;
 	}
 
 	return min(__misc_state_int["pulls available"], amount);
