@@ -31,7 +31,7 @@ void initialiseIOTMsUsable()
     if (my_path().id != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         //Campground items:
-        foreach it in $items[source terminal, haunted doghouse, Witchess Set, potted tea tree, portable mayo clinic, Little Geneticist DNA-Splicing Lab, cornucopia]
+        foreach it in $items[source terminal, haunted doghouse, Witchess Set, potted tea tree, portable mayo clinic, Little Geneticist DNA-Splicing Lab, cornucopia, A Guide to Burning Leaves]
         {
             if (__campground[it] > 0)
                 __iotms_usable[it] = true;
