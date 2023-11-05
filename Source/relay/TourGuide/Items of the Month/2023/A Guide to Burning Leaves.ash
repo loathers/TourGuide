@@ -10,9 +10,9 @@ Record LeafyFight
     string scaling;
     int leavesDropped;
     string extraDrops;
-}
+};
 
-LeafyFight LeafyFightMake(int cost, monster summonedMonster, string scaling, int leavesDropped, item itemDropped)
+LeafyFight LeafyFightMake(int cost, monster summonedMonster, string scaling, int leavesDropped, string itemDropped)
 {
     LeafyFight summon;
 
@@ -20,7 +20,7 @@ LeafyFight LeafyFightMake(int cost, monster summonedMonster, string scaling, int
     summon.summonedMonster = summonedMonster;
     summon.scaling = scaling;
     summon.leavesDropped = leavesDropped;
-    summon.itemDropped = itemDropped;
+    summon.extraDrops = itemDropped;
     
     return summon;
 }
@@ -32,7 +32,7 @@ Record LeafySummon
     string description;
     boolean meltingStatus;
     string prefName;
-}
+};
 
 LeafySummon LeafySummonMake(int cost, item summonedItem, string desc, boolean melts, string prefName)
 {
@@ -47,6 +47,22 @@ LeafySummon LeafySummonMake(int cost, item summonedItem, string desc, boolean me
     return summon;
 }
 
+void listAppend(LeafyFight [int] list, LeafyFight entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+void listAppend(LeafySummon [int] list, LeafySummon entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 RegisterResourceGenerationFunction("IOTMBurningLeavesGenerateResource");
 void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -56,18 +72,17 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
     string url = "campground.php?preaction=burningleaves";
 
     // Make two tiles for spending leaves
-    item leaf = $item[inflammable leaf];
-    int leafCount = leaf.item_amount();
+    int leafCount = $item[inflammable leaf].item_amount();
     string [int] itemsDescription;
     string [int] monstersDescription;
 
     // To use these, if you do "aftercoreStuff[##]" it'll return true if it's in the list or false if not
-    boolean [int] aftercoreStuff = [222,1111,6666,11111];
-    boolean [int] inRunStuff = [42,43,44,66];
+    boolean [int] aftercoreStuff = $ints[222,1111,6666,11111];
+    boolean [int] inRunStuff = $ints[42,43,44,66];
 
     // Disabling in-run condition for testing
     // if (leaf.have() && __misc_state["in run"]) {
-    if (leaf.have()) {
+    if ($item[inflammable leaf].have()) {
 
         LeafyFight [int] leafyFights;
         // leafyFights.listAppend(LeafyFightMake(#leafcost, $monster[leafmonster], "scaling desc", #leafdrops, "extra drops"));
@@ -112,22 +127,22 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
         foreach key, summon in leafySummons 
         {
             // Adding some skip conditions for certain stuff
-            if (__misc_state["in run"] && aftercoreStuff[summon.leafCost]) continue; 
-            if (!__misc_state["in run"] && inRunStuff[summon.leafCost]) continue;
+            // if (__misc_state["in run"] && aftercoreStuff[summon.leafCost]) continue; 
+            // if (!__misc_state["in run"] && inRunStuff[summon.leafCost]) continue;
 
             // Run pref checks & do not generate a row if you can't summon it
-            boolean userCanSummon;
+            // boolean userCanSummon = true;
 
-            switch (summon.prefName) {
-                case "":
-                    userCanSummon = true;
-                case "_leafLassosCrafted":
-                    userCanSummon = get_property_int("_leafLassosCrafted") < 3;
-                default:
-                    userCanSummon = get_property_boolean(summon.prefName);
-            }
+            // switch (summon.prefName) {
+            //     case "":
+            //         userCanSummon = true;
+            //     case "_leafLassosCrafted":
+            //         userCanSummon = get_property_int("_leafLassosCrafted") < 3;
+            //     default:
+            //         userCanSummon = get_property_boolean(summon.prefName);
+            // }
 
-            if (!userCanSummon) continue;
+            // if (!userCanSummon) continue;
 
             // Set the color to gray if you don't have enough leaves
             boolean hasEnoughLeaves = leafCount > summon.leafCost;
@@ -141,15 +156,15 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
             string [int] option;
             // add cost
             option.listAppend(summon.leafCost);
-            option.listAppend(summon.summonedItem.to_string())
-            option.listAppend(summonDesc)
+            option.listAppend(summon.summonedItem.to_string());
+            option.listAppend(summonDesc);
             foreach key, s in option 
             {
                 option[key] = HTMLGenerateSpanFont(s, rowColor);
             }
-            summonOptions.listAppend(options);
+            summonOptions.listAppend(option);
         }
-        itemsDescription.listPrepend(HTMLGenerateSimpleTableLines(summonOptions));
+        itemsDescription.listAppend(HTMLGenerateSimpleTableLines(summonOptions));
 
         resource_entries.listAppend(ChecklistEntryMake("__item inflammable leaf", url, ChecklistSubentryMake(pluralise(leafCount, "leaf to spend", "leaves to spend"), "", itemsDescription), 13).ChecklistEntrySetIDTag("Burning leaf item summons"));
 
@@ -173,7 +188,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Have enough leaves, if you let the leaflets drop their bounty!");
         }
         else {
-            description.listAppend(HTMLGenerateSpanFont("Don't have enough leaves to fight your leaflets... get more!", "red"))
+            description.listAppend(HTMLGenerateSpanFont("Don't have enough leaves to fight your leaflets... get more!", "red"));
         }
 
         subentries.listAppend(ChecklistSubentryMake(pluralise(fightsRemaining, "free flaming leaflet fight", "free flaming leaflet fights"), "", description));

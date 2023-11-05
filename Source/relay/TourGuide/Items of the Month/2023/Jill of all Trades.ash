@@ -33,10 +33,10 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
 
     string [int] description;
     if (mapsDropped == 0) {
-        description.listAppend("You haven't gotten a map to halloween town yet! Try using your Jill for a map at ~"+estimatedMapProbability+"% chance, or approximately "+round(turnsToMap,2)+" turns.");
+        description.listAppend("You haven't gotten a map to halloween town yet! Try using your Jill for a map at ~"+estimatedMapProbability+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
     }
     else {
-        description.listAppend("You have a map; the next map is at a ~"+estimatedMapProbability+"% chance, or approximately "+round(turnsToMap,2)+" turns.")
+        description.listAppend("You have a map; the next map is at a ~"+estimatedMapProbability+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
     }
     
 	int habitatRecallsLeft = clampi(3 - get_property_int("_monsterHabitatsRecalled"), 0, 3);
