@@ -96,7 +96,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
         leafySummons.listAppend(LeafySummonMake(222, $item[day shortener], "spend 5 turns for a +turn item", false, "_leafDayShortenerCrafted"));
         leafySummons.listAppend(LeafySummonMake(1111, $item[coping juice], "copium for the masses", false, ""));
         leafySummons.listAppend(LeafySummonMake(6666, $item[smoldering leafcutter ant egg], "mosquito & leaves familiar", false, "_leafAntEggCrafted"));
-        leafySummons.listAppend(LeafySummonMake(11111, $item[super-heated leaf], "burn leaves into your skiiiin", false, ""));
+        leafySummons.listAppend(LeafySummonMake(11111, $item[super-heated leaf], "burn leaves into your skiiiin", false, "_leafTattooCrafted"));
 
         // Make a big summons table for a leaf summoning tile 
         string [int][int] summonOptions;
