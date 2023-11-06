@@ -80,15 +80,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
     boolean [int] aftercoreStuff = $ints[222,1111,6666,11111];
     boolean [int] inRunStuff = $ints[42,43,44,66];
 
-    // Disabling in-run condition for testing
-    // if (leaf.have() && __misc_state["in run"]) {
     if ($item[inflammable leaf].have()) {
-
-        LeafyFight [int] leafyFights;
-        // leafyFights.listAppend(LeafyFightMake(#leafcost, $monster[leafmonster], "scaling desc", #leafdrops, "extra drops"));
-        leafyFights.listAppend(LeafyFightMake(11, $monster[flaming leaflet], "11/11/11", 4, ""));
-        leafyFights.listAppend(LeafyFightMake(111, $monster[flaming monstera], "scaling", 7, "leafy browns"));
-        leafyFights.listAppend(LeafyFightMake(666, $monster[leaviathan], "scaling boss (hard!)", 125, "leafy browns"));
 
         LeafySummon [int] leafySummons;
         // leafySummons.listAppend(LeafySummonMake(#leafcost, $item[leafsummon], "tile desc", t/f(melts), "name of summon check pref"));
@@ -126,23 +118,43 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
         // Populate the table
         foreach key, summon in leafySummons 
         {
-            // Adding some skip conditions for certain stuff
+            // Adding some skip conditions for aftercore/in-run options
             // if (__misc_state["in run"] && aftercoreStuff[summon.leafCost]) continue; 
             // if (!__misc_state["in run"] && inRunStuff[summon.leafCost]) continue;
 
-            // Run pref checks & do not generate a row if you can't summon it
-            // boolean userCanSummon = true;
+            // Run pref checks & do not generate a row if you cannot summon it anymore
+            boolean userCanSummon = true;
 
-            // switch (summon.prefName) {
-            //     case "":
-            //         userCanSummon = true;
-            //     case "_leafLassosCrafted":
-            //         userCanSummon = get_property_int("_leafLassosCrafted") < 3;
-            //     default:
-            //         userCanSummon = get_property_boolean(summon.prefName);
-            // }
+            if (summon.prefName == "")
+                userCanSummon = true;
+            else if (summon.prefName == "_leafLassosCrafted")
+                userCanSummon = get_property_int("_leafLassosCrafted") < 3; // can make a lasso if you've made <3
+            else
+                userCanSummon = !get_property_boolean(summon.prefName); // prefs are false if non-summoned, true if summoned and you're locked out
 
-            // if (!userCanSummon) continue;
+            if (!userCanSummon) continue;
+
+            // A handful of conditional exclusions. Enumerated reasons in the comments!
+
+            // The bomb is useful if you aren't able to use crab or short-order cook. Otherwise, not particularly useful.
+            boolean canUseShorty = lookupFamiliar("Shorter-Order Cook").familiar_is_usable();
+            boolean canUseCrab = lookupFamiliar("Imitation Crab").familiar_is_usable();
+
+            if (canUseShorty || canUseCrab) {
+                if (summon.leafCost == 37) continue;  
+            }
+
+            // If the user is level 12 or higher, no reason to show fig or torch. Going to still
+            //   show drape if they don't have it, as 20% stat might be useful slot-filler for some
+            //   weird user somewhere.
+            if (my_level() > 11) {
+                if ($ints[42,43] contains summon.leafCost) continue;
+            }
+
+            // Do not get 2 of any of the equips
+            if (summon.summonedItem.available_amount() > 0) {
+                if ($ints[42,43,44,66] contains summon.leafCost) continue;
+            }
 
             // Set the color to gray if you don't have enough leaves
             boolean hasEnoughLeaves = leafCount > summon.leafCost;
@@ -151,7 +163,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
             // Add smaller melting tag to description, if it's melting
             string summonDesc = summon.description;
             if (summon.meltingStatus) 
-                summonDesc += HTMLGenerateSpanFont("(melting)", "0.9em");
+                summonDesc += HTMLGenerateSpanFont(" (melting)", "gray", "0.7em");
 
             string [int] option;
             // add cost
@@ -165,12 +177,80 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
             summonOptions.listAppend(option);
         }
         itemsDescription.listAppend(HTMLGenerateSimpleTableLines(summonOptions));
+        resource_entries.listAppend(ChecklistEntryMake("__item inflammable leaf", url, ChecklistSubentryMake(pluralise(leafCount, "leaf to burn for items", "leaves to burn for items"), "", itemsDescription), 14).ChecklistEntrySetIDTag("Burning leaf item summons"));
 
-        resource_entries.listAppend(ChecklistEntryMake("__item inflammable leaf", url, ChecklistSubentryMake(pluralise(leafCount, "leaf to spend", "leaves to spend"), "", itemsDescription), 13).ChecklistEntrySetIDTag("Burning leaf item summons"));
+        // With item summons done, make a seal-esque fights tile
+        
+        int fightsRemaining = clampi(5 - get_property_int("_leafMonstersFought"), 0, 5);
 
+        if (fightsRemaining > 0) {
+            LeafyFight [int] leafyFights;
+            // leafyFights.listAppend(LeafyFightMake(#leafcost, $monster[leafmonster], "scaling desc", #leafdrops, "extra drops"));
+            leafyFights.listAppend(LeafyFightMake(11, $monster[flaming leaflet], "11/11/11", 4, ""));
+            leafyFights.listAppend(LeafyFightMake(111, $monster[flaming monstera], "scaling", 7, "leafy browns"));
+            leafyFights.listAppend(LeafyFightMake(666, $monster[leaviathan], "scaling boss (hard!)", 125, "flaming leaf crown"));
+
+            string [int][int] fightOptions;
+
+            // Header for the fight summons table
+            if (true)
+            {
+                string [int] option;
+                option.listAppend("cost");
+                option.listAppend("monster");
+                option.listAppend("stats & info");
+                foreach key, s in option
+                {
+                    option[key] = HTMLGenerateSpanOfClass(s, "r_bold");
+                }
+                fightOptions.listAppend(option);
+            }
+
+            foreach key, summon in leafyFights
+            {
+                boolean hasEnoughLeaves = leafCount > summon.leafCost;
+                string rowColor = hasEnoughLeaves ? "black" : "gray";
+
+                // Add smaller melting tag to description, if it's melting
+                string summonDesc = summon.scaling + "; ~"+summon.leavesDropped+" leaves dropped ";
+                if (summon.extraDrops != "") 
+                    summonDesc += HTMLGenerateSpanFont("(also, drops "+summon.extraDrops+")", "gray", "0.7em");
+
+                string [int] option;
+                // add cost
+                option.listAppend(summon.leafCost);
+                option.listAppend(summon.summonedMonster.to_string());
+                option.listAppend(summonDesc);
+                foreach key, s in option 
+                {
+                    option[key] = HTMLGenerateSpanFont(s, rowColor);
+                }
+                fightOptions.listAppend(option);
+            }
+
+            int leafletsUserCanSummon = leafCount/11;
+
+            monstersDescription.listAppend(HTMLGenerateSimpleTableLines(fightOptions));
+            if (leafCount > 111*fightsRemaining) {
+                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you can summon <b>"+fightsRemaining+" monstera</b>, for 5 scaling fights");
+            }
+            else if (leafCount > 11*fightsRemaining) {
+                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you can summon <b>"+fightsRemaining+" leaflets</b>, for familiar turns");
+            }
+            else if (leafCount > 11) {
+                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you can currently summon "+pluralise(leafletsUserCanSummon,"leaflet","leaflets")+"; save leaves for more!");
+            }
+            else {
+                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you cannot currently summon a free fight; save leaves for more!");
+            }
+
+            resource_entries.listAppend(ChecklistEntryMake("__monster flaming leaflet", url, ChecklistSubentryMake(pluralise(fightsRemaining, "remaining free burned leaf fight", "remaining free burned leaf fights"), "remember to lasso for +1 fight!", monstersDescription), 13).ChecklistEntrySetIDTag("Burning leaf fight summons"));
+
+        }
+        
     }
     
-    // Make a free fights tile for available free leaf fights
+    // Make a free fights combo tag for available free leaf fights
     int fightsRemaining = clampi(5 - get_property_int("_leafMonstersFought"), 0, 5);
     
     string [int] description;
