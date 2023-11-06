@@ -161,6 +161,11 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
                 if ($ints[42,43,44,66,74] contains summon.leafCost) continue;
             }
 
+            // Do not show the bed if it is already installed either
+            if (get_campground() contains $item[forest canopy bed]) {
+                if (summon.leafCost == 74) continue;
+            }
+
             // Set the color to gray if you don't have enough leaves
             boolean hasEnoughLeaves = leafCount > summon.leafCost;
             string rowColor = hasEnoughLeaves ? "black" : "gray";
@@ -193,7 +198,11 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
             // leafyFights.listAppend(LeafyFightMake(#leafcost, $monster[leafmonster], "scaling desc", #leafdrops, "extra drops"));
             leafyFights.listAppend(LeafyFightMake(11, $monster[flaming leaflet], "11/11/11", 4, ""));
             leafyFights.listAppend(LeafyFightMake(111, $monster[flaming monstera], "scaling", 7, "leafy browns"));
-            leafyFights.listAppend(LeafyFightMake(666, $monster[leaviathan], "scaling boss (hard!)", 125, "flaming leaf crown"));
+
+            // No particular need to fight leaviathan over monstera in run if the user owns the crown already
+            if (!(__misc_state["in run"] && $item[flaming leaf crown].have())) {
+                leafyFights.listAppend(LeafyFightMake(666, $monster[leaviathan], "scaling boss (hard!)", 125, "flaming leaf crown"));
+            }
 
             string [int][int] fightOptions;
 
