@@ -167,7 +167,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
             }
 
             // Set the color to gray if you don't have enough leaves
-            boolean hasEnoughLeaves = leafCount > summon.leafCost;
+            boolean hasEnoughLeaves = leafCount >= summon.leafCost;
             string rowColor = hasEnoughLeaves ? "black" : "gray";
 
             // Add smaller melting tag to description, if it's melting
@@ -222,7 +222,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
 
             foreach key, summon in leafyFights
             {
-                boolean hasEnoughLeaves = leafCount > summon.leafCost;
+                boolean hasEnoughLeaves = leafCount >= summon.leafCost;
                 string rowColor = hasEnoughLeaves ? "black" : "gray";
 
                 // Add smaller melting tag to description, if it's melting
