@@ -77,7 +77,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] monstersDescription;
 
     // To use these, if you do "aftercoreStuff[##]" it'll return true if it's in the list or false if not
-    boolean [int] aftercoreStuff = $ints[222,1111,6666,11111];
+    boolean [int] aftercoreStuff = $ints[99,222,1111,6666,11111];
     boolean [int] inRunStuff = $ints[42,43,44,66];
 
     if ($item[inflammable leaf].have()) {
@@ -151,9 +151,14 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
                 if ($ints[42,43] contains summon.leafCost) continue;
             }
 
-            // Do not get 2 of any of the equips
+            // If the user has Tao of the Terrapin available, they probably don't need the aegis
+            if (lookupSkill("Tao of the Terrapin").have_skill()) {
+                if (summon.leafCost == 66) continue;
+            }
+
+            // Do not get 2 of any of the equips or other one-use items
             if (summon.summonedItem.available_amount() > 0) {
-                if ($ints[42,43,44,66] contains summon.leafCost) continue;
+                if ($ints[42,43,44,66,74] contains summon.leafCost) continue;
             }
 
             // Set the color to gray if you don't have enough leaves
