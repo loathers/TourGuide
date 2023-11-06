@@ -40,6 +40,9 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
     if (!get_property_boolean("ledCandleDropped")) {
         description.listAppend("Fight a dude for an LED candle, to tune your Jill!");
     }
+
+    // If we have nothing to say, do not display the tile
+    if (count(description) == 0) return;
 	
     resource_entries.listAppend(ChecklistEntryMake("__familiar jill-of-all-trades", url, ChecklistSubentryMake("Celebrating the Jillenium", "", description)).ChecklistEntrySetIDTag("Jill of All Trades tile"));
 }
