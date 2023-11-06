@@ -1,12 +1,12 @@
 import "relay/TourGuide/Support/Math.ash"
 import "relay/TourGuide/Support/List.ash"
 
-buffer to_buffer(string str)
-{
-	buffer result;
-	result.append(str);
-	return result;
-}
+// buffer to_buffer(string str)
+// {
+// 	buffer result;
+// 	result.append(str);
+// 	return result;
+// }
 
 buffer copyBuffer(buffer buf)
 {
