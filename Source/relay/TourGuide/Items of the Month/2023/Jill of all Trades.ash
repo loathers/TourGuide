@@ -22,7 +22,7 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
     float estimatedMapProbability = 35 * (0.05 ** min(mapsDropped, 3)); // confirmed by cannonfire to stop decreasing after 3rd time
 
     // Convert to turns
-    float turnsToMap = clampf(1/(estimatedMapProbability/100),0,1);
+    float turnsToMap = 1/(estimatedMapProbability/100);
 
     string [int] description;
     if (mapsDropped == 0) {
