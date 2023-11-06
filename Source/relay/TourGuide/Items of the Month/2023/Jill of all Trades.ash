@@ -19,7 +19,7 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
 		url = "";
   
     // Initial chance is 35% with a masssive dropoff (multiply by 5% per map dropped)
-    float estimatedMapProbability = 35 * (0.05 ** min(mapsDropped, 3)); // confirmed by cannonfire to stop decreasing after 3rd time
+    float estimatedMapProbability = 35 * (0.05 ** clampi(mapsDropped, 0, 3)); // confirmed by cannonfire to stop decreasing after 3rd time
 
     // Convert to turns
     float turnsToMap = 1/(estimatedMapProbability/100);
@@ -28,7 +28,7 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
     if (mapsDropped == 0) {
         description.listAppend("You haven't gotten a map to halloween town yet! Try using your Jill for a map at ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
     }
-    else {
+    else if (mapsDropped < 2) { // The third map drop chance is less than 1 in a thousand - not something that is particularly useful to hunt for
         description.listAppend("You have a map; the next map is at a ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
     }
     
