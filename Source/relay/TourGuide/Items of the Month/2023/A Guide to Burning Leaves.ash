@@ -77,7 +77,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] monstersDescription;
 
     // To use these, if you do "aftercoreStuff[##]" it'll return true if it's in the list or false if not
-    boolean [int] aftercoreStuff = $ints[222,1111,6666,11111];
+    boolean [int] aftercoreStuff = $ints[99,222,1111,6666,11111];
     boolean [int] inRunStuff = $ints[42,43,44,66];
 
     if ($item[inflammable leaf].have()) {
@@ -96,7 +96,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
         leafySummons.listAppend(LeafySummonMake(222, $item[day shortener], "spend 5 turns for a +turn item", false, "_leafDayShortenerCrafted"));
         leafySummons.listAppend(LeafySummonMake(1111, $item[coping juice], "copium for the masses", false, ""));
         leafySummons.listAppend(LeafySummonMake(6666, $item[smoldering leafcutter ant egg], "mosquito & leaves familiar", false, "_leafAntEggCrafted"));
-        leafySummons.listAppend(LeafySummonMake(11111, $item[super-heated leaf], "burn leaves into your skiiiin", false, ""));
+        leafySummons.listAppend(LeafySummonMake(11111, $item[super-heated leaf], "burn leaves into your skiiiin", false, "_leafTattooCrafted"));
 
         // Make a big summons table for a leaf summoning tile 
         string [int][int] summonOptions;
@@ -151,13 +151,23 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
                 if ($ints[42,43] contains summon.leafCost) continue;
             }
 
-            // Do not get 2 of any of the equips
+            // If the user has Tao of the Terrapin available, they probably don't need the aegis
+            if (lookupSkill("Tao of the Terrapin").have_skill()) {
+                if (summon.leafCost == 66) continue;
+            }
+
+            // Do not get 2 of any of the equips or other one-use items
             if (summon.summonedItem.available_amount() > 0) {
-                if ($ints[42,43,44,66] contains summon.leafCost) continue;
+                if ($ints[42,43,44,66,74] contains summon.leafCost) continue;
+            }
+
+            // Do not show the bed if it is already installed either
+            if (get_campground() contains $item[forest canopy bed]) {
+                if (summon.leafCost == 74) continue;
             }
 
             // Set the color to gray if you don't have enough leaves
-            boolean hasEnoughLeaves = leafCount > summon.leafCost;
+            boolean hasEnoughLeaves = leafCount >= summon.leafCost;
             string rowColor = hasEnoughLeaves ? "black" : "gray";
 
             // Add smaller melting tag to description, if it's melting
@@ -188,7 +198,11 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
             // leafyFights.listAppend(LeafyFightMake(#leafcost, $monster[leafmonster], "scaling desc", #leafdrops, "extra drops"));
             leafyFights.listAppend(LeafyFightMake(11, $monster[flaming leaflet], "11/11/11", 4, ""));
             leafyFights.listAppend(LeafyFightMake(111, $monster[flaming monstera], "scaling", 7, "leafy browns"));
-            leafyFights.listAppend(LeafyFightMake(666, $monster[leaviathan], "scaling boss (hard!)", 125, "flaming leaf crown"));
+
+            // No particular need to fight leaviathan over monstera in run if the user owns the crown already
+            if (!(__misc_state["in run"] && $item[flaming leaf crown].have())) {
+                leafyFights.listAppend(LeafyFightMake(666, $monster[leaviathan], "scaling boss (hard!)", 125, "flaming leaf crown"));
+            }
 
             string [int][int] fightOptions;
 
@@ -208,7 +222,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
 
             foreach key, summon in leafyFights
             {
-                boolean hasEnoughLeaves = leafCount > summon.leafCost;
+                boolean hasEnoughLeaves = leafCount >= summon.leafCost;
                 string rowColor = hasEnoughLeaves ? "black" : "gray";
 
                 // Add smaller melting tag to description, if it's melting

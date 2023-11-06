@@ -18,25 +18,18 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
 	if (bigJillyStyle == my_familiar())
 		url = "";
   
-    // Dunno what the probs are, from my logs it looks like 30% with STEEEEEEEP dropoff?
-    //   For the purposes of assumptions I'll go with 30% odds, 5% odds, 1% odds thereafter
-    int estimatedMapProbability = 1;
-    switch (mapsDropped) {
-        case 0:
-            estimatedMapProbability = 30;
-        case 1:
-            estimatedMapProbability = 5;
-    }
+    // Initial chance is 35% with a masssive dropoff (multiply by 5% per map dropped)
+    float estimatedMapProbability = 35 * (0.05 ** clampi(mapsDropped, 0, 3)); // confirmed by cannonfire to stop decreasing after 3rd time
 
     // Convert to turns
-    float turnsToMap = clampf(1/(to_float(estimatedMapProbability)/100),0,1);
+    float turnsToMap = 1/(estimatedMapProbability/100);
 
     string [int] description;
     if (mapsDropped == 0) {
-        description.listAppend("You haven't gotten a map to halloween town yet! Try using your Jill for a map at ~"+estimatedMapProbability+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
+        description.listAppend("You haven't gotten a map to halloween town yet! Try using your Jill for a map at ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
     }
-    else {
-        description.listAppend("You have a map; the next map is at a ~"+estimatedMapProbability+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
+    else if (mapsDropped < 2) { // The third map drop chance is less than 1 in a thousand - not something that is particularly useful to hunt for
+        description.listAppend("You have a map; the next map is at a ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
     }
     
 	int habitatRecallsLeft = clampi(3 - get_property_int("_monsterHabitatsRecalled"), 0, 3);
@@ -47,6 +40,9 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
     if (!get_property_boolean("ledCandleDropped")) {
         description.listAppend("Fight a dude for an LED candle, to tune your Jill!");
     }
+
+    // If we have nothing to say, do not display the tile
+    if (count(description) == 0) return;
 	
     resource_entries.listAppend(ChecklistEntryMake("__familiar jill-of-all-trades", url, ChecklistSubentryMake("Celebrating the Jillenium", "", description)).ChecklistEntrySetIDTag("Jill of All Trades tile"));
 }
