@@ -72,7 +72,7 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	title = HTMLGenerateSpanFont(sweatAdvs + " adv stillsuit sweat booze", "purple");
 	
 	// However, if the user is in a path where they can't use stillsuit or cannot drink the distillate right now, do not show this supernag.
-	if (!inStillsuitPath || !canGuzzleSweat) continue;
+	if (!inStillsuitPath || !canGuzzleSweat) return;
 
 	if (__misc_state["in run"] && sweatAdvs > 6) {
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
