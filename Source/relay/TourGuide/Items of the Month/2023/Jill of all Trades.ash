@@ -37,7 +37,8 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
     if (habitatRecallsLeft > 0)
 		description.listAppend("Halloween monsters make excellent targets for <b>Recall Habitat</b> from BoFA.");
 
-    if (!get_property_boolean("ledCandleDropped")) {
+    // Adding a small exception here to not generate this if they weirdly acquired LED through other means (like casual or a pull or something)
+    if (!get_property_boolean("ledCandleDropped") && $item[LED Candle].item_amount() < 1) {
         description.listAppend("Fight a dude for an LED candle, to tune your Jill!");
     }
 

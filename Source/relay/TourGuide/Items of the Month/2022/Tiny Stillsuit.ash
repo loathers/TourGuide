@@ -8,9 +8,15 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	string title;
 	string [int] description;
 	string url = "inventory.php?action=distill&pwd=" + my_hash();
+
 	int sweatCalcSweat;
 	int sweatAdvs = round(to_int(get_property("familiarSweat"))**0.4);
 
+	// Adding a few conditions to turn off the supernag.
+	boolean canGuzzleSweat = (availableDrunkenness() > 0);
+	boolean inStillsuitPath = (!__misc_state["familiars temporarily blocked"] && my_path() != $path[A Shrunken Adventurer am I]);
+
+	// TODO: Turn this into an actual math function instead of an else-if lol
 	if (fam_sweat_o_meter >= 358) {
 		sweatCalcSweat = 449;
 	}
@@ -50,8 +56,9 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 		description.listAppend(HTMLGenerateSpanOfClass(fam_sweat_o_meter + "/" + sweatCalcSweat, "r_bold") + " drams of stillsuit sweat for next adventure.");
 		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " combats on current familiar)");
 	}
-	
-	if ($item[tiny stillsuit].item_amount() == 1) {
+
+	// Still generate the "warning, not generating sweat" supernag so long as familiars aren't blocked
+	if ($item[tiny stillsuit].item_amount() == 1 && !__misc_state["familiars temporarily blocked"]) {
 		title = HTMLGenerateSpanFont("Equip the stillsuit", "purple");
 		description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
 		url = "familiar.php";
@@ -63,6 +70,10 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
     }	
 	title = HTMLGenerateSpanFont(sweatAdvs + " adv stillsuit sweat booze", "purple");
+	
+	// However, if the user is in a path where they can't use stillsuit or cannot drink the distillate right now, do not show this supernag.
+	if (!inStillsuitPath || !canGuzzleSweat) continue;
+
 	if (__misc_state["in run"] && sweatAdvs > 6) {
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
