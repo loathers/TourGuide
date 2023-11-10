@@ -2,7 +2,7 @@
 
 since r27521; // Eagle & Scepter supported
 //These settings are for development. Don't worry about editing them.
-string __version = "2.2.0"; // pushed to 2.2.0 on new pull list refactor
+string __version = "2.2.1"; // pushed to 2.2.1 on jill/leaves tiles
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -53739,7 +53739,7 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	title = HTMLGenerateSpanFont(sweatAdvs + " adv stillsuit sweat booze", "purple");
 	
 	// However, if the user is in a path where they can't use stillsuit or cannot drink the distillate right now, do not show this supernag.
-	if (!inStillsuitPath || !canGuzzleSweat) continue;
+	if (!inStillsuitPath || !canGuzzleSweat) return;
 
 	if (__misc_state["in run"] && sweatAdvs > 6) {
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
