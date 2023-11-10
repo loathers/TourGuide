@@ -90,7 +90,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
         leafySummons.listAppend(LeafySummonMake(44, $item[smoldering drape], "cape; +2 mys/fight, +20% stat", true, ""));
         leafySummons.listAppend(LeafySummonMake(50, $item[distilled resin], "potion; generate +1 leaf/fight (100 turns)", false, ""));
         leafySummons.listAppend(LeafySummonMake(66, $item[autumnal aegis], "shield; +250 DA, +2 all res", false, ""));
-        leafySummons.listAppend(LeafySummonMake(69, $item[lit leaf lasso], "combat item; lasso leaf freebies for +1 free fight", false, "_leafLassosCrafted"));
+        leafySummons.listAppend(LeafySummonMake(69, $item[lit leaf lasso], "combat item; lasso leaf freebies for extra end-of-combat triggers", false, "_leafLassosCrafted"));
         leafySummons.listAppend(LeafySummonMake(74, $item[forest canopy bed], "bed; +5 free rests, stats via rests", false, ""));
         leafySummons.listAppend(LeafySummonMake(99, $item[autumnic balm], "potion; +2 all res (100 turns)", false, ""));
         leafySummons.listAppend(LeafySummonMake(222, $item[day shortener], "spend 5 turns for a +turn item", false, "_leafDayShortenerCrafted"));
@@ -175,6 +175,15 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
             if (summon.meltingStatus) 
                 summonDesc += HTMLGenerateSpanFont(" (melting)", "gray", "0.7em");
 
+            // Hide aftercore stuff while in-run, and visa versa
+            if (__misc_state["in run"]) {
+                if (aftercoreStuff[summon.leafCost]) continue;
+            } 
+            
+            if (!__misc_state["in run"]) {
+                if (inRunStuff[summon.leafCost]) continue;
+            }
+
             string [int] option;
             // add cost
             option.listAppend(summon.leafCost);
@@ -246,7 +255,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
 
             monstersDescription.listAppend(HTMLGenerateSimpleTableLines(fightOptions));
             if (leafCount > 111*fightsRemaining) {
-                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you can summon <b>"+fightsRemaining+" monstera</b>, for 5 scaling fights");
+                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you can summon <b>"+fightsRemaining+" monstera</b>, for scaling fights");
             }
             else if (leafCount > 11*fightsRemaining) {
                 monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you can summon <b>"+fightsRemaining+" leaflets</b>, for familiar turns");
@@ -266,23 +275,24 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
     
     // Make a free fights combo tag for available free leaf fights
     int fightsRemaining = clampi(5 - get_property_int("_leafMonstersFought"), 0, 5);
+    int leafletsUserCanSummon = leafCount/11;
     
     string [int] description;
     ChecklistSubentry [int] subentries;
 
     if (fightsRemaining > 0) {
         
-        if (leafCount > 111*fightsRemaining) {
+        if (leafCount >= 111*fightsRemaining) {
             description.listAppend("Have enough leaves for "+fightsRemaining+" flaming monstera");
         }
-        else if (leafCount > 11*fightsRemaining) {
+        else if (leafCount >= 11*fightsRemaining) {
             description.listAppend("Have enough leaves for "+fightsRemaining+" leaflets");
         }
-        else if (leafCount > 8*fightsRemaining) {
+        else if (leafCount >= 8*fightsRemaining) {
             description.listAppend("Have enough leaves, if you let the leaflets drop their bounty!");
         }
         else {
-            description.listAppend(HTMLGenerateSpanFont("Don't have enough leaves to fight your leaflets... get more!", "red"));
+            description.listAppend(HTMLGenerateSpanFont("Can summon "+leafletsUserCanSummon+" of your "+fightsRemaining+" leaflets... get more leaves!", "orange"));
         }
 
         subentries.listAppend(ChecklistSubentryMake(pluralise(fightsRemaining, "free flaming leaflet fight", "free flaming leaflet fights"), "", description));
