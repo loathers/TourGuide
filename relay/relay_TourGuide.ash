@@ -25806,7 +25806,8 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && have_outfit_components("Frat Warrior Fatigues") && have_outfit_components("War Hippy Fatigues")) //brigand trick
             potential_targets.listAppend("brigand");
         
-        if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && !__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax equivalent accessible"])
+        // Adding KoE check to the romantic arrow check for a ghost monster, since this is only useful in KoE now.
+        if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && my_path().id == PATH_KINGDOM_OF_EXPLOATHING && !__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax equivalent accessible"])
             potential_targets.listAppend("ghost");
         
         if (__misc_state["in run"] && ($items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner].available_amount() > 0 || $skill[summon brickos].skill_is_usable()))
@@ -29902,8 +29903,10 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             location_wanted_monster[$location[The Haunted Pantry]] = $monster[drunken half-orc hobo];
         }
         location_wanted_monster[$location[fear man's level]] = $monster[morbid skull];
-        if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"] && $item[white pixel].available_amount() + $item[white pixel].creatable_amount() < 27)
-            location_wanted_monster[$location[8-bit realm]] = $monster[Blooper];
+
+        // RIP to my boy, the blooper
+        // if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"] && $item[white pixel].available_amount() + $item[white pixel].creatable_amount() < 27)
+        //     location_wanted_monster[$location[8-bit realm]] = $monster[Blooper];
         
         
         if (!__quest_state["Level 11 Pyramid"].finished && olfacted_monster != $monster[tomb servant])
@@ -46802,8 +46805,6 @@ void IOTMClanFloundryGenerateResource(ChecklistEntry [int] resource_entries)
     {
         //Bass clarinet: -10% combat, 1h ranged weapon, +100% moxie, -3 MP skill cost, +50 ranged damage, 10 white pixels
         string line = "-10% combat, +100% moxie, -3 MP skill cost, +50 ranged damage";
-        if (!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
-            line += ", 10 white pixels";
         equipment.listAppend(listMake("Bass clarinet", "ranged weapon", line));
         //Fish hatchet: -10% combat, 1h axe, +100% muscle, +5 familiar weight, +50 weapon damage, +5 bridge progress
         line = "-10% combat, +100% muscle, +5 familiar weight, +50 weapon damage";
