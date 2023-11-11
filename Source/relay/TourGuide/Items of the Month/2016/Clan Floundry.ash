@@ -26,8 +26,6 @@ void IOTMClanFloundryGenerateResource(ChecklistEntry [int] resource_entries)
     {
         //Bass clarinet: -10% combat, 1h ranged weapon, +100% moxie, -3 MP skill cost, +50 ranged damage, 10 white pixels
         string line = "-10% combat, +100% moxie, -3 MP skill cost, +50 ranged damage";
-        if (!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
-            line += ", 10 white pixels";
         equipment.listAppend(listMake("Bass clarinet", "ranged weapon", line));
         //Fish hatchet: -10% combat, 1h axe, +100% muscle, +5 familiar weight, +50 weapon damage, +5 bridge progress
         line = "-10% combat, +100% muscle, +5 familiar weight, +50 weapon damage";
