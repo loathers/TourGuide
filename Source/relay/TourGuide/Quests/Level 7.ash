@@ -204,6 +204,21 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 
         if (evilness_removed_per_adventure != 0.0)
             turns_remaining = MAX(1, ceiling(evilness_remaining / evilness_removed_per_adventure));
+
+		// TODO: This doesn't work if the user is using a non-olfaction copy source, like nosy nose or monkey point. Need to add logic for that
+	    boolean sniffedDOL = false;
+		if (get_property_monster("olfactedMonster") == $monster[dirty old lihc]) sniffedDOL = true;
+
+		// evilness_removed_per_adventure will = 0 if all appearance rates are 0, i.e., everyone is banished.
+		//   This allows the tile to note that if DOL is olfacted and everything else is banished via phylum
+		//   silliness, you can assume the rest of the turns are DOL. Otherwise, everything is unbanished, so
+		//   you get 1.5 per turn (average of all 4 monsters). 
+		if (evilness_removed_per_adventure == 0.0)
+		{
+			if (sniffedDOL) turns_remaining = MAX(1, ceiling(evilness_remaining / 3.0));
+			if (!sniffedDOL) turns_remaining = MAX(1, ceiling(evilness_remaining / 1.5));
+
+		}
         
 		if (evilness > CYRPT_BOSS_EVILNESS + 1 && (appearance_rates[$monster[slick lihc]] > 0.0 || appearance_rates[$monster[senile lihc]] > 0.0))
         {

@@ -55,8 +55,10 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             location_wanted_monster[$location[The Haunted Pantry]] = $monster[drunken half-orc hobo];
         }
         location_wanted_monster[$location[fear man's level]] = $monster[morbid skull];
-        if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"] && $item[white pixel].available_amount() + $item[white pixel].creatable_amount() < 27)
-            location_wanted_monster[$location[8-bit realm]] = $monster[Blooper];
+
+        // RIP to my boy, the blooper
+        // if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"] && $item[white pixel].available_amount() + $item[white pixel].creatable_amount() < 27)
+        //     location_wanted_monster[$location[8-bit realm]] = $monster[Blooper];
         
         
         if (!__quest_state["Level 11 Pyramid"].finished && olfacted_monster != $monster[tomb servant])
