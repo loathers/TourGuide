@@ -6,6 +6,7 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	if (!get_property_boolean("hasAutumnaton")) return; // Don't show if they don't actually have Fall-E
 	if (my_path() == $path[Legacy of Loathing]) return; // Cannot use fall-e in LoL
     if (my_path().id == PATH_G_LOVER) return; // Cannot use fall-e in G-Lover 
+	if (in_bad_moon()) return; // Cannot use fall-e in Bad Moon
 
 	int autobotsToday = get_property_int("_autumnatonQuests");
 	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");

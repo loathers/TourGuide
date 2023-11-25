@@ -1,6 +1,8 @@
 RegisterTaskGenerationFunction("SMonorailStationGenerateTasks");
 void SMonorailStationGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    if (in_bad_moon()) return; // No Breakfast Counter in Bad Moon
+
     if (__misc_state["can eat just about anything"] && get_property("muffinOnOrder") == "earthenware muffin tin")
         task_entries.listAppend(ChecklistEntryMake("__item earthenware muffin tin", "place.php?whichplace=monorail&action=monorail_downtown", ChecklistSubentryMake("Get your muffin tin back", "", "Vist the monorail's breakfast counter"), -11).ChecklistEntrySetIDTag("Monorail get muffin tin"));
  
