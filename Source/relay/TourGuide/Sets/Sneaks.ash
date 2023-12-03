@@ -2,7 +2,7 @@
 //   This will require quite a few things. In order:
 //     - we will need to have a way for tourguide to tell that you have an NC forcer up for supernag
 //     - we will need to have a tile that shows good NCs to force
-//     - we will need to append NC forcers available to this
+//     - we will need to append NC forcers available to this 
 
 // SYNTAX FOR NEW NC FORCERS
 //   In order to centralize, all NC forcers that were old were placed in this file. They utilize a
@@ -23,7 +23,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     // Saving some useful variables for use in the calculations.
     int spleenRemaining = spleen_limit() - my_spleen_use();
     int stomachLeft = availableFullness();
-
+ 
     SneakSource getSneakisol() {
         SneakSource final;
 
@@ -76,7 +76,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.tileDescription = `<b>{plausibleJellies}x stench jellies</b> (have {clampi(toastCount,0,15)} on toast, {clampi(jellyCount,0,15)} as jelly)`;
         return final;
     }
-
+    
     SneakSource getSpikos() {
         SneakSource final;
 
@@ -85,14 +85,14 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.imageLookupName = "__item jurassic parka";
 
         int spikosLeft = clampi(5 - get_property_int("_spikolodonSpikeUses"), 0, 5);
-
+        
         final.sneakCondition = __iotms_usable[$item[Jurassic Parka]];
         final.sneakCount = spikosLeft;
         final.tileDescription = `<b>{spikosLeft}x spikolodon spikes</b> left`;
         return final;
 
     }
-
+    
     SneakSource getClaras() {
         SneakSource final;
 
@@ -101,12 +101,12 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.imageLookupName = "__item clara's bell";
 
         final.sneakCondition = $item[clara's bell].available_amount() > 0 && !get_property_boolean("_claraBellUsed");
-        final.sneakCount = get_property_boolean("_claraBellUsed") ? 0 : 1;
+        final.sneakCount = get_property_boolean("_claraBellUsed") ? 0 : 1; 
         final.tileDescription = `<b>{final.sneakCount}x clara's bell</b> charge left`;
 
         return final;
     }
-
+    
     SneakSource getCinchos() {
         SneakSource final;
 
@@ -153,7 +153,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     SneakSource [string] sneakSources;
 
     sneakSources["cinco"] = getCinchos();
-    sneakSources["spiko"] = getSpikos();
+    sneakSources["spiko"] = getSpikos(); 
     sneakSources["jello"] = getStenchJellies();
     sneakSources["pillo"] = getSneakisol();
     sneakSources["claro"] = getClaras();
@@ -162,7 +162,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     string [int] sneakOrder = listMake("cinco","spiko","jello","claro","pillo");
 
     ChecklistEntry entry;
-
+    
 	entry.url = "";
 	entry.image_lookup_name = "__effect Feeling Sneaky";
     entry.tags.id = "Sneak sources available";
@@ -192,12 +192,12 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     // Store the base description within the mouseover subentries
     entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalSneaks, "sneak usable", "sneaks usable"), "", description));
-
+    
     // Add a description that falls away when you hoverover
     entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalSneaks, "sneak usable", "sneaks usable"), "", description));
 
-    // OK, now we're going to make a big table with the NC recommendations. Yeesh.
-    //   This tile is complicated, dude! First, start by initializing variables.
+    // OK, now we're going to make a big table with the NC recommendations. Yeesh. 
+    //   This tile is complicated, dude! First, start by initializing variables. 
     //   Ezan's table creators are formatted as string[int][int], where the first
     //   is the row and the second is the column... I think?
 
@@ -210,7 +210,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     // This is a function that generates the right format for the table. Basically,
     //   it ingests the table title + a separated list of all sneak opportunities in
-    //   that summarized title.
+    //   that summarized title. 
     string populateSneakTable(string title, string [int] desc) {
         string finalDesc = "";
 
@@ -223,13 +223,13 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         }
 
         // Finally, generate a little sub-tile that looks like this:
-
+        
         //   NAME OF SNEAKS
         //   1 sneaksource
         //   1 sneaksource
 
         // Where the name is bold and the sneaksources are tiny. In some future world,
-        // it might be nice to have coloring that grays those that are not available
+        // it might be nice to have coloring that grays those that are not available 
         // yet, but that is too much for this first implementation.
         return HTMLGenerateSpanOfClass(title, "r_bold") + "<br>" + HTMLGenerateSpanOfStyle(finalDesc, "font-size:0.8em");
     }
@@ -265,7 +265,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     boolean [string] necks_known_ncs = $strings[How Do We Do It? Quaint and Curious Volume!,Strike One!,Olive My Love To You\, Oh.,Dodecahedrariffic!];
     boolean [string] heart_known_ncs = $strings[Moon Over the Dark Heart,Running the Lode,I\, Martin,Imp Be Nimble\, Imp Be Quick];
     boolean [string] elbow_known_ncs = $strings[Deep Imp Act,Imp Art\, Some Wisdom,A Secret\, But Not the Secret You're Looking For,Butter Knife?  I'll Take the Knife];
-
+    
     // Then, a tiny function to count the NCs found by zone for friars.
     int countFriarNCs(boolean [string] known_ncs, location place) {
         int ncs_found = 0;
@@ -292,7 +292,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     //   this fix, but I do think it's worth solving this at some point.
 
     int questPropMin = get_property('questL06Friar') == 'finished' ? 0 : 4;
-
+    
     int necksNCsLeft = min(4 - countFriarNCs(necks_known_ncs, $location[The Dark Neck of the Woods]) - cartoAdjustment, questPropMin);
     int heartNCsLeft = min(4 - countFriarNCs(heart_known_ncs, $location[The Dark Heart of the Woods]), questPropMin);
     int elbowNCsLeft = min(4 - countFriarNCs(elbow_known_ncs, $location[The Dark Elbow of the Woods]), questPropMin);
@@ -312,7 +312,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         sneak95.listAppend(`{elbowNCsLeft} Dark Elbow`);
         totalNCsRemaining += elbowNCsLeft-1;
     }
-
+    
     // If the pref is any of these, you can still sneak the basement.
     boolean [string] canSneakBasement = $strings[unstarted,started,step1,step2,step3,step4,step5,step6,step7];
 
@@ -379,16 +379,16 @@ void SneakActiveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] opt
 {
     // Use the new preference to tell if there's an NC forcer active
     if (!get_property_boolean("noncombatForcerActive")) return;
-
+    
     // If you are forcing an NC, build the reminder
     ChecklistEntry entry;
-
+    
 	entry.url = "";
 	entry.image_lookup_name = "__effect Feeling Sneaky";
     entry.tags.id = "Active sneak reminder";
     entry.importance_level = -11;
 
-    entry.subentries.listAppend(ChecklistSubentryMake("Noncombat up next","","You're feeling sneaky; a noncombat will occur in the next zone where an NC is available. Don't waste it!"));
+    entry.subentries.listAppend(ChecklistSubentryMake("Noncombat up next","","You're feeling sneaky; a noncombat will occur in the next zone where an NC is available. Don't waste it!")); 
 
     task_entries.listAppend(entry);
 }
