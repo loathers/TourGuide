@@ -32,7 +32,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.imageLookupName = "__item Eight Days a Week Pill Keeper";
 
         // see # of free pillkeeepers remaining
-        int freeSneakLeft = get_property_boolean("_freePillKeeperUsed") ? 1 : 0;
+        int freeSneakLeft = get_property_boolean("_freePillKeeperUsed") ? 0 : 1;
 
         // calculate possible spleen-based sneaks
         int spleenSneaks = floor(spleenRemaining / 3);
