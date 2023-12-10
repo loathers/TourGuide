@@ -10,13 +10,14 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	{
 		string url = "inventory.php?ftext=candy+cane+sword+cane";
 		description2.listAppend(HTMLGenerateSpanFont("You're", "red") + " " + HTMLGenerateSpanFont("in a", "green") + " " + HTMLGenerateSpanFont("candy", "red") + " " + HTMLGenerateSpanFont("cane", "green") + " " + HTMLGenerateSpanFont("sword", "red") + " " + HTMLGenerateSpanFont("cane", "green") + " " + HTMLGenerateSpanFont("noncom", "red") + " " + HTMLGenerateSpanFont("zone!", "green"));
+		//this supernag will only appear while lastadv is in a cane zone AND the option has not been taken already
 		//candy cane advs
 		if (!get_property_boolean("_candyCaneSwordLyle")) {
 			options.listAppend(HTMLGenerateSpanOfClass("Bonus:", "r_bold") + " Lyle monorail +40% init buff");
 		}
 		if (!get_property_boolean("candyCaneSwordBlackForest")) {
 			options.listAppend(HTMLGenerateSpanOfClass("Bonus:", "r_bold") + " Black Forest +8 exploration");
-			if (($locations[the home of the future] contains __last_adventure_location)) {
+			if (($locations[The Black Forest] contains __last_adventure_location)) {
 			task_entries.listAppend(ChecklistEntryMake("__item candy cane sword cane", url, ChecklistSubentryMake("Equip the candy cane sword cane", "", description2), -11));
 			}	
 		}
