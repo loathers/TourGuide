@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTMCandyCaneSwordGenerateTasks");
 void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__iotms_usable[lookupItem("candy cane sword cane")]) return;
+	if (!__iotms_usable[lookupItem("candy cane sword cane")]) return;
 	string [int] description;
 	string [int] description2;
 	string [int] options;
