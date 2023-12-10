@@ -2,7 +2,7 @@
 
 since r27521; // Eagle & Scepter supported
 //These settings are for development. Don't worry about editing them.
-string __version = "2.2.0"; // pushed to 2.2.0 on new pull list refactor
+string __version = "2.2.1"; // pushed to 2.2.1 on jill/leaves tiles
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -1808,12 +1808,12 @@ int [int] stringToIntIntList(string input)
 }
 
 
-buffer to_buffer(string str)
-{
-	buffer result;
-	result.append(str);
-	return result;
-}
+// buffer to_buffer(string str)
+// {
+// 	buffer result;
+// 	result.append(str);
+// 	return result;
+// }
 
 buffer copyBuffer(buffer buf)
 {
@@ -4972,7 +4972,7 @@ void initialiseIOTMsUsable()
     if (my_path().id != PATH_ACTUALLY_ED_THE_UNDYING)
     {
         //Campground items:
-        foreach it in $items[source terminal, haunted doghouse, Witchess Set, potted tea tree, portable mayo clinic, Little Geneticist DNA-Splicing Lab, cornucopia]
+        foreach it in $items[source terminal, haunted doghouse, Witchess Set, potted tea tree, portable mayo clinic, Little Geneticist DNA-Splicing Lab, cornucopia, A Guide to Burning Leaves]
         {
             if (__campground[it] > 0)
                 __iotms_usable[it] = true;
@@ -11055,6 +11055,21 @@ void QLevel7GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 
         if (evilness_removed_per_adventure != 0.0)
             turns_remaining = MAX(1, ceiling(evilness_remaining / evilness_removed_per_adventure));
+
+		// TODO: This doesn't work if the user is using a non-olfaction copy source, like nosy nose or monkey point. Need to add logic for that
+	    boolean sniffedDOL = false;
+		if (get_property_monster("olfactedMonster") == $monster[dirty old lihc]) sniffedDOL = true;
+
+		// evilness_removed_per_adventure will = 0 if all appearance rates are 0, i.e., everyone is banished.
+		//   This allows the tile to note that if DOL is olfacted and everything else is banished via phylum
+		//   silliness, you can assume the rest of the turns are DOL. Otherwise, everything is unbanished, so
+		//   you get 1.5 per turn (average of all 4 monsters). 
+		if (evilness_removed_per_adventure == 0.0)
+		{
+			if (sniffedDOL) turns_remaining = MAX(1, ceiling(evilness_remaining / 3.0));
+			if (!sniffedDOL) turns_remaining = MAX(1, ceiling(evilness_remaining / 1.5));
+
+		}
         
 		if (evilness > CYRPT_BOSS_EVILNESS + 1 && (appearance_rates[$monster[slick lihc]] > 0.0 || appearance_rates[$monster[senile lihc]] > 0.0))
         {
@@ -25806,7 +25821,8 @@ void SFamiliarsGenerateEntry(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && have_outfit_components("Frat Warrior Fatigues") && have_outfit_components("War Hippy Fatigues")) //brigand trick
             potential_targets.listAppend("brigand");
         
-        if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && !__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax equivalent accessible"])
+        // Adding KoE check to the romantic arrow check for a ghost monster, since this is only useful in KoE now.
+        if (!familiar_is_usable($familiar[angry jung man]) && in_hardcore() && my_path().id == PATH_KINGDOM_OF_EXPLOATHING && !__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0 && __misc_state["fax equivalent accessible"])
             potential_targets.listAppend("ghost");
         
         if (__misc_state["in run"] && ($items[bricko eye brick,bricko airship,bricko bat,bricko cathedral,bricko elephant,bricko gargantuchicken,bricko octopus,bricko ooze,bricko oyster,bricko python,bricko turtle,bricko vacuum cleaner].available_amount() > 0 || $skill[summon brickos].skill_is_usable()))
@@ -29902,8 +29918,10 @@ void SOlfactionGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             location_wanted_monster[$location[The Haunted Pantry]] = $monster[drunken half-orc hobo];
         }
         location_wanted_monster[$location[fear man's level]] = $monster[morbid skull];
-        if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"] && $item[white pixel].available_amount() + $item[white pixel].creatable_amount() < 27)
-            location_wanted_monster[$location[8-bit realm]] = $monster[Blooper];
+
+        // RIP to my boy, the blooper
+        // if ($item[digital key].available_amount() == 0 && !__quest_state["Level 13"].state_boolean["digital key used"] && $item[white pixel].available_amount() + $item[white pixel].creatable_amount() < 27)
+        //     location_wanted_monster[$location[8-bit realm]] = $monster[Blooper];
         
         
         if (!__quest_state["Level 11 Pyramid"].finished && olfacted_monster != $monster[tomb servant])
@@ -33468,6 +33486,8 @@ void SLevel13DoorGenerateMissingItems(ChecklistEntry [int] tower_door_entries)
 RegisterTaskGenerationFunction("SMonorailStationGenerateTasks");
 void SMonorailStationGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+    if (in_bad_moon()) return; // No Breakfast Counter in Bad Moon
+
     if (__misc_state["can eat just about anything"] && get_property("muffinOnOrder") == "earthenware muffin tin")
         task_entries.listAppend(ChecklistEntryMake("__item earthenware muffin tin", "place.php?whichplace=monorail&action=monorail_downtown", ChecklistSubentryMake("Get your muffin tin back", "", "Vist the monorail's breakfast counter"), -11).ChecklistEntrySetIDTag("Monorail get muffin tin"));
  
@@ -33516,7 +33536,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.imageLookupName = "__item Eight Days a Week Pill Keeper";
 
         // see # of free pillkeeepers remaining
-        int freeSneakLeft = get_property_boolean("_freePillKeeperUsed") ? 1 : 0;
+        int freeSneakLeft = get_property_boolean("_freePillKeeperUsed") ? 0 : 1;
 
         // calculate possible spleen-based sneaks
         int spleenSneaks = floor(spleenRemaining / 3);
@@ -46802,8 +46822,6 @@ void IOTMClanFloundryGenerateResource(ChecklistEntry [int] resource_entries)
     {
         //Bass clarinet: -10% combat, 1h ranged weapon, +100% moxie, -3 MP skill cost, +50 ranged damage, 10 white pixels
         string line = "-10% combat, +100% moxie, -3 MP skill cost, +50 ranged damage";
-        if (!__quest_state["Level 13"].state_boolean["digital key used"] && ($item[digital key].available_amount() + creatable_amount($item[digital key])) == 0)
-            line += ", 10 white pixels";
         equipment.listAppend(listMake("Bass clarinet", "ranged weapon", line));
         //Fish hatchet: -10% combat, 1h axe, +100% muscle, +5 familiar weight, +50 weapon damage, +5 bridge progress
         line = "-10% combat, +100% muscle, +5 familiar weight, +50 weapon damage";
@@ -53675,9 +53693,15 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	string title;
 	string [int] description;
 	string url = "inventory.php?action=distill&pwd=" + my_hash();
+
 	int sweatCalcSweat;
 	int sweatAdvs = round(to_int(get_property("familiarSweat"))**0.4);
 
+	// Adding a few conditions to turn off the supernag.
+	boolean canGuzzleSweat = (availableDrunkenness() > 0);
+	boolean inStillsuitPath = (!__misc_state["familiars temporarily blocked"] && my_path() != $path[A Shrunken Adventurer am I]);
+
+	// TODO: Turn this into an actual math function instead of an else-if lol
 	if (fam_sweat_o_meter >= 358) {
 		sweatCalcSweat = 449;
 	}
@@ -53717,8 +53741,9 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 		description.listAppend(HTMLGenerateSpanOfClass(fam_sweat_o_meter + "/" + sweatCalcSweat, "r_bold") + " drams of stillsuit sweat for next adventure.");
 		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " combats on current familiar)");
 	}
-	
-	if ($item[tiny stillsuit].item_amount() == 1) {
+
+	// Still generate the "warning, not generating sweat" supernag so long as familiars aren't blocked
+	if ($item[tiny stillsuit].item_amount() == 1 && !__misc_state["familiars temporarily blocked"]) {
 		title = HTMLGenerateSpanFont("Equip the stillsuit", "purple");
 		description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
 		url = "familiar.php";
@@ -53730,6 +53755,10 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
     }	
 	title = HTMLGenerateSpanFont(sweatAdvs + " adv stillsuit sweat booze", "purple");
+	
+	// However, if the user is in a path where they can't use stillsuit or cannot drink the distillate right now, do not show this supernag.
+	if (!inStillsuitPath || !canGuzzleSweat) return;
+
 	if (__misc_state["in run"] && sweatAdvs > 6) {
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
@@ -53912,6 +53941,7 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	if (!get_property_boolean("hasAutumnaton")) return; // Don't show if they don't actually have Fall-E
 	if (my_path() == $path[Legacy of Loathing]) return; // Cannot use fall-e in LoL
     if (my_path().id == PATH_G_LOVER) return; // Cannot use fall-e in G-Lover 
+	if (in_bad_moon()) return; // Cannot use fall-e in Bad Moon
 
 	int autobotsToday = get_property_int("_autumnatonQuests");
 	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");
@@ -55739,6 +55769,360 @@ void IOTMBookofFactsGenerateResource(ChecklistEntry [int] resource_entries)
 	resource_entries.listAppend(ChecklistEntryMake("__item book of facts", "", ChecklistSubentryMake(("Miscellaneous valuable BOFA drops"), "", BOFAdropsDescription), 8).ChecklistEntrySetIDTag("bofa tatters"));
 }
 
+// TILE SPEC: 
+//    - Remind the user to get a halloween map. 
+//    - Remind the user to get an LED candle.
+//    - Recommend halloween monsters for habitation.
+
+// CANNOT DO YET:
+//    - Add halloween fights to freebies combination tag; need better mafia tracking...
+
+RegisterResourceGenerationFunction("IOTMJillv2GenerateResource");
+void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
+{
+    familiar bigJillyStyle = lookupFamiliar("Jill-of-All-Trades");
+	if (!bigJillyStyle.familiar_is_usable()) return;
+
+	int mapsDropped = get_property_int("_mapToACandyRichBlockDrops");
+	
+	string url = "familiar.php";
+	if (bigJillyStyle == my_familiar())
+		url = "";
+  
+    // Initial chance is 35% with a masssive dropoff (multiply by 5% per map dropped)
+    float estimatedMapProbability = 35 * (0.05 ** clampi(mapsDropped, 0, 3)); // confirmed by cannonfire to stop decreasing after 3rd time
+
+    // Convert to turns
+    float turnsToMap = 1/(estimatedMapProbability/100);
+
+    string [int] description;
+    if (mapsDropped == 0) {
+        description.listAppend("You haven't gotten a map to halloween town yet! Try using your Jill for a map at ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
+    }
+    else if (mapsDropped < 2) { // The third map drop chance is less than 1 in a thousand - not something that is particularly useful to hunt for
+        description.listAppend("You have a map; the next map is at a ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
+    }
+    
+	int habitatRecallsLeft = clampi(3 - get_property_int("_monsterHabitatsRecalled"), 0, 3);
+    if (!lookupSkill("Just the Facts").have_skill() && !__iotms_usable[$item[book of facts (dog-eared)]]) habitatRecallsLeft = 0;
+    if (habitatRecallsLeft > 0)
+		description.listAppend("Halloween monsters make excellent targets for <b>Recall Habitat</b> from BoFA.");
+
+    // Adding a small exception here to not generate this if they weirdly acquired LED through other means (like casual or a pull or something)
+    if (!get_property_boolean("ledCandleDropped") && $item[LED Candle].item_amount() < 1) {
+        description.listAppend("Fight a dude for an LED candle, to tune your Jill!");
+    }
+
+    // If we have nothing to say, do not display the tile
+    if (count(description) == 0) return;
+	
+    resource_entries.listAppend(ChecklistEntryMake("__familiar jill-of-all-trades", url, ChecklistSubentryMake("Celebrating the Jillenium", "", description)).ChecklistEntrySetIDTag("Jill of All Trades tile"));
+}
+
+// TILE SPEC:
+//    - Remind the user to spend their leaves.
+//    - Advise the user of top leafy options.
+//    - Add leafy free fights to the freefightcombinationtag
+
+Record LeafyFight 
+{
+    int leafCost;
+    monster summonedMonster;
+    string scaling;
+    int leavesDropped;
+    string extraDrops;
+};
+
+LeafyFight LeafyFightMake(int cost, monster summonedMonster, string scaling, int leavesDropped, string itemDropped)
+{
+    LeafyFight summon;
+
+    summon.leafCost = cost;
+    summon.summonedMonster = summonedMonster;
+    summon.scaling = scaling;
+    summon.leavesDropped = leavesDropped;
+    summon.extraDrops = itemDropped;
+    
+    return summon;
+}
+
+Record LeafySummon
+{
+    int leafCost;
+    item summonedItem;
+    string description;
+    boolean meltingStatus;
+    string prefName;
+};
+
+LeafySummon LeafySummonMake(int cost, item summonedItem, string desc, boolean melts, string prefName)
+{
+    LeafySummon summon;
+
+    summon.leafCost = cost;
+    summon.summonedItem = summonedItem;
+    summon.description = desc;
+    summon.meltingStatus = melts;
+    summon.prefName = prefName;
+    
+    return summon;
+}
+
+void listAppend(LeafyFight [int] list, LeafyFight entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+void listAppend(LeafySummon [int] list, LeafySummon entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+RegisterResourceGenerationFunction("IOTMBurningLeavesGenerateResource");
+void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    // Don't generate these tiles if they cannot actually use their leaves
+    if (!__iotms_usable[$item[A Guide to Burning Leaves]]) return;
+
+    string url = "campground.php?preaction=burningleaves";
+
+    // Make two tiles for spending leaves
+    int leafCount = $item[inflammable leaf].item_amount();
+    string [int] itemsDescription;
+    string [int] monstersDescription;
+
+    // To use these, if you do "aftercoreStuff[##]" it'll return true if it's in the list or false if not
+    boolean [int] aftercoreStuff = $ints[99,222,1111,6666,11111];
+    boolean [int] inRunStuff = $ints[42,43,44,66];
+
+    if ($item[inflammable leaf].have()) {
+
+        LeafySummon [int] leafySummons;
+        // leafySummons.listAppend(LeafySummonMake(#leafcost, $item[leafsummon], "tile desc", t/f(melts), "name of summon check pref"));
+        leafySummons.listAppend(LeafySummonMake(37, $item[autumnic bomb], "potion; prismatic stinging (25 turns)", false, ""));
+        leafySummons.listAppend(LeafySummonMake(42, $item[impromptu torch], "weapon; +2 mus/fight", true, ""));
+        leafySummons.listAppend(LeafySummonMake(43, $item[flaming fig leaf], "pants; +2 mox/fight", true, ""));
+        leafySummons.listAppend(LeafySummonMake(44, $item[smoldering drape], "cape; +2 mys/fight, +20% stat", true, ""));
+        leafySummons.listAppend(LeafySummonMake(50, $item[distilled resin], "potion; generate +1 leaf/fight (100 turns)", false, ""));
+        leafySummons.listAppend(LeafySummonMake(66, $item[autumnal aegis], "shield; +250 DA, +2 all res", false, ""));
+        leafySummons.listAppend(LeafySummonMake(69, $item[lit leaf lasso], "combat item; lasso leaf freebies for extra end-of-combat triggers", false, "_leafLassosCrafted"));
+        leafySummons.listAppend(LeafySummonMake(74, $item[forest canopy bed], "bed; +5 free rests, stats via rests", false, ""));
+        leafySummons.listAppend(LeafySummonMake(99, $item[autumnic balm], "potion; +2 all res (100 turns)", false, ""));
+        leafySummons.listAppend(LeafySummonMake(222, $item[day shortener], "spend 5 turns for a +turn item", false, "_leafDayShortenerCrafted"));
+        leafySummons.listAppend(LeafySummonMake(1111, $item[coping juice], "copium for the masses", false, ""));
+        leafySummons.listAppend(LeafySummonMake(6666, $item[smoldering leafcutter ant egg], "mosquito & leaves familiar", false, "_leafAntEggCrafted"));
+        leafySummons.listAppend(LeafySummonMake(11111, $item[super-heated leaf], "burn leaves into your skiiiin", false, "_leafTattooCrafted"));
+
+        // Make a big summons table for a leaf summoning tile 
+        string [int][int] summonOptions;
+
+        // Header for the item summons table
+        if (true) 
+        {
+            string [int] option;
+            option.listAppend("cost");
+            option.listAppend("item");
+            option.listAppend("description");
+            foreach key, s in option
+            {
+                option[key] = HTMLGenerateSpanOfClass(s, "r_bold");
+            }
+            summonOptions.listAppend(option);
+        }
+
+        // Populate the table
+        foreach key, summon in leafySummons 
+        {
+            // Adding some skip conditions for aftercore/in-run options
+            // if (__misc_state["in run"] && aftercoreStuff[summon.leafCost]) continue; 
+            // if (!__misc_state["in run"] && inRunStuff[summon.leafCost]) continue;
+
+            // Run pref checks & do not generate a row if you cannot summon it anymore
+            boolean userCanSummon = true;
+
+            if (summon.prefName == "")
+                userCanSummon = true;
+            else if (summon.prefName == "_leafLassosCrafted")
+                userCanSummon = get_property_int("_leafLassosCrafted") < 3; // can make a lasso if you've made <3
+            else
+                userCanSummon = !get_property_boolean(summon.prefName); // prefs are false if non-summoned, true if summoned and you're locked out
+
+            if (!userCanSummon) continue;
+
+            // A handful of conditional exclusions. Enumerated reasons in the comments!
+
+            // The bomb is useful if you aren't able to use crab or short-order cook. Otherwise, not particularly useful.
+            boolean canUseShorty = lookupFamiliar("Shorter-Order Cook").familiar_is_usable();
+            boolean canUseCrab = lookupFamiliar("Imitation Crab").familiar_is_usable();
+
+            if (canUseShorty || canUseCrab) {
+                if (summon.leafCost == 37) continue;  
+            }
+
+            // If the user is level 12 or higher, no reason to show fig or torch. Going to still
+            //   show drape if they don't have it, as 20% stat might be useful slot-filler for some
+            //   weird user somewhere.
+            if (my_level() > 11) {
+                if ($ints[42,43] contains summon.leafCost) continue;
+            }
+
+            // If the user has Tao of the Terrapin available, they probably don't need the aegis
+            if (lookupSkill("Tao of the Terrapin").have_skill()) {
+                if (summon.leafCost == 66) continue;
+            }
+
+            // Do not get 2 of any of the equips or other one-use items
+            if (summon.summonedItem.available_amount() > 0) {
+                if ($ints[42,43,44,66,74] contains summon.leafCost) continue;
+            }
+
+            // Do not show the bed if it is already installed either
+            if (get_campground() contains $item[forest canopy bed]) {
+                if (summon.leafCost == 74) continue;
+            }
+
+            // Set the color to gray if you don't have enough leaves
+            boolean hasEnoughLeaves = leafCount >= summon.leafCost;
+            string rowColor = hasEnoughLeaves ? "black" : "gray";
+
+            // Add smaller melting tag to description, if it's melting
+            string summonDesc = summon.description;
+            if (summon.meltingStatus) 
+                summonDesc += HTMLGenerateSpanFont(" (melting)", "gray", "0.7em");
+
+            // Hide aftercore stuff while in-run, and visa versa
+            if (__misc_state["in run"]) {
+                if (aftercoreStuff[summon.leafCost]) continue;
+            } 
+            
+            if (!__misc_state["in run"]) {
+                if (inRunStuff[summon.leafCost]) continue;
+            }
+
+            string [int] option;
+            // add cost
+            option.listAppend(summon.leafCost);
+            option.listAppend(summon.summonedItem.to_string());
+            option.listAppend(summonDesc);
+            foreach key, s in option 
+            {
+                option[key] = HTMLGenerateSpanFont(s, rowColor);
+            }
+            summonOptions.listAppend(option);
+        }
+        itemsDescription.listAppend(HTMLGenerateSimpleTableLines(summonOptions));
+        resource_entries.listAppend(ChecklistEntryMake("__item inflammable leaf", url, ChecklistSubentryMake(pluralise(leafCount, "leaf to burn for items", "leaves to burn for items"), "", itemsDescription), 14).ChecklistEntrySetIDTag("Burning leaf item summons"));
+
+        // With item summons done, make a seal-esque fights tile
+        
+        int fightsRemaining = clampi(5 - get_property_int("_leafMonstersFought"), 0, 5);
+
+        if (fightsRemaining > 0) {
+            LeafyFight [int] leafyFights;
+            // leafyFights.listAppend(LeafyFightMake(#leafcost, $monster[leafmonster], "scaling desc", #leafdrops, "extra drops"));
+            leafyFights.listAppend(LeafyFightMake(11, $monster[flaming leaflet], "11/11/11", 4, ""));
+            leafyFights.listAppend(LeafyFightMake(111, $monster[flaming monstera], "scaling", 7, "leafy browns"));
+
+            // No particular need to fight leaviathan over monstera in run if the user owns the crown already
+            if (!(__misc_state["in run"] && $item[flaming leaf crown].have())) {
+                leafyFights.listAppend(LeafyFightMake(666, $monster[leaviathan], "scaling boss (hard!)", 125, "flaming leaf crown"));
+            }
+
+            string [int][int] fightOptions;
+
+            // Header for the fight summons table
+            if (true)
+            {
+                string [int] option;
+                option.listAppend("cost");
+                option.listAppend("monster");
+                option.listAppend("stats & info");
+                foreach key, s in option
+                {
+                    option[key] = HTMLGenerateSpanOfClass(s, "r_bold");
+                }
+                fightOptions.listAppend(option);
+            }
+
+            foreach key, summon in leafyFights
+            {
+                boolean hasEnoughLeaves = leafCount >= summon.leafCost;
+                string rowColor = hasEnoughLeaves ? "black" : "gray";
+
+                // Add smaller melting tag to description, if it's melting
+                string summonDesc = summon.scaling + "; ~"+summon.leavesDropped+" leaves dropped ";
+                if (summon.extraDrops != "") 
+                    summonDesc += HTMLGenerateSpanFont("(also, drops "+summon.extraDrops+")", "gray", "0.7em");
+
+                string [int] option;
+                // add cost
+                option.listAppend(summon.leafCost);
+                option.listAppend(summon.summonedMonster.to_string());
+                option.listAppend(summonDesc);
+                foreach key, s in option 
+                {
+                    option[key] = HTMLGenerateSpanFont(s, rowColor);
+                }
+                fightOptions.listAppend(option);
+            }
+
+            int leafletsUserCanSummon = leafCount/11;
+
+            monstersDescription.listAppend(HTMLGenerateSimpleTableLines(fightOptions));
+            if (leafCount > 111*fightsRemaining) {
+                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you can summon <b>"+fightsRemaining+" monstera</b>, for scaling fights");
+            }
+            else if (leafCount > 11*fightsRemaining) {
+                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you can summon <b>"+fightsRemaining+" leaflets</b>, for familiar turns");
+            }
+            else if (leafCount > 11) {
+                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you can currently summon "+pluralise(leafletsUserCanSummon,"leaflet","leaflets")+"; save leaves for more!");
+            }
+            else {
+                monstersDescription.listAppend("With your "+pluralise(leafCount, "leaf", "leaves")+", you cannot currently summon a free fight; save leaves for more!");
+            }
+
+            resource_entries.listAppend(ChecklistEntryMake("__monster flaming leaflet", url, ChecklistSubentryMake(pluralise(fightsRemaining, "remaining free burned leaf fight", "remaining free burned leaf fights"), "remember to lasso for +1 fight!", monstersDescription), 13).ChecklistEntrySetIDTag("Burning leaf fight summons"));
+
+        }
+        
+    }
+    
+    // Make a free fights combo tag for available free leaf fights
+    int fightsRemaining = clampi(5 - get_property_int("_leafMonstersFought"), 0, 5);
+    int leafletsUserCanSummon = leafCount/11;
+    
+    string [int] description;
+    ChecklistSubentry [int] subentries;
+
+    if (fightsRemaining > 0) {
+        
+        if (leafCount >= 111*fightsRemaining) {
+            description.listAppend("Have enough leaves for "+fightsRemaining+" flaming monstera");
+        }
+        else if (leafCount >= 11*fightsRemaining) {
+            description.listAppend("Have enough leaves for "+fightsRemaining+" leaflets");
+        }
+        else if (leafCount >= 8*fightsRemaining) {
+            description.listAppend("Have enough leaves, if you let the leaflets drop their bounty!");
+        }
+        else {
+            description.listAppend(HTMLGenerateSpanFont("Can summon "+leafletsUserCanSummon+" of your "+fightsRemaining+" leaflets... get more leaves!", "orange"));
+        }
+
+        subentries.listAppend(ChecklistSubentryMake(pluralise(fightsRemaining, "free flaming leaflet fight", "free flaming leaflet fights"), "", description));
+        TagGroup tags;
+        tags.id = "Burning Leaves free fights";
+        tags.combination = "daily free fight";
+        resource_entries.listAppend(ChecklistEntryMake("__item tied-up flaming leaflet", url, subentries, tags, 0));
+    }
+}
 
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
