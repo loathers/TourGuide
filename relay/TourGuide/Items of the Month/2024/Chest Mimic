@@ -6,7 +6,7 @@ void IOTMChestMimicGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!lookupFamiliar("Chest Mimic").familiar_is_usable()) return;
 
 	// Title
-    int famExperienceGain = numeric_modifier("familiar experience") +1;
+	int famExperienceGain = numeric_modifier("familiar experience") + 1;
 	int chestExperience = ($familiar[chest mimic].experience);
 	int famExpNeededForNextEgg = (50 - (chestExperience % 50));
 	int mimicEggsLeft = clampi(11 - get_property_int("_mimicEggsObtained"), 0, 11);
