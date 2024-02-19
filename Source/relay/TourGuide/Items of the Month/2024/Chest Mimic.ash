@@ -12,12 +12,11 @@ void IOTMChestMimicGenerateResource(ChecklistEntry [int] resource_entries)
 	int mimicEggsLeft = clampi(11 - get_property_int("_mimicEggsObtained"), 0, 11);
 	string [int] description;
 	string url = "familiar.php";
-	{
-		description.listAppend("Currently have " + HTMLGenerateSpanOfClass(chestExperience, "r_bold") + " experience, currently gain " + HTMLGenerateSpanOfClass(famExperienceGain, "r_bold") + " fam exp per fight.");
-		description.listAppend("Need " + HTMLGenerateSpanOfClass(famExpNeededForNextEgg, "r_bold") + " more famxp for next egg. (" + ceil(toFloat(famExpNeededForNextEgg) / famExperienceGain) + " fight(s))");
-		description.listAppend("Can lay " + HTMLGenerateSpanOfClass(mimicEggsLeft, "r_bold") + " more eggs today.");
-		resource_entries.listAppend(ChecklistEntryMake("__familiar chest mimic", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Chest mimic fxp", "black"), "", description), -2));
-	}
+	description.listAppend("Currently have " + HTMLGenerateSpanOfClass(chestExperience, "r_bold") + " experience, currently gain " + HTMLGenerateSpanOfClass(famExperienceGain, "r_bold") + " fam exp per fight.");
+	description.listAppend("Need " + HTMLGenerateSpanOfClass(famExpNeededForNextEgg, "r_bold") + " more famxp for next egg. (" + ceil(to_float(famExpNeededForNextEgg) / famExperienceGain) + " fight(s))");
+	description.listAppend("Can lay " + HTMLGenerateSpanOfClass(mimicEggsLeft, "r_bold") + " more eggs today.");
+
+	resource_entries.listAppend(ChecklistEntryMake("__familiar chest mimic", url, ChecklistSubentryMake("Chest mimic fxp", "", description), -2));
 	if ($item[mimic egg].available_amount() > 0) {
 		string header = $item[mimic egg].pluralise().capitaliseFirstLetter();
 		string url = "inv_use.php?pwd=" + my_hash() + "&whichitem=11542";
