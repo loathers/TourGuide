@@ -4,7 +4,7 @@ RegisterResourceGenerationFunction("IOTMSpringShoesGenerateResource");
 
 void IOTMSpringShoesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (available_amount($item[spring shoes]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
+	if (__misc_state["in run"] && available_amount($item[spring shoes]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
 	{
 		if ($effect[everything looks green].have_effect() == 0) 
 		{
