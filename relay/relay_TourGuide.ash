@@ -30590,6 +30590,7 @@ static
 	__banish_source_length["patriotic screech"] = 100;
     __banish_source_length["roar like a lion"] = 30; // not sure it is needed; it should generally be not more than 30
 	__banish_source_length["monkey slap"] = 1234567; // this, for some reason, was not properly respecting the reset condition. so imma just do this to hopefully solve it.
+    __banish_source_length["spring kick"] = -1;
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;
@@ -56122,6 +56123,68 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
         tags.combination = "daily free fight";
         resource_entries.listAppend(ChecklistEntryMake("__item tied-up flaming leaflet", url, subentries, tags, 0));
     }
+}
+
+// 2024
+//2024
+//Chest Mimic
+RegisterResourceGenerationFunction("IOTMChestMimicGenerateResource");
+void IOTMChestMimicGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (!lookupFamiliar("Chest Mimic").familiar_is_usable()) return;
+
+	// Title
+	int famExperienceGain = numeric_modifier("familiar experience") + 1;
+	int chestExperience = ($familiar[chest mimic].experience);
+	int famExpNeededForNextEgg = (50 - (chestExperience % 50));
+    string fightsForNextEgg = pluralise(ceil(to_float(famExpNeededForNextEgg) / famExperienceGain), "fight", "fights");
+	int mimicEggsLeft = clampi(11 - get_property_int("_mimicEggsObtained"), 0, 11);
+
+	string [int] description;
+	string url = "familiar.php";
+	description.listAppend(`Currently have {HTMLGenerateSpanOfClass(chestExperience, "r_bold")} experience, currently gain {HTMLGenerateSpanOfClass(famExperienceGain, "r_bold")} fam exp per fight.`);
+	description.listAppend(`Need {HTMLGenerateSpanOfClass(famExpNeededForNextEgg, "r_bold")} more famxp for next egg. ({fightsForNextEgg})`);
+	description.listAppend(`Can lay {HTMLGenerateSpanOfClass(mimicEggsLeft, "r_bold")} more eggs today.`);
+
+	resource_entries.listAppend(ChecklistEntryMake("__familiar chest mimic", url, ChecklistSubentryMake("Chest mimic fxp", "", description), -2));
+	if ($item[mimic egg].available_amount() > 0) {
+		string header = $item[mimic egg].pluralise().capitaliseFirstLetter();
+		string url = `inv_use.php?pwd={my_hash()}&whichitem=11542`;
+		resource_entries.listAppend(ChecklistEntryMake("__item mimic egg", url, ChecklistSubentryMake(header, "", "Fight some copies"), -1).ChecklistEntrySetCombinationTag("fax and copies"));
+	}
+}
+
+//Spring shoes
+RegisterTaskGenerationFunction("IOTMSpringShoesGenerateTasks");
+RegisterResourceGenerationFunction("IOTMSpringShoesGenerateResource");
+
+void IOTMSpringShoesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	if (available_amount($item[spring shoes]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
+	{
+		if ($effect[everything looks green].have_effect() == 0) 
+		{
+			string [int] description;
+			string url = "inventory.php?ftext=spring+shoes";
+			description.listAppend(HTMLGenerateSpanFont("Run away from your problems!", "green"));
+			if (lookupItem("spring shoes").equipped_amount() == 0)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Equip the spring shoes first.", "red"));
+			}
+			task_entries.listAppend(ChecklistEntryMake("__item spring shoes", url, ChecklistSubentryMake("Spring shoes runaway available!", "", description), -11));
+		}
+	}
+}
+
+void IOTMSpringShoesGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	string [int] banishDescription;
+	banishDescription.listAppend("All day banish, doesn't end combat");
+	if (lookupItem("spring shoes").equipped_amount() == 0)
+	{
+		banishDescription.listAppend(HTMLGenerateSpanFont("Equip the spring shoes first.", "red"));
+	}
+	resource_entries.listAppend(ChecklistEntryMake("__skill spring shoes", "", ChecklistSubentryMake("Spring Kick", "", banishDescription)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Spring shoes spring kick banish"));
 }
 
 
