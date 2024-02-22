@@ -56,6 +56,9 @@ static {
     int PATH_JOURNEYMAN = 45;
     int PATH_FALL_OF_THE_DINOSAURS = 46;
     int PATH_AVATAR_OF_SHADOWS_OVER_LOATHING = 47;
+    // skip Legacy of Loathing
+    // skip A Shrunken Adventurer Am I
+    int PATH_WEREPROFESSOR = 50;
 }
 
 float numeric_modifier_replacement(item it, string modifier_string) {
