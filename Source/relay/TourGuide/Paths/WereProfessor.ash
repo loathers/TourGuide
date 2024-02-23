@@ -95,7 +95,7 @@ void PathWereProfessorGenerateResource(ChecklistEntry [int] resource_entries)
             smashed_equipment_description.listAppend("Consider crafting:" + craftable_items.listJoinComponents("<hr>").HTMLGenerateIndentedText());
         }
 
-        resource_entries.listAppend(ChecklistEntryMake("__item smashed scientific equipment", "", ChecklistSubentryMake(pluralise($item[smashed scientific equipment]) + " available", "", smashed_equipment_description)));
+        resource_entries.listAppend(ChecklistEntryMake("__item smashed scientific equipment", "shop.php?whichshop=wereprofessor_tinker", ChecklistSubentryMake(pluralise($item[smashed scientific equipment]) + " available", "", smashed_equipment_description)));
     }
 }
 
@@ -110,7 +110,7 @@ void PathWereProfessorGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         // Too high ML!
         if (monster_level_adjustment() > 25) {
             should_nag = true;
-            professor_tips.listAppend(HTMLGenerateSpanFont(`Reduce ML, elemental monsters will kill you at the start of combat with +{monster_level_adjustment()} ML.`, "red"));
+            professor_tips.listAppend(HTMLGenerateSpanFont(`Reduce ML, elemental-aligned monsters will kill you at the start of combat with +{monster_level_adjustment()} ML.`, "red"));
         }
 
         boolean wearing_quest_outfit = false;
@@ -157,6 +157,14 @@ void PathWereProfessorGenerateTasks(ChecklistEntry [int] task_entries, Checklist
             else stuff_to_buy.listAppend("bitchin' meatcar components");
         }
         if (knoll_available() && !have($item[detuned radio])) stuff_to_buy.listAppend("detuned radio");
+        if (__quest_state["Level 11"].mafia_internal_step >= 2) { // Black Market open
+            if (__quest_state["Level 11"].mafia_internal_step == 2 && !have($item[forged identification documents])) stuff_to_buy.listAppend("forged identification documents");
+            if (!__quest_state["Level 11 Desert"].state_boolean["Black Paint Given"] && !have($item[can of black paint])) stuff_to_buy.listAppend("can of black paint");
+            if (__quest_state["Level 11 Ron"].mafia_internal_step <= 4 && !have($item[red zeppelin ticket])) stuff_to_buy.listAppend("Red Zeppelin ticket");
+        }
+        if (!have($item[UV-resistant compass])) stuff_to_buy.listAppend("UV-resistant compass");
+        if (!have($item[dinghy plans]) && !__misc_state["mysterious island available"]) stuff_to_buy.listAppend("dinghy plans");
+        if (!have($item[dingy planks]) && !__misc_state["mysterious island available"]) stuff_to_buy.listAppend("dingy planks");
         // TODO: Dramatic Range 
         //if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && !have($item[Dramatic&trade; range]) && not in campground) stuff_to_buy.listAppend("Dramatic&trade; range");
 
@@ -172,7 +180,7 @@ void PathWereProfessorGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         }
 
         if (professor_tips.count() > 0) {
-            tips_location.listAppend(ChecklistEntryMake("__monster government scientist", "", ChecklistSubentryMake("You are a Professor", professor_tips), priority));
+            tips_location.listAppend(ChecklistEntryMake("WereProfessor", "", ChecklistSubentryMake("You are a Professor", professor_tips), priority));
         }
     }
 }
