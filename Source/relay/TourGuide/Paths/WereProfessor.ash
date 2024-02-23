@@ -102,10 +102,77 @@ void PathWereProfessorGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("PathWereProfessorGenerateTasks");
 void PathWereProfessorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    // TODO: Professor shopping spree
-    // (a reminder to buy stuff because Beast cannot access shops)
-    // (also research stuff, but this requires Mafia support)
+    if ($effect[Mild-Mannered Professor].have_effect() > 0) {
+        boolean should_nag = false;
 
-    // TODO: supernag to remove ML if you have 26+ ML and are a Professor
-    // (start-of-combat elemental damage)
+        string [int] professor_tips;
+
+        // Too high ML!
+        if (monster_level_adjustment() > 25) {
+            should_nag = true;
+            professor_tips.listAppend(HTMLGenerateSpanFont(`Reduce ML, elemental monsters will kill you at the start of combat with +{monster_level_adjustment()} ML.`, "red"));
+        }
+
+        boolean wearing_quest_outfit = false;
+        if (is_wearing_outfit("Knob Goblin Harem Girl Disguise")) wearing_quest_outfit = true;
+        if (is_wearing_outfit("Knob Goblin Elite Guard Uniform")) wearing_quest_outfit = true;
+        if (is_wearing_outfit("eXtreme Cold-Weather Gear")) wearing_quest_outfit = true;
+        if (is_wearing_outfit("War Hippy Fatigues")) wearing_quest_outfit = true;
+        if (is_wearing_outfit("Frat Warrior Fatigues")) wearing_quest_outfit = true;
+
+        // Equip research equipment. TODO: don't show it if we have 2250 points total; don't nag it if we have all of stomach and liver skills
+        foreach it in $items[biphasic molecular oculus,triphasic molecular oculus] {
+            if (have(it) && it.equipped_amount() == 0) {
+                if (!wearing_quest_outfit) {
+                    should_nag = true;
+                    professor_tips.listAppend(HTMLGenerateSpanFont(`Equip your {it} to do advanced research.`, "red"));
+                }
+                else professor_tips.listAppend(`Equip your {it} to do advanced research.`);
+            }
+        }
+
+        // Equip attack avoidance pants
+        foreach it in $items[high-tension exoskeleton,ultra-high-tension exoskeleton,irresponsible-tension exoskeleton] {
+            if (have(it) && it.equipped_amount() == 0) {
+                professor_tips.listAppend(`Equip your {it} to avoid enemy attacks.`);
+            }
+        }
+
+        // Equip something to avoid the jump
+        if (initiative_modifier() < 100 && $item[Jurassic Parka].equipped_amount() == 0) {
+            if (__misc_state["Torso aware"] && have($item[Jurassic Parka])) {
+                should_nag = true;
+                professor_tips.listAppend(HTMLGenerateSpanFont("Equip your Jurassic Parka to avoid enemies getting the jump and instakilling you.", "red"));
+            }
+            else {
+                professor_tips.listAppend(`Increase your initiative (currently {initiative_modifier()}%) to avoid enemies getting the jump and instakilling you.`);
+            }
+        }
+
+        // Buy stuff
+        string [int] stuff_to_buy;
+        if (get_property_int("_cloversPurchased") < 3) stuff_to_buy.listAppend("11-leaf clovers");
+        if (!__misc_state["desert beach available"]) {
+            if (!knoll_available()) stuff_to_buy.listAppend("desert bus pass");
+            else stuff_to_buy.listAppend("bitchin' meatcar components");
+        }
+        if (knoll_available() && !have($item[detuned radio])) stuff_to_buy.listAppend("detuned radio");
+        // TODO: Dramatic Range 
+        //if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && !have($item[Dramatic&trade; range]) && not in campground) stuff_to_buy.listAppend("Dramatic&trade; range");
+
+        if (stuff_to_buy.count() > 0) {
+            professor_tips.listAppend("Buy stuff before you become a Beast again: " + stuff_to_buy.listJoinComponents(", ", "or") + ".");
+        }
+
+        int priority = 12;
+        ChecklistEntry [int] tips_location = optional_task_entries;
+        if (should_nag) {
+            priority = -11;
+            tips_location = task_entries;
+        }
+
+        if (professor_tips.count() > 0) {
+            tips_location.listAppend(ChecklistEntryMake("__monster government scientist", "", ChecklistSubentryMake("You are a Professor", professor_tips), priority));
+        }
+    }
 }
