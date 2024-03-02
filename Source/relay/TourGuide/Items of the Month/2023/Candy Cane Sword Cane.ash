@@ -1,4 +1,4 @@
-//candy cane sword cane
+// Candy Cane Sword Cane
 RegisterTaskGenerationFunction("IOTMCandyCaneSwordGenerateTasks");
 void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -8,23 +8,22 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	string [int] describeSupernag;
 	string [int] options;
 
-	// Added a check for all paths where you do not want the supernag:
+	// Added a check for all paths where you do not want the tile at all:
 	//   - Community Service & Grey Goo: irrelevant
-	//   - Avatar of Boris: cannot wield a weapon other than trusty
+	//   - Avatar of Boris: cannot wield a weapon other than trusty or use a familiar
 	boolean pathCheck = true;
 	pathCheck = my_path().id == PATH_COMMUNITY_SERVICE ? false : true;
 	pathCheck = my_path().id == PATH_GREY_GOO ? false : true;
 	pathCheck = my_path().id == PATH_AVATAR_OF_BORIS ? false : true;
 
-	// __misc_state["in run"] && 
-	if (pathCheck)
+	// __misc_state["in run"] && pathCheck
+	if (true)
 	{
 		string url = "inventory.php?ftext=candy+cane+sword+cane";
 		// This is the description for the supernag. The supernag is in the task_entries, buried within conditional ifs and only shows up if you're in the zone.
 		describeSupernag.listAppend(HTMLGenerateSpanFont("You're", "red") + " " + HTMLGenerateSpanFont("in a", "green") + " " + HTMLGenerateSpanFont("candy", "red") + " " + HTMLGenerateSpanFont("cane", "green") + " " + HTMLGenerateSpanFont("sword", "red") + " " + HTMLGenerateSpanFont("cane", "green") + " " + HTMLGenerateSpanFont("noncom", "red") + " " + HTMLGenerateSpanFont("zone!", "green"));
 
-		// This enumerates the useful CCSC adventures.
-
+		// This enumerates the useful CCSC adventures
 		if (!get_property_boolean("_candyCaneSwordLyle")) {
 			options.listAppend(HTMLGenerateSpanOfClass("Bonus:", "r_bold") + " Lyle's Monorail Buff (+40% init)");
 		}
@@ -87,14 +86,14 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 
 		if (options.count() > 0) {
 			description.listAppend("Ensure your CCSC is equipped for these useful NCs:" + options.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+			
+			if (lookupItem("candy cane sword cane").equipped_amount() == 0) {
+				description.listAppend(HTMLGenerateSpanFont("(Equip the candy cane sword cane -- it's not equipped!)", "red"));
+			}
+
+			optional_task_entries.listAppend(ChecklistEntryMake("__item Candy cane sword cane", url, ChecklistSubentryMake("Candy cane sword cane noncombats", description)).ChecklistEntrySetCombinationTag("CCSC tasks").ChecklistEntrySetIDTag("CCSC"));
 		}
 		
-	if (lookupItem("candy cane sword cane").equipped_amount() == 0) {
-		description.listAppend(HTMLGenerateSpanFont("(Equip the candy cane sword cane -- it's not equipped!)", "red"));
-	}
-	// Only generate the tile if there are actual options.
-	if (options.count() > 0) {
-		optional_task_entries.listAppend(ChecklistEntryMake("__item Candy cane sword cane", url, ChecklistSubentryMake("Candy cane sword cane noncombats", description)).ChecklistEntrySetCombinationTag("CCSC tasks").ChecklistEntrySetIDTag("CCSC"));
-	}
-	}
+	}					
 }
+
