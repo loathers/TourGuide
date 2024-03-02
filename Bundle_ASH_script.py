@@ -189,3 +189,5 @@ def bundle_and_write(path_to_file,path_to_result,path_to_folder = '',allow_overw
 
   if return_imported_files:
     return imported_files
+
+# bundle_and_write('relay/relay_TourGuide.ash', 'relay_TourGuide.ash', 'Source')
