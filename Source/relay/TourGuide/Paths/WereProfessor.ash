@@ -165,8 +165,7 @@ void PathWereProfessorGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         if (!have($item[UV-resistant compass])) stuff_to_buy.listAppend("UV-resistant compass");
         if (!have($item[dinghy plans]) && !__misc_state["mysterious island available"]) stuff_to_buy.listAppend("dinghy plans");
         if (!have($item[dingy planks]) && !__misc_state["mysterious island available"]) stuff_to_buy.listAppend("dingy planks");
-        // TODO: Dramatic Range 
-        //if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && !have($item[Dramatic&trade; range]) && not in campground) stuff_to_buy.listAppend("Dramatic&trade; range");
+        if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && !have($item[Dramatic&trade; range]) && !get_property_boolean("hasRange")) stuff_to_buy.listAppend("Dramatic&trade; range");
 
         if (stuff_to_buy.count() > 0) {
             professor_tips.listAppend("Buy stuff before you become a Beast again: " + stuff_to_buy.listJoinComponents(", ", "or") + ".");
