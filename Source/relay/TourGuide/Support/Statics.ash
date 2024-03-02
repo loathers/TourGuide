@@ -56,6 +56,10 @@ static {
     int PATH_JOURNEYMAN = 45;
     int PATH_FALL_OF_THE_DINOSAURS = 46;
     int PATH_AVATAR_OF_SHADOWS_OVER_LOATHING = 47;
+    int PATH_LEGACY_OF_LOATHING = 48;
+    int PATH_SMOL = 49; // easier to type
+    int PATH_A_SHRUNKEN_ADVENTURER_AM_I = 49;
+    int PATH_WEREPROFESSOR = 50;
 }
 
 float numeric_modifier_replacement(item it, string modifier_string) {

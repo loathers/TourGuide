@@ -145,6 +145,13 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Clan Carnival Game")] = true;
         __iotms_usable[$item[clan floundry]] = true;
     }
+
+    if (lookupItem("candy cane sword cane").available_amount() > 0) //Dec 2023
+        __iotms_usable[lookupItem("candy cane sword cane")] = true;
+
+    if (lookupItem("spring shoes").available_amount() > 0) //Feb 2023
+        __iotms_usable[lookupItem("spring shoes")] = true;
+        
     //Can't use many things in G-Lover
     if (my_path().id == PATH_G_LOVER) //Path 33
     {
