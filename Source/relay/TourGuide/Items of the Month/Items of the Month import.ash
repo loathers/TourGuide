@@ -145,3 +145,4 @@ import "relay/TourGuide/Items of the Month/2023/A Guide to Burning Leaves.ash";
 
 // 2024
 import "relay/TourGuide/Items of the Month/2024/Chest Mimic.ash";
+import "relay/TourGuide/Items of the Month/2024/Spring Shoes.ash";
