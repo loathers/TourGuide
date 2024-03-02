@@ -2538,6 +2538,10 @@ static {
     int PATH_JOURNEYMAN = 45;
     int PATH_FALL_OF_THE_DINOSAURS = 46;
     int PATH_AVATAR_OF_SHADOWS_OVER_LOATHING = 47;
+    int PATH_LEGACY_OF_LOATHING = 48;
+    int PATH_SMOL = 49; // easier to type
+    int PATH_A_SHRUNKEN_ADVENTURER_AM_I = 49;
+    int PATH_WEREPROFESSOR = 50;
 }
 
 float numeric_modifier_replacement(item it, string modifier_string) {
@@ -5089,6 +5093,9 @@ void initialiseIOTMsUsable()
 
     if (lookupItem("candy cane sword cane").available_amount() > 0) //Dec 2023
         __iotms_usable[lookupItem("candy cane sword cane")] = true;
+
+    if (lookupItem("spring shoes").available_amount() > 0) //Feb 2023
+        __iotms_usable[lookupItem("spring shoes")] = true;
         
     //Can't use many things in G-Lover
     if (my_path().id == PATH_G_LOVER) //Path 33
@@ -56148,8 +56155,8 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	pathCheck = my_path().id == PATH_GREY_GOO ? false : true;
 	pathCheck = my_path().id == PATH_AVATAR_OF_BORIS ? false : true;
 
-	// __misc_state["in run"]
-	if (pathCheck)
+	// Only show when in run, for obvious reasons.
+	if (__misc_state["in run"] && pathCheck)
 	{
 		string url = "inventory.php?ftext=candy+cane+sword+cane";
 		// This is the description for the supernag. The supernag is in the task_entries, buried within conditional ifs and only shows up if you're in the zone.
@@ -56227,7 +56234,8 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 			optional_task_entries.listAppend(ChecklistEntryMake("__item Candy cane sword cane", url, ChecklistSubentryMake("Candy Cane Sword Cane NCs", description)).ChecklistEntrySetCombinationTag("CCSC tasks").ChecklistEntrySetIDTag("CCSC"));
 		}
 		
-	}					
+	}	
+					
 }
 
 
@@ -56267,13 +56275,25 @@ RegisterResourceGenerationFunction("IOTMSpringShoesGenerateResource");
 
 void IOTMSpringShoesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__misc_state["in run"] && available_amount($item[spring shoes]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
+	// Initialization. Do not generate if you don't have spring shoes.
+	if (!__iotms_usable[lookupItem("spring shoes")]) return;
+
+	// Added a check for all paths where you do not want the tile at all:
+	//   - Community Service: irrelevant
+	//   - WereProfessor: is not a free run.
+
+	boolean pathCheck = true;
+	pathCheck = my_path().id == PATH_COMMUNITY_SERVICE ? false : true;
+	pathCheck = my_path().id == PATH_WEREPROFESSOR ? false : true;
+
+	// Technically, the available_amount here precludes the need for the initialization up top.
+	if (__misc_state["in run"] && available_amount($item[spring shoes]) > 0 && pathCheck)
 	{
 		if ($effect[everything looks green].have_effect() == 0) 
 		{
 			string [int] description;
 			string url = "inventory.php?ftext=spring+shoes";
-			description.listAppend(HTMLGenerateSpanFont("Run away from your problems!", "green"));
+			description.listAppend(HTMLGenerateSpanFont("Free-run away from your problems with the <b>Spring Away</b> skill!", "green"));
 			if (lookupItem("spring shoes").equipped_amount() == 0)
 			{
 				description.listAppend(HTMLGenerateSpanFont("Equip the spring shoes first.", "red"));
@@ -56285,6 +56305,9 @@ void IOTMSpringShoesGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 
 void IOTMSpringShoesGenerateResource(ChecklistEntry [int] resource_entries)
 {
+	// Initialization. Do not generate iof you don't have spring shoes.
+	if (!__iotms_usable[lookupItem("spring shoes")]) return;
+
 	string [int] banishDescription;
 	banishDescription.listAppend("All day banish, doesn't end combat");
 	if (lookupItem("spring shoes").equipped_amount() == 0)
