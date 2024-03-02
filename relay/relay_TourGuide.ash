@@ -4991,7 +4991,7 @@ void initialiseIOTMsUsable()
         if (__campground[lookupItem("Little Geneticist DNA-Splicing Lab")] > 0)
             __iotms_usable[lookupItem("Little Geneticist DNA-Splicing Lab")] = true;
         if (__campground[lookupItem("Replica Little Geneticist DNA-Splicing Lab")] > 0)
-            __iotms_usable[lookupItem("Little Geneticist DNA-Splicing Lab")] = true;
+            __[lookupItem("Little Geneticist DNA-Splicing Lab")] = true;
 
         // __iotms_usable for gardens tracks whether the user has the garden installed.
         // Gardens start returning 0 instead of 1 when the items are picked, so checking
@@ -5086,6 +5086,10 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Clan Carnival Game")] = true;
         __iotms_usable[$item[clan floundry]] = true;
     }
+    
+    if (lookupItem("candy cane sword cane").available_amount() > 0) //Mar 2021
+        __iotms_usable[lookupItem("candy cane sword cane")] = true;
+        
     //Can't use many things in G-Lover
     if (my_path().id == PATH_G_LOVER) //Path 33
     {
@@ -56141,8 +56145,8 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	pathCheck = my_path().id == PATH_GREY_GOO ? false : true;
 	pathCheck = my_path().id == PATH_AVATAR_OF_BORIS ? false : true;
 
-	// __misc_state["in run"] && pathCheck
-	if (true)
+	// __misc_state["in run"]
+	if (pathCheck)
 	{
 		string url = "inventory.php?ftext=candy+cane+sword+cane";
 		// This is the description for the supernag. The supernag is in the task_entries, buried within conditional ifs and only shows up if you're in the zone.
