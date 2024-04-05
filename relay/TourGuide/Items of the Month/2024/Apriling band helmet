@@ -6,7 +6,7 @@ void IOTMAprilingBandHelmetGenerateResource(ChecklistEntry [int] resource_entrie
 	#if (__misc_state["in run"] && available_amount($item[apriling band helmet]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
 	{
 		//battle of the bands
-		int aprilingBandConductorTimer = (get_property_int("nextAprilBandTurn") - total_turns_played()); 
+		int aprilingBandConductorTimer = get_property_int("nextAprilBandTurn"); 
 		string url = "inventory.php?pwd=" + my_hash() + "&action=apriling";
 		
 		int aprilingBandInstrumentsAvailable = clampi(2 - get_property_int("_aprilBandInstruments"), 0, 2);
@@ -22,7 +22,7 @@ void IOTMAprilingBandHelmetGenerateResource(ChecklistEntry [int] resource_entrie
 			description.listAppend("+25% booze, +50% food, +100% candy");
 		}	
 		else {
-			description.listAppend(aprilingBandConductorTimer + " adventures until you can change your tune.");
+			description.listAppend((aprilingBandConductorTimer - total_turns_played()) + " adventures until you can change your tune.");
 		}
 		resource_entries.listAppend(ChecklistEntryMake("__item apriling band helmet", url, ChecklistSubentryMake("Apriling band helmet buff", "", description), 8));
 	}
