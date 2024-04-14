@@ -1,23 +1,49 @@
 //Jurassic parka
+RegisterTaskGenerationFunction("IOTMJurassicParkaGenerateTasks");
+void IOTMJurassicParkaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	#if (__misc_state["in run"] && available_amount($item[everfull dart holster]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
+	if (!__iotms_usable[$item[Jurassic Parka]]) return;
+	{
+		string [int] description;
+		string url = "inventory.php?ftext=jurassic+parka";
+			
+		if ($effect[everything looks yellow].have_effect() == 0) 
+		{
+			if (lookupItem("jurassic parka").equipped_amount() == 0)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Equip the parka first", "red"));
+			}
+			else description.listAppend(HTMLGenerateSpanFont("Parka equipped", "orange"));
+			if (get_property("parkaMode") != "dilophosaur")
+			{
+				description.listAppend(HTMLGenerateSpanFont("Change to dilophosaur", "red"));
+			}
+			else description.listAppend(HTMLGenerateSpanFont("Dilophosaur enabled", "orange"));			
+			task_entries.listAppend(ChecklistEntryMake("__item jurassic parka", url, ChecklistSubentryMake("Jurassic Parka YR", "", description), -11));
+		}
+	}
+}
+
 RegisterResourceGenerationFunction("IOTMJurassicParkaGenerateResource");
 void IOTMJurassicParkaGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__iotms_usable[$item[Jurassic Parka]]) return;
-    if (!__misc_state["in run"]) return; 
+	if (!__iotms_usable[$item[Jurassic Parka]]) return;
+	if (!__misc_state["in run"]) return; 
 	if (my_path().id == PATH_G_LOVER) return; // cannot use parka in g-lover
 
-    string url;
+	string url;
 	string parkaMode = get_property("parkaMode");
 	string parkaEnchant;
 	string [int] description;
 
-    url = invSearch("jurassic parka");
+	url = invSearch("jurassic parka");
 
 	int spikos_left = clampi(5 - get_property_int("_spikolodonSpikeUses"), 0, 5);
 	
-    // Title
-        string main_title = "Jurassic Parka";
-        description.listAppend("You're the dinosaur now, dawg.");
+	// Title
+		string main_title = "Jurassic Parka";
+		description.listAppend("You're the dinosaur now, dawg.");
 		
 		switch (get_property("parkaMode"))			
 		{
