@@ -53910,8 +53910,8 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTMJurassicParkaGenerateTasks");
 void IOTMJurassicParkaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	#if (__misc_state["in run"] && available_amount($item[everfull dart holster]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
 	if (!__iotms_usable[$item[Jurassic Parka]]) return;
+    if (__misc_state["in run"] && available_amount($item[jurassic parka]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
 	{
 		string [int] description;
 		string url = "inventory.php?ftext=jurassic+parka";
