@@ -17,9 +17,22 @@ void IOTMAprilingBandHelmetGenerateResource(ChecklistEntry [int] resource_entrie
 		
 		if (aprilingBandConductorTimer <= total_turns_played()) {
 			description.listAppend(HTMLGenerateSpanFont("You can change your tune!", "blue"));
-			description.listAppend("-10% Combat Frequency");
-			description.listAppend("+10% Combat Frequency");
-			description.listAppend("+25% booze, +50% food, +100% candy");
+			
+			if ($effect[Apriling Band Patrol Beat].have_effect() > 0) {
+				description.listAppend(HTMLGenerateSpanFont("-10% Combat Frequency", "blue"));
+				description.listAppend("+10% Combat Frequency");
+				description.listAppend("+25% booze, +50% food, +100% candy");
+			}
+			if ($effect[Apriling Band Battle Cadence].have_effect() > 0) {
+				description.listAppend("-10% Combat Frequency");
+				description.listAppend(HTMLGenerateSpanFont("+10% Combat Frequency", "blue"));
+				description.listAppend("+25% booze, +50% food, +100% candy");
+			}
+			if ($effect[Apriling Band Celebration Bop].have_effect() > 0) {
+				description.listAppend("+10% Combat Frequency");
+				description.listAppend("-10% Combat Frequency");
+				description.listAppend(HTMLGenerateSpanFont("+25% booze, +50% food, +100% candy", "blue"));
+			}
 		}	
 		else {
 			description.listAppend((aprilingBandConductorTimer - total_turns_played()) + " adventures until you can change your tune.");
