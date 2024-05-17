@@ -4,6 +4,9 @@ void IOTMJurassicParkaGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 {
 	// Task-based nag for using the parka. Instruct the user to swap modes or equip parka if needed.
 	if (!__iotms_usable[$item[Jurassic Parka]]) return;
+
+	// Fondeluge is the only skill strictly better than Jurassic acid; don't show this tile if you happen to have it
+	if (lookupSkill("Fondeluge").have_skill()) return;
     if (__misc_state["in run"] && available_amount($item[jurassic parka]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
 	{
 		string [int] description;
