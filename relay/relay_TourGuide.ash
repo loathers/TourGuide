@@ -35393,8 +35393,6 @@ void setUpState()
     if (my_path().id != PATH_SLOW_AND_STEADY) {
         adventures_after_rollover += numeric_modifier("adventures");
         adventures_after_rollover += get_property_int("extraRolloverAdventures");
-        if (getHolidaysTomorrow()["Labór Day"])
-            adventures_after_rollover += 10;
     }
     adventures_after_rollover = MAX(adventures_after_rollover, 0); //Who knows?
     int adventures_after_rollover_post_cap = MIN(adventures_after_rollover, 200);
