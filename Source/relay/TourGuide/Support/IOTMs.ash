@@ -284,6 +284,12 @@ void initialiseIOTMsUsable()
     replicaCheck("2002 Mr. Store Catalog"); # handled in own tile
     replicaCheck("August Scepter"); # handled in own tile
 
+    // Swap parka to false if you aren't torso aware.
+    if (!__misc_state["Torso aware"]) 
+    {
+        __iotms_usable[lookupItem("Jurassic Parka")] = false;
+    }
+
 }
 
 initialiseIOTMsUsable();
