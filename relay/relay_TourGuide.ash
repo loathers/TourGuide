@@ -5229,6 +5229,12 @@ void initialiseIOTMsUsable()
     replicaCheck("2002 Mr. Store Catalog"); # handled in own tile
     replicaCheck("August Scepter"); # handled in own tile
 
+    // Swap parka to false if you aren't torso aware.
+    if (!__misc_state["Torso aware"]) 
+    {
+        __iotms_usable[lookupItem("Jurassic Parka")] = false;
+    }
+
 }
 
 initialiseIOTMsUsable();
@@ -53910,25 +53916,27 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTMJurassicParkaGenerateTasks");
 void IOTMJurassicParkaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+	// Task-based nag for using the parka. Instruct the user to swap modes or equip parka if needed.
 	if (!__iotms_usable[$item[Jurassic Parka]]) return;
     if (__misc_state["in run"] && available_amount($item[jurassic parka]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
 	{
 		string [int] description;
 		string url = "inventory.php?ftext=jurassic+parka";
-			
+		
+		// TODO: Perhaps a centralized YR supernag would be better? Not sure, tbh.
 		if ($effect[everything looks yellow].have_effect() == 0) 
 		{
 			if (lookupItem("jurassic parka").equipped_amount() == 0)
 			{
-				description.listAppend(HTMLGenerateSpanFont("Equip the parka first", "red"));
+				description.listAppend(HTMLGenerateSpanFont("Equip your Jurassic Parka!", "red"));
 			}
-			else description.listAppend(HTMLGenerateSpanFont("Parka equipped", "orange"));
+			else description.listAppend(HTMLGenerateSpanFont("Parka equipped.", "orange"));
 			if (get_property("parkaMode") != "dilophosaur")
 			{
-				description.listAppend(HTMLGenerateSpanFont("Change to dilophosaur", "red"));
+				description.listAppend(HTMLGenerateSpanFont("Change your parka to dilophosaur mode!", "red"));
 			}
-			else description.listAppend(HTMLGenerateSpanFont("Dilophosaur enabled", "orange"));			
-			task_entries.listAppend(ChecklistEntryMake("__item jurassic parka", url, ChecklistSubentryMake("Jurassic Parka YR", "", description), -11));
+			else description.listAppend(HTMLGenerateSpanFont("Dilophosaur mode enabled.", "orange"));			
+			task_entries.listAppend(ChecklistEntryMake("__item jurassic parka", url, ChecklistSubentryMake("Parka yellow ray is ready; spit some acid!", "", description), -11));
 		}
 	}
 }
