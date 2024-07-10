@@ -16,7 +16,7 @@ void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         else {
             description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "blue"));
         }
-        task_entries.listAppend(ChecklistEntryMake("__item Abracandalabra", url, ChecklistSubentryMake("Roman Candelabra runaway available!", "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra runaway available!", "", description), -11));
     }
 
     // Purple people beater
@@ -32,6 +32,6 @@ void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         {
             description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "blue"));
         }
-        task_entries.listAppend(ChecklistEntryMake("__item Abracandalabra", url, ChecklistSubentryMake("Roman Candelabra copy available!", "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra copy available!", "", description), -11));
     }
 }
