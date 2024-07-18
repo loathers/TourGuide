@@ -1,3 +1,4 @@
+//Roman Candelabra
 RegisterTaskGenerationFunction("IOTMRomanCandelabraGenerateTasks");
 void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -14,7 +15,7 @@ void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, Checkli
             description.listAppend(HTMLGenerateSpanFont("Equip the Roman Candelabra first.", "red"));
         }
         else {
-            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "blue"));
+            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "green"));
         }
         task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra runaway available!", "", description), -11));
     }
@@ -23,15 +24,14 @@ void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     if ($effect[Everything Looks Purple].have_effect() == 0)
     {
         string [int] description;
-        description.listAppend(HTMLGenerateSpanFont("Purple Candle chained fight!", "magenta"));
         if (lookupItem("Roman Candelabra").equipped_amount() == 0)
         {
             description.listAppend(HTMLGenerateSpanFont("Equip the Roman Candelabra first.", "red"));
         }
         else
         {
-            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "blue"));
+            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "purple"));
         }
-        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra copy available!", "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra chain ready!", "", description), -11));
     }
 }
