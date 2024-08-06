@@ -76,7 +76,7 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
                     unusedSymbols.listAppend(mayamSymbol.friendlyName);
                 }
             }
-            description.listAppend(`{HTMLGenerateSpanOfClass(ringName, "r_bold")} {unusedSymbols.listJoinComponents(", ")}`);
+            description.listAppend(`{HTMLGenerateSpanOfClass(`{ringOrdinal} ring:`, "r_bold")} {unusedSymbols.listJoinComponents(", ")}`);
             hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
         }
         description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
