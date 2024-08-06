@@ -12,6 +12,11 @@ record MayamSymbol {
     string description;
 };
 
+void addToBothDescriptions(string [int] description1, string [int] description2, string text) {
+    description1.listAppend(text);
+    description2.listAppend(text);
+}
+
 //Mayam calendar
 RegisterResourceGenerationFunction("IOTMMayamCalendarGenerateResource");
 void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
@@ -40,10 +45,16 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
         new MayamSymbol(4, "Explosion", "explosion", "+5 fites")
     };
 
-    string [int] description;
-    string url = "inv_use.php?pwd=" + my_hash() + "&which=99&whichitem=11572";
+    string [int] description, hoverDescription;
+
     int templeResetAscension = get_property_int("lastTempleAdventures");
-    description.listAppend("Happy Mayam New Year!");
+    addToBothDescriptions(description, hoverDescription, "Happy Mayam New Year!");
+
+    ChecklistEntry entry;
+    entry.url = "inv_use.php?pwd=" + my_hash() + "&which=99&whichitem=11572";
+    entry.image_lookup_name = "mayam calendar";
+    entry.tags.id = "Mayam Calendar";
+    entry.importance_level = 8;
 
     if (!get_property("_mayamSymbolsUsed").contains_text("yam4") ||
         !get_property("_mayamSymbolsUsed").contains_text("clock") ||
@@ -51,30 +62,40 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
         my_ascensions() > templeResetAscension)
     {
         description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+        hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+
         int[int] rings = {1, 2, 3, 4};
         foreach ring in rings {
             string ringName = `{capitaliseFirstLetter(substring(int_to_ordinal(ring + 1), 1))} ring:`;
-            description.listAppend(HTMLGenerateSpanOfClass(ringName, "r_bold"));
+            string [int] unusedSymbols;
+
+            hoverDescription.listAppend(HTMLGenerateSpanOfClass(ringName, "r_bold"));
             foreach index, mayamSymbol in mayamSymbols {
                 if (mayamSymbol.ring == ring + 1 && !get_property("_mayamSymbolsUsed").contains_text(mayamSymbol.mafiaName)) {
-                    description.listAppend(HTMLGenerateSpanOfClass(mayamSymbol.friendlyName, "r_bold") + ": " + mayamSymbol.description);
+                    hoverDescription.listAppend(`- {HTMLGenerateSpanOfClass(mayamSymbol.friendlyName, "r_bold")}: {mayamSymbol.description}`);
+                    unusedSymbols.listAppend(mayamSymbol.friendlyName);
                 }
+
             }
-            description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+            description.listAppend(`{HTMLGenerateSpanOfClass(ringName, "r_bold")} {unusedSymbols.listJoinComponents(", ")}`);
+            hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
         }
+        description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
 
         string [int] resonances;
         resonances.listAppend(HTMLGenerateSpanOfClass("15-turn banisher", "r_bold") + ": Vessel + Yam + Cheese + Explosion");
         resonances.listAppend(HTMLGenerateSpanOfClass("Yam and swiss", "r_bold") + ": Yam + Meat + Cheese + Yam");
         resonances.listAppend(HTMLGenerateSpanOfClass("+55% meat accessory", "r_bold") + ": Yam + Meat + Eyepatch + Yam");
         resonances.listAppend(HTMLGenerateSpanOfClass("+100% Food drops", "r_bold") + ": Yam + Yam + Cheese + Clock");
-
-        description.listAppend(HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+        
+        addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
 
         if (my_ascensions() > templeResetAscension) {
-            description.listAppend(HTMLGenerateSpanFont("Temple reset available!", "r_bold") + "");
+            addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanFont("Temple reset available!", "r_bold") + "");
         }
 
-        resource_entries.listAppend(ChecklistEntryMake("__item mayam calendar", url, ChecklistSubentryMake("Mayam Calendar", "", description), 8));
+        entry.subentries.listAppend(ChecklistSubentryMake("Mayam Calendar", "", description));
+        entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Mayam Calendar", "", hoverDescription));
+        resource_entries.listAppend(entry);
     }
 }
