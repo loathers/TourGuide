@@ -11,11 +11,6 @@ void IOTMAprilingBandHelmetGenerateResource(ChecklistEntry [int] resource_entrie
     int aprilingBandConductorTimer = get_property_int("nextAprilBandTurn");
     string url = "inventory.php?pwd=" + my_hash() + "&action=apriling";
 
-    int aprilingBandInstrumentsAvailable = clampi(2 - get_property_int("_aprilBandInstruments"), 0, 2);
-    if (aprilingBandInstrumentsAvailable > 0) {
-        description.listAppend(HTMLGenerateSpanFont("Can pick " + aprilingBandInstrumentsAvailable + " more instruments!", "green"));
-    }
-
     if (aprilingBandConductorTimer <= total_turns_played()) {
         description.listAppend(HTMLGenerateSpanFont("You can change your tune!", "blue"));
         if ($effect[Apriling Band Patrol Beat].have_effect() > 0) {
@@ -48,8 +43,14 @@ void IOTMAprilingBandHelmetGenerateResource(ChecklistEntry [int] resource_entrie
         get_property_int("_aprilBandTubaUses") +
         get_property_int("_aprilBandPiccoloUses");
 
+    string [int] instrumentDescription;
+
+    int aprilingBandInstrumentsAvailable = clampi(2 - get_property_int("_aprilBandInstruments"), 0, 2);
+    if (aprilingBandInstrumentsAvailable > 0) {
+        instrumentDescription.listAppend(HTMLGenerateSpanFont("Can pick " + aprilingBandInstrumentsAvailable + " more instruments!", "green"));
+    }
+
     if (instrumentUses < 6) {
-        string [int] instrumentDescription;
         string url = "inventory.php?ftext=apriling";
         if (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band saxophone]) > 0) {
             instrumentDescription.listAppend(`Can play the Sax {aprilingBandSaxUsesLeft} more times. {HTMLGenerateSpanFont("LUCKY!", "green")}`);
