@@ -52,16 +52,16 @@ void IOTMAprilingBandHelmetGenerateResource(ChecklistEntry [int] resource_entrie
         string [int] instrumentDescription;
         string url = "inventory.php?ftext=apriling";
         if (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band saxophone]) > 0) {
-            description2.listAppend(`Can play the Sax {aprilingBandSaxUsesLeft} more times. {HTMLGenerateSpanFont("LUCKY!", "green")}`);
+            instrumentDescription.listAppend(`Can play the Sax {aprilingBandSaxUsesLeft} more times. {HTMLGenerateSpanFont("LUCKY!", "green")}`);
         }
         if (aprilingBandQuadTomUsesLeft > 0 && available_amount($item[apriling band quad tom]) > 0) {
-            description2.listAppend(`Can play the Quad Toms {aprilingBandQuadTomUsesLeft} more times. {HTMLGenerateSpanFont("Sandworm!", "orange")}`);
+            instrumentDescription.listAppend(`Can play the Quad Toms {aprilingBandQuadTomUsesLeft} more times. {HTMLGenerateSpanFont("Sandworm!", "orange")}`);
         }
         if (aprilingBandTubaUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0) {
-            description2.listAppend(`Can play the Tuba {aprilingBandTubaUsesLeft} more times. {HTMLGenerateSpanFont("SNEAK!", "grey")}`);
+            instrumentDescription.listAppend(`Can play the Tuba {aprilingBandTubaUsesLeft} more times. {HTMLGenerateSpanFont("SNEAK!", "grey")}`);
         }
         if (aprilingBandPiccoloUsesLeft > 0 && available_amount($item[apriling band piccolo]) > 0) {
-            description2.listAppend(`Can play the Piccolo {aprilingBandPiccoloUsesLeft} more times. {HTMLGenerateSpanFont("+40 fxp", "purple")}`);
+            instrumentDescription.listAppend(`Can play the Piccolo {aprilingBandPiccoloUsesLeft} more times. {HTMLGenerateSpanFont("+40 fxp", "purple")}`);
         }
         resource_entries.listAppend(ChecklistEntryMake("__item apriling band helmet", url, ChecklistSubentryMake("Apriling band instruments", "", instrumentDescription), 8));
     }
