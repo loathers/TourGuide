@@ -56353,6 +56353,177 @@ void IOTMSpringShoesGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__skill spring shoes", "", ChecklistSubentryMake("Spring Kick", "", banishDescription)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Spring shoes spring kick banish"));
 }
+// Apriling band helmet
+RegisterResourceGenerationFunction("IOTMAprilingBandHelmetGenerateResource");
+void IOTMAprilingBandHelmetGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (available_amount($item[apriling band helmet]) < 1)
+        return;
+
+    string [int] description;
+
+    //battle of the bands
+    int aprilingBandConductorTimer = get_property_int("nextAprilBandTurn");
+    string url = "inventory.php?pwd=" + my_hash() + "&action=apriling";
+
+    if (aprilingBandConductorTimer <= total_turns_played()) {
+        description.listAppend(HTMLGenerateSpanFont("You can change your tune!", "blue"));
+        if ($effect[Apriling Band Patrol Beat].have_effect() > 0) {
+            description.listAppend(HTMLGenerateSpanFont("-10% Combat Frequency", "blue"));
+            description.listAppend("+10% Combat Frequency");
+            description.listAppend("+25% booze, +50% food, +100% candy");
+        }
+        if ($effect[Apriling Band Battle Cadence].have_effect() > 0) {
+            description.listAppend("-10% Combat Frequency");
+            description.listAppend(HTMLGenerateSpanFont("+10% Combat Frequency", "blue"));
+            description.listAppend("+25% booze, +50% food, +100% candy");
+        }
+        if ($effect[Apriling Band Celebration Bop].have_effect() > 0) {
+            description.listAppend("+10% Combat Frequency");
+            description.listAppend("-10% Combat Frequency");
+            description.listAppend(HTMLGenerateSpanFont("+25% booze, +50% food, +100% candy", "blue"));
+        }
+    }
+    else {
+        description.listAppend((aprilingBandConductorTimer - total_turns_played()) + " adventures until you can change your tune.");
+    }
+    resource_entries.listAppend(ChecklistEntryMake("__item apriling band helmet", url, ChecklistSubentryMake("Apriling band helmet buff", "", description), 8));
+
+    int aprilingBandSaxUsesLeft = clampi(3 - get_property_int("_aprilBandSaxophoneUses"), 0, 3);
+    int aprilingBandQuadTomUsesLeft = clampi(3 - get_property_int("_aprilBandTomUses"), 0, 3);
+    int aprilingBandTubaUsesLeft = clampi(3 - get_property_int("_aprilBandTubaUses"), 0, 3);
+    int aprilingBandPiccoloUsesLeft = clampi(3 - get_property_int("_aprilBandPiccoloUses"), 0, 3);
+    int instrumentUses = get_property_int("_aprilBandSaxophoneUses") +
+        get_property_int("_aprilBandTomUses") +
+        get_property_int("_aprilBandTubaUses") +
+        get_property_int("_aprilBandPiccoloUses");
+
+    string [int] instrumentDescription;
+
+    int aprilingBandInstrumentsAvailable = clampi(2 - get_property_int("_aprilBandInstruments"), 0, 2);
+    if (aprilingBandInstrumentsAvailable > 0) {
+        instrumentDescription.listAppend(HTMLGenerateSpanFont("Can pick " + aprilingBandInstrumentsAvailable + " more instruments!", "green"));
+    }
+
+    if (instrumentUses < 6) {
+        string url = "inventory.php?ftext=apriling";
+        if (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band saxophone]) > 0) {
+            instrumentDescription.listAppend(`Can play the Sax {aprilingBandSaxUsesLeft} more times. {HTMLGenerateSpanFont("LUCKY!", "green")}`);
+        }
+        if (aprilingBandQuadTomUsesLeft > 0 && available_amount($item[apriling band quad tom]) > 0) {
+            instrumentDescription.listAppend(`Can play the Quad Toms {aprilingBandQuadTomUsesLeft} more times. {HTMLGenerateSpanFont("Sandworm!", "orange")}`);
+        }
+        if (aprilingBandTubaUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0) {
+            instrumentDescription.listAppend(`Can play the Tuba {aprilingBandTubaUsesLeft} more times. {HTMLGenerateSpanFont("SNEAK!", "grey")}`);
+        }
+        if (aprilingBandPiccoloUsesLeft > 0 && available_amount($item[apriling band piccolo]) > 0) {
+            instrumentDescription.listAppend(`Can play the Piccolo {aprilingBandPiccoloUsesLeft} more times. {HTMLGenerateSpanFont("+40 fxp", "purple")}`);
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__item apriling band helmet", url, ChecklistSubentryMake("Apriling band instruments", "", instrumentDescription), 8));
+    }
+}
+
+record MayamSymbol {
+    // Which ring the symbol is in
+    int ring;
+
+    // Printable name for the symbol
+    string friendlyName;
+
+    // What mafia calls the symbol
+    string mafiaName;
+
+    // The player-friendly description of the symbol
+    string description;
+};
+
+void addToBothDescriptions(string [int] description1, string [int] description2, string text) {
+    description1.listAppend(text);
+    description2.listAppend(text);
+}
+
+//Mayam calendar
+RegisterResourceGenerationFunction("IOTMMayamCalendarGenerateResource");
+void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (available_amount($item[mayam calendar]) < 1)
+        return;
+
+    MayamSymbol [int] mayamSymbols = {
+        new MayamSymbol(1, "A yam", "yam1", "craftable ingredient"),
+        new MayamSymbol(1, "Sword", "sword", `+{min(150, 10 * my_level())} mus stats`),
+        new MayamSymbol(1, "Vessel", "vessel", "+1000 MP"),
+        new MayamSymbol(1, "Fur", "fur", "+100 Fxp"),
+        new MayamSymbol(1, "Chair", "chair", "+5 free rests"),
+        new MayamSymbol(1, "Eye", "eye", "+30% item for 100 advs"),
+        new MayamSymbol(2, "Another yam", "yam2", "craftable ingredient"),
+        new MayamSymbol(2, "Lightning", "lightning", `+{min(150, 10 * my_level())} mys stats`),
+        new MayamSymbol(2, "Bottle", "bottle", "+1000 HP"),
+        new MayamSymbol(2, "Wood", "wood", "+4 bridge parts"),
+        new MayamSymbol(2, "Meat", "meat", `+{min(150, 10 * my_level())} meat`),
+        new MayamSymbol(3, "A third yam", "yam3", "craftable ingredient"),
+        new MayamSymbol(3, "Eyepatch", "eyepatch", `+{min(150, 10 * my_level())} mox stats`),
+        new MayamSymbol(3, "Wall", "wall", "+2 res for 100 advs"),
+        new MayamSymbol(3, "Cheese", "cheese", "+1 goat cheese"),
+        new MayamSymbol(4, "A fourth yam", "yam4", "yep."),
+        new MayamSymbol(4, "Clock", "clock", "+5 advs"),
+        new MayamSymbol(4, "Explosion", "explosion", "+5 fites")
+    };
+
+    string [int] description, hoverDescription;
+
+    int templeResetAscension = get_property_int("lastTempleAdventures");
+    addToBothDescriptions(description, hoverDescription, "Happy Mayam New Year!");
+
+    ChecklistEntry entry;
+    entry.url = "inv_use.php?pwd=" + my_hash() + "&which=99&whichitem=11572";
+    entry.image_lookup_name = "mayam calendar";
+    entry.tags.id = "Mayam Calendar";
+    entry.importance_level = 8;
+
+    if (!get_property("_mayamSymbolsUsed").contains_text("yam4") ||
+        !get_property("_mayamSymbolsUsed").contains_text("clock") ||
+        !get_property("_mayamSymbolsUsed").contains_text("explosion") ||
+        my_ascensions() > templeResetAscension)
+    {
+        description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+        hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+
+        int[int] rings = {1, 2, 3, 4};
+        foreach ring in rings {
+            string ringOrdinal = capitaliseFirstLetter(substring(int_to_ordinal(ring + 1), 1));
+            hoverDescription.listAppend(HTMLGenerateSpanOfClass(`{ringOrdinal} ring:`, "r_bold"));
+
+            string [int] unusedSymbols;
+            foreach index, mayamSymbol in mayamSymbols {
+                if (mayamSymbol.ring == ring + 1 && !get_property("_mayamSymbolsUsed").contains_text(mayamSymbol.mafiaName)) {
+                    hoverDescription.listAppend(`- {HTMLGenerateSpanOfClass(mayamSymbol.friendlyName, "r_bold")}: {mayamSymbol.description}`);
+                    unusedSymbols.listAppend(mayamSymbol.friendlyName);
+                }
+            }
+            description.listAppend(`{HTMLGenerateSpanOfClass(ringName, "r_bold")} {unusedSymbols.listJoinComponents(", ")}`);
+            hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+        }
+        description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+
+        string [int] resonances;
+        resonances.listAppend(HTMLGenerateSpanOfClass("15-turn banisher", "r_bold") + ": Vessel + Yam + Cheese + Explosion");
+        resonances.listAppend(HTMLGenerateSpanOfClass("Yam and swiss", "r_bold") + ": Yam + Meat + Cheese + Yam");
+        resonances.listAppend(HTMLGenerateSpanOfClass("+55% meat accessory", "r_bold") + ": Yam + Meat + Eyepatch + Yam");
+        resonances.listAppend(HTMLGenerateSpanOfClass("+100% Food drops", "r_bold") + ": Yam + Yam + Cheese + Clock");
+        
+        addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+
+        if (my_ascensions() > templeResetAscension) {
+            addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanFont("Temple reset available!", "r_bold") + "");
+        }
+
+        entry.subentries.listAppend(ChecklistSubentryMake("Mayam Calendar", "", description));
+        entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Mayam Calendar", "", hoverDescription));
+        resource_entries.listAppend(entry);
+    }
+}
+
 //Roman Candelabra
 RegisterTaskGenerationFunction("IOTMRomanCandelabraGenerateTasks");
 void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
