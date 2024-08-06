@@ -66,16 +66,15 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
 
         int[int] rings = {1, 2, 3, 4};
         foreach ring in rings {
-            string ringName = `{capitaliseFirstLetter(substring(int_to_ordinal(ring + 1), 1))} ring:`;
-            string [int] unusedSymbols;
+            string ringOrdinal = capitaliseFirstLetter(substring(int_to_ordinal(ring + 1), 1));
+            hoverDescription.listAppend(HTMLGenerateSpanOfClass(`{ringOrdinal} ring:`, "r_bold"));
 
-            hoverDescription.listAppend(HTMLGenerateSpanOfClass(ringName, "r_bold"));
+            string [int] unusedSymbols;
             foreach index, mayamSymbol in mayamSymbols {
                 if (mayamSymbol.ring == ring + 1 && !get_property("_mayamSymbolsUsed").contains_text(mayamSymbol.mafiaName)) {
                     hoverDescription.listAppend(`- {HTMLGenerateSpanOfClass(mayamSymbol.friendlyName, "r_bold")}: {mayamSymbol.description}`);
                     unusedSymbols.listAppend(mayamSymbol.friendlyName);
                 }
-
             }
             description.listAppend(`{HTMLGenerateSpanOfClass(ringName, "r_bold")} {unusedSymbols.listJoinComponents(", ")}`);
             hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
