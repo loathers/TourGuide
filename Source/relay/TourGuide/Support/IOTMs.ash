@@ -1,3 +1,4 @@
+import "relay/TourGuide/QuestState.ash"
 import "relay/TourGuide/Support/Campground.ash"
 
 boolean [item] __iotms_usable;
@@ -283,6 +284,12 @@ void initialiseIOTMsUsable()
     replicaCheck("Cincho de Mayo"); # handled in own tile & sneaks.ash
     replicaCheck("2002 Mr. Store Catalog"); # handled in own tile
     replicaCheck("August Scepter"); # handled in own tile
+
+    // Swap parka to false if you aren't torso aware.
+    if (!__misc_state["Torso aware"]) 
+    {
+        __iotms_usable[lookupItem("Jurassic Parka")] = false;
+    }
 
 }
 

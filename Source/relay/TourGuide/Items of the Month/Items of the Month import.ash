@@ -148,3 +148,4 @@ import "relay/TourGuide/Items of the Month/2023/Candy Cane Sword Cane.ash";
 import "relay/TourGuide/Items of the Month/2024/Chest Mimic.ash";
 import "relay/TourGuide/Items of the Month/2024/Spring Shoes.ash";
 import "relay/TourGuide/Items of the Month/2024/Apriling Band Helmet.ash";
+import "relay/TourGuide/Items of the Month/2024/Roman Candelabra.ash";
