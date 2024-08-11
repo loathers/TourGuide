@@ -4602,6 +4602,140 @@ boolean isAprilFools() {
 }
 
 
+//Quest status stores all/most of our quest information in an internal format that's easier to understand.
+record QuestState
+{
+	string quest_name;
+	string image_name;
+	
+	boolean startable; //can be started, but hasn't yet
+	boolean started;
+	boolean in_progress;
+	boolean finished;
+	
+	int mafia_internal_step; //0 for not started. INT32_MAX for finished. This is +1 versus mafia's "step1/step2/stepX" system. "step1" is represented as 2, "step2" as 3, etc.
+	
+	boolean [string] state_boolean;
+	string [string] state_string;
+	int [string] state_int;
+	float [string] state_float;
+	
+	boolean council_quest;
+};
+
+QuestState [string] __quest_state;
+boolean [string] __misc_state;
+string [string] __misc_state_string;
+int [string] __misc_state_int;
+float [string] __misc_state_float;
+
+int QuestStateConvertQuestPropertyValueToNumber(string property_value)
+{
+	int result = 0;
+	if (property_value == "")
+		return -1;
+	if (property_value == "started")
+	{
+		result = 1;
+	}
+	else if (property_value == "finished")
+	{
+		result = INT32_MAX;
+	}
+	else if (property_value.contains_text("step"))
+	{
+		//lazy:
+		string theoretical_int = property_value.replace_string(" ", "").replace_string("step", ""); //one revision had a bug that set questL11Worship to "step 4", so remove spaces
+		int step_value = theoretical_int.to_int_silent();
+		
+		result = step_value + 1;
+		
+		if (result < 0)
+			result = 0;
+	}
+	else
+	{
+		//unknown
+	}
+	return result;
+}
+
+boolean questPropertyPastInternalStepNumber(string quest_property, int number)
+{
+	return QuestStateConvertQuestPropertyValueToNumber(get_property(quest_property)) >= number;
+}
+
+void QuestStateParseMafiaQuestPropertyValue(QuestState state, string property_value)
+{
+	state.started = false;
+	state.finished = false;
+    state.in_progress = false;
+	state.mafia_internal_step = QuestStateConvertQuestPropertyValueToNumber(property_value);
+	
+	if (state.mafia_internal_step > 0)
+		state.started = true;
+	if (state.mafia_internal_step == INT32_MAX)
+		state.finished = true;
+	if (state.started && !state.finished)
+		state.in_progress = true;
+
+	// Adding a new state check that finishes our quests if the user is in CS or GG.
+	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO)
+		state.finished = true;
+}
+
+boolean QuestStateEquals(QuestState q1, QuestState q2)
+{
+	//not sure how to do record equality otherwise
+	if (q1.quest_name != q2.quest_name)
+		return false;
+	if (q1.image_name != q2.image_name)
+		return false;
+	if (q1.startable != q2.startable)
+		return false;
+	if (q1.started != q2.started)
+		return false;
+	if (q1.in_progress != q2.in_progress)
+		return false;
+	if (q1.finished != q2.finished)
+		return false;
+	if (q1.mafia_internal_step != q2.mafia_internal_step)
+		return false;
+		
+	if (q1.state_boolean != q2.state_boolean)
+		return false;
+	if (q1.state_string != q2.state_string)
+		return false;
+	if (q1.state_int != q2.state_int)
+		return false;
+	return true;
+}
+
+void QuestStateParseMafiaQuestProperty(QuestState state, string property_name, boolean allow_quest_log_load)
+{
+	state.QuestStateParseMafiaQuestPropertyValue(get_property(property_name));
+}
+
+void QuestStateParseMafiaQuestProperty(QuestState state, string property_name)
+{
+    QuestStateParseMafiaQuestProperty(state, property_name, true);
+}
+
+QuestState QuestState(string property_name)
+{
+	QuestState state;
+    QuestStateParseMafiaQuestProperty(state, property_name);
+    return state;
+}
+
+QuestState QuestStateFromManualStep(string manual_value)
+{
+    QuestState state;
+    state.QuestStateParseMafiaQuestPropertyValue(manual_value);
+    return state;
+}
+
+
 
 float __setting_indention_width_in_em = 1.45;
 string __setting_indention_width = __setting_indention_width_in_em + "em";
@@ -5228,6 +5362,12 @@ void initialiseIOTMsUsable()
     replicaCheck("Cincho de Mayo"); # handled in own tile & sneaks.ash
     replicaCheck("2002 Mr. Store Catalog"); # handled in own tile
     replicaCheck("August Scepter"); # handled in own tile
+
+    // Swap parka to false if you aren't torso aware.
+    if (!__misc_state["Torso aware"]) 
+    {
+        __iotms_usable[lookupItem("Jurassic Parka")] = false;
+    }
 
 }
 
@@ -6198,140 +6338,6 @@ CountersInit();
 //Library for checking if any given location is unlocked.
 //Similar to canadv.ash, except there's no code for using items and no URLs are (currently) visited. This limits our accuracy.
 //Currently, most locations are missing, sorry.
-
-//Quest status stores all/most of our quest information in an internal format that's easier to understand.
-record QuestState
-{
-	string quest_name;
-	string image_name;
-	
-	boolean startable; //can be started, but hasn't yet
-	boolean started;
-	boolean in_progress;
-	boolean finished;
-	
-	int mafia_internal_step; //0 for not started. INT32_MAX for finished. This is +1 versus mafia's "step1/step2/stepX" system. "step1" is represented as 2, "step2" as 3, etc.
-	
-	boolean [string] state_boolean;
-	string [string] state_string;
-	int [string] state_int;
-	float [string] state_float;
-	
-	boolean council_quest;
-};
-
-QuestState [string] __quest_state;
-boolean [string] __misc_state;
-string [string] __misc_state_string;
-int [string] __misc_state_int;
-float [string] __misc_state_float;
-
-int QuestStateConvertQuestPropertyValueToNumber(string property_value)
-{
-	int result = 0;
-	if (property_value == "")
-		return -1;
-	if (property_value == "started")
-	{
-		result = 1;
-	}
-	else if (property_value == "finished")
-	{
-		result = INT32_MAX;
-	}
-	else if (property_value.contains_text("step"))
-	{
-		//lazy:
-		string theoretical_int = property_value.replace_string(" ", "").replace_string("step", ""); //one revision had a bug that set questL11Worship to "step 4", so remove spaces
-		int step_value = theoretical_int.to_int_silent();
-		
-		result = step_value + 1;
-		
-		if (result < 0)
-			result = 0;
-	}
-	else
-	{
-		//unknown
-	}
-	return result;
-}
-
-boolean questPropertyPastInternalStepNumber(string quest_property, int number)
-{
-	return QuestStateConvertQuestPropertyValueToNumber(get_property(quest_property)) >= number;
-}
-
-void QuestStateParseMafiaQuestPropertyValue(QuestState state, string property_value)
-{
-	state.started = false;
-	state.finished = false;
-    state.in_progress = false;
-	state.mafia_internal_step = QuestStateConvertQuestPropertyValueToNumber(property_value);
-	
-	if (state.mafia_internal_step > 0)
-		state.started = true;
-	if (state.mafia_internal_step == INT32_MAX)
-		state.finished = true;
-	if (state.started && !state.finished)
-		state.in_progress = true;
-
-	// Adding a new state check that finishes our quests if the user is in CS or GG.
-	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO)
-		state.finished = true;
-}
-
-boolean QuestStateEquals(QuestState q1, QuestState q2)
-{
-	//not sure how to do record equality otherwise
-	if (q1.quest_name != q2.quest_name)
-		return false;
-	if (q1.image_name != q2.image_name)
-		return false;
-	if (q1.startable != q2.startable)
-		return false;
-	if (q1.started != q2.started)
-		return false;
-	if (q1.in_progress != q2.in_progress)
-		return false;
-	if (q1.finished != q2.finished)
-		return false;
-	if (q1.mafia_internal_step != q2.mafia_internal_step)
-		return false;
-		
-	if (q1.state_boolean != q2.state_boolean)
-		return false;
-	if (q1.state_string != q2.state_string)
-		return false;
-	if (q1.state_int != q2.state_int)
-		return false;
-	return true;
-}
-
-void QuestStateParseMafiaQuestProperty(QuestState state, string property_name, boolean allow_quest_log_load)
-{
-	state.QuestStateParseMafiaQuestPropertyValue(get_property(property_name));
-}
-
-void QuestStateParseMafiaQuestProperty(QuestState state, string property_name)
-{
-    QuestStateParseMafiaQuestProperty(state, property_name, true);
-}
-
-QuestState QuestState(string property_name)
-{
-	QuestState state;
-    QuestStateParseMafiaQuestProperty(state, property_name);
-    return state;
-}
-
-QuestState QuestStateFromManualStep(string manual_value)
-{
-    QuestState state;
-    state.QuestStateParseMafiaQuestPropertyValue(manual_value);
-    return state;
-}
-
 
 
 boolean [location] __la_location_is_available;
@@ -8676,6 +8682,7 @@ static
         building_images["Avatar of Jarlsberg"] = KOLImageMake("images/otherimages/jarlsberg_avatar_f.gif", Vec2iMake(60,100), RectMake(0,6,59,96));
         building_images["Avatar of Boris"] = KOLImageMake("images/otherimages/boris_avatar_f.gif", Vec2iMake(60,100), RectMake(0,4,59,93));
         building_images["Zombie Master"] = KOLImageMake("images/otherimages/zombavatar_f.gif", Vec2iMake(60,100), RectMake(10,3,55,99));
+        building_images["WereProfessor"] = KOLImageMake("images/otherimages/wereprofavatar_f.gif", Vec2iMake(60,100), RectMake(9,7,50,98));
         building_images["Hourglass"] = KOLImageMake("images/itemimages/hourglass.gif", Vec2iMake(30,30));
 
         building_images["Nemesis Disco Bandit"] = KOLImageMake("images/adventureimages/newwave.gif", Vec2iMake(100,100));
@@ -35392,8 +35399,6 @@ void setUpState()
     if (my_path().id != PATH_SLOW_AND_STEADY) {
         adventures_after_rollover += numeric_modifier("adventures");
         adventures_after_rollover += get_property_int("extraRolloverAdventures");
-        if (getHolidaysTomorrow()["Labór Day"])
-            adventures_after_rollover += 10;
     }
     adventures_after_rollover = MAX(adventures_after_rollover, 0); //Who knows?
     int adventures_after_rollover_post_cap = MIN(adventures_after_rollover, 200);
@@ -35813,7 +35818,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_FALL_OF_THE_DINOSAURS || my_path().id == PATH_AVATAR_OF_SHADOWS_OVER_LOATHING)
+	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_FALL_OF_THE_DINOSAURS || my_path().id == PATH_AVATAR_OF_SHADOWS_OVER_LOATHING || my_path().id == PATH_WEREPROFESSOR)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -37803,7 +37808,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
 
     //Not sure how I feel about this. It's kind of extraneous?
-    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_G_LOVER) {
+    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_G_LOVER && my_path().id != PATH_WEREPROFESSOR) {
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
         description.listAppend("+" + (percentage == 25 ? "35% or +25" : percentage) + "% to all attributes. (10 turns)");
@@ -53907,25 +53912,56 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
     resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
 }
 //Jurassic parka
+RegisterTaskGenerationFunction("IOTMJurassicParkaGenerateTasks");
+void IOTMJurassicParkaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	// Task-based nag for using the parka. Instruct the user to swap modes or equip parka if needed.
+	if (!__iotms_usable[$item[Jurassic Parka]]) return;
+
+	// Fondeluge is the only skill strictly better than Jurassic acid; don't show this tile if you happen to have it
+	if (lookupSkill("Fondeluge").have_skill()) return;
+    if (__misc_state["in run"] && available_amount($item[jurassic parka]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
+	{
+		string [int] description;
+		string url = "inventory.php?ftext=jurassic+parka";
+		
+		// TODO: Perhaps a centralized YR supernag would be better? Not sure, tbh.
+		if ($effect[everything looks yellow].have_effect() == 0) 
+		{
+			if (lookupItem("jurassic parka").equipped_amount() == 0)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Equip your Jurassic Parka!", "red"));
+			}
+			else description.listAppend(HTMLGenerateSpanFont("Parka equipped.", "orange"));
+			if (get_property("parkaMode") != "dilophosaur")
+			{
+				description.listAppend(HTMLGenerateSpanFont("Change your parka to dilophosaur mode!", "red"));
+			}
+			else description.listAppend(HTMLGenerateSpanFont("Dilophosaur mode enabled.", "orange"));			
+			task_entries.listAppend(ChecklistEntryMake("__item jurassic parka", url, ChecklistSubentryMake("Parka yellow ray is ready; spit some acid!", "", description), -11));
+		}
+	}
+}
+
 RegisterResourceGenerationFunction("IOTMJurassicParkaGenerateResource");
 void IOTMJurassicParkaGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__iotms_usable[$item[Jurassic Parka]]) return;
-    if (!__misc_state["in run"]) return; 
+	if (!__iotms_usable[$item[Jurassic Parka]]) return;
+	if (!__misc_state["in run"]) return; 
 	if (my_path().id == PATH_G_LOVER) return; // cannot use parka in g-lover
 
-    string url;
+	string url;
 	string parkaMode = get_property("parkaMode");
 	string parkaEnchant;
 	string [int] description;
 
-    url = invSearch("jurassic parka");
+	url = invSearch("jurassic parka");
 
 	int spikos_left = clampi(5 - get_property_int("_spikolodonSpikeUses"), 0, 5);
 	
-    // Title
-        string main_title = "Jurassic Parka";
-        description.listAppend("You're the dinosaur now, dawg.");
+	// Title
+		string main_title = "Jurassic Parka";
+		description.listAppend("You're the dinosaur now, dawg.");
 		
 		switch (get_property("parkaMode"))			
 		{
@@ -53945,6 +53981,7 @@ void IOTMJurassicParkaGenerateResource(ChecklistEntry [int] resource_entries)
 		description.listAppend(HTMLGenerateSpanOfClass(spikos_left, "r_bold") + " spikolodon spikes available.");
 		resource_entries.listAppend(ChecklistEntryMake("__item jurassic parka", "inventory.php?action=jparka", ChecklistSubentryMake(main_title, "", description)));
 }
+
 //Autumnaton
 RegisterTaskGenerationFunction("IOTMAutumnatonGenerateTasks");
 void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -56316,6 +56353,215 @@ void IOTMSpringShoesGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__skill spring shoes", "", ChecklistSubentryMake("Spring Kick", "", banishDescription)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Spring shoes spring kick banish"));
 }
+// Apriling band helmet
+RegisterResourceGenerationFunction("IOTMAprilingBandHelmetGenerateResource");
+void IOTMAprilingBandHelmetGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (available_amount($item[apriling band helmet]) < 1)
+        return;
+
+    string [int] description;
+
+    //battle of the bands
+    int aprilingBandConductorTimer = get_property_int("nextAprilBandTurn");
+    string url = "inventory.php?pwd=" + my_hash() + "&action=apriling";
+
+    if (aprilingBandConductorTimer <= total_turns_played()) {
+        description.listAppend(HTMLGenerateSpanFont("You can change your tune!", "blue"));
+        if ($effect[Apriling Band Patrol Beat].have_effect() > 0) {
+            description.listAppend(HTMLGenerateSpanFont("-10% Combat Frequency", "blue"));
+            description.listAppend("+10% Combat Frequency");
+            description.listAppend("+25% booze, +50% food, +100% candy");
+        }
+        if ($effect[Apriling Band Battle Cadence].have_effect() > 0) {
+            description.listAppend("-10% Combat Frequency");
+            description.listAppend(HTMLGenerateSpanFont("+10% Combat Frequency", "blue"));
+            description.listAppend("+25% booze, +50% food, +100% candy");
+        }
+        if ($effect[Apriling Band Celebration Bop].have_effect() > 0) {
+            description.listAppend("+10% Combat Frequency");
+            description.listAppend("-10% Combat Frequency");
+            description.listAppend(HTMLGenerateSpanFont("+25% booze, +50% food, +100% candy", "blue"));
+        }
+    }
+    else {
+        description.listAppend((aprilingBandConductorTimer - total_turns_played()) + " adventures until you can change your tune.");
+    }
+    resource_entries.listAppend(ChecklistEntryMake("__item apriling band helmet", url, ChecklistSubentryMake("Apriling band helmet buff", "", description), 8));
+
+    int aprilingBandSaxUsesLeft = clampi(3 - get_property_int("_aprilBandSaxophoneUses"), 0, 3);
+    int aprilingBandQuadTomUsesLeft = clampi(3 - get_property_int("_aprilBandTomUses"), 0, 3);
+    int aprilingBandTubaUsesLeft = clampi(3 - get_property_int("_aprilBandTubaUses"), 0, 3);
+    int aprilingBandPiccoloUsesLeft = clampi(3 - get_property_int("_aprilBandPiccoloUses"), 0, 3);
+    int instrumentUses = get_property_int("_aprilBandSaxophoneUses") +
+        get_property_int("_aprilBandTomUses") +
+        get_property_int("_aprilBandTubaUses") +
+        get_property_int("_aprilBandPiccoloUses");
+
+    string [int] instrumentDescription;
+
+    int aprilingBandInstrumentsAvailable = clampi(2 - get_property_int("_aprilBandInstruments"), 0, 2);
+    if (aprilingBandInstrumentsAvailable > 0) {
+        instrumentDescription.listAppend(HTMLGenerateSpanFont("Can pick " + aprilingBandInstrumentsAvailable + " more instruments!", "green"));
+    }
+
+    if (instrumentUses < 6) {
+        string url = "inventory.php?ftext=apriling";
+        if (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band saxophone]) > 0) {
+            instrumentDescription.listAppend(`Can play the Sax {aprilingBandSaxUsesLeft} more times. {HTMLGenerateSpanFont("LUCKY!", "green")}`);
+        }
+        if (aprilingBandQuadTomUsesLeft > 0 && available_amount($item[apriling band quad tom]) > 0) {
+            instrumentDescription.listAppend(`Can play the Quad Toms {aprilingBandQuadTomUsesLeft} more times. {HTMLGenerateSpanFont("Sandworm!", "orange")}`);
+        }
+        if (aprilingBandTubaUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0) {
+            instrumentDescription.listAppend(`Can play the Tuba {aprilingBandTubaUsesLeft} more times. {HTMLGenerateSpanFont("SNEAK!", "grey")}`);
+        }
+        if (aprilingBandPiccoloUsesLeft > 0 && available_amount($item[apriling band piccolo]) > 0) {
+            instrumentDescription.listAppend(`Can play the Piccolo {aprilingBandPiccoloUsesLeft} more times. {HTMLGenerateSpanFont("+40 fxp", "purple")}`);
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__item apriling band helmet", url, ChecklistSubentryMake("Apriling band instruments", "", instrumentDescription), 8));
+    }
+}
+
+record MayamSymbol {
+    // Which ring the symbol is in
+    int ring;
+
+    // Printable name for the symbol
+    string friendlyName;
+
+    // What mafia calls the symbol
+    string mafiaName;
+
+    // The player-friendly description of the symbol
+    string description;
+};
+
+void addToBothDescriptions(string [int] description1, string [int] description2, string text) {
+    description1.listAppend(text);
+    description2.listAppend(text);
+}
+
+//Mayam calendar
+RegisterResourceGenerationFunction("IOTMMayamCalendarGenerateResource");
+void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (available_amount($item[mayam calendar]) < 1)
+        return;
+
+    MayamSymbol [int] mayamSymbols = {
+        new MayamSymbol(1, "A yam", "yam1", "craftable ingredient"),
+        new MayamSymbol(1, "Sword", "sword", `+{min(150, 10 * my_level())} mus stats`),
+        new MayamSymbol(1, "Vessel", "vessel", "+1000 MP"),
+        new MayamSymbol(1, "Fur", "fur", "+100 Fxp"),
+        new MayamSymbol(1, "Chair", "chair", "+5 free rests"),
+        new MayamSymbol(1, "Eye", "eye", "+30% item for 100 advs"),
+        new MayamSymbol(2, "Another yam", "yam2", "craftable ingredient"),
+        new MayamSymbol(2, "Lightning", "lightning", `+{min(150, 10 * my_level())} mys stats`),
+        new MayamSymbol(2, "Bottle", "bottle", "+1000 HP"),
+        new MayamSymbol(2, "Wood", "wood", "+4 bridge parts"),
+        new MayamSymbol(2, "Meat", "meat", `+{min(150, 10 * my_level())} meat`),
+        new MayamSymbol(3, "A third yam", "yam3", "craftable ingredient"),
+        new MayamSymbol(3, "Eyepatch", "eyepatch", `+{min(150, 10 * my_level())} mox stats`),
+        new MayamSymbol(3, "Wall", "wall", "+2 res for 100 advs"),
+        new MayamSymbol(3, "Cheese", "cheese", "+1 goat cheese"),
+        new MayamSymbol(4, "A fourth yam", "yam4", "yep."),
+        new MayamSymbol(4, "Clock", "clock", "+5 advs"),
+        new MayamSymbol(4, "Explosion", "explosion", "+5 fites")
+    };
+
+    string [int] description, hoverDescription;
+
+    int templeResetAscension = get_property_int("lastTempleAdventures");
+    addToBothDescriptions(description, hoverDescription, "Happy Mayam New Year!");
+
+    ChecklistEntry entry;
+    entry.url = "inv_use.php?pwd=" + my_hash() + "&which=99&whichitem=11572";
+    entry.image_lookup_name = "mayam calendar";
+    entry.tags.id = "Mayam Calendar";
+    entry.importance_level = 8;
+
+    if (!get_property("_mayamSymbolsUsed").contains_text("yam4") ||
+        !get_property("_mayamSymbolsUsed").contains_text("clock") ||
+        !get_property("_mayamSymbolsUsed").contains_text("explosion") ||
+        my_ascensions() > templeResetAscension)
+    {
+        description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+        hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+
+        int[int] rings = {1, 2, 3, 4};
+        foreach ring in rings {
+            string ringOrdinal = capitaliseFirstLetter(substring(int_to_ordinal(ring + 1), 1));
+            hoverDescription.listAppend(HTMLGenerateSpanOfClass(`{ringOrdinal} ring:`, "r_bold"));
+
+            string [int] unusedSymbols;
+            foreach index, mayamSymbol in mayamSymbols {
+                if (mayamSymbol.ring == ring + 1 && !get_property("_mayamSymbolsUsed").contains_text(mayamSymbol.mafiaName)) {
+                    hoverDescription.listAppend(`- {HTMLGenerateSpanOfClass(mayamSymbol.friendlyName, "r_bold")}: {mayamSymbol.description}`);
+                    unusedSymbols.listAppend(mayamSymbol.friendlyName);
+                }
+            }
+            description.listAppend(`{HTMLGenerateSpanOfClass(`{ringOrdinal} ring:`, "r_bold")} {unusedSymbols.listJoinComponents(", ")}`);
+            hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+        }
+        description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
+
+        string [int] resonances;
+        resonances.listAppend(HTMLGenerateSpanOfClass("15-turn banisher", "r_bold") + ": Vessel + Yam + Cheese + Explosion");
+        resonances.listAppend(HTMLGenerateSpanOfClass("Yam and swiss", "r_bold") + ": Yam + Meat + Cheese + Yam");
+        resonances.listAppend(HTMLGenerateSpanOfClass("+55% meat accessory", "r_bold") + ": Yam + Meat + Eyepatch + Yam");
+        resonances.listAppend(HTMLGenerateSpanOfClass("+100% Food drops", "r_bold") + ": Yam + Yam + Cheese + Clock");
+        
+        addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+
+        if (my_ascensions() > templeResetAscension) {
+            addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanFont("Temple reset available!", "r_bold") + "");
+        }
+
+        entry.subentries.listAppend(ChecklistSubentryMake("Mayam Calendar", "", description));
+        entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Mayam Calendar", "", hoverDescription));
+        resource_entries.listAppend(entry);
+    }
+}
+
+//Roman Candelabra
+RegisterTaskGenerationFunction("IOTMRomanCandelabraGenerateTasks");
+void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if ($item[roman candelabra].available_amount() == 0) return;
+
+    string url = "inventory.php?ftext=Roman+Candelabra";
+
+    // Extra runaway nag for spring shoes unhavers
+    if ($effect[Everything Looks Green].have_effect() == 0 && $item[spring shoes].available_amount() == 0)
+    {
+        string [int] description;
+        description.listAppend(HTMLGenerateSpanFont("Green candle runaway!", "green"));
+        if (lookupItem("Roman Candelabra").equipped_amount() == 0) {
+            description.listAppend(HTMLGenerateSpanFont("Equip the Roman Candelabra first.", "red"));
+        }
+        else {
+            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "green"));
+        }
+        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra runaway available!", "", description), -11));
+    }
+
+    // Purple people beater
+    if ($effect[Everything Looks Purple].have_effect() == 0)
+    {
+        string [int] description;
+        if (lookupItem("Roman Candelabra").equipped_amount() == 0)
+        {
+            description.listAppend(HTMLGenerateSpanFont("Equip the Roman Candelabra first.", "red"));
+        }
+        else
+        {
+            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "purple"));
+        }
+        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra chain ready!", "", description), -11));
+    }
+}
+
 
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
@@ -59648,6 +59894,191 @@ void PathLegacyOfLoathingGenerateTasks(ChecklistEntry [int] task_entries, Checkl
 
     task_entries.listAppend(entry);
 
+}
+
+RegisterResourceGenerationFunction("PathWereProfessorGenerateResource");
+void PathWereProfessorGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (my_path().id != PATH_WEREPROFESSOR) return;
+
+    // Smashed scientific equipment
+    location [int] scientific_locations = {
+        $location[Noob Cave],
+        $location[The Haunted Pantry],
+        $location[Madness Bakery],
+        $location[The Thinknerd Warehouse],
+        $location[Vanya's Castle],
+        $location[The Old Landfill],
+        $location[Cobb's Knob Laboratory],
+        $location[Cobb's Knob Menagerie, Level 1],
+        $location[Cobb's Knob Menagerie, Level 2],
+        $location[Cobb's Knob Menagerie, Level 3],
+        $location[The Haunted Laboratory],
+        $location[The Castle in the Clouds in the Sky (Top Floor)],
+        $location[The Hidden Hospital]
+    };
+
+    string [int] scientific_locations_description;
+    scientific_locations_description.listAppend("Found in a free non-combat on 7th adventure in a zone.");
+    if ($effect[Mild-Mannered Professor].have_effect() > 0) scientific_locations_description.listAppend(HTMLGenerateSpanFont("Can only be found as a Beast", "red"));
+
+    location [int] scientific_locations_options;
+    foreach key, loc in scientific_locations {
+        boolean obtained_equipment = false;
+        foreach nc_key, nc in loc.locationSeenNoncombats() {
+            if (nc == "The Antiscientific Method") obtained_equipment = true;
+        }
+        if (!obtained_equipment) scientific_locations_options.listAppend(loc);
+    }
+
+    int scientific_locations_sort(location loc) {
+        int score = 0;
+        // +1 for each turn spent, up to 6
+        // -30 if location is inaccessible
+        // +3 if location is a quest one and the relevant quest is not yet done
+        // +10 if location is the last adventured location
+
+        int turns_spent = loc.turns_spent;
+        score += min(6, loc.turns_spent);
+        if (!loc.locationAvailable()) score -= 30;
+
+        if (loc == $location[Vanya's Castle]) score += 3; // should always get that one in the optimal scenario
+        if (loc == $location[The Castle in the Clouds in the Sky (Top Floor)] && !__quest_state["Level 10"].finished) score += 3;
+        if (loc == $location[The Hidden Hospital] && !__quest_state["Level 11 Hidden City"].state_boolean["Hospital finished"]) score += 3;
+
+        if (__last_adventure_location == loc) score += 10;
+        return score;
+    }
+
+    sort scientific_locations_options by -scientific_locations_sort(value);
+
+    string [int] loc_descriptions;
+
+    foreach key, loc in scientific_locations_options {
+        int turns_spent = loc.turns_spent;
+        string scientific_locations_option = loc.HTMLGenerateFutureTextByLocationAvailability();
+        if (turns_spent < 6) scientific_locations_option += " - " + pluralise(6 - turns_spent, "turn left", "turns left");
+        else scientific_locations_option += " - drops next turn";
+        loc_descriptions.listAppend(scientific_locations_option);
+    }
+
+    if (scientific_locations_options.count() > 0) {
+        if (scientific_locations_options.count() > 3) {
+            scientific_locations_description.listAppend("Drop locations:" + (loc_descriptions[0] + "<hr>" + HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(loc_descriptions.listJoinComponents("<hr>").HTMLGenerateIndentedText(), "r_tooltip_inner_class") + "All locations", "r_tooltip_outer_class")).HTMLGenerateIndentedText());
+        }
+        else scientific_locations_description.listAppend("Drop locations:" + loc_descriptions.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+
+        resource_entries.listAppend(ChecklistEntryMake("__item smashed scientific equipment", "", ChecklistSubentryMake("Obtain smashed scientific equipment", "", scientific_locations_description)));
+    }
+
+    // Owned smashed scientific equipment
+    if (have($item[smashed scientific equipment])) {
+        string [int] smashed_equipment_description;
+        string [int] craftable_items;
+
+        if ($effect[Savage Beast].have_effect() > 0) smashed_equipment_description.listAppend("Wait until you are a Professor to craft stuff.");
+
+        // Science-producting hats -- TODO: ignore if have all Stomach/Liver upgrades (pending Mafia support)
+        if (!have($item[biphasic molecular oculus]) && !have($item[triphasic molecular oculus])) craftable_items.listAppend("biphasic molecular oculus (more Research Points)");
+        if (have($item[biphasic molecular oculus])) craftable_items.listAppend("triphasic molecular oculus (more Research Points)");
+        // Exoskeletons
+        if (!have($item[high-tension exoskeleton]) && !have($item[ultra-high-tension exoskeleton]) && !have($item[irresponsible-tension exoskeleton])) craftable_items.listAppend("high-tension exoskeleton (avoid attacks)");
+        if (have($item[high-tension exoskeleton])) craftable_items.listAppend("ultra-high-tension exoskeleton (avoid attacks)");
+        if (have($item[ultra-high-tension exoskeleton])) craftable_items.listAppend("irresponsible-tension exoskeleton (avoid attacks)");
+        // Initiative, consider if no Spring Shoes available (since they do the same thing) and cannot equip Parka (protection from the jump)
+        if (!(__misc_state["Torso aware"] && have($item[Jurassic Parka])) && !have($item[spring shoes]) && !have($item[motion sensor])) craftable_items.listAppend("motion sensor (+100% initiative accessory)");
+
+        if (craftable_items.count() > 0) {
+            smashed_equipment_description.listAppend("Consider crafting:" + craftable_items.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+        }
+
+        resource_entries.listAppend(ChecklistEntryMake("__item smashed scientific equipment", "shop.php?whichshop=wereprofessor_tinker", ChecklistSubentryMake(pluralise($item[smashed scientific equipment]) + " available", "", smashed_equipment_description)));
+    }
+}
+
+RegisterTaskGenerationFunction("PathWereProfessorGenerateTasks");
+void PathWereProfessorGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if ($effect[Mild-Mannered Professor].have_effect() > 0) {
+        boolean should_nag = false;
+
+        string [int] professor_tips;
+
+        // Too high ML!
+        if (monster_level_adjustment() > 25) {
+            should_nag = true;
+            professor_tips.listAppend(HTMLGenerateSpanFont(`Reduce ML, elemental-aligned monsters will kill you at the start of combat with +{monster_level_adjustment()} ML.`, "red"));
+        }
+
+        boolean wearing_quest_outfit = false;
+        if (is_wearing_outfit("Knob Goblin Harem Girl Disguise")) wearing_quest_outfit = true;
+        if (is_wearing_outfit("Knob Goblin Elite Guard Uniform")) wearing_quest_outfit = true;
+        if (is_wearing_outfit("eXtreme Cold-Weather Gear")) wearing_quest_outfit = true;
+        if (is_wearing_outfit("War Hippy Fatigues")) wearing_quest_outfit = true;
+        if (is_wearing_outfit("Frat Warrior Fatigues")) wearing_quest_outfit = true;
+
+        // Equip research equipment. TODO: don't show it if we have 2250 points total; don't nag it if we have all of stomach and liver skills
+        foreach it in $items[biphasic molecular oculus,triphasic molecular oculus] {
+            if (have(it) && it.equipped_amount() == 0) {
+                if (!wearing_quest_outfit) {
+                    should_nag = true;
+                    professor_tips.listAppend(HTMLGenerateSpanFont(`Equip your {it} to do advanced research.`, "red"));
+                }
+                else professor_tips.listAppend(`Equip your {it} to do advanced research.`);
+            }
+        }
+
+        // Equip attack avoidance pants
+        foreach it in $items[high-tension exoskeleton,ultra-high-tension exoskeleton,irresponsible-tension exoskeleton] {
+            if (have(it) && it.equipped_amount() == 0) {
+                professor_tips.listAppend(`Equip your {it} to avoid enemy attacks.`);
+            }
+        }
+
+        // Equip something to avoid the jump
+        if (initiative_modifier() < 100 && $item[Jurassic Parka].equipped_amount() == 0) {
+            if (__misc_state["Torso aware"] && have($item[Jurassic Parka])) {
+                should_nag = true;
+                professor_tips.listAppend(HTMLGenerateSpanFont("Equip your Jurassic Parka to avoid enemies getting the jump and instakilling you.", "red"));
+            }
+            else {
+                professor_tips.listAppend(`Increase your initiative (currently {initiative_modifier()}%) to avoid enemies getting the jump and instakilling you.`);
+            }
+        }
+
+        // Buy stuff
+        string [int] stuff_to_buy;
+        if (get_property_int("_cloversPurchased") < 3) stuff_to_buy.listAppend("11-leaf clovers");
+        if (!__misc_state["desert beach available"]) {
+            if (!knoll_available()) stuff_to_buy.listAppend("desert bus pass");
+            else stuff_to_buy.listAppend("bitchin' meatcar components");
+        }
+        if (knoll_available() && !have($item[detuned radio])) stuff_to_buy.listAppend("detuned radio");
+        if (__quest_state["Level 11"].mafia_internal_step >= 2) { // Black Market open
+            if (__quest_state["Level 11"].mafia_internal_step == 2 && !have($item[forged identification documents])) stuff_to_buy.listAppend("forged identification documents");
+            if (!__quest_state["Level 11 Desert"].state_boolean["Black Paint Given"] && !have($item[can of black paint])) stuff_to_buy.listAppend("can of black paint");
+            if (__quest_state["Level 11 Ron"].mafia_internal_step <= 4 && !have($item[red zeppelin ticket])) stuff_to_buy.listAppend("Red Zeppelin ticket");
+        }
+        if (!have($item[UV-resistant compass])) stuff_to_buy.listAppend("UV-resistant compass");
+        if (!have($item[dinghy plans]) && !__misc_state["mysterious island available"]) stuff_to_buy.listAppend("dinghy plans");
+        if (!have($item[dingy planks]) && !__misc_state["mysterious island available"]) stuff_to_buy.listAppend("dingy planks");
+        if (__quest_state["Level 11 Manor"].mafia_internal_step < 4 && !have($item[Dramatic&trade; range]) && !get_property_boolean("hasRange")) stuff_to_buy.listAppend("Dramatic&trade; range");
+
+        if (stuff_to_buy.count() > 0) {
+            professor_tips.listAppend("Buy stuff before you become a Beast again: " + stuff_to_buy.listJoinComponents(", ", "or") + ".");
+        }
+
+        int priority = 12;
+        ChecklistEntry [int] tips_location = optional_task_entries;
+        if (should_nag) {
+            priority = -11;
+            tips_location = task_entries;
+        }
+
+        if (professor_tips.count() > 0) {
+            tips_location.listAppend(ChecklistEntryMake("WereProfessor", "", ChecklistSubentryMake("You are a Professor", professor_tips), priority));
+        }
+    }
 }
 
 
