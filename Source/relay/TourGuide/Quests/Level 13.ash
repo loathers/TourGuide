@@ -1134,6 +1134,8 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 }
                 if (my_mp() < $skill[saucegeyser].mp_cost() * 4.0)
                     subentry.entries.listAppend(HTMLGenerateSpanFont("Restore some MP first.", "red"));
+                if (__iotms_usable[lookupItem("candy cane sword cane")])
+                    subentry.entries.listAppend("Also, consider using your Candy Cane Sword Cane's surprisingly sweet slash to cut the wall's HP by 75%!");
                 if (need_modifier_output)
                 {
                     subentry.modifiers.listAppend("mysticality");

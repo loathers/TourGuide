@@ -11,11 +11,24 @@ void IOTMBookofFactsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 
 	// If they have an eagle, remind them they can eagle-banish to make it easier to find the habitat guys
 	string eagleString = lookupFamiliar("Patriotic Eagle").familiar_is_usable() ? "; remember, you can phylum-banish with your Patriotic Eagle to make it easier!" : "." ;
+	phylum eaglePhylumBanished = $phylum[none];
+
+    if (get_property("banishedPhyla") != "")
+        eaglePhylumBanished = get_property("banishedPhyla").split_string(":")[1].to_phylum();
 	
 	if (habitat_monster != $monster[none] && fights_left > 0) 
 	{
         description.listAppend("Neaaaar, faaaaaaar, wherever you spaaaaaaar, I believe that the heart does go onnnnn.");
 		description.listAppend("Appears as a wandering monster in any zone. Try a place with few competing monsters"+eagleString);
+
+		if (eaglePhylumBanished == habitat_monster.phylum) {
+			description.listAppend(HTMLGenerateSpanFont(`WARNING: {habitat_monster}'s phylum is banished!`, "red"));
+		}
+
+		if (habitat_monster.is_banished()) {
+			description.listAppend(HTMLGenerateSpanFont(`WARNING: {habitat_monster} is banished!`, "red"));
+		}
+
 		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + habitat_monster, "", ChecklistSubentryMake("Fight " + pluralise(fights_left, "more non-native " + habitat_monster, "more non-native " + habitat_monster + "s"), "", description), -4));
     }
 
