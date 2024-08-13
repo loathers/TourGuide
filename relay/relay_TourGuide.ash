@@ -2,7 +2,7 @@
 
 since r27521; // Eagle & Scepter supported
 //These settings are for development. Don't worry about editing them.
-string __version = "2.2.1"; // pushed to 2.2.1 on jill/leaves tiles
+string __version = "2.2.2"; // pushed to 2.2.1 on jill/leaves tiles
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -5228,9 +5228,24 @@ void initialiseIOTMsUsable()
     if (lookupItem("candy cane sword cane").available_amount() > 0) //Dec 2023
         __iotms_usable[lookupItem("candy cane sword cane")] = true;
 
-    if (lookupItem("spring shoes").available_amount() > 0) //Feb 2023
+    if (lookupItem("spring shoes").available_amount() > 0) //Feb 2024
         __iotms_usable[lookupItem("spring shoes")] = true;
         
+    if (lookupItem("everfull dart holster").available_amount() > 0) //Mar 2024
+        __iotms_usable[lookupItem("everfull dart holster")] = true;
+
+    if (lookupItem("apriling band helmet").available_amount() > 0) //Apr 2024
+        __iotms_usable[lookupItem("apriling band helmet")] = true;
+
+    if (lookupItem("mayam calendar").available_amount() > 0) //May 2024
+        __iotms_usable[lookupItem("mayam calendar")] = true;
+
+    if (lookupItem("roman candelabra").available_amount() > 0) //Jun 2024
+        __iotms_usable[lookupItem("roman candelabra")] = true;
+        
+    if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
+        __iotms_usable[lookupItem("tearaway pants")] = true;
+
     //Can't use many things in G-Lover
     if (my_path().id == PATH_G_LOVER) //Path 33
     {
@@ -18063,6 +18078,8 @@ void QLevel13GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
                 }
                 if (my_mp() < $skill[saucegeyser].mp_cost() * 4.0)
                     subentry.entries.listAppend(HTMLGenerateSpanFont("Restore some MP first.", "red"));
+                if (__iotms_usable[lookupItem("candy cane sword cane")])
+                    subentry.entries.listAppend("Also, consider using your Candy Cane Sword Cane's surprisingly sweet slash to cut the wall's HP by 75%!");
                 if (need_modifier_output)
                 {
                     subentry.modifiers.listAppend("mysticality");
@@ -27291,7 +27308,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     
     if (in_run) {
-        if ($item[tattered scrap of paper].available_amount() > 0 && __misc_state["free runs usable"] && $item[tattered scrap of paper].item_is_usable()) {
+        // As of the ELG change, tatters are worse than other options. Only show if the user doesn't have those options.
+        if ($item[tattered scrap of paper].available_amount() > 0 && __misc_state["free runs usable"] && $item[tattered scrap of paper].item_is_usable() && !__iotms_usable[lookupItem("spring shoes")] && !__iotms_usable[lookupItem("spring shoes")] && $item[roman candelabra].available_amount() == 0) {
             string [int] description;
             description.listAppend(($item[tattered scrap of paper].available_amount() / 2.0).roundForOutput(1) + " free runs.");
             if (in_bad_moon())
@@ -35631,7 +35649,7 @@ void setUpState()
 		blank_outs_usable = false;
 	__misc_state["blank outs usable"] = free_runs_usable;
 	
-	
+	// TODO: reconfig this whole state thing re: free runs.
 	boolean free_runs_available = false;
 	if (familiar_is_usable($familiar[pair of stomping boots]) || ($skill[the ode to booze].skill_is_usable() && familiar_is_usable($familiar[Frumious Bandersnatch])))
 		free_runs_available = true;
@@ -52661,7 +52679,11 @@ void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries
 RegisterResourceGenerationFunction("IOTMUndergroundFireworksShopGenerateResource");
 void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path().id == PATH_G_LOVER) return; // none of this stuff has G in it
+	if (my_path().id == PATH_G_LOVER) return; // none of this stuff has G in it!
+
+	// Adding a way to get this to yank out the tile if you're in standard.
+	if (!lookupItem("fedora-mounted fountain").is_unrestricted()) return;
+
 	if (!get_property_boolean("_fireworksShopEquipmentBought") && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path() != $path[Legacy of Loathing])
 		{
 			string [int] description;
@@ -52754,6 +52776,9 @@ RegisterTaskGenerationFunction("IOTMVampireVintnerGenerateTasks");
 void IOTMVampireVintnerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (!__misc_state["in run"] || !lookupFamiliar("vampire vintner").familiar_is_usable()) return;
+
+	// For some reason, Vintner leaked into subsequent standards. Unfortunately, the wine isn't standard, so...
+	if (!lookupItem("1950 vampire vintner wine").is_unrestricted()) return;
 	
 	int vintnerFightsLeft = clampi(14 - get_property_int("vintnerCharge"), 0, 14);
 	int vintnerWineLevel = get_property_int("vintnerWineLevel");
@@ -55756,11 +55781,24 @@ void IOTMBookofFactsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 
 	// If they have an eagle, remind them they can eagle-banish to make it easier to find the habitat guys
 	string eagleString = lookupFamiliar("Patriotic Eagle").familiar_is_usable() ? "; remember, you can phylum-banish with your Patriotic Eagle to make it easier!" : "." ;
+	phylum eaglePhylumBanished = $phylum[none];
+
+    if (get_property("banishedPhyla") != "")
+        eaglePhylumBanished = get_property("banishedPhyla").split_string(":")[1].to_phylum();
 	
 	if (habitat_monster != $monster[none] && fights_left > 0) 
 	{
         description.listAppend("Neaaaar, faaaaaaar, wherever you spaaaaaaar, I believe that the heart does go onnnnn.");
 		description.listAppend("Appears as a wandering monster in any zone. Try a place with few competing monsters"+eagleString);
+
+		if (eaglePhylumBanished == habitat_monster.phylum) {
+			description.listAppend(HTMLGenerateSpanFont(`WARNING: {habitat_monster}'s phylum is banished!`, "red"));
+		}
+
+		if (habitat_monster.is_banished()) {
+			description.listAppend(HTMLGenerateSpanFont(`WARNING: {habitat_monster} is banished!`, "red"));
+		}
+
 		optional_task_entries.listAppend(ChecklistEntryMake("__monster " + habitat_monster, "", ChecklistSubentryMake("Fight " + pluralise(fights_left, "more non-native " + habitat_monster, "more non-native " + habitat_monster + "s"), "", description), -4));
     }
 
@@ -55808,13 +55846,18 @@ void IOTMBookofFactsGenerateResource(ChecklistEntry [int] resource_entries)
         BOFAdropsDescription.listAppend("" + BOFApocketwishes + " BOFA wishes available.");
     }
 
-	// Not going to remove this because I think it's valid right now but once mt_rand is 
-	//   properly exposed it would be good to hide this if the user is in a seed where 
-	//   they can't really access tatters...
-	int BOFAtatters = clampi(11 - get_property_int("_bookOfFactsTatters"), 0, 11);
-	if (get_property_int("_bookOfFactsTatters") < 11) {
-        BOFAdropsDescription.listAppend("" + BOFAtatters + " BOFA tatters available.");
+	// NOTE: Altering as of 2024 ELG change, as tatters are 40 turns vs the 30 of spring shoes. 
+	//   There is a remote chance in some future standard context tatters will be the best option
+	//   for a user with some odd IOTM configurations, which is why I didn't entirely extract
+	//   this, but it at least shouldn't be present if they own the candles or the shoes.
+
+	if (!__iotms_usable[lookupItem("spring shoes")] && $item[roman candelabra].available_amount() == 0) {
+		int BOFAtatters = clampi(11 - get_property_int("_bookOfFactsTatters"), 0, 11);
+		if (get_property_int("_bookOfFactsTatters") < 11) {
+			BOFAdropsDescription.listAppend("" + BOFAtatters + " BOFA tatters available.");
+		}	
 	}
+
 	resource_entries.listAppend(ChecklistEntryMake("__item book of facts", "", ChecklistSubentryMake(("Miscellaneous valuable BOFA drops"), "", BOFAdropsDescription), 8).ChecklistEntrySetIDTag("bofa tatters"));
 }
 
@@ -56353,6 +56396,59 @@ void IOTMSpringShoesGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__skill spring shoes", "", ChecklistSubentryMake("Spring Kick", "", banishDescription)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Spring shoes spring kick banish"));
 }
+//Everfull Dart Holster via TES
+RegisterTaskGenerationFunction("IOTMEverfullDartsGenerateTasks");
+void IOTMEverfullDartsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	#if (__misc_state["in run"] && available_amount($item[everfull dart holster]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
+	if (!__iotms_usable[$item[everfull dart holster]]) return;
+	{
+		string [int] description;
+		string url = "inventory.php?ftext=everfull+dart_holster";
+			
+			if ($effect[everything looks red].have_effect() == 0) 
+		{
+			int dartCooldown = 50;
+			if (get_property("everfullDartPerks").contains_text("You are less impressed by bullseyes")) {
+				dartCooldown -= 10;
+			}
+			if (get_property("everfullDartPerks").contains_text("Bullseyes do not impress you much")) {
+				dartCooldown -= 10;
+			}
+			description.listAppend(HTMLGenerateSpanFont("Shoot a bullseye! (" + dartCooldown + " ELR)", "red"));
+			if (lookupItem("everfull dart holster").equipped_amount() == 0)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Equip the dart holster first.", "red"));
+			}
+			else description.listAppend(HTMLGenerateSpanFont("Dart holster equipped", "blue"));
+			task_entries.listAppend(ChecklistEntryMake("__item everfull dart holster", url, ChecklistSubentryMake("Everfull Darts free kill available!", "", description), -11));
+		}
+	}
+}
+
+RegisterResourceGenerationFunction("IOTMEverfullDartsGenerateResource");
+void IOTMEverfullDartsGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (__misc_state["in run"] && available_amount($item[everfull dart holster]) > 0 && my_path().id != PATH_COMMUNITY_SERVICE)
+	{
+		int dartSkill = get_property_int("dartsThrown");
+		string [int] description;
+		string url = "inventory.php?ftext=everfull+dart_holster";
+			
+		if (dartSkill < 401) {
+			int dartsNeededForNextPerk = (floor(sqrt(dartSkill)+1) **2 - dartSkill);
+			description.listAppend("Current dart skill: " + dartSkill);
+			description.listAppend(HTMLGenerateSpanFont(dartsNeededForNextPerk, "blue") + " darts needed for next Perk");
+		
+			if (lookupItem("everfull dart holster").equipped_amount() == 0)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Equip the dart holster first.", "red"));
+			}
+			else description.listAppend(HTMLGenerateSpanFont("Dart holster equipped", "blue"));
+			resource_entries.listAppend(ChecklistEntryMake("__item everfull dart holster", url, ChecklistSubentryMake("🍑🎯 Everfull Dart Holster charging", "", description), 11));
+		}
+	}
+}
 // Apriling band helmet
 RegisterResourceGenerationFunction("IOTMAprilingBandHelmetGenerateResource");
 void IOTMAprilingBandHelmetGenerateResource(ChecklistEntry [int] resource_entries)
@@ -56562,6 +56658,66 @@ void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     }
 }
 
+// Mini-Kiwi
+RegisterResourceGenerationFunction("IOTMMiniKiwiGenerateResource");
+void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (!lookupFamiliar("Mini Kiwi").familiar_is_usable()) return;
+
+    // This familiar sucks. It's really bad. Still, fine to have a tile, I guess.
+    int miniKiwiCount = $item[mini kiwi].available_amount();
+    int kiwiWeight = effective_familiar_weight($familiar[Mini Kiwi]) + weight_adjustment();
+    int kiwiModifier = $item[aviator goggles].available_amount() > 0 ? 0.75 : 0.50;
+    int kiwiChance = min(kiwiWeight * kiwiModifier,100);
+    boolean kiwiSpiritsBought = get_property_boolean("_miniKiwiIntoxicatingSpiritsBought"); 
+    int miniKiwiBikiniCount = $item[mini kiwi bikini].available_amount();
+	string [int] description;
+	string url = "familiar.php";
+	string header = pluralise(miniKiwiCount, "mini kiwi available", "mini kiwis available");
+
+	description.listAppend(`At {kiwiWeight} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
+
+    if (!kiwiSpiritsBought) {
+        description.listAppend('| Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
+    }
+
+    if (!miniKiwiBikiniCount < 1 && get_property_int("zeppelinProtestors") < 80) {
+        description.listAppend('| Consider purchasing mini kiwi bikinis, for the Zeppelin sleaze test.');
+    } 
+
+	resource_entries.listAppend(ChecklistEntryMake("__familiar mini kiwi", url, ChecklistSubentryMake(header, "", description), 0));
+
+}
+
+// Tearaway Pants
+RegisterResourceGenerationFunction("IOTMTearawayPantsGenerateTask");
+void IOTMTearawayPantsGenerateTask(ChecklistEntry [int] optional_task_entries)
+{
+    // Don't show the tile if you don't have the pants.
+	if (!!__iotms_usable[lookupItem("tearaway pants")]) return;
+
+    // Don't show the tile if you aren't a moxie class.
+    if (!($classes[disco bandit,accordion thief] contains my_class())) return;
+
+    // I can't believe I'm doing this. I have truly lost control of my life.
+    QuestState base_quest_state = __quest_state["Guild"];
+	if (base_quest_state.finished || !base_quest_state.startable || base_quest_state.mafia_internal_step == 2) return;
+
+    // Do you have the stupid pants equipped?
+    boolean havePantsEquipped = $slot[pants].equipped_item() == $item[tearaway pants];
+
+	string [int] description;
+
+    // If equipped, send user to the guild. If not, send them to the inventory.
+	string url = havePantsEquipped ? "guild.php" : "inventory.php?ftext=tearaway+pants";
+	string header = "Tear away your tearaway pants!";
+
+    if (havePantsEquipped) description.listAppend(`Visit the Department of Shadowy Arts and Crafts to unlock the guild!`);
+    if (!havePantsEquipped) description.listAppend(`Visit the Department of Shadowy Arts and Crafts with your pants equipped to unlock the guild!`);
+
+	optional_task_entries.listAppend(ChecklistEntryMake("__item tearaway pants", url, ChecklistSubentryMake(header, "", description), 0));
+
+}
 
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
