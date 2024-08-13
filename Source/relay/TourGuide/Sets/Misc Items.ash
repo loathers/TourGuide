@@ -660,7 +660,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     
     if (in_run) {
-        if ($item[tattered scrap of paper].available_amount() > 0 && __misc_state["free runs usable"] && $item[tattered scrap of paper].item_is_usable()) {
+        // As of the ELG change, tatters are worse than other options. Only show if the user doesn't have those options.
+        if ($item[tattered scrap of paper].available_amount() > 0 && __misc_state["free runs usable"] && $item[tattered scrap of paper].item_is_usable() && !__iotms_usable[lookupItem("spring shoes")] && !__iotms_usable[lookupItem("spring shoes")] && $item[roman candelabra].available_amount() == 0) {
             string [int] description;
             description.listAppend(($item[tattered scrap of paper].available_amount() / 2.0).roundForOutput(1) + " free runs.");
             if (in_bad_moon())

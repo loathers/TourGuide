@@ -63,12 +63,17 @@ void IOTMBookofFactsGenerateResource(ChecklistEntry [int] resource_entries)
         BOFAdropsDescription.listAppend("" + BOFApocketwishes + " BOFA wishes available.");
     }
 
-	// Not going to remove this because I think it's valid right now but once mt_rand is 
-	//   properly exposed it would be good to hide this if the user is in a seed where 
-	//   they can't really access tatters...
-	int BOFAtatters = clampi(11 - get_property_int("_bookOfFactsTatters"), 0, 11);
-	if (get_property_int("_bookOfFactsTatters") < 11) {
-        BOFAdropsDescription.listAppend("" + BOFAtatters + " BOFA tatters available.");
+	// NOTE: Altering as of 2024 ELG change, as tatters are 40 turns vs the 30 of spring shoes. 
+	//   There is a remote chance in some future standard context tatters will be the best option
+	//   for a user with some odd IOTM configurations, which is why I didn't entirely extract
+	//   this, but it at least shouldn't be present if they own the candles or the shoes.
+
+	if (!__iotms_usable[lookupItem("spring shoes")] && $item[roman candelabra].available_amount() == 0) {
+		int BOFAtatters = clampi(11 - get_property_int("_bookOfFactsTatters"), 0, 11);
+		if (get_property_int("_bookOfFactsTatters") < 11) {
+			BOFAdropsDescription.listAppend("" + BOFAtatters + " BOFA tatters available.");
+		}	
 	}
+
 	resource_entries.listAppend(ChecklistEntryMake("__item book of facts", "", ChecklistSubentryMake(("Miscellaneous valuable BOFA drops"), "", BOFAdropsDescription), 8).ChecklistEntrySetIDTag("bofa tatters"));
 }
