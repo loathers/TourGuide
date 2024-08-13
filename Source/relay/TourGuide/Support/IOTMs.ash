@@ -150,9 +150,24 @@ void initialiseIOTMsUsable()
     if (lookupItem("candy cane sword cane").available_amount() > 0) //Dec 2023
         __iotms_usable[lookupItem("candy cane sword cane")] = true;
 
-    if (lookupItem("spring shoes").available_amount() > 0) //Feb 2023
+    if (lookupItem("spring shoes").available_amount() > 0) //Feb 2024
         __iotms_usable[lookupItem("spring shoes")] = true;
         
+    if (lookupItem("everfull dart holster").available_amount() > 0) //Mar 2024
+        __iotms_usable[lookupItem("everfull dart holster")] = true;
+
+    if (lookupItem("apriling band helmet").available_amount() > 0) //Apr 2024
+        __iotms_usable[lookupItem("apriling band helmet")] = true;
+
+    if (lookupItem("mayam calendar").available_amount() > 0) //May 2024
+        __iotms_usable[lookupItem("mayam calendar")] = true;
+
+    if (lookupItem("roman candelabra").available_amount() > 0) //Jun 2024
+        __iotms_usable[lookupItem("roman candelabra")] = true;
+        
+    if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
+        __iotms_usable[lookupItem("tearaway pants")] = true;
+
     //Can't use many things in G-Lover
     if (my_path().id == PATH_G_LOVER) //Path 33
     {
