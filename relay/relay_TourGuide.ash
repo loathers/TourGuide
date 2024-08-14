@@ -56681,7 +56681,7 @@ void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend('| Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
     }
 
-    if (!miniKiwiBikiniCount < 1 && get_property_int("zeppelinProtestors") < 80) {
+    if (miniKiwiBikiniCount < 1 && get_property_int("zeppelinProtestors") < 80) {
         description.listAppend('| Consider purchasing mini kiwi bikinis, for the Zeppelin sleaze test.');
     } 
 
@@ -56694,7 +56694,7 @@ RegisterResourceGenerationFunction("IOTMTearawayPantsGenerateTask");
 void IOTMTearawayPantsGenerateTask(ChecklistEntry [int] optional_task_entries)
 {
     // Don't show the tile if you don't have the pants.
-	if (!!__iotms_usable[lookupItem("tearaway pants")]) return;
+	if (!__iotms_usable[lookupItem("tearaway pants")]) return;
 
     // Don't show the tile if you aren't a moxie class.
     if (!($classes[disco bandit,accordion thief] contains my_class())) return;
