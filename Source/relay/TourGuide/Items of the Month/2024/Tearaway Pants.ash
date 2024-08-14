@@ -3,7 +3,7 @@ RegisterResourceGenerationFunction("IOTMTearawayPantsGenerateTask");
 void IOTMTearawayPantsGenerateTask(ChecklistEntry [int] optional_task_entries)
 {
     // Don't show the tile if you don't have the pants.
-	if (!!__iotms_usable[lookupItem("tearaway pants")]) return;
+	if (!__iotms_usable[lookupItem("tearaway pants")]) return;
 
     // Don't show the tile if you aren't a moxie class.
     if (!($classes[disco bandit,accordion thief] contains my_class())) return;

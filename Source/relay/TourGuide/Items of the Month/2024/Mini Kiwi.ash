@@ -21,7 +21,7 @@ void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend('| Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
     }
 
-    if (!miniKiwiBikiniCount < 1 && get_property_int("zeppelinProtestors") < 80) {
+    if (miniKiwiBikiniCount < 1 && get_property_int("zeppelinProtestors") < 80) {
         description.listAppend('| Consider purchasing mini kiwi bikinis, for the Zeppelin sleaze test.');
     } 
 
