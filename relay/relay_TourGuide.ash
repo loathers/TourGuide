@@ -5216,8 +5216,13 @@ void initialiseIOTMsUsable()
     if (lookupItem("cosmic bowling ball").available_amount() > 0 || get_property_int("_cosmicBowlingSkillsUsed") > 0) //Jan 2022
         // change to use tracking property if/when mafia adds one from coolitems.php
         __iotms_usable[lookupItem("cosmic bowling ball")] = true;
-    if (lookupItem("unbreakable umbrella").available_amount() > 0) //Mar 2021
+
+    if (lookupItem("unbreakable umbrella").available_amount() > 0) //Mar 2022  
         __iotms_usable[lookupItem("unbreakable umbrella")] = true;
+
+    if (lookupItem("Jurassic Parka").available_amount() > 0) // adding because of a strange issue w/ Sneaks.ash...
+        __iotms_usable[lookupItem("Jurassic Parka")] = true;
+
     if ($item[Clan VIP Lounge key].item_amount() > 0)
     {
     	//FIXME all
@@ -33581,8 +33586,9 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         // usable if we have pill keeper plus free sneaks or spleen sneaks available
         final.sneakCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeSneakLeft + spleenSneaks > 0);
 
+        // never noticed I didn't explicitly say this was pillkeeper in the tile lol
         final.sneakCount = freeSneakLeft + spleenSneaks;
-        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x free sneak, </b>`;
+        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x PillKeeper free sneak, </b>`;
         final.tileDescription = final.tileDescription + `<b>{spleenSneaks}x sneaks</b> for 3 spleen each`;
         return final;
     }
@@ -46540,7 +46546,7 @@ void IOTMHauntedDoghouseGenerateResource(ChecklistEntry [int] resource_entries)
         return;
     if ($item[tennis ball].available_amount() > 0 && in_ronin() && $item[tennis ball].item_is_usable())
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item tennis ball", "", ChecklistSubentryMake(pluralise($item[tennis ball]), "", "Free run/banish."), 6).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Haunted doghouse banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item tennis ball", "", ChecklistSubentryMake(pluralise($item[tennis ball]), "", "Free run/banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Haunted doghouse banish"));
     }
     //I, um, hmm. I guess there's not much to say. Poor lonely file, nearly empty.
 }
@@ -48559,7 +48565,7 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
     }
     //Play a time prank - 1 minute, heart
     
-    resource_entries.listAppend(ChecklistEntryMake("Hourglass", "inv_use.php?whichitem=9104&pwd=" + my_hash(), ChecklistSubentryMake(pluralise(minutes_left, "Time-Spinner minute", "Time-Spinner minutes"), "", description), 5).ChecklistEntrySetIDTag("Time-spinner resource"));
+    resource_entries.listAppend(ChecklistEntryMake("__item Time-Spinner", "inv_use.php?whichitem=9104&pwd=" + my_hash(), ChecklistSubentryMake(pluralise(minutes_left, "Time-Spinner minute", "Time-Spinner minutes"), "", description), 5).ChecklistEntrySetIDTag("Time-spinner resource"));
 }
 
 RegisterResourceGenerationFunction("IOTMWitchessGenerateResource");
@@ -56666,26 +56672,30 @@ void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
 
     // This familiar sucks. It's really bad. Still, fine to have a tile, I guess.
     int miniKiwiCount = $item[mini kiwi].available_amount();
-    int kiwiWeight = effective_familiar_weight($familiar[Mini Kiwi]) + weight_adjustment();
-    int kiwiModifier = $item[aviator goggles].available_amount() > 0 ? 0.75 : 0.50;
-    int kiwiChance = min(kiwiWeight * kiwiModifier,100);
+    float kiwiWeight = effective_familiar_weight($familiar[Mini Kiwi]) + weight_adjustment();
+    float kiwiModifier = $item[aviator goggles].available_amount() > 0 ? 0.75 : 0.50;
+
+    // Calculating the chance of a kiwi per fight; weight * your modifier
+    int kiwiChance = to_int(min(kiwiWeight * kiwiModifier,100.0));
     boolean kiwiSpiritsBought = get_property_boolean("_miniKiwiIntoxicatingSpiritsBought"); 
     int miniKiwiBikiniCount = $item[mini kiwi bikini].available_amount();
+
+    // Tile setup stuff
 	string [int] description;
-	string url = "familiar.php";
+	string url = "familiar.php"; // Could send to the kwiki mart, but don't care enough.
 	string header = pluralise(miniKiwiCount, "mini kiwi available", "mini kiwis available");
 
 	description.listAppend(`At {kiwiWeight} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
 
     if (!kiwiSpiritsBought) {
-        description.listAppend('| Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
+        description.listAppend('|*Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
     }
 
     if (miniKiwiBikiniCount < 1 && get_property_int("zeppelinProtestors") < 80) {
-        description.listAppend('| Consider purchasing mini kiwi bikinis, for the Zeppelin sleaze test.');
+        description.listAppend('|*Consider purchasing mini kiwi bikinis, for the Zeppelin sleaze test.');
     } 
 
-	resource_entries.listAppend(ChecklistEntryMake("__familiar mini kiwi", url, ChecklistSubentryMake(header, "", description), 0));
+	resource_entries.listAppend(ChecklistEntryMake("__familiar mini kiwi", url, ChecklistSubentryMake(header, "", description), 10));
 
 }
 
