@@ -40,8 +40,9 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         // usable if we have pill keeper plus free sneaks or spleen sneaks available
         final.sneakCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeSneakLeft + spleenSneaks > 0);
 
+        // never noticed I didn't explicitly say this was pillkeeper in the tile lol
         final.sneakCount = freeSneakLeft + spleenSneaks;
-        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x free sneak, </b>`;
+        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x PillKeeper free sneak, </b>`;
         final.tileDescription = final.tileDescription + `<b>{spleenSneaks}x sneaks</b> for 3 spleen each`;
         return final;
     }

@@ -138,8 +138,13 @@ void initialiseIOTMsUsable()
     if (lookupItem("cosmic bowling ball").available_amount() > 0 || get_property_int("_cosmicBowlingSkillsUsed") > 0) //Jan 2022
         // change to use tracking property if/when mafia adds one from coolitems.php
         __iotms_usable[lookupItem("cosmic bowling ball")] = true;
-    if (lookupItem("unbreakable umbrella").available_amount() > 0) //Mar 2021
+
+    if (lookupItem("unbreakable umbrella").available_amount() > 0) //Mar 2022  
         __iotms_usable[lookupItem("unbreakable umbrella")] = true;
+
+    if (lookupItem("Jurassic Parka").available_amount() > 0) // adding because of a strange issue w/ Sneaks.ash...
+        __iotms_usable[lookupItem("Jurassic Parka")] = true;
+
     if ($item[Clan VIP Lounge key].item_amount() > 0)
     {
     	//FIXME all

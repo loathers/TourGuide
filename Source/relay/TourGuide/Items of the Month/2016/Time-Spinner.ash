@@ -46,5 +46,5 @@ void IOTMTimeSpinnerGenerateResource(ChecklistEntry [int] resource_entries)
     }
     //Play a time prank - 1 minute, heart
     
-    resource_entries.listAppend(ChecklistEntryMake("Hourglass", "inv_use.php?whichitem=9104&pwd=" + my_hash(), ChecklistSubentryMake(pluralise(minutes_left, "Time-Spinner minute", "Time-Spinner minutes"), "", description), 5).ChecklistEntrySetIDTag("Time-spinner resource"));
+    resource_entries.listAppend(ChecklistEntryMake("__item Time-Spinner", "inv_use.php?whichitem=9104&pwd=" + my_hash(), ChecklistSubentryMake(pluralise(minutes_left, "Time-Spinner minute", "Time-Spinner minutes"), "", description), 5).ChecklistEntrySetIDTag("Time-spinner resource"));
 }
