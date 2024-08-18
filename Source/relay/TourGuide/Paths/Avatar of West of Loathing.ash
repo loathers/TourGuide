@@ -113,7 +113,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
             string title = pluralise(banish_count, "beancannon banish", "beancannon banishes");
             if (!in_ronin())
                 title = "Beancannon banishes";
-            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(title, "", description), 8).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("West Loathing path beancannon banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__skill beancannon", url, ChecklistSubentryMake(title, "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("West Loathing path beancannon banish"));
         }
     }
     

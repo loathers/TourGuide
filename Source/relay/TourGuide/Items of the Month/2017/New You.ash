@@ -46,7 +46,7 @@ void IOTMNewYouGenerateResource(ChecklistEntry [int] resource_entries)
             }
             else if (it == lookupItem("Daily Affirmation: Be a Mind Master"))
             {
-                resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("New you affirmation mind master banish"));
+                resource_entries.listAppend(ChecklistEntryMake("__item " + it, "", subentry, 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("New you affirmation mind master banish"));
             }
             else
 	            entry.subentries.listAppend(subentry);
