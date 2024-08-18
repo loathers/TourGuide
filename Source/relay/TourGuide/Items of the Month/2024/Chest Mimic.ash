@@ -9,7 +9,13 @@ void IOTMChestMimicGenerateResource(ChecklistEntry [int] resource_entries)
 	int famExperienceGain = numeric_modifier("familiar experience") + 1;
 	int chestExperience = ($familiar[chest mimic].experience);
 	int famExpNeededForNextEgg = (50 - (chestExperience % 50));
-    string fightsForNextEgg = pluralise(ceil(to_float(famExpNeededForNextEgg) / famExperienceGain), "fight", "fights");
+	string fightsForNextEgg;
+	if (famExperienceGain > 0) {
+		fightsForNextEgg = pluralise(ceil(to_float(famExpNeededForNextEgg) / famExperienceGain), "fight", "fights");
+	}
+	else {
+		fightsForNextEgg = "cannot get";
+	}
 	int mimicEggsLeft = clampi(11 - get_property_int("_mimicEggsObtained"), 0, 11);
 
 	string [int] description;
