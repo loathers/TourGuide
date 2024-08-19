@@ -55093,7 +55093,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         string url;
         url = "main.php";
         description.listAppend("Turn-taking repeat-use banish. Lasts until you use it again!");
-        if ($item[cursed monkey paw].equipped_amount() == 0) {
+        if ($item[cursed monkey's paw].equipped_amount() == 0) {
             description.listAppend("Equip your cursed monkey paw first.");
             url = "inventory.php?ftext=cursed+monkey";
         }
