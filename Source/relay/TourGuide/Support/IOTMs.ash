@@ -142,8 +142,8 @@ void initialiseIOTMsUsable()
     if (lookupItem("unbreakable umbrella").available_amount() > 0) //Mar 2022  
         __iotms_usable[lookupItem("unbreakable umbrella")] = true;
 
-    if (lookupItem("Jurassic Parka").available_amount() > 0) // adding because of a strange issue w/ Sneaks.ash...
-        __iotms_usable[lookupItem("Jurassic Parka")] = true;
+    if (available_amount($item[jurassic parka]) > 0) // adding because of a strange issue w/ Sneaks.ash...
+        __iotms_usable[$item[jurassic parka]] = true;
 
     if ($item[Clan VIP Lounge key].item_amount() > 0)
     {
@@ -305,8 +305,12 @@ void initialiseIOTMsUsable()
     replicaCheck("2002 Mr. Store Catalog"); # handled in own tile
     replicaCheck("August Scepter"); # handled in own tile
 
-    // Swap parka to false if you aren't torso aware.
-    if (!__misc_state["Torso aware"]) 
+    // Swap parka to false if you aren't torso aware. You cannot use the __misc_state
+    //   shortcuts here, because this comes before it in execution. That's a sad 
+    //   disadvantage of all our bundling, did not remotely realize state wasn't 
+    //   instantiated before this. That means the parka stuff hasn't shown up since
+    //   Legacy of Loathing lmao.
+    if (!$skill[12].have_skill()) 
     {
         __iotms_usable[lookupItem("Jurassic Parka")] = false;
     }
