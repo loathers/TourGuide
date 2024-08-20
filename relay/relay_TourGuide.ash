@@ -55399,6 +55399,17 @@ void IOTMPatrioticEagleGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if (fights_left > 0 && possible_appearance_locations.count() > 0)
             optional_task_entries.listAppend(entry);
     }
+    
+    // Extra nag from TES re: setting your global pledge.
+    string [int] description2;
+    
+    if (__misc_state["in run"] && ($effect[Citizen of a Zone].have_effect() == 0)) {
+        description2.listAppend("Haunted Kitchen: +100% init");
+        description2.listAppend("Haunted Library/Laundry: +30% item");
+        description2.listAppend("Batrat/Ninja Snowmen/Frat Battlefield: +50% meat");
+        task_entries.listAppend(ChecklistEntryMake("__familiar Patriotic Eagle", "familiar.php", ChecklistSubentryMake("Pledge to a zone!", description2), -5).ChecklistEntrySetIDTag("Patriotic Eagle familiar pledge reminder"));
+    }
+
 }
 	
 RegisterResourceGenerationFunction("IOTMPatrioticEagleGenerateResource");
@@ -56672,13 +56683,13 @@ void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         string [int] description;
         if (lookupItem("Roman Candelabra").equipped_amount() == 0)
         {
-            description.listAppend(HTMLGenerateSpanFont("Equip the Roman Candelabra first.", "red"));
+            description.listAppend(HTMLGenerateSpanFont("Equip the Roman Candelabra, for your purple ray.", "red"));
         }
         else
         {
-            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "purple"));
+            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped, blow your purple candle!", "purple"));
         }
-        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra chain ready!", "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra monster chain ready", "", description), -11));
     }
 }
 
@@ -56703,7 +56714,7 @@ void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
 	string url = "familiar.php"; // Could send to the kwiki mart, but don't care enough.
 	string header = pluralise(miniKiwiCount, "mini kiwi available", "mini kiwis available");
 
-	description.listAppend(`At {kiwiWeight} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
+	description.listAppend(`At {to_int(kiwiWeight)} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
 
     if (!kiwiSpiritsBought) {
         description.listAppend('|*Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
