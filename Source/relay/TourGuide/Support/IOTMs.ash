@@ -138,8 +138,13 @@ void initialiseIOTMsUsable()
     if (lookupItem("cosmic bowling ball").available_amount() > 0 || get_property_int("_cosmicBowlingSkillsUsed") > 0) //Jan 2022
         // change to use tracking property if/when mafia adds one from coolitems.php
         __iotms_usable[lookupItem("cosmic bowling ball")] = true;
-    if (lookupItem("unbreakable umbrella").available_amount() > 0) //Mar 2021
+
+    if (lookupItem("unbreakable umbrella").available_amount() > 0) //Mar 2022  
         __iotms_usable[lookupItem("unbreakable umbrella")] = true;
+
+    if (available_amount($item[jurassic parka]) > 0) // adding because of a strange issue w/ Sneaks.ash...
+        __iotms_usable[$item[jurassic parka]] = true;
+
     if ($item[Clan VIP Lounge key].item_amount() > 0)
     {
     	//FIXME all
@@ -150,9 +155,24 @@ void initialiseIOTMsUsable()
     if (lookupItem("candy cane sword cane").available_amount() > 0) //Dec 2023
         __iotms_usable[lookupItem("candy cane sword cane")] = true;
 
-    if (lookupItem("spring shoes").available_amount() > 0) //Feb 2023
+    if (lookupItem("spring shoes").available_amount() > 0) //Feb 2024
         __iotms_usable[lookupItem("spring shoes")] = true;
         
+    if (lookupItem("everfull dart holster").available_amount() > 0) //Mar 2024
+        __iotms_usable[lookupItem("everfull dart holster")] = true;
+
+    if (lookupItem("apriling band helmet").available_amount() > 0) //Apr 2024
+        __iotms_usable[lookupItem("apriling band helmet")] = true;
+
+    if (lookupItem("mayam calendar").available_amount() > 0) //May 2024
+        __iotms_usable[lookupItem("mayam calendar")] = true;
+
+    if (lookupItem("roman candelabra").available_amount() > 0) //Jun 2024
+        __iotms_usable[lookupItem("roman candelabra")] = true;
+        
+    if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
+        __iotms_usable[lookupItem("tearaway pants")] = true;
+
     //Can't use many things in G-Lover
     if (my_path().id == PATH_G_LOVER) //Path 33
     {
@@ -285,8 +305,12 @@ void initialiseIOTMsUsable()
     replicaCheck("2002 Mr. Store Catalog"); # handled in own tile
     replicaCheck("August Scepter"); # handled in own tile
 
-    // Swap parka to false if you aren't torso aware.
-    if (!__misc_state["Torso aware"]) 
+    // Swap parka to false if you aren't torso aware. You cannot use the __misc_state
+    //   shortcuts here, because this comes before it in execution. That's a sad 
+    //   disadvantage of all our bundling, did not remotely realize state wasn't 
+    //   instantiated before this. That means the parka stuff hasn't shown up since
+    //   Legacy of Loathing lmao.
+    if (!$skill[12].have_skill()) 
     {
         __iotms_usable[lookupItem("Jurassic Parka")] = false;
     }

@@ -21,6 +21,12 @@ void addToBothDescriptions(string [int] description1, string [int] description2,
 RegisterResourceGenerationFunction("IOTMMayamCalendarGenerateResource");
 void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
 {
+    // Adding this prior to the check if the user has stinkbombs.
+    if ($item[stuffed yam stinkbomb].available_amount() > 0 )
+    {
+        resource_entries.listAppend(ChecklistEntryMake("__item stuffed yam stinkbomb", "", ChecklistSubentryMake(pluralise($item[stuffed yam stinkbomb]), "", "Free run/banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Haunted doghouse banish"));
+    }
+
     if (available_amount($item[mayam calendar]) < 1)
         return;
 

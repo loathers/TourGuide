@@ -40,7 +40,11 @@ void IOTMUndergroundFireworksShopGenerateTasks(ChecklistEntry [int] task_entries
 RegisterResourceGenerationFunction("IOTMUndergroundFireworksShopGenerateResource");
 void IOTMUndergroundFireworksShopGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (my_path().id == PATH_G_LOVER) return; // none of this stuff has G in it
+	if (my_path().id == PATH_G_LOVER) return; // none of this stuff has G in it!
+
+	// Adding a way to get this to yank out the tile if you're in standard.
+	if (!lookupItem("fedora-mounted fountain").is_unrestricted()) return;
+
 	if (!get_property_boolean("_fireworksShopEquipmentBought") && available_amount($item[Clan VIP Lounge key]) > 0 && get_property("_fireworksShop").to_boolean() && my_path() != $path[Legacy of Loathing])
 		{
 			string [int] description;

@@ -338,7 +338,7 @@ void setUpState()
 		blank_outs_usable = false;
 	__misc_state["blank outs usable"] = free_runs_usable;
 	
-	
+	// TODO: reconfig this whole state thing re: free runs.
 	boolean free_runs_available = false;
 	if (familiar_is_usable($familiar[pair of stomping boots]) || ($skill[the ode to booze].skill_is_usable() && familiar_is_usable($familiar[Frumious Bandersnatch])))
 		free_runs_available = true;

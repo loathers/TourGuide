@@ -38,6 +38,17 @@ void IOTMPatrioticEagleGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if (fights_left > 0 && possible_appearance_locations.count() > 0)
             optional_task_entries.listAppend(entry);
     }
+    
+    // Extra nag from TES re: setting your global pledge.
+    string [int] description2;
+    
+    if (__misc_state["in run"] && ($effect[Citizen of a Zone].have_effect() == 0)) {
+        description2.listAppend("Haunted Kitchen: +100% init");
+        description2.listAppend("Haunted Library/Laundry: +30% item");
+        description2.listAppend("Batrat/Ninja Snowmen/Frat Battlefield: +50% meat");
+        task_entries.listAppend(ChecklistEntryMake("__familiar Patriotic Eagle", "familiar.php", ChecklistSubentryMake("Pledge to a zone!", description2), -5).ChecklistEntrySetIDTag("Patriotic Eagle familiar pledge reminder"));
+    }
+
 }
 	
 RegisterResourceGenerationFunction("IOTMPatrioticEagleGenerateResource");

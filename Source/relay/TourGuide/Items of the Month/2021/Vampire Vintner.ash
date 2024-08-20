@@ -3,6 +3,9 @@ RegisterTaskGenerationFunction("IOTMVampireVintnerGenerateTasks");
 void IOTMVampireVintnerGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (!__misc_state["in run"] || !lookupFamiliar("vampire vintner").familiar_is_usable()) return;
+
+	// For some reason, Vintner leaked into subsequent standards. Unfortunately, the wine isn't standard, so...
+	if (!lookupItem("1950 vampire vintner wine").is_unrestricted()) return;
 	
 	int vintnerFightsLeft = clampi(14 - get_property_int("vintnerCharge"), 0, 14);
 	int vintnerWineLevel = get_property_int("vintnerWineLevel");
