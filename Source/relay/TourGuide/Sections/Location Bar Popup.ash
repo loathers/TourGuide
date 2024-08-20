@@ -1003,7 +1003,33 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             fl_entry_width_weight[fl_entries.count() - 1] = width_weight;
         }
         
-        
+        // ----------- NEW BIT FROM SCOTCH ABOUT BOFA -------------
+        if (true)
+        {
+            if ($skill[just the facts].have_skill()) {
+                string bofaText;
+                string bofaEffect = m.fact_type();
+                string factAppend;
+
+                // TODO: Bunch of stuff, this is a first implementation. Goals:
+                //   - Try to figure out a nicer way to format this.
+                //   - Filter out the "junk" BOFA results.
+                if (bofaEffect == "item") factAppend = HTMLGenerateSpanFont(m.item_fact().name,"red");
+                if (bofaEffect == "effect") factAppend = HTMLGenerateSpanFont(`{m.effect_fact().name} ({m.numeric_fact()})`,"blue");
+                bofaText = `{factAppend}`;
+
+                // I tried to put this a few places. First I tried in the stats
+                //   sidebar, then I tried under the name, then I tried as an
+                //   appended item. I ended up preferring having it generate in 
+                //   visibly in large zones with cutoff entries. I am pretty sure
+                //   the "best" solution is a more elegant way to add it to the
+                //   item list, but this initial implementation is good enough for
+                //   now, I think. 
+
+                fl_entries.listAppend(bofaText);
+                fl_entry_styles[fl_entries.count() - 1] = "text-align:left;font-size:0.8em";
+            }
+        }
         
         //FIXME handle canceling NC
         buffer rate_buffer;
