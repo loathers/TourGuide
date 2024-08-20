@@ -26,12 +26,12 @@ void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, Checkli
         string [int] description;
         if (lookupItem("Roman Candelabra").equipped_amount() == 0)
         {
-            description.listAppend(HTMLGenerateSpanFont("Equip the Roman Candelabra first.", "red"));
+            description.listAppend(HTMLGenerateSpanFont("Equip the Roman Candelabra, for your purple ray.", "red"));
         }
         else
         {
-            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped", "purple"));
+            description.listAppend(HTMLGenerateSpanFont("Candelbra equipped, blow your purple candle!", "purple"));
         }
-        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra chain ready!", "", description), -11));
+        task_entries.listAppend(ChecklistEntryMake("__item Roman Candelabra", url, ChecklistSubentryMake("Roman Candelabra monster chain ready", "", description), -11));
     }
 }

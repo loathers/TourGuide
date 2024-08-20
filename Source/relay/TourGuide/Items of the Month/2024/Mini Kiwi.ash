@@ -19,7 +19,7 @@ void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
 	string url = "familiar.php"; // Could send to the kwiki mart, but don't care enough.
 	string header = pluralise(miniKiwiCount, "mini kiwi available", "mini kiwis available");
 
-	description.listAppend(`At {kiwiWeight} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
+	description.listAppend(`At {to_int(kiwiWeight)} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
 
     if (!kiwiSpiritsBought) {
         description.listAppend('|*Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
