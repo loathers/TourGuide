@@ -7,7 +7,7 @@ void IOTMSeptemberCenserGenerateResource(ChecklistEntry [int] resource_entries)
     int septEmbers = get_property_int("availableSeptEmbers");
     string [int] description;
     float cold_resistance = numeric_modifier("cold resistance");
-    int mainstat_gain = (7 * (cold_resistance) ** 1.7) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
+    int mainstatGain = (7 * (cold_resistance) ** 1.7) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
     string url = "shop.php?whichshop=september";
     string title = "Sept-Ember Censer";
     int bembershootCount = $item[bembershoot].available_amount();
@@ -23,7 +23,7 @@ void IOTMSeptemberCenserGenerateResource(ChecklistEntry [int] resource_entries)
     }
 
     description.listAppend("1 embers: +5 cold res accessory. (You have " + (HTMLGenerateSpanFont(bembershootCount, "red")) + " of this)");
-    description.listAppend("2 embers: mmm-brr! mouthwash for " + (HTMLGenerateSpanFont(mainstat_gain, "blue")) + " mainstat. (You have " + (HTMLGenerateSpanFont(mouthwashCount, "red")) + " of this)");
+    description.listAppend("2 embers: mmm-brr! mouthwash for " + (HTMLGenerateSpanFont(mainstatGain, "blue")) + " mainstat. (You have " + (HTMLGenerateSpanFont(mouthwashCount, "red")) + " of this)");
 
     if (structureUsed) {
         description.listAppend((HTMLGenerateSpanFont("Already used structural ember today", "red")));
