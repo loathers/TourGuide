@@ -1,4 +1,3 @@
-
 //CyberRealm
 RegisterTaskGenerationFunction("IOTYCyberRealmGenerateTasks");
 void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -100,7 +99,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		}
 		else
 		{
-			if (cyberfree < 10) {
+			if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
 				description.listAppend(HTMLGenerateSpanFont("Have " + (10 - CyberFree) + " free fights left!", "green"));
 			}
 			else	{
@@ -108,4 +107,20 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 			}
 			optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
 		}
+}
+
+RegisterResourceGenerationFunction("IOTYCyberRealmGenerateResource");
+void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if ($item[server room key].available_amount() < 1) return;
+    
+    int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
+	string url;
+	string [int] description;
+
+    if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
+        string url = "place.php?whichplace=CyberRealm";
+		description.listAppend("Hack into the system!");
+		resource_entries.listAppend(ChecklistEntryMake("__skill stats+++", url, ChecklistSubentryMake(pluralise(CyberFree, "CyberRealm fight", "CyberRealm fights"), "", description), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("CyberRealm free fight"));
+    }
 }
