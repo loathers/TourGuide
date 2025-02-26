@@ -843,275 +843,29 @@ int [int] listMakeBlankInt()
     return result;
 }
 
-
-
-
-string [int] listMake(string e1)
+string [int] listMake(string ... entries)
 {
-	string [int] result;
-	result.listAppend(e1);
-	return result;
+	return entries;
 }
 
-string [int] listMake(string e1, string e2)
+int [int] listMake(int ... entries)
 {
-	string [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	return result;
+	return entries;
 }
 
-string [int] listMake(string e1, string e2, string e3)
+item [int] listMake(item ... entries)
 {
-	string [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	return result;
+	return entries;
 }
 
-string [int] listMake(string e1, string e2, string e3, string e4)
+skill [int] listMake(skill ... entries)
 {
-	string [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	return result;
+	return entries;
 }
 
-string [int] listMake(string e1, string e2, string e3, string e4, string e5)
+monster [int] listMake(monster ... entries)
 {
-	string [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	result.listAppend(e5);
-	return result;
-}
-
-string [int] listMake(string e1, string e2, string e3, string e4, string e5, string e6)
-{
-	string [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	result.listAppend(e5);
-	result.listAppend(e6);
-	return result;
-}
-
-int [int] listMake(int e1)
-{
-	int [int] result;
-	result.listAppend(e1);
-	return result;
-}
-
-int [int] listMake(int e1, int e2)
-{
-	int [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	return result;
-}
-
-int [int] listMake(int e1, int e2, int e3)
-{
-	int [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	return result;
-}
-
-int [int] listMake(int e1, int e2, int e3, int e4)
-{
-	int [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	return result;
-}
-
-int [int] listMake(int e1, int e2, int e3, int e4, int e5)
-{
-	int [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	result.listAppend(e5);
-	return result;
-}
-
-// Being a big ol' dummy and just adding a function for this
-
-int [int] listMake(int e1, int e2, int e3, int e4, int e5, int e6, int e7, int e8, int e9, int e10)
-{
-	int [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	result.listAppend(e5);
-	result.listAppend(e6);
-	result.listAppend(e7);
-	result.listAppend(e8);
-	result.listAppend(e9);
-	result.listAppend(e10);
-	return result;
-}
-
-item [int] listMake(item e1)
-{
-	item [int] result;
-	result.listAppend(e1);
-	return result;
-}
-
-item [int] listMake(item e1, item e2)
-{
-	item [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	return result;
-}
-
-item [int] listMake(item e1, item e2, item e3)
-{
-	item [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	return result;
-}
-
-item [int] listMake(item e1, item e2, item e3, item e4)
-{
-	item [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	return result;
-}
-
-item [int] listMake(item e1, item e2, item e3, item e4, item e5)
-{
-	item [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	result.listAppend(e5);
-	return result;
-}
-
-skill [int] listMake(skill e1)
-{
-	skill [int] result;
-	result.listAppend(e1);
-	return result;
-}
-
-skill [int] listMake(skill e1, skill e2)
-{
-	skill [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	return result;
-}
-
-skill [int] listMake(skill e1, skill e2, skill e3)
-{
-	skill [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	return result;
-}
-
-skill [int] listMake(skill e1, skill e2, skill e3, skill e4)
-{
-	skill [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	return result;
-}
-
-skill [int] listMake(skill e1, skill e2, skill e3, skill e4, skill e5)
-{
-	skill [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	result.listAppend(e5);
-	return result;
-}
-
-
-monster [int] listMake(monster e1)
-{
-	monster [int] result;
-	result.listAppend(e1);
-	return result;
-}
-
-monster [int] listMake(monster e1, monster e2)
-{
-	monster [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	return result;
-}
-
-monster [int] listMake(monster e1, monster e2, monster e3)
-{
-	monster [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	return result;
-}
-
-monster [int] listMake(monster e1, monster e2, monster e3, monster e4)
-{
-	monster [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	return result;
-}
-
-monster [int] listMake(monster e1, monster e2, monster e3, monster e4, monster e5)
-{
-	monster [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	result.listAppend(e5);
-	return result;
-}
-
-monster [int] listMake(monster e1, monster e2, monster e3, monster e4, monster e5, monster e6)
-{
-	monster [int] result;
-	result.listAppend(e1);
-	result.listAppend(e2);
-	result.listAppend(e3);
-	result.listAppend(e4);
-	result.listAppend(e5);
-	result.listAppend(e6);
-	return result;
+	return entries;
 }
 
 string listJoinComponents(string [int] list, string joining_string, string and_string)
