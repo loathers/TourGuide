@@ -3,8 +3,9 @@
 **TourGuide** is a script meant to help [Kingdom of Loathing](https://www.kingdomofloathing.com/) players efficiently play through an ascension. It will give you advice on getting through your active quests, tips on how to efficiently use your resources, and reminders on using time-limited resources. 
 
 To install, run the following command on an up-to-date [KolMafia](https://github.com/kolmafia/kolmafia) version:
-
-> `git checkout loathers/tourguide Release`
+```
+ git checkout loathers/tourguide Release
+```
 
 To update, run `git update` or check the "Update installed Git projects on login" box within Mafia preferences.
 
