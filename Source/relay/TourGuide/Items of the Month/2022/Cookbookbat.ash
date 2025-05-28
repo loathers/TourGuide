@@ -1,3 +1,30 @@
+RegisterTaskGenerationFunction("IOTMCookbookbatGenerateTasks");
+void IOTMCookbookbatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!lookupFamiliar("Cookbookbat").familiar_is_usable()) return;
+	string url = "familiar.php";
+	string [int] description;
+	string cbbIngredient = (get_property("_cookbookbatQuestIngredient"));
+	string cbbTarget = (get_property("_cookbookbatQuestMonster"));
+	string cbbZone = (get_property("_cookbookbatQuestLastLocation"));
+	int cbbResetTimer = get_property_int("_cookbookbatCombatsUntilNewQuest");
+	string main_title = HTMLGenerateSpanFont("Cookbookbat hunt", "black");
+	description.listAppend("Hunt: " + HTMLGenerateSpanFont(cbbTarget, "blue"));
+	description.listAppend("Zone: " + HTMLGenerateSpanFont(cbbZone, "purple"));
+	description.listAppend("Reward: 3x " +HTMLGenerateSpanFont(cbbIngredient, "green"));
+	description.listAppend(HTMLGenerateSpanOfClass(cbbResetTimer, "r_bold") + " fights until new hunt");
+			
+	if (cbbTarget != "" && cbbIngredient != "") {
+		location questLocation = get_property("_cookbookbatQuestLastLocation").to_location();
+		if (my_familiar() == lookupFamiliar("cookbookbat")) {
+			task_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", questLocation.getClickableURLForLocation(), ChecklistSubentryMake(main_title, description), -11, boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("cookbookbat hunt"));
+		}
+		else if (my_familiar() != lookupFamiliar("cookbookbat")) {
+			optional_task_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", questLocation.getClickableURLForLocation(), ChecklistSubentryMake(main_title, description), 10, boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("cookbookbat hunt"));
+		}
+	}
+}
+
 RegisterResourceGenerationFunction("IOTMCookbookbatGenerateResource");
 void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -46,7 +73,12 @@ void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 	tooltip_text.append(HTMLGenerateSimpleTableLines(pizzaParlorRecipes));
 		
 	description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Important Recipes", "r_tooltip_outer_class"));
-
+	
+	int cbbIngredientDrop = 11 - get_property_int("cookbookbatIngredientsCharge");
+	int cbbResetTimer = get_property_int("_cookbookbatCombatsUntilNewQuest");
+	description.listAppend(HTMLGenerateSpanOfClass(cbbIngredientDrop, "r_bold") + " wins until 3x ingredient");
+		description.listAppend(HTMLGenerateSpanOfClass(cbbResetTimer, "r_bold") + " fights until new hunt");
+	
     int cookings_remaining = clampi(5 - get_property_int("_cookbookbatCrafting"), 0, 5);
     if (cookings_remaining > 0) 
     {
