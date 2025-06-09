@@ -122,7 +122,10 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
     if ($effect[Shadow Affinity].have_effect() > 0 && riftAdvsUntilNC != 0 && !state.state_boolean["quest objective fulfilled"]) {
         int riftAdvsUntilNC = get_property_int("encountersUntilSRChoice");
         string [int] affinityDescription;
-        affinityDescription.listAppend(HTMLGenerateSpanFont("Shadow Rift fights are free!", "purple"));
+        if (shadowLodestones > 0) {
+			affinityDescription.listAppend(HTMLGenerateSpanFont("Have " + pluralise($item[Rufus's shadow lodestone]) + ".", "purple"));
+		}
+		affinityDescription.listAppend(HTMLGenerateSpanFont("Shadow Rift fights are free!", "purple"));
         affinityDescription.listAppend(HTMLGenerateSpanFont(riftAdvsUntilNC + " encounters until NC/boss.", "black"));
         affinityDescription.listAppend(HTMLGenerateSpanFont("(don't use other free kills in there)", "black"));
         task_entries.listAppend(ChecklistEntryMake("__effect Shadow Affinity", url, ChecklistSubentryMake(shadowRiftFightsDoableRightNow + " Shadow Rift free fights", "", affinityDescription), -11));
