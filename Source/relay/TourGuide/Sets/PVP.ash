@@ -51,7 +51,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             else if ($item[Spanish fly trap].available_amount() == 0)
             {
             	modifiers.listAppend("-combat");
-                if ($location[Frat House].noncombat_queue.contains_text("I Just Wanna Fly") || $location[The Orcish Frat House (Bombed Back to the Stone Age)].noncombat_queue.contains_text("Me Just Want Fly"))
+                if ($location[The Orcish Frat House].noncombat_queue.contains_text("I Just Wanna Fly") || $location[The Orcish Frat House (Bombed Back to the Stone Age)].noncombat_queue.contains_text("Me Just Want Fly"))
                 {
                     description.listAppend("Run -combat in The Obligatory Pirate's Cove, acquire Spanish fly trap.");
                 }

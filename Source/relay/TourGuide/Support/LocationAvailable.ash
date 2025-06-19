@@ -278,7 +278,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
     if (zone == "The Prince's Ball")
         return get_property("grimstoneMaskPath").to_lower_case() == "stepmother" && get_property_int("cinderellaMinutesToMidnight") > 0;
     
-    if (loc == $location[hippy camp])
+    if (loc == $location[The Hippy Camp])
     {
     	//FIXME we don't know who won the war, do we? so only give information if the war hasn't started 
     	if (get_property_ascension("lastIslandUnlock"))
@@ -759,9 +759,9 @@ static
         lookup_map["The Enormous Greater-Than Sign"] = "da.php";
         lookup_map["The Dungeons of Doom"] = "da.php";
         lookup_map["The Daily Dungeon"] = "da.php";
-        lookup_map["Video Game Level 1"] = "place.php?whichplace=faqdungeon";
-        lookup_map["Video Game Level 2"] = "place.php?whichplace=faqdungeon";
-        lookup_map["Video Game Level 3"] = "place.php?whichplace=faqdungeon";
+        lookup_map["[DungeonFAQ - Level 1]"] = "place.php?whichplace=faqdungeon";
+        lookup_map["[DungeonFAQ - Level 2]"] = "place.php?whichplace=faqdungeon";
+        lookup_map["[DungeonFAQ - Level 3]"] = "place.php?whichplace=faqdungeon";
         lookup_map["A Maze of Sewer Tunnels"] = "clan_hobopolis.php";
         lookup_map["Hobopolis Town Square"] = "clan_hobopolis.php?place=2";
         lookup_map["Burnbarrel Blvd."] = "clan_hobopolis.php?place=4";
@@ -869,11 +869,11 @@ static
         lookup_map["The Defiled Alcove"] = "crypt.php";
         lookup_map["The Defiled Niche"] = "crypt.php";
         lookup_map["Haert of the Cyrpt"] = "crypt.php";
-        lookup_map["Frat House"] = "island.php";
+        lookup_map["The Orcish Frat House"] = "island.php";
         lookup_map["Frat House In Disguise"] = "island.php";
         lookup_map["Frat House (frat disguise)"] = "island.php";
         lookup_map["The Frat House (Bombed Back to the Stone Age)"] = "island.php";
-        lookup_map["Hippy Camp"] = "island.php";
+        lookup_map["The Hippy Camp"] = "island.php";
         lookup_map["Hippy Camp In Disguise"] = "island.php";
         lookup_map["Hippy Camp (hippy disguise)"] = "island.php";
         lookup_map["The Hippy Camp (Bombed Back to the Stone Age)"] = "island.php";

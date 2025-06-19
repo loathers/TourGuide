@@ -307,7 +307,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if (!lookupSkill("ink gland").have_skill() && lookupItem("shot of granola liqueur").available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[hippy]);
-            suggested_locations.listAppend($location[hippy camp]);
+            suggested_locations.listAppend($location[The Hippy Camp]);
             matchup_type.listAppend("-");
             have_minus = true;
         }
@@ -328,7 +328,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if (!lookupSkill("powerful vocal chords").have_skill() && lookupItem("baby oil shooter").available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[orc]);
-            suggested_locations.listAppend($location[frat house]);
+            suggested_locations.listAppend($location[The Orcish Frat House]);
             matchup_type.listAppend("+");
             have_plus = true;
         }
