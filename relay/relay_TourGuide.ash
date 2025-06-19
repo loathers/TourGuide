@@ -1,6 +1,6 @@
 //This script and its support scripts are in the public domain.
 
-since r27521; // Eagle & Scepter supported
+since r28562; // fix: names for base hippy camp, frat house, video game dungeons
 //These settings are for development. Don't worry about editing them.
 string __version = "2.2.2"; // pushed to 2.2.1 on jill/leaves tiles
 
@@ -6387,7 +6387,7 @@ boolean locationAvailablePrivateCheck(location loc, Error able_to_find)
     if (zone == "The Prince's Ball")
         return get_property("grimstoneMaskPath").to_lower_case() == "stepmother" && get_property_int("cinderellaMinutesToMidnight") > 0;
     
-    if (loc == $location[hippy camp])
+    if (loc == $location[The Hippy Camp])
     {
     	//FIXME we don't know who won the war, do we? so only give information if the war hasn't started 
     	if (get_property_ascension("lastIslandUnlock"))
@@ -6868,9 +6868,9 @@ static
         lookup_map["The Enormous Greater-Than Sign"] = "da.php";
         lookup_map["The Dungeons of Doom"] = "da.php";
         lookup_map["The Daily Dungeon"] = "da.php";
-        lookup_map["Video Game Level 1"] = "place.php?whichplace=faqdungeon";
-        lookup_map["Video Game Level 2"] = "place.php?whichplace=faqdungeon";
-        lookup_map["Video Game Level 3"] = "place.php?whichplace=faqdungeon";
+        lookup_map["[DungeonFAQ - Level 1]"] = "place.php?whichplace=faqdungeon";
+        lookup_map["[DungeonFAQ - Level 2]"] = "place.php?whichplace=faqdungeon";
+        lookup_map["[DungeonFAQ - Level 3]"] = "place.php?whichplace=faqdungeon";
         lookup_map["A Maze of Sewer Tunnels"] = "clan_hobopolis.php";
         lookup_map["Hobopolis Town Square"] = "clan_hobopolis.php?place=2";
         lookup_map["Burnbarrel Blvd."] = "clan_hobopolis.php?place=4";
@@ -6978,11 +6978,11 @@ static
         lookup_map["The Defiled Alcove"] = "crypt.php";
         lookup_map["The Defiled Niche"] = "crypt.php";
         lookup_map["Haert of the Cyrpt"] = "crypt.php";
-        lookup_map["Frat House"] = "island.php";
+        lookup_map["The Orcish Frat House"] = "island.php";
         lookup_map["Frat House In Disguise"] = "island.php";
         lookup_map["Frat House (frat disguise)"] = "island.php";
         lookup_map["The Frat House (Bombed Back to the Stone Age)"] = "island.php";
-        lookup_map["Hippy Camp"] = "island.php";
+        lookup_map["The Hippy Camp"] = "island.php";
         lookup_map["Hippy Camp In Disguise"] = "island.php";
         lookup_map["Hippy Camp (hippy disguise)"] = "island.php";
         lookup_map["The Hippy Camp (Bombed Back to the Stone Age)"] = "island.php";
@@ -16125,7 +16125,7 @@ void QLevel12GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 	ChecklistSubentry subentry;
 	subentry.header = base_quest_state.quest_name;
 	
-	task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "island.php", subentry, $locations[the battlefield (frat uniform), the battlefield (hippy uniform), frat house, hippy camp, wartime frat house, wartime frat house (hippy disguise), wartime hippy camp, wartime hippy camp (frat disguise)]).ChecklistEntrySetIDTag("Council L12 quest battlefield"));
+	task_entries.listAppend(ChecklistEntryMake(base_quest_state.image_name, "island.php", subentry, $locations[the battlefield (frat uniform), the battlefield (hippy uniform), The Orcish Frat House, The Hippy camp, wartime frat house, wartime frat house (hippy disguise), wartime hippy camp, wartime hippy camp (frat disguise)]).ChecklistEntrySetIDTag("Council L12 quest battlefield"));
 	if (base_quest_state.mafia_internal_step < 2)
 	{
 		subentry.modifiers.listAppend("-combat");
@@ -31225,7 +31225,7 @@ void SPVPGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             else if ($item[Spanish fly trap].available_amount() == 0)
             {
             	modifiers.listAppend("-combat");
-                if ($location[Frat House].noncombat_queue.contains_text("I Just Wanna Fly") || $location[The Orcish Frat House (Bombed Back to the Stone Age)].noncombat_queue.contains_text("Me Just Want Fly"))
+                if ($location[The Orcish Frat House].noncombat_queue.contains_text("I Just Wanna Fly") || $location[The Orcish Frat House (Bombed Back to the Stone Age)].noncombat_queue.contains_text("Me Just Want Fly"))
                 {
                     description.listAppend("Run -combat in The Obligatory Pirate's Cove, acquire Spanish fly trap.");
                 }
@@ -32041,7 +32041,7 @@ void SPowerlevelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         else if (spooky_airport_unlocked)
             url = $location[the deep dark jungle].getClickableURLForLocation();
         else if ($item[GameInformPowerDailyPro walkthru].available_amount() > 0)
-            url = $location[video game level 1].getClickableURLForLocation();
+            url = $location[[DungeonFAQ - Level 1]].getClickableURLForLocation();
         else if (my_primestat() == $stat[muscle] && $location[the haunted billiards room].locationAvailable())
             url = $location[the haunted gallery].getClickableURLForLocation();
         else if (my_primestat() == $stat[mysticality] && $location[the haunted bedroom].locationAvailable())
@@ -32664,7 +32664,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if ($familiar[slimeling].familiar_is_usable())
             modifiers.listAppend("slimeling?");
             
-        ChecklistEntry entry = ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]);
+        ChecklistEntry entry = ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[The Hippy Camp]);
         entry.tags.id = "Filthy hippy disguise acquire";
         if (should_be_future_task)
             future_task_entries.listAppend(entry);
@@ -32690,7 +32690,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     
     //I'm not sure if you ever need a frat boy ensemble in-run, even if you're doing the hippy side on the war? If you need war hippy fatigues, the faster (?) way is acquire hippy outfit -> frat warrior fatigues -> start the war / use desert adventure for hippy fatigues. But if they're sure...
-	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && $location[frat house].turnsAttemptedInLocation() >= 3 && ($location[frat house].combatTurnsAttemptedInLocation() > 0 || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Murder by Death") || $location[frat house].noncombat_queue.contains_text("I Just Wanna Fly") || $location[frat house].noncombat_queue.contains_text("From Stoked to Smoked") || $location[frat house].noncombat_queue.contains_text("Purple Hazers")))
+	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && $location[The Orcish Frat House].turnsAttemptedInLocation() >= 3 && ($location[The Orcish Frat House].combatTurnsAttemptedInLocation() > 0 || $location[The Orcish Frat House].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[The Orcish Frat House].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[The Orcish Frat House].noncombat_queue.contains_text("Murder by Death") || $location[The Orcish Frat House].noncombat_queue.contains_text("I Just Wanna Fly") || $location[The Orcish Frat House].noncombat_queue.contains_text("From Stoked to Smoked") || $location[The Orcish Frat House].noncombat_queue.contains_text("Purple Hazers")))
     {
         //they don't have a frat boy ensemble, but they adventured in the pre-war frat house
         //I'm assuming this means they want the outfit, for whatever reason. So, suggest it, until the level 12 starts:
@@ -32706,7 +32706,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         else
             description.listAppend("Possibly wait until level 9, to unlock NCs in the area.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item orcish frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[frat house]).ChecklistEntrySetIDTag("Frat boy ensemble acquire"));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item orcish frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[The Orcish Frat House]).ChecklistEntrySetIDTag("Frat boy ensemble acquire"));
     }
 		
 	if ($item[strange leaflet].available_amount() > 0 && __misc_state["in run"] && !get_property_boolean("leafletCompleted"))
@@ -40099,10 +40099,10 @@ static
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(4, $location[Cobb's Knob Treasury], "STAT2", "+40 muscle, -50% familiar weight", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(5, $location[Cobb's Knob Kitchens], "STAT2", "+40 myst, -50% familiar weight", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(6, $location[Cobb's Knob Harem], "STAT2", "+40 moxie, -50% familiar weight", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(7, $location[Frat House], "STAT3", "+50% muscle, -50% myst", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(7, $location[The Orcish Frat House], "STAT3", "+50% muscle, -50% myst", "", false));
         // __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, $location[Frat House In Disguise], "STAT3", "+50% muscle, -50% moxie", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(8, fratHouseInDisguise(), "STAT3", "+50% muscle, -50% moxie", "", false));
-        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(9, $location[Hippy Camp], "STAT3", "+50% myst, -50% moxie", "", false));
+        __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(9, $location[The Hippy Camp], "STAT3", "+50% myst, -50% moxie", "", false));
         // __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, $location[Hippy Camp In Disguise], "STAT3", "+50% myst, -50% muscle", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(10, hippyCampInDisguise(), "STAT3", "+50% myst, -50% muscle", "", false));
         __static_bad_moon_adventures.listAppend(BadMoonAdventureMake(11, $location[The Obligatory Pirate's Cove], "STAT3", "+50% moxie, -50% muscle", "", false));
@@ -40565,9 +40565,9 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     /*
     FIXME
     "Tower Ruins" unknown to locationAvailable
-    "Frat House" unknown to locationAvailable
+    "The Orcish Frat House" unknown to locationAvailable
     "Frat House (Frat Disguise)" unknown to locationAvailable
-    "Hippy Camp" unknown to locationAvailable
+    "The Hippy Camp" unknown to locationAvailable
     "Hippy Camp (Hippy Disguise)" unknown to locationAvailable
     */
 }
@@ -42462,7 +42462,7 @@ buffer generateLocationBar(boolean displaying_navbar)
             location_data.listAppend(average_coins_gained.roundForOutput(1) + " ka");
     }
     
-    boolean [location] powerleveling_locations = $locations[hamburglaris shield generator,video game level 1,video game level 2,video game level 3];
+    boolean [location] powerleveling_locations = $locations[hamburglaris shield generator,[DungeonFAQ - Level 1],[DungeonFAQ - Level 2],[DungeonFAQ - Level 3]];
     
     if (sample_count > 0 && (__misc_state["in run"] || powerleveling_locations contains l || average_ml > my_buffedstat($stat[moxie])))
     {
@@ -51040,7 +51040,7 @@ void IOTMRedNosedSnapperResource(ChecklistEntry [int] resource_entries)
 
             case $phylum[hippy]: //hippy camp
                 if (__misc_state["mysterious island available"] && __quest_state["Island War"].state_string["Side seemingly fighting for"] != "hippy")
-                    reachable_instances.listAppend(__quest_state["Island War"].state_boolean["War in progress"] ? "war hippies" : "hippy camp");
+                    reachable_instances.listAppend(__quest_state["Island War"].state_boolean["War in progress"] ? "war hippies" : "The Hippy Camp");
                 break;
 
             case $phylum[hobo]: //no hobos in one's normal path. There's some in the wrong side of the track, but we don't recommend they go there for that.
@@ -56904,8 +56904,8 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
         }
         if (__misc_state["mysterious island available"] && !__quest_state["Level 12"].in_progress && my_level() < 9) //we test if we're under level 9 and the level 12 quest isn't in progress. maybe they ate a lot of hot dogs. it could happen!
         {
-            places_to_farm_ka.listAppend("hippy camp");
-            if (url.length() == 0) url = $location[hippy camp].getClickableURLForLocation();
+            places_to_farm_ka.listAppend("The Hippy Camp");
+            if (url.length() == 0) url = $location[The Hippy Camp].getClickableURLForLocation();
         }
         if (!__misc_state["mysterious island available"] && my_basestat($stat[mysticality]) < 40)
         {
@@ -58751,7 +58751,7 @@ void PathWOTSFGenerateResource(ChecklistEntry [int] resource_entries)
 	teaching_properties_to_locations["fistTeachingsBarroomBrawl"] = $location[A Barroom Brawl];
 	teaching_properties_to_locations["fistTeachingsBatHole"] = $location[The Bat Hole Entrance];
 	teaching_properties_to_locations["fistTeachingsConservatory"] = $location[The Haunted Conservatory];
-	teaching_properties_to_locations["fistTeachingsFratHouse"] = $location[Frat House];
+	teaching_properties_to_locations["fistTeachingsFratHouse"] = $location[The Orcish Frat House];
 	teaching_properties_to_locations["fistTeachingsFunHouse"] = $location[The "Fun" House];
 	teaching_properties_to_locations["fistTeachingsHaikuDungeon"] = $location[The Haiku Dungeon];
 	teaching_properties_to_locations["fistTeachingsMenagerie"] = $location[Cobb's Knob Menagerie\, Level 2];
@@ -58774,6 +58774,7 @@ void PathWOTSFGenerateResource(ChecklistEntry [int] resource_entries)
 		resource_entries.listAppend(ChecklistEntryMake("__item Teachings of the Fist", "", ChecklistSubentryMake("Teachings of the Fist", "", "Found in " + missing_areas.listJoinComponents(", ", "and") + "."), 5).ChecklistEntrySetIDTag("Surprising fist path find fist skills"));
 		
 }
+
 RegisterTaskGenerationFunction("PathTheSourceGenerateTasks");
 void PathTheSourceGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -59452,7 +59453,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if (!lookupSkill("ink gland").have_skill() && lookupItem("shot of granola liqueur").available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[hippy]);
-            suggested_locations.listAppend($location[hippy camp]);
+            suggested_locations.listAppend($location[The Hippy Camp]);
             matchup_type.listAppend("-");
             have_minus = true;
         }
@@ -59473,7 +59474,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         if (!lookupSkill("powerful vocal chords").have_skill() && lookupItem("baby oil shooter").available_amount() == 0)
         {
             phylums_to_run_against.listAppend($phylum[orc]);
-            suggested_locations.listAppend($location[frat house]);
+            suggested_locations.listAppend($location[The Orcish Frat House]);
             matchup_type.listAppend("+");
             have_plus = true;
         }
@@ -59507,6 +59508,7 @@ void PathGelatinousNoobGenerateTasks(ChecklistEntry [int] task_entries, Checklis
         }
     }
 }
+
 RegisterTaskGenerationFunction("PathLicenseToAdventureGenerateTasks");
 void PathLicenseToAdventureGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
