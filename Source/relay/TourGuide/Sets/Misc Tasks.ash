@@ -87,7 +87,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if ($familiar[slimeling].familiar_is_usable())
             modifiers.listAppend("slimeling?");
             
-        ChecklistEntry entry = ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]);
+        ChecklistEntry entry = ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[The Hippy Camp]);
         entry.tags.id = "Filthy hippy disguise acquire";
         if (should_be_future_task)
             future_task_entries.listAppend(entry);
