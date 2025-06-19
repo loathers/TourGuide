@@ -155,7 +155,7 @@ void IOTMRedNosedSnapperResource(ChecklistEntry [int] resource_entries)
 
             case $phylum[hippy]: //hippy camp
                 if (__misc_state["mysterious island available"] && __quest_state["Island War"].state_string["Side seemingly fighting for"] != "hippy")
-                    reachable_instances.listAppend(__quest_state["Island War"].state_boolean["War in progress"] ? "war hippies" : "hippy camp");
+                    reachable_instances.listAppend(__quest_state["Island War"].state_boolean["War in progress"] ? "war hippies" : "The Hippy Camp");
                 break;
 
             case $phylum[hobo]: //no hobos in one's normal path. There's some in the wrong side of the track, but we don't recommend they go there for that.

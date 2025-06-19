@@ -58,7 +58,7 @@ void SPowerlevelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         else if (spooky_airport_unlocked)
             url = $location[the deep dark jungle].getClickableURLForLocation();
         else if ($item[GameInformPowerDailyPro walkthru].available_amount() > 0)
-            url = $location[video game level 1].getClickableURLForLocation();
+            url = $location[[DungeonFAQ - Level 1]].getClickableURLForLocation();
         else if (my_primestat() == $stat[muscle] && $location[the haunted billiards room].locationAvailable())
             url = $location[the haunted gallery].getClickableURLForLocation();
         else if (my_primestat() == $stat[mysticality] && $location[the haunted bedroom].locationAvailable())

@@ -15,7 +15,7 @@ void PathWOTSFGenerateResource(ChecklistEntry [int] resource_entries)
 	teaching_properties_to_locations["fistTeachingsBarroomBrawl"] = $location[A Barroom Brawl];
 	teaching_properties_to_locations["fistTeachingsBatHole"] = $location[The Bat Hole Entrance];
 	teaching_properties_to_locations["fistTeachingsConservatory"] = $location[The Haunted Conservatory];
-	teaching_properties_to_locations["fistTeachingsFratHouse"] = $location[Frat House];
+	teaching_properties_to_locations["fistTeachingsFratHouse"] = $location[The Orcish Frat House];
 	teaching_properties_to_locations["fistTeachingsFunHouse"] = $location[The "Fun" House];
 	teaching_properties_to_locations["fistTeachingsHaikuDungeon"] = $location[The Haiku Dungeon];
 	teaching_properties_to_locations["fistTeachingsMenagerie"] = $location[Cobb's Knob Menagerie\, Level 2];

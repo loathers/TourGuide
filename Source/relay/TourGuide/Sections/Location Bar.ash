@@ -475,7 +475,7 @@ buffer generateLocationBar(boolean displaying_navbar)
             location_data.listAppend(average_coins_gained.roundForOutput(1) + " ka");
     }
     
-    boolean [location] powerleveling_locations = $locations[hamburglaris shield generator,video game level 1,video game level 2,video game level 3];
+    boolean [location] powerleveling_locations = $locations[hamburglaris shield generator,[DungeonFAQ - Level 1],[DungeonFAQ - Level 2],[DungeonFAQ - Level 3]];
     
     if (sample_count > 0 && (__misc_state["in run"] || powerleveling_locations contains l || average_ml > my_buffedstat($stat[moxie])))
     {

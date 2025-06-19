@@ -310,8 +310,8 @@ void PathActuallyEdtheUndyingGenerateResource(ChecklistEntry [int] resource_entr
         }
         if (__misc_state["mysterious island available"] && !__quest_state["Level 12"].in_progress && my_level() < 9) //we test if we're under level 9 and the level 12 quest isn't in progress. maybe they ate a lot of hot dogs. it could happen!
         {
-            places_to_farm_ka.listAppend("hippy camp");
-            if (url.length() == 0) url = $location[hippy camp].getClickableURLForLocation();
+            places_to_farm_ka.listAppend("The Hippy Camp");
+            if (url.length() == 0) url = $location[The Hippy Camp].getClickableURLForLocation();
         }
         if (!__misc_state["mysterious island available"] && my_basestat($stat[mysticality]) < 40)
         {

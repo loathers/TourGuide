@@ -87,7 +87,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if ($familiar[slimeling].familiar_is_usable())
             modifiers.listAppend("slimeling?");
             
-        ChecklistEntry entry = ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[hippy camp]);
+        ChecklistEntry entry = ChecklistEntryMake("__item filthy knitted dread sack", "island.php", ChecklistSubentryMake("Acquire a filthy hippy disguise", modifiers, description), $locations[The Hippy Camp]);
         entry.tags.id = "Filthy hippy disguise acquire";
         if (should_be_future_task)
             future_task_entries.listAppend(entry);
@@ -113,7 +113,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
     
     //I'm not sure if you ever need a frat boy ensemble in-run, even if you're doing the hippy side on the war? If you need war hippy fatigues, the faster (?) way is acquire hippy outfit -> frat warrior fatigues -> start the war / use desert adventure for hippy fatigues. But if they're sure...
-	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && $location[frat house].turnsAttemptedInLocation() >= 3 && ($location[frat house].combatTurnsAttemptedInLocation() > 0 || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[frat house].noncombat_queue.contains_text("Murder by Death") || $location[frat house].noncombat_queue.contains_text("I Just Wanna Fly") || $location[frat house].noncombat_queue.contains_text("From Stoked to Smoked") || $location[frat house].noncombat_queue.contains_text("Purple Hazers")))
+	if (!have_outfit_components("Frat boy ensemble") && __misc_state["mysterious island available"] && __misc_state["in run"] && !__quest_state["Level 12"].finished && !__quest_state["Level 12"].started && $location[The Orcish Frat House].turnsAttemptedInLocation() >= 3 && ($location[The Orcish Frat House].combatTurnsAttemptedInLocation() > 0 || $location[The Orcish Frat House].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[The Orcish Frat House].noncombat_queue.contains_text("Sing This Explosion to Me") || $location[The Orcish Frat House].noncombat_queue.contains_text("Murder by Death") || $location[The Orcish Frat House].noncombat_queue.contains_text("I Just Wanna Fly") || $location[The Orcish Frat House].noncombat_queue.contains_text("From Stoked to Smoked") || $location[The Orcish Frat House].noncombat_queue.contains_text("Purple Hazers")))
     {
         //they don't have a frat boy ensemble, but they adventured in the pre-war frat house
         //I'm assuming this means they want the outfit, for whatever reason. So, suggest it, until the level 12 starts:
@@ -129,7 +129,7 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
         else
             description.listAppend("Possibly wait until level 9, to unlock NCs in the area.");
-		optional_task_entries.listAppend(ChecklistEntryMake("__item orcish frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[frat house]).ChecklistEntrySetIDTag("Frat boy ensemble acquire"));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item orcish frat-paddle", "island.php", ChecklistSubentryMake("Acquire a frat boy ensemble?", modifiers, description), $locations[The Orcish Frat House]).ChecklistEntrySetIDTag("Frat boy ensemble acquire"));
     }
 		
 	if ($item[strange leaflet].available_amount() > 0 && __misc_state["in run"] && !get_property_boolean("leafletCompleted"))
