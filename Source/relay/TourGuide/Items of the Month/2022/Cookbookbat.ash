@@ -9,13 +9,16 @@ void IOTMCookbookbatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 	string cbbZone = (get_property("_cookbookbatQuestLastLocation"));
 	int cbbResetTimer = get_property_int("_cookbookbatCombatsUntilNewQuest");
 	string main_title = HTMLGenerateSpanFont("Cookbookbat hunt", "black");
-	description.listAppend("Hunt: " + HTMLGenerateSpanFont(cbbTarget, "blue"));
-	description.listAppend("Zone: " + HTMLGenerateSpanFont(cbbZone, "purple"));
-	description.listAppend("Reward: 3x " +HTMLGenerateSpanFont(cbbIngredient, "green"));
 	description.listAppend(HTMLGenerateSpanOfClass(cbbResetTimer, "r_bold") + " fights until new hunt");
+	int cbbIngredientDrop = 11 - get_property_int("cookbookbatIngredientsCharge");
+	description.listAppend(HTMLGenerateSpanOfClass(cbbIngredientDrop, "r_bold") + " wins until 3x ingredient");
 			
 	if (cbbTarget != "" && cbbIngredient != "") {
+		description.listAppend("Hunt: " + HTMLGenerateSpanFont(cbbTarget, "blue"));
+		description.listAppend("Zone: " + HTMLGenerateSpanFont(cbbZone, "purple"));
+		description.listAppend("Reward: 3x " +HTMLGenerateSpanFont(cbbIngredient, "green"));
 		location questLocation = get_property("_cookbookbatQuestLastLocation").to_location();
+		
 		if (my_familiar() == lookupFamiliar("cookbookbat")) {
 			task_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", questLocation.getClickableURLForLocation(), ChecklistSubentryMake(main_title, description), -11, boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("cookbookbat hunt"));
 		}
@@ -23,6 +26,9 @@ void IOTMCookbookbatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
 			optional_task_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", questLocation.getClickableURLForLocation(), ChecklistSubentryMake(main_title, description), 10, boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("cookbookbat hunt"));
 		}
 	}
+	if (cbbTarget == "" && cbbIngredient == "" && my_familiar() == lookupFamiliar("cookbookbat")) {
+		task_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", url, ChecklistSubentryMake("Cookbookbat charging", description), -11));
+	}	
 }
 
 RegisterResourceGenerationFunction("IOTMCookbookbatGenerateResource");
