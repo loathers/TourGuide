@@ -53938,6 +53938,39 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	}
 }
 
+RegisterTaskGenerationFunction("IOTMCookbookbatGenerateTasks");
+void IOTMCookbookbatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (!lookupFamiliar("Cookbookbat").familiar_is_usable()) return;
+	string url = "familiar.php";
+	string [int] description;
+	string cbbIngredient = (get_property("_cookbookbatQuestIngredient"));
+	string cbbTarget = (get_property("_cookbookbatQuestMonster"));
+	string cbbZone = (get_property("_cookbookbatQuestLastLocation"));
+	int cbbResetTimer = get_property_int("_cookbookbatCombatsUntilNewQuest");
+	string main_title = HTMLGenerateSpanFont("Cookbookbat hunt", "black");
+	description.listAppend(HTMLGenerateSpanOfClass(cbbResetTimer, "r_bold") + " fights until new hunt");
+	int cbbIngredientDrop = 11 - get_property_int("cookbookbatIngredientsCharge");
+	description.listAppend(HTMLGenerateSpanOfClass(cbbIngredientDrop, "r_bold") + " wins until 3x ingredient");
+			
+	if (cbbTarget != "" && cbbIngredient != "") {
+		description.listAppend("Hunt: " + HTMLGenerateSpanFont(cbbTarget, "blue"));
+		description.listAppend("Zone: " + HTMLGenerateSpanFont(cbbZone, "purple"));
+		description.listAppend("Reward: 3x " +HTMLGenerateSpanFont(cbbIngredient, "green"));
+		location questLocation = get_property("_cookbookbatQuestLastLocation").to_location();
+		
+		if (my_familiar() == lookupFamiliar("cookbookbat")) {
+			task_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", questLocation.getClickableURLForLocation(), ChecklistSubentryMake(main_title, description), -11, boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("cookbookbat hunt"));
+		}
+		else if (my_familiar() != lookupFamiliar("cookbookbat")) {
+			optional_task_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", questLocation.getClickableURLForLocation(), ChecklistSubentryMake(main_title, description), 10, boolean [location] {questLocation:true}).ChecklistEntrySetIDTag("cookbookbat hunt"));
+		}
+	}
+	if (cbbTarget == "" && cbbIngredient == "" && my_familiar() == lookupFamiliar("cookbookbat")) {
+		task_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", url, ChecklistSubentryMake("Cookbookbat charging", description), -11));
+	}	
+}
+
 RegisterResourceGenerationFunction("IOTMCookbookbatGenerateResource");
 void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -53986,7 +54019,12 @@ void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 	tooltip_text.append(HTMLGenerateSimpleTableLines(pizzaParlorRecipes));
 		
 	description.listAppend(HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Important Recipes", "r_tooltip_outer_class"));
-
+	
+	int cbbIngredientDrop = 11 - get_property_int("cookbookbatIngredientsCharge");
+	int cbbResetTimer = get_property_int("_cookbookbatCombatsUntilNewQuest");
+	description.listAppend(HTMLGenerateSpanOfClass(cbbIngredientDrop, "r_bold") + " wins until 3x ingredient");
+		description.listAppend(HTMLGenerateSpanOfClass(cbbResetTimer, "r_bold") + " fights until new hunt");
+	
     int cookings_remaining = clampi(5 - get_property_int("_cookbookbatCrafting"), 0, 5);
     if (cookings_remaining > 0) 
     {
@@ -53995,6 +54033,7 @@ void IOTMCookbookbatGenerateResource(ChecklistEntry [int] resource_entries)
 	
     resource_entries.listAppend(ChecklistEntryMake("__familiar cookbookbat", url, ChecklistSubentryMake("Pizza party with the Cookbookbat!", "", description)).ChecklistEntrySetIDTag("Cookbookbat Resource"));
 }
+
 RegisterResourceGenerationFunction("IOTMOliversPlaceGenerateResource");
 void IOTMOliversPlaceGenerateResource(ChecklistEntry [int] resource_entries) 
 {
@@ -54377,6 +54416,7 @@ void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     }
 
 }
+//shadow phone
 QuestState parseRufusQuestState() {
     /*
     Below description from Veracity's PR introducing Rufus quest tracking:
@@ -54448,17 +54488,22 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
     ChecklistEntry [int] whereToAddRufusQuestTile;
     string rufusImage = "__item closed-circuit pay phone";
     string rufusQuestTitle;
+	string rufusQuestTarget = get_property("rufusQuestTarget");
     string [int] rufusQuestDescription;
     int rufusQuestPriority;
-    
+    int shadowRiftFightsDoableRightNow = $effect[Shadow Affinity].have_effect();
+	
     int shadowLodestones = available_amount($item[Rufus's shadow lodestone]);
     if (shadowLodestones > 0) {
         rufusQuestDescription.listAppend(HTMLGenerateSpanFont("Have " + pluralise($item[Rufus's shadow lodestone]) + ".", "purple"));
     }
 
     int riftAdvsUntilNC = get_property_int("encountersUntilSRChoice");
-    rufusQuestDescription.listAppend(HTMLGenerateSpanFont(riftAdvsUntilNC + " encounters until NC/boss.", "black"));
-
+    if (shadowRiftFightsDoableRightNow > 0) {
+		rufusQuestDescription.listAppend(HTMLGenerateSpanFont("" + shadowRiftFightsDoableRightNow + " Shadow Rift free fights", "purple"));
+	}
+	rufusQuestDescription.listAppend(HTMLGenerateSpanFont(riftAdvsUntilNC + " encounters until NC/boss.", "black"));
+	
     if (state.state_boolean["quest objective fulfilled"]) {
         // We've fulfilled the quest objective but still need to call Rufus
         rufusQuestDescription.listAppend(HTMLGenerateSpanFont("Call Rufus and get a lodestone", "black"));
@@ -54467,7 +54512,7 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
         whereToAddRufusQuestTile = task_entries;
     }
     else if (state.started && riftAdvsUntilNC == 0) {
-        rufusQuestDescription.listAppend(HTMLGenerateSpanFont("Fight a boss or get an artifact", "black"));
+        rufusQuestDescription.listAppend("Looking for " + HTMLGenerateSpanFont(rufusQuestTarget, "blue"));
         rufusQuestTitle = "Shadow Rift NC up next";
         rufusQuestPriority = -11;
         rufusImage = "__item shadow bucket";
@@ -54475,7 +54520,7 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
     }
     else if (state.started) {
         rufusQuestTitle = "Rufus quest in progress";
-        rufusQuestPriority = 11;
+        rufusQuestPriority = 999;
         whereToAddRufusQuestTile = optional_task_entries;
     }
     else if (!state.started) {
@@ -54484,7 +54529,7 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
         string callRufusMessage = calledRufusToday ? "Optionally call Rufus again for another (turn-taking) quest." : "Haven't called Rufus yet today.";
         rufusQuestDescription.listAppend(HTMLGenerateSpanFont(callRufusMessage, textColor));
         rufusQuestTitle = "Rufus quest doable now";
-        rufusQuestPriority = 11;
+        rufusQuestPriority = 999;
         whereToAddRufusQuestTile = optional_task_entries;
     }
 
@@ -54492,11 +54537,13 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
 
     whereToAddRufusQuestTile.listAppend(ChecklistEntryMake(rufusImage, url, ChecklistSubentryMake(rufusQuestTitle, "", rufusQuestDescription), rufusQuestPriority));
 
-    if ($effect[Shadow Affinity].have_effect() > 0) {
-        int shadowRiftFightsDoableRightNow = $effect[Shadow Affinity].have_effect();
+    if ($effect[Shadow Affinity].have_effect() > 0 && riftAdvsUntilNC != 0 && !state.state_boolean["quest objective fulfilled"]) {
         int riftAdvsUntilNC = get_property_int("encountersUntilSRChoice");
         string [int] affinityDescription;
-        affinityDescription.listAppend(HTMLGenerateSpanFont("Shadow Rift fights are free!", "purple"));
+        if (shadowLodestones > 0) {
+			affinityDescription.listAppend(HTMLGenerateSpanFont("Have " + pluralise($item[Rufus's shadow lodestone]) + ".", "purple"));
+		}
+		affinityDescription.listAppend(HTMLGenerateSpanFont("Shadow Rift fights are free!", "purple"));
         affinityDescription.listAppend(HTMLGenerateSpanFont(riftAdvsUntilNC + " encounters until NC/boss.", "black"));
         affinityDescription.listAppend(HTMLGenerateSpanFont("(don't use other free kills in there)", "black"));
         task_entries.listAppend(ChecklistEntryMake("__effect Shadow Affinity", url, ChecklistSubentryMake(shadowRiftFightsDoableRightNow + " Shadow Rift free fights", "", affinityDescription), -11));
