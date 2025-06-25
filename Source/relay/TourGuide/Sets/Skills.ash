@@ -29,6 +29,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 
         int free_crafts_left = 0;
         int free_cooks_left = 0;
+        int free_mixes_left = 0;
         if ($effect[Inigo's Incantation of Inspiration].have_effect() >= 5) {
             free_crafts_left += $effect[Inigo's Incantation of Inspiration].have_effect() / 5;
         }
@@ -51,6 +52,28 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 			string title = "free cooking";
 			if (free_cooks_left > 0) {
 			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_cooks_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "COOKING only" : "", description));
+			}
+        }
+		// holiday multitasking
+		if (lookupSkill("Holiday Multitasking").skill_is_usable()) {
+            free_crafts_left += clampi(3 - get_property_int("_holidayMultitaskingUsed"), 0, 3);
+        }    
+        // elf guard cooking
+        if (lookupSkill("Elf Guard Cooking").skill_is_usable()) {
+            string [int] description;
+			free_cooks_left += clampi(3 - get_property_int("_elfGuardCookingUsed"), 0, 3);
+			string title = "free cooking";
+			if (free_cooks_left > 0) {
+			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_cooks_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "COOKING only" : "", description));
+			}
+        }
+		// cocktails of the age of sail
+        if (lookupSkill("Old-School Cocktailcrafting").skill_is_usable()) {
+            string [int] description;
+			free_mixes_left += clampi(3 - get_property_int("_oldSchoolCocktailCraftingUsed"), 0, 3);
+			string title = "free mixing";
+			if (free_mixes_left > 0) {
+			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_mixes_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "MIXING only" : "", description));
 			}
         }
 
