@@ -56614,6 +56614,375 @@ void IOTMSeptemberCenserGenerateResource(ChecklistEntry [int] resource_entries)
     resource_entries.listAppend(ChecklistEntryMake("__item sept-ember censer", url, ChecklistSubentryMake(title, "", description), 8));
 }
 
+// Bat Wings
+RegisterTaskGenerationFunction("IOTMRomanBatWingsTasks");
+void IOTMRomanBatWingsTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if ($item[bat wings].available_amount() == 0) return;
+
+    string [int] description;
+	string url;
+    // 25 bridge parts
+    int bridgeProg = get_property_int("chasmBridgeProgress");
+    {
+        if (bridgeProg >= 25 && !locationAvailable($location[Oil Peak])) 
+		{
+		    if (lookupItem("bat wings").equipped_amount() == 0) {
+				url = "inventory.php?ftext=bat+wings";
+				description.listAppend(HTMLGenerateSpanFont("Equip the bat wings first.", "red"));
+			}
+			else {
+				url = "place.php?whichplace=orc_chasm";
+				description.listAppend(HTMLGenerateSpanFont("Leap across the bridge!", "blue"));
+			}
+			task_entries.listAppend(ChecklistEntryMake("__item miniature suspension bridge", url, ChecklistSubentryMake("Bat wings to cross the chasm!", "", description), -11));
+		}
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMBatWingsGenerateResource");
+void IOTMBatWingsGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (available_amount($item[bat wings]) < 1)
+        return;
+
+    string [int] description;
+	string url = "inventory.php?ftext=bat+wings";
+	
+    //save the city of gotpork, battyman!
+    int batWingSwoopsLeft = clampi(11 - get_property_int("_batWingsSwoopUsed"), 0, 11);
+	int batWingRestsLeft = clampi(11 - get_property_int("_batWingsRestUsed"), 0, 11);
+	int batWingCauldronsLeft = clampi(11 - get_property_int("_batWingsCauldronUsed"), 0, 11);
+	int batWingFreeFlapsLeft = clampi(5 - get_property_int("_batWingsFreeFights"), 0, 5);
+	int bridge = get_property_int("chasmBridgeProgress");
+	
+	if (lookupItem("bat wings").equipped_amount() == 0)
+	{
+		description.listAppend(HTMLGenerateSpanFont("Equip your bat wings.", "red"));
+	}
+	else
+	{
+		description.listAppend(HTMLGenerateSpanFont("Nanananananananana Battyman!", "purple"));
+	}
+	if (!$location[The Castle in the Clouds in the Sky (Basement)].locationAvailable()) {
+        description.listAppend(HTMLGenerateSpanFont("This saves turns in the Airshit!", "blue"));
+	}
+	if (batWingSwoopsLeft == 0)
+	{
+		description.listAppend(HTMLGenerateSpanFont("0 Swoop Evilpockets left.", "red"));
+	}
+	else
+	{
+		description.listAppend("Swoop Evilpockets: " + (HTMLGenerateSpanOfClass(batWingSwoopsLeft, "r_bold")) + " left.");
+	}
+	if (batWingRestsLeft == 0)
+	{
+		description.listAppend(HTMLGenerateSpanFont("0 Bat Rests left.", "red"));
+	}
+	else
+	{
+		description.listAppend("Rest +1000 HP/MP: " + (HTMLGenerateSpanOfClass(batWingRestsLeft, "r_bold")) + " left.");
+	}
+	if (batWingFreeFlapsLeft == 0)
+	{
+		description.listAppend(HTMLGenerateSpanFont("0 Free Flaps left.", "red"));
+	}
+	else
+	{
+		description.listAppend("Free flaps: " + (HTMLGenerateSpanOfClass(batWingFreeFlapsLeft, "r_bold")) + " left.");
+	}
+	
+	if (bridge >= 25 && !locationAvailable($location[Oil Peak])) {
+		description.listAppend("You can skip the rest of the bridge!");
+	}
+	if (($locations[A Mob of Zeppelin Protesters] contains __last_adventure_location)) {
+		description.listAppend("This does... something useful!");
+	}
+	
+	boolean guanoBat = get_property_boolean("batWingsGuanoJunction"); 
+	
+	if (!guanoBat) {
+		description.listAppend("Visit the Bat Hole zones to unlock the Beanbat Chamber and get a bean");
+	}
+
+	resource_entries.listAppend(ChecklistEntryMake("__item bat wings", url, ChecklistSubentryMake("Bat Wings functions", "", description), 8));
+}
+
+// Clan VIP Photo booth
+RegisterResourceGenerationFunction("IOTMVIPPhotoBoothGenerateResource");
+void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if (available_amount($item[Clan VIP Lounge key]) < 1)
+        return;
+
+    string [int] description;
+	string url = "inventory.php?ftext=sheriff";
+	
+    int photosLeft = clampi(3 - get_property_int("_photoBoothEffects"), 0, 3);
+	if (photosLeft > 0)
+	{
+		description.listAppend(HTMLGenerateSpanFont("Get your photo taken:", "black"));
+		description.listAppend(HTMLGenerateSpanFont("photobooth west: +50% init, +noncom%", "black"));
+		description.listAppend(HTMLGenerateSpanFont("photobooth tower: +com%", "black"));
+		description.listAppend(HTMLGenerateSpanFont("photobooth space: this sucks", "black"));
+		
+		resource_entries.listAppend(ChecklistEntryMake("__item expensive camera", url, ChecklistSubentryMake(photosLeft + " clan photos takeable", description), 8));
+	}
+	//this here town ain't big enough for the two of us
+    int sheriffings = clampi(3 - get_property_int("_assertYourAuthorityCast"), 0, 3);
+	if (sheriffings > 0)
+	{
+		if (lookupItem("sheriff badge").equipped_amount() == 1 && lookupItem("sheriff moustache").equipped_amount() == 1 && lookupItem("sheriff pistol").equipped_amount() == 1)
+		{
+			description.listAppend(HTMLGenerateSpanFont("Assert your authority!", "blue"));
+		} 
+		else 
+		{
+			description.listAppend(HTMLGenerateSpanFont("Equip your sheriff gear first.", "red"));
+		}
+	resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", url, ChecklistSubentryMake(sheriffings + " Sheriff Authority free kill(s)", description), 5));
+	}
+}
+
+RegisterResourceGenerationFunction("IOTMPeaceTurkeyGenerateResource");
+void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if (!lookupFamiliar("Peace Turkey").familiar_is_usable()) return;
+
+	// Purkey Title
+//still needs a fix for famwt when not active (currently returns 0 but still functions)
+    int turkeyProc = 24;
+	if (my_familiar() == lookupFamiliar("peace turkey"));
+	{
+		int turkeyProc = 24 + sqrt(effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());	
+	}
+	int PeasCount = available_amount($item[whirled peas]);
+	int PeaSoupCount = available_amount($item[handful of split pea soup]);
+	string [int] description;
+	string url = "familiar.php";
+	{
+		description.listAppend("" + PeasCount + " peas available (need to paste them)");
+		description.listAppend("" + PeaSoupCount + " peabanishers available");
+		resource_entries.listAppend(ChecklistEntryMake("__familiar peace turkey", url, ChecklistSubentryMake(HTMLGenerateSpanFont(turkeyProc +"% Peace Turkey proc", "black"), "", description), 2));
+	}
+	if ($item[handful of split pea soup].available_amount() > 0 )
+    {
+        resource_entries.listAppend(ChecklistEntryMake("__item handful of split pea soup", "", ChecklistSubentryMake(pluralise($item[handful of split pea soup]), "", "Free run/banish. Also have " + PeasCount + " peas."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
+    }
+}
+
+//Takerspace
+RegisterResourceGenerationFunction("IOTMTakerspaceGenerateResource");
+void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	//you wouldn't download a boat
+	if (__iotms_usable[lookupItem("TakerSpace letter of Marque")]) return;
+	
+	string [int] description;
+	string url = "campground.php?action=workshed";
+	int TSAnchors = get_property_int("takerSpaceAnchor");
+	int TSGold = get_property_int("takerSpaceGold");
+	int TSMasts = get_property_int("takerSpaceMast");
+	int TSRum = get_property_int("takerSpaceRum");
+	int TSSilk = get_property_int("takerSpaceSilk");
+	int TSSpice = get_property_int("takerSpaceSpice");
+	
+	if (TSAnchors + TSGold + TSMasts + TSRum + TSSilk + TSSpice > 0) 
+	{
+		description.listAppend(HTMLGenerateSpanOfClass("Spices: ", "r_bold") + "" + TSSpice + "");
+		description.listAppend(HTMLGenerateSpanOfClass("Rum: ", "r_bold") + "" + TSRum + "");
+		description.listAppend(HTMLGenerateSpanOfClass("Anchors: ", "r_bold") + "" + TSAnchors + "");
+		description.listAppend(HTMLGenerateSpanOfClass("Masts: ", "r_bold") + "" + TSMasts + "");
+		description.listAppend(HTMLGenerateSpanOfClass("Silk: ", "r_bold") + "" + TSSilk + "");
+		description.listAppend(HTMLGenerateSpanOfClass("Gold: ", "r_bold") + "" + TSGold + "");
+		
+		if ($item[pirate dinghy].available_amount() == 0 ) {
+			description.listAppend(HTMLGenerateSpanFont("Boat: 1 anchor/1 mast/1 silk", "blue"));
+		}
+		if ($item[deft pirate hook].available_amount() == 0 ) {
+			description.listAppend(HTMLGenerateSpanFont("Hook: 1 anchor/1 mast/1 gold", "blue"));
+		}
+		if ($item[jolly roger flag].available_amount() == 0 ) {
+			description.listAppend(HTMLGenerateSpanFont("Flag: 1 rum/1 mast/1 silk/1 gold", "blue"));
+		}
+		resource_entries.listAppend(ChecklistEntryMake("__item pirate dinghy", url, ChecklistSubentryMake("Takerspace resources", description), 1));
+	}
+}
+
+
+// 2024
+//CyberRealm
+RegisterTaskGenerationFunction("IOTYCyberRealmGenerateTasks");
+void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+	if ($item[server room key].available_amount() < 1) return;
+	
+	int CyberFree = get_property_int("_cyberFreeFights");
+	int zone1Turns = get_property_int("_cyberZone1Turns");
+	int zone2Turns = get_property_int("_cyberZone2Turns");
+	int zone3Turns = get_property_int("_cyberZone3Turns");
+	int CyberZoneLeft = zone1turns + zone2turns + zone3turns;
+	string [int] description;
+	string url = "place.php?whichplace=CyberRealm";
+	string image_name = "__skill stats+++";
+		
+		if ($item[familiar-in-the-middle wrapper].equipped_amount() == 1) {
+			description.listAppend(HTMLGenerateSpanFont("FITMW equipped. Extra 1 per fight.", "blue"));
+		}
+		else if ($item[familiar-in-the-middle wrapper].equipped_amount() == 0) {
+			description.listAppend(HTMLGenerateSpanFont("Equip your FITMW for an extra 1 per fight.", "red"));
+		}
+		
+		#if (zone1Turns < 20)
+		{
+			if (zone1Turns < 9) {			
+				description.listAppend(9 - zone1Turns + " combats until Zone 1 Eleres test.");
+			}
+			else if (zone1Turns == 9)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Get 11 eleres for the Cyberzone 1 test", "blue"));
+				image_name = "__skill overclock(10)";
+			}
+			else if (zone1Turns < 19) 
+			{			
+				description.listAppend(19 - zone1Turns + " combats until Zone 1 reward.");
+			}
+			else if (zone1Turns == 19)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Cyberzone 1 reward!", "green"));
+				image_name = "__skill sleep(5)";
+			}
+			else if (zone1Turns > 19) {			
+				description.listAppend(HTMLGenerateSpanFont("Cyberzone 1 finished.", "grey"));
+			}
+		}
+		
+		#if (zone2Turns < 20)
+		{
+			if (zone2Turns < 9) {			
+				description.listAppend(9 - zone2Turns + " combats until Zone 2 Eleres test.");
+			}
+			else if (zone2Turns == 9)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Get 11 eleres for the Cyberzone 2 test", "blue"));
+				image_name = "__skill overclock(10)";
+			}
+			else if (zone2Turns < 19) 
+			{			
+				description.listAppend(19 - zone2Turns + " combats until Zone 2 reward.");
+			}
+			else if (zone2Turns == 19)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Cyberzone 2 reward!", "green"));
+				image_name = "__skill sleep(5)";
+			}
+			else if (zone2Turns > 19) {			
+				description.listAppend(HTMLGenerateSpanFont("Cyberzone 2 finished.", "grey"));
+			}
+		}
+		
+		#if (zone3Turns < 20)
+		{
+			if (zone3Turns < 9) {			
+				description.listAppend(9 - zone3Turns + " combats until Zone 3 Eleres test.");
+			}
+			else if (zone3Turns == 9)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Get 11 eleres for the Cyberzone 3 test", "blue"));
+				image_name = "__skill overclock(10)";
+			}
+			else if (zone3Turns < 19) 
+			{			
+				description.listAppend(19 - zone3Turns + " combats until Zone 3 reward.");
+			}
+			else if (zone3Turns == 19)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Cyberzone 3 reward!", "green"));
+				image_name = "__skill sleep(5)";
+			}
+			else if (zone3Turns > 19) {			
+				description.listAppend(HTMLGenerateSpanFont("Cyberzone 3 finished.", "grey"));
+			}
+		}
+				
+		if (($locations[Cyberzone 1,Cyberzone 2,Cyberzone 3] contains __last_adventure_location))
+		{
+			description.listAppend(HTMLGenerateSpanFont("Have " + (10 - CyberFree) + " free fights left!", "green"));
+			task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), -11));
+		}
+		else
+		{
+			if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
+				description.listAppend(HTMLGenerateSpanFont("Have " + (10 - CyberFree) + " free fights left!", "green"));
+			}
+			else	{
+				description.listAppend(HTMLGenerateSpanFont("No free fights left", "red"));
+			}
+			optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
+		}
+}
+
+RegisterResourceGenerationFunction("IOTYCyberRealmGenerateResource");
+void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if ($item[server room key].available_amount() < 1) return;
+    
+    int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
+	string url;
+	string [int] description;
+
+    if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
+        string url = "place.php?whichplace=CyberRealm";
+		description.listAppend("Hack into the system!");
+		resource_entries.listAppend(ChecklistEntryMake("__skill stats+++", url, ChecklistSubentryMake(pluralise(CyberFree, "CyberRealm fight", "CyberRealm fights"), "", description), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("CyberRealm free fight"));
+    }
+}
+
+
+//Ski set
+RegisterResourceGenerationFunction("IOTMSkiSetGenerateResource");
+void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if ($item[McHugeLarge duffel bag].available_amount() < 1) return;
+        
+	if ($item[McHugeLarge duffel bag].available_amount() > 0 && $item[McHugeLarge right ski].available_amount() == 0);
+	{
+		resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", "inventory.php?ftext=McHugeLarge+duffel+bag", ChecklistSubentryMake("McHugeLarge duffel bag", "", "Open it!"), 0).ChecklistEntrySetIDTag("McHugeLarge duffel bag resource"));
+    }
+	
+	int skiAvalanchesLeft = clampi(3 - get_property_int("_mcHugeLargeAvalancheUses"), 0, 3);
+	int skiSlashesLeft = clampi(3 - get_property_int("_mcHugeLargeSlashUses"), 0, 3);
+	string [int] description;
+	string url = "inventory.php?ftext=McHugeLarge";
+	
+	if (skiAvalanchesLeft > 0)
+	{
+		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " avalanches", "r_bold") + " left. Sneak!");
+    //fixme: currently not supported by sneako tile
+		if (lookupItem("McHugeLarge left ski").equipped_amount() == 1)
+		{
+			description.listAppend(HTMLGenerateSpanFont("LEFT SKI equipped!", "blue"));
+		}
+		else if (lookupItem("McHugeLarge left ski").equipped_amount() == 0)
+		{
+			description.listAppend(HTMLGenerateSpanFont("Equip the LEFT SKI first.", "red"));
+		}
+	}
+	if (skiSlashesLeft > 0)
+	{
+		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " slashes", "r_bold") + " left. Track a monster.");
+		if (lookupItem("McHugeLarge left pole").equipped_amount() == 1)
+		{
+			description.listAppend(HTMLGenerateSpanFont("LEFT POLE equipped!", "blue"));
+		}
+		else if (lookupItem("McHugeLarge left pole").equipped_amount() == 0)
+		{
+			description.listAppend(HTMLGenerateSpanFont("Equip the LEFT POLE first.", "red"));
+		}
+	}
+	resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", url, ChecklistSubentryMake("McHugeLarge ski set skills", description), 1));
+}
+
 
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
