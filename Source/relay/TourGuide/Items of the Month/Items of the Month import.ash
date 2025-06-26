@@ -101,6 +101,7 @@ import "relay/TourGuide/Items of the Month/2020/Superhero Cape.ash";
 import "relay/TourGuide/Items of the Month/2020/Box O Ghosts.ash";
 
 // 2021
+// Missing IotY - Fresh Coat of Paint
 import "relay/TourGuide/Items of the Month/2021/Miniature Crystal Ball.ash";
 import "relay/TourGuide/Items of the Month/2021/Emotion Chip.ash";
 import "relay/TourGuide/Items of the Month/2021/Potted Power Plant.ash";
@@ -131,6 +132,7 @@ import "relay/TourGuide/Items of the Month/2022/Oliver's Place.ash";
 import "relay/TourGuide/Items of the Month/2022/Model Train Set.ash";
 
 // 2023
+// Missing IotY - Hobo in Sheep's Clothing
 import "relay/TourGuide/Items of the Month/2023/Rock Garden.ash";
 import "relay/TourGuide/Items of the Month/2023/SIT Course Certificate.ash";
 import "relay/TourGuide/Items of the Month/2023/Closed Circuit Pay Phone.ash";
@@ -145,13 +147,14 @@ import "relay/TourGuide/Items of the Month/2023/A Guide to Burning Leaves.ash";
 import "relay/TourGuide/Items of the Month/2023/Candy Cane Sword Cane.ash";
 
 // 2024
+// Missing IotY - Black and White Apron Meal Kit	
 import "relay/TourGuide/Items of the Month/2024/Chest Mimic.ash";
 import "relay/TourGuide/Items of the Month/2024/Spring Shoes.ash";
 import "relay/TourGuide/Items of the Month/2024/Everfull Dart Holster.ash";
 import "relay/TourGuide/Items of the Month/2024/Apriling Band Helmet.ash";
 import "relay/TourGuide/Items of the Month/2024/Mayam Calendar.ash";
-import "relay/TourGuide/Items of the Month/2024/Roman Candelabra.ash";
 import "relay/TourGuide/Items of the Month/2024/Mini Kiwi.ash";
+import "relay/TourGuide/Items of the Month/2024/Roman Candelabra.ash";
 import "relay/TourGuide/Items of the Month/2024/Tearaway Pants.ash";
 import "relay/TourGuide/Items of the Month/2024/Sept-Ember Censer.ash";
 import "relay/TourGuide/Items of the Month/2024/bat wings.ash";
@@ -159,6 +162,11 @@ import "relay/TourGuide/Items of the Month/2024/VIP Photobooth.ash";
 import "relay/TourGuide/Items of the Month/2024/Peace Turkey.ash";
 import "relay/TourGuide/Items of the Month/2024/TakerSpace.ash";
 
-// 2024
+// 2025
 import "relay/TourGuide/Items of the Month/2025/CyberRealm.ash";
 import "relay/TourGuide/Items of the Month/2025/McHugeLarge Ski Set.ash";
+// Missing February IotM - Toy Cupid Bow
+// Missing March IotM - Leprecondo
+// Missing April IotM - April Shower Thoughts Calendar
+// Missing May IotM - Peridot of Peril
+// Missing June IotM - Prismatic Beret
