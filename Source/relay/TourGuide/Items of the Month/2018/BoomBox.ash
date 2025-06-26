@@ -14,7 +14,7 @@ void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 		description.listAppend((11 - boomboxProgress).pluralise("combat", "combats") + " until next drop.");
 		optional_task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), 8));
 	}
-	int priority = (!__misc_state["in run"] ? -11 : 8);
+	int priority = (__misc_state["in run"] ? -11 : 8);
 	if (boomboxProgress == 9)
 	{
 		task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop in 2 fights", "", description), priority));
