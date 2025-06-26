@@ -2,14 +2,13 @@
 RegisterTaskGenerationFunction("LockPickingGenerateTasks");
 void LockPickingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (get_property_boolean("lockPicked") == true || !lookupSkill("Lock Picking").have_skill())
+	if (get_property_boolean("lockPicked") == true || !lookupSkill("Lock Picking").have_skill() || !__misc_state["in run"]) {
 		return;
-	{
-		string [int] description;
-		string main_title = "Pick a lock!";
-		description.listAppend("Grab your mainstat key, probably.");
-		task_entries.listAppend(ChecklistEntryMake("__skill lock picking", "skillz.php", ChecklistSubentryMake(main_title, "", description), -11));
 	}
+	string [int] description;
+	string main_title = "Pick a lock!";
+	description.listAppend("Grab your mainstat key, probably.");
+	task_entries.listAppend(ChecklistEntryMake("__skill lock picking", "skillz.php", ChecklistSubentryMake(main_title, "", description), -11));
 }
 
 void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

@@ -47,18 +47,11 @@ void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             // If in-run, generate a supernag
             description.listAppend("Try changing your S.I.T. course to accumulate different items.");
             task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
-        } 
-        else {
-            // If not, generate an optional task
-            main_title = "Could change your S.I.T. skill, for new items...";
-            optional_task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), 1).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
         }
-    } 
-    else {
+    } else {
         // If they don't have a skill, generate a supernag.
         string miscPhrase = miscPhrases[random(count(miscPhrases))];
         description.listAppend(HTMLGenerateSpanFont(miscPhrase + " Take your S.I.T. course!", "red"));
         task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
     }
-
 }
