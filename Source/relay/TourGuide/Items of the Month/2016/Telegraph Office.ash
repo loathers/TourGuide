@@ -184,7 +184,7 @@ void IOTMTelegraphOfficeGenerateTasks(ChecklistEntry [int] task_entries, Checkli
 RegisterResourceGenerationFunction("IOTMTelegraphOfficeGenerateResource");
 void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (__misc_state["in run"] && $item[Clara's bell].available_amount() > 0 && !get_property_boolean("_claraBellUsed"))
+    if (lookupItem("Clara's bell").have() && !get_property_boolean("_claraBellUsed"))
     {
         string [int] description;
         description.listAppend("Ring for a non-combat next turn, once/day.");
@@ -221,7 +221,7 @@ void IOTMTelegraphOfficeGenerateResource(ChecklistEntry [int] resource_entries)
         }
         
         
-        resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?ftext=clara's+bell", ChecklistSubentryMake("Clara's Bell", "", description), 5).ChecklistEntrySetIDTag("LT&T claras bell resource"));
+        resource_entries.listAppend(ChecklistEntryMake("__item clara's bell", "inventory.php?ftext=clara's+bell", ChecklistSubentryMake("Clara's Bell", "", description), -11).ChecklistEntrySetCombinationTag("sneaks").ChecklistEntrySetIDTag("LT&T claras bell resource"));
     }
     
     //skills:

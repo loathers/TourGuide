@@ -173,6 +173,9 @@ void initialiseIOTMsUsable()
     if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
         __iotms_usable[lookupItem("tearaway pants")] = true;
 
+    if (lookupItem("McHugeLarge duffel bag").have()) // Jan 2025
+        __iotms_usable[lookupItem("McHugeLarge deluxe ski set")] = true;
+
     //Can't use many things in G-Lover
     if (my_path().id == PATH_G_LOVER) //Path 33
     {
