@@ -49469,14 +49469,16 @@ void IOTMGodLobsterGenerateResource(ChecklistEntry [int] resource_entries)
     resource_entries.listAppend(ChecklistEntryMake("__familiar god lobster", url, ChecklistSubentryMake(pluralise(free_fights_left, "free God Lobster fight", "free God Lobster fights"), "", description)).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("God lobster daily fights"));
 }
 
+//Songboom
+RegisterTaskGenerationFunction("IOTMBoomBoxGenerateTasks");
 void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0) return;
-
-
+		 
+ 
 	string song = get_property("boomBoxSong");
 	int changes_left = get_property_int("_boomBoxSongsLeft"); //the boys are back in town, eleven times. everyone will love it
-
+	
 	int boomboxProgress = get_property_int("_boomBoxFights");
 	string [int] description;
 	{
@@ -49490,13 +49492,13 @@ void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 		{
             task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop in 2 fights", "", description), -11));
         }	
-
+		
 		if (boomboxProgress == 10)
         {
             task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop this fight", "", description), -11));
         }
 	}	
-
+ 
 	if (song == "" && changes_left > 0)
 	{
         string [int] description;
@@ -56795,6 +56797,7 @@ void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item handful of split pea soup", "", ChecklistSubentryMake(pluralise($item[handful of split pea soup]), "", "Free run/banish. Also have " + PeasCount + " peas."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
     }
 }
+
 //Takerspace
 RegisterResourceGenerationFunction("IOTMTakerspaceGenerateResource");
 void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
