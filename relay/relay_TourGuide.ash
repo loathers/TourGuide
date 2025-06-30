@@ -56944,7 +56944,7 @@ void IOTMSkiSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 }
 
 RegisterResourceGenerationFunction("IOTMSkiSetAvalancheGenerateResource");
-void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries) {
+void IOTMSkiSetAvalancheGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
 	// resource for Avalanche (3/day non-combat force).
 	int skiAvalanchesLeft = clampi(3 - get_property_int("_mcHugeLargeAvalancheUses"), 0, 3);
