@@ -56935,7 +56935,7 @@ void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries) {
 
 //Ski set
 RegisterTaskGenerationFunction("IOTMSkiSetGenerateTasks");
-void IOTMGarbageToteGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+void IOTMSkiSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
 	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
 	// supernag to use it if unopened. Should appear once per ascension.
 	if (!lookupItem("McHugeLarge left ski").have())	{
