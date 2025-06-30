@@ -56952,7 +56952,7 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries) {
 	string url = "inventory.php?ftext=McHugeLarge";
 	
 	if (skiAvalanchesLeft > 0) {
-		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " avalanches", "r_bold") + " left.");
+		description.listAppend(HTMLGenerateSpanOfClass(skiAvalanchesLeft + " avalanches", "r_bold") + " left.");
 		if (!lookupItem("McHugeLarge left ski").equipped()) {
 			description.listAppend(HTMLGenerateSpanFont("Equip the McHugeLarge Left Ski first.", "red"));
 		}
