@@ -21,7 +21,7 @@ RegisterResourceGenerationFunction("SocialDistanceGenerator");
 void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 {
     // Saving some useful variables for use in the calculations.
-    int spleenRemaining = availableSpleen();
+    int spleenRemaining = spleen_limit() - my_spleen_use();
     int stomachLeft = availableFullness();
  
     SneakSource getSneakisol() {
