@@ -13,17 +13,31 @@ void IOTMSkiSetAvalancheGenerateResource(ChecklistEntry [int] resource_entries) 
 	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
 	// resource for Avalanche (3/day non-combat force).
 	int skiAvalanchesLeft = clampi(3 - get_property_int("_mcHugeLargeAvalancheUses"), 0, 3);
-
-	if (skiAvalanchesLeft < 1) return;
-
 	string [int] description;
-	string url = "inventory.php?ftext=McHugeLarge";
+	string url = "inventory.php?ftext=McHugeLarge+left+ski";
 	
 	if (skiAvalanchesLeft > 0) {
-		description.listAppend(HTMLGenerateSpanOfClass(skiAvalanchesLeft + " avalanches", "r_bold") + " left.");
+		description.listAppend(HTMLGenerateSpanOfClass(skiAvalanchesLeft + " Avalanches", "r_bold") + " left.");
 		if (!lookupItem("McHugeLarge left ski").equipped()) {
 			description.listAppend(HTMLGenerateSpanFont("Equip the McHugeLarge Left Ski first.", "red"));
 		}
+		resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge Left Ski", url, ChecklistSubentryMake("McHugeLarge Avalanche", description), -11).ChecklistEntrySetCombinationTag("sneaks"));
 	}
-	resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge Left Ski", url, ChecklistSubentryMake("McHugeLarge Avalanche", description), -11).ChecklistEntrySetCombinationTag("sneaks"));
+}
+
+RegisterResourceGenerationFunction("IOTMSkiSetSlasheGenerateResource");
+void IOTMSkiSetSlasheGenerateResource(ChecklistEntry [int] resource_entries) {
+	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
+	// resource for Avalanche (3/day non-combat force).
+	int skiSlashesLeft = clampi(3 - get_property_int("_mcHugeLargeSlashUses"), 0, 3);
+	string [int] description;
+	string url = "inventory.php?ftext=McHugeLarge+left+pole";
+	
+	if (skiSlashesLeft > 0) {
+		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " Slashes", "r_bold") + " left.");
+		if (!lookupItem("McHugeLarge left pole").equipped()) {
+			description.listAppend(HTMLGenerateSpanFont("Equip the McHugeLarge Left Pole first.", "red"));
+		}
+		resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge Left Ski", url, ChecklistSubentryMake("McHugeLarge Avalanche", description), 1).ChecklistEntrySetCombinationTag("sniffs"));
+	}
 }
