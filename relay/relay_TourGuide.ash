@@ -56948,6 +56948,9 @@ void IOTMSkiSetAvalancheGenerateResource(ChecklistEntry [int] resource_entries) 
 	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
 	// resource for Avalanche (3/day non-combat force).
 	int skiAvalanchesLeft = clampi(3 - get_property_int("_mcHugeLargeAvalancheUses"), 0, 3);
+
+	if (skiAvalanchesLeft < 1) return;
+
 	string [int] description;
 	string url = "inventory.php?ftext=McHugeLarge";
 	
