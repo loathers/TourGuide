@@ -1,7 +1,7 @@
 //Ski set
 RegisterTaskGenerationFunction("IOTMSkiSetGenerateTasks");
 void IOTMSkiSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
+	if (!__iotms_usable[lookupItem("McHugeLarge deluxe ski set")]) return;
 	// supernag to use it if unopened. Should appear once per ascension.
 	if (!lookupItem("McHugeLarge left ski").have())	{
 		task_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", "inventory.php?ftext=McHugeLarge+duffel+bag", ChecklistSubentryMake("McHugeLarge duffel bag", "", "Open it!"), -11).ChecklistEntrySetIDTag("McHugeLarge duffel bag resource"));
@@ -10,7 +10,7 @@ void IOTMSkiSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
 RegisterResourceGenerationFunction("IOTMSkiSetAvalancheGenerateResource");
 void IOTMSkiSetAvalancheGenerateResource(ChecklistEntry [int] resource_entries) {
-	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
+	if (!__iotms_usable[lookupItem("McHugeLarge deluxe ski set")]) return;
 	// resource for Avalanche (3/day non-combat force).
 	int skiAvalanchesLeft = clampi(3 - get_property_int("_mcHugeLargeAvalancheUses"), 0, 3);
 	string [int] description;
@@ -27,7 +27,7 @@ void IOTMSkiSetAvalancheGenerateResource(ChecklistEntry [int] resource_entries) 
 
 RegisterResourceGenerationFunction("IOTMSkiSetSlasheGenerateResource");
 void IOTMSkiSetSlasheGenerateResource(ChecklistEntry [int] resource_entries) {
-	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
+	if (!__iotms_usable[lookupItem("McHugeLarge deluxe ski set")]) return;
 	// resource for Avalanche (3/day non-combat force).
 	int skiSlashesLeft = clampi(3 - get_property_int("_mcHugeLargeSlashUses"), 0, 3);
 	string [int] description;
