@@ -56829,13 +56829,13 @@ void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries) {
 		description.listAppend(HTMLGenerateSpanOfClass("Silk: ", "r_bold") + "" + TSSilk + "");
 		description.listAppend(HTMLGenerateSpanOfClass("Gold: ", "r_bold") + "" + TSGold + "");
 		
-		if ($item[pirate dinghy].available_amount() == 0 ) {
+		if (!lookupItem("pirate dinghy").have()) {
 			description.listAppend(HTMLGenerateSpanFont("Boat: 1 anchor/1 mast/1 silk", "blue"));
 		}
-		if ($item[deft pirate hook].available_amount() == 0 ) {
+		if (!lookupItem("deft pirate hook").have()) {
 			description.listAppend(HTMLGenerateSpanFont("Hook: 1 anchor/1 mast/1 gold", "blue"));
 		}
-		if ($item[jolly roger flag].available_amount() == 0 ) {
+		if (!lookupItem("jolly roger flag").have()) {
 			description.listAppend(HTMLGenerateSpanFont("Flag: 1 rum/1 mast/1 silk/1 gold", "blue"));
 		}
 		resource_entries.listAppend(ChecklistEntryMake("__item pirate dinghy", url, ChecklistSubentryMake("Takerspace resources", description), 1));
