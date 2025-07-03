@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTYCyberRealmGenerateTasks");
 void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
 
-	if (!get_property_boolean("crAlways") && !get_property_boolean("_crToday")) return;
+	if (!__iotms_usable[$item[CyberRealm keycode]]) return;
 	
 	int CyberFree = get_property_int("_cyberFreeFights");
 	int zone1Turns = get_property_int("_cyberZone1Turns");
@@ -75,7 +75,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 RegisterResourceGenerationFunction("IOTYCyberRealmFreeFightsGenerateResource");
 void IOTYCyberRealmFreeFightsGenerateResource(ChecklistEntry [int] resource_entries) {
 
-	if (!get_property_boolean("crAlways") && !get_property_boolean("_crToday")) return;
+	if (!__iotms_usable[$item[CyberRealm keycode]]) return;
 	
 	int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
 	string url;
