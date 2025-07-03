@@ -56856,9 +56856,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	string url = "place.php?whichplace=CyberRealm";
 	string image_name = "__skill stats+++";
 		
-	if ($item[familiar-in-the-middle wrapper].equipped_amount() == 1) {
-		description.listAppend(HTMLGenerateSpanFont("FITMW equipped. Extra 1 per fight.", "blue"));
-	}	else if (lookupItem("familiar-in-the-middle wrapper").available_amount() > 0 && $item[familiar-in-the-middle wrapper].equipped_amount() == 0) {
+	if (lookupItem("familiar-in-the-middle wrapper").have() && !lookupItem("familiar-in-the-middle wrapper").equipped()) {
 		description.listAppend(HTMLGenerateSpanFont("Equip your FITMW for an extra 1 per fight.", "red"));
 	}
 	
@@ -56917,8 +56915,8 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	}
 }
 
-RegisterResourceGenerationFunction("IOTYCyberRealmGenerateResource");
-void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries) {
+RegisterResourceGenerationFunction("IOTYCyberRealmFreeFightsGenerateResource");
+void IOTYCyberRealmFreeFightsGenerateResource(ChecklistEntry [int] resource_entries) {
 
 	if (!get_property_boolean("crAlways") && !get_property_boolean("_crToday")) return;
 	
@@ -56926,7 +56924,7 @@ void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries) {
 	string url;
 	string [int] description;
 
-	if (CyberFree > 0 && lookupSkill("OVERCLOCK(10)").have_skill()) {
+	if (CyberFree > 0 && lookupSkill("OVERCLOCK(10)").skill_is_usable()) {
 		string url = "place.php?whichplace=CyberRealm";
 		description.listAppend("Hack into the system!");
 		resource_entries.listAppend(ChecklistEntryMake("__skill stats+++", url, ChecklistSubentryMake(pluralise(CyberFree, "CyberRealm fight", "CyberRealm fights"), "", description), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("CyberRealm free fight"));
