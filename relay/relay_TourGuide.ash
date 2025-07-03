@@ -56848,7 +56848,7 @@ void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries) {
 RegisterTaskGenerationFunction("IOTYCyberRealmGenerateTasks");
 void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
 
-	if (!__iotms_usable[$item[CyberRealm keycode]]) return;
+	if (!__iotms_usable[lookupItem("CyberRealm keycode")]) return;
 	
 	int CyberFree = get_property_int("_cyberFreeFights");
 	int zone1Turns = get_property_int("_cyberZone1Turns");
@@ -56905,7 +56905,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		description.listAppend(HTMLGenerateSpanFont("Cyberzone 3 finished.", "grey"));
 	}
 
-	if ($locations[Cyberzone 1,Cyberzone 2,Cyberzone 3] contains __last_adventure_location) {
+	if (lookupLocations("Cyberzone 1,Cyberzone 2,Cyberzone 3") contains __last_adventure_location) {
 		description.listAppend(HTMLGenerateSpanFont("Have " + (10 - CyberFree) + " free fights left!", "green"));
 		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), -11));
 	}	else {
@@ -56921,7 +56921,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 RegisterResourceGenerationFunction("IOTYCyberRealmFreeFightsGenerateResource");
 void IOTYCyberRealmFreeFightsGenerateResource(ChecklistEntry [int] resource_entries) {
 
-	if (!__iotms_usable[$item[CyberRealm keycode]]) return;
+	if (!__iotms_usable[lookupItem("CyberRealm keycode")]) return;
 	
 	int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
 	string url;
@@ -56937,7 +56937,7 @@ void IOTYCyberRealmFreeFightsGenerateResource(ChecklistEntry [int] resource_entr
 //Ski set
 RegisterTaskGenerationFunction("IOTMSkiSetGenerateTasks");
 void IOTMSkiSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
+	if (!__iotms_usable[lookupItem("McHugeLarge deluxe ski set")]) return;
 	// supernag to use it if unopened. Should appear once per ascension.
 	if (!lookupItem("McHugeLarge left ski").have())	{
 		task_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", "inventory.php?ftext=McHugeLarge+duffel+bag", ChecklistSubentryMake("McHugeLarge duffel bag", "", "Open it!"), -11).ChecklistEntrySetIDTag("McHugeLarge duffel bag resource"));
@@ -56946,7 +56946,7 @@ void IOTMSkiSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
 RegisterResourceGenerationFunction("IOTMSkiSetAvalancheGenerateResource");
 void IOTMSkiSetAvalancheGenerateResource(ChecklistEntry [int] resource_entries) {
-	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
+	if (!__iotms_usable[lookupItem("McHugeLarge deluxe ski set")]) return;
 	// resource for Avalanche (3/day non-combat force).
 	int skiAvalanchesLeft = clampi(3 - get_property_int("_mcHugeLargeAvalancheUses"), 0, 3);
 	string [int] description;
@@ -56963,7 +56963,7 @@ void IOTMSkiSetAvalancheGenerateResource(ChecklistEntry [int] resource_entries) 
 
 RegisterResourceGenerationFunction("IOTMSkiSetSlasheGenerateResource");
 void IOTMSkiSetSlasheGenerateResource(ChecklistEntry [int] resource_entries) {
-	if (!__iotms_usable[$item[McHugeLarge deluxe ski set]]) return;
+	if (!__iotms_usable[lookupItem("McHugeLarge deluxe ski set")]) return;
 	// resource for Avalanche (3/day non-combat force).
 	int skiSlashesLeft = clampi(3 - get_property_int("_mcHugeLargeSlashUses"), 0, 3);
 	string [int] description;
