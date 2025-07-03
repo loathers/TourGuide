@@ -4878,6 +4878,8 @@ void initialiseIOTMsUsable()
             __iotms_usable[lookupItem("cold medicine cabinet")] = true;
         if (__campground[lookupItem("model train set")] > 0)
             __iotms_usable[lookupItem("model train set")] = true;
+        if (__campground[lookupItem("TakerSpace letter of Marque")] > 0)
+            __iotms_usable[lookupItem("TakerSpace letter of Marque")] = true;
 
         // This didn't appear in my LoL test run; I am making this more explicit and hopefully this works.
         if (__campground[lookupItem("Little Geneticist DNA-Splicing Lab")] > 0)
@@ -5004,6 +5006,9 @@ void initialiseIOTMsUsable()
         
     if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
         __iotms_usable[lookupItem("tearaway pants")] = true;
+        
+    if (get_property_boolean("crAlways") || get_property_boolean("_crToday")) // 2025 IotY
+        __iotms_usable[lookupItem("CyberRealm keycode")] = true;
 
     if (lookupItem("McHugeLarge duffel bag").have()) // Jan 2025
         __iotms_usable[lookupItem("McHugeLarge deluxe ski set")] = true;
@@ -56803,10 +56808,9 @@ void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries)
 
 //Takerspace
 RegisterResourceGenerationFunction("IOTMTakerspaceGenerateResource");
-void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
-{
+void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries) {
 	//you wouldn't download a boat
-	if (__iotms_usable[lookupItem("TakerSpace letter of Marque")]) return;
+	if (!__iotms_usable[lookupItem("TakerSpace letter of Marque")]) return;
 	
 	string [int] description;
 	string url = "campground.php?action=workshed";
@@ -56817,8 +56821,7 @@ void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
 	int TSSilk = get_property_int("takerSpaceSilk");
 	int TSSpice = get_property_int("takerSpaceSpice");
 	
-	if (TSAnchors + TSGold + TSMasts + TSRum + TSSilk + TSSpice > 0) 
-	{
+	if (TSAnchors + TSGold + TSMasts + TSRum + TSSilk + TSSpice > 0) {
 		description.listAppend(HTMLGenerateSpanOfClass("Spices: ", "r_bold") + "" + TSSpice + "");
 		description.listAppend(HTMLGenerateSpanOfClass("Rum: ", "r_bold") + "" + TSRum + "");
 		description.listAppend(HTMLGenerateSpanOfClass("Anchors: ", "r_bold") + "" + TSAnchors + "");
@@ -56845,7 +56848,7 @@ void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("IOTYCyberRealmGenerateTasks");
 void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
 
-	if (!get_property_boolean("crAlways") && !get_property_boolean("_crToday")) return;
+	if (!__iotms_usable[$item[CyberRealm keycode]]) return;
 	
 	int CyberFree = get_property_int("_cyberFreeFights");
 	int zone1Turns = get_property_int("_cyberZone1Turns");
@@ -56918,7 +56921,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 RegisterResourceGenerationFunction("IOTYCyberRealmFreeFightsGenerateResource");
 void IOTYCyberRealmFreeFightsGenerateResource(ChecklistEntry [int] resource_entries) {
 
-	if (!get_property_boolean("crAlways") && !get_property_boolean("_crToday")) return;
+	if (!__iotms_usable[$item[CyberRealm keycode]]) return;
 	
 	int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
 	string url;
