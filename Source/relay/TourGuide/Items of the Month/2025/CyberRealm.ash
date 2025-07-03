@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTYCyberRealmGenerateTasks");
 void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
 
-	if (!__iotms_usable[$item[CyberRealm keycode]]) return;
+	if (!__iotms_usable[lookupItem("CyberRealm keycode")]) return;
 	
 	int CyberFree = get_property_int("_cyberFreeFights");
 	int zone1Turns = get_property_int("_cyberZone1Turns");
@@ -59,7 +59,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		description.listAppend(HTMLGenerateSpanFont("Cyberzone 3 finished.", "grey"));
 	}
 
-	if ($locations[Cyberzone 1,Cyberzone 2,Cyberzone 3] contains __last_adventure_location) {
+	if (lookupLocations("Cyberzone 1,Cyberzone 2,Cyberzone 3") contains __last_adventure_location) {
 		description.listAppend(HTMLGenerateSpanFont("Have " + (10 - CyberFree) + " free fights left!", "green"));
 		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), -11));
 	}	else {
@@ -75,7 +75,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 RegisterResourceGenerationFunction("IOTYCyberRealmFreeFightsGenerateResource");
 void IOTYCyberRealmFreeFightsGenerateResource(ChecklistEntry [int] resource_entries) {
 
-	if (!__iotms_usable[$item[CyberRealm keycode]]) return;
+	if (!__iotms_usable[lookupItem("CyberRealm keycode")]) return;
 	
 	int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
 	string url;
