@@ -1,9 +1,8 @@
 //Takerspace
 RegisterResourceGenerationFunction("IOTMTakerspaceGenerateResource");
-void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
-{
+void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries) {
 	//you wouldn't download a boat
-	if (__iotms_usable[lookupItem("TakerSpace letter of Marque")]) return;
+	if (!__iotms_usable[lookupItem("TakerSpace letter of Marque")]) return;
 	
 	string [int] description;
 	string url = "campground.php?action=workshed";
@@ -14,8 +13,7 @@ void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
 	int TSSilk = get_property_int("takerSpaceSilk");
 	int TSSpice = get_property_int("takerSpaceSpice");
 	
-	if (TSAnchors + TSGold + TSMasts + TSRum + TSSilk + TSSpice > 0) 
-	{
+	if (TSAnchors + TSGold + TSMasts + TSRum + TSSilk + TSSpice > 0) {
 		description.listAppend(HTMLGenerateSpanOfClass("Spices: ", "r_bold") + "" + TSSpice + "");
 		description.listAppend(HTMLGenerateSpanOfClass("Rum: ", "r_bold") + "" + TSRum + "");
 		description.listAppend(HTMLGenerateSpanOfClass("Anchors: ", "r_bold") + "" + TSAnchors + "");

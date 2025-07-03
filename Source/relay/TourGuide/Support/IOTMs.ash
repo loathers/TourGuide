@@ -46,6 +46,8 @@ void initialiseIOTMsUsable()
             __iotms_usable[lookupItem("cold medicine cabinet")] = true;
         if (__campground[lookupItem("model train set")] > 0)
             __iotms_usable[lookupItem("model train set")] = true;
+        if (__campground[lookupItem("TakerSpace letter of Marque")] > 0)
+            __iotms_usable[lookupItem("TakerSpace letter of Marque")] = true;
 
         // This didn't appear in my LoL test run; I am making this more explicit and hopefully this works.
         if (__campground[lookupItem("Little Geneticist DNA-Splicing Lab")] > 0)
@@ -172,6 +174,9 @@ void initialiseIOTMsUsable()
         
     if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
         __iotms_usable[lookupItem("tearaway pants")] = true;
+        
+    if (get_property_boolean("crAlways") || get_property_boolean("_crToday")) // 2025 IotY
+        __iotms_usable[lookupItem("CyberRealm keycode")] = true;
 
     if (lookupItem("McHugeLarge duffel bag").have()) // Jan 2025
         __iotms_usable[lookupItem("McHugeLarge deluxe ski set")] = true;
