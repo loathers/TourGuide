@@ -845,27 +845,52 @@ int [int] listMakeBlankInt()
 
 string [int] listMake(string ... entries)
 {
-	return entries;
+	string [int] result;
+	foreach _, e in entries
+	{
+		result.listAppend(e);
+	}
+	return result;
 }
 
 int [int] listMake(int ... entries)
 {
-	return entries;
+	int [int] result;
+	foreach _, e in entries
+	{
+		result.listAppend(e);
+	}
+	return result;
 }
 
 item [int] listMake(item ... entries)
 {
-	return entries;
+	item [int] result;
+	foreach _, e in entries
+	{
+		result.listAppend(e);
+	}
+	return result;
 }
 
 skill [int] listMake(skill ... entries)
 {
-	return entries;
+	skill [int] result;
+	foreach _, e in entries
+	{
+		result.listAppend(e);
+	}
+	return result;
 }
 
 monster [int] listMake(monster ... entries)
 {
-	return entries;
+	monster [int] result;
+	foreach _, e in entries
+	{
+		result.listAppend(e);
+	}
+	return result;
 }
 
 string listJoinComponents(string [int] list, string joining_string, string and_string)
