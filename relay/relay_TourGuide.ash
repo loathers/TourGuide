@@ -4995,6 +4995,7 @@ void initialiseIOTMsUsable()
     	//FIXME all
         __iotms_usable[lookupItem("Clan Carnival Game")] = true;
         __iotms_usable[$item[clan floundry]] = true;
+        __iotms_usable[lookupItem("photo booth sized crate")] = true;
     }
 
     if (lookupItem("candy cane sword cane").available_amount() > 0) //Dec 2023
@@ -56756,37 +56757,34 @@ void IOTMBatWingsGenerateResource(ChecklistEntry [int] resource_entries)
 
 // Clan VIP Photo booth
 RegisterResourceGenerationFunction("IOTMVIPPhotoBoothGenerateResource");
-void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (available_amount($item[Clan VIP Lounge key]) < 1)
-        return;
-
-    string [int] description;
+void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries) {
+	if (!__iotms_usable[lookupItem("photo booth sized crate")] || !(get_clan_lounge() contains lookupItem("photo booth sized crate"))) return;
+	string [int] description;
 	string url = "inventory.php?ftext=sheriff";
-	
-    int photosLeft = clampi(3 - get_property_int("_photoBoothEffects"), 0, 3);
-	if (photosLeft > 0)
-	{
+	int photosLeft = clampi(3 - get_property_int("_photoBoothEffects"), 0, 3);
+	if (photosLeft > 0) {
 		description.listAppend(HTMLGenerateSpanFont("Get your photo taken:", "black"));
 		description.listAppend(HTMLGenerateSpanFont("photobooth west: +50% init, +noncom%", "black"));
 		description.listAppend(HTMLGenerateSpanFont("photobooth tower: +com%", "black"));
 		description.listAppend(HTMLGenerateSpanFont("photobooth space: this sucks", "black"));
-		
-		resource_entries.listAppend(ChecklistEntryMake("__item expensive camera", url, ChecklistSubentryMake(photosLeft + " clan photos takeable", description), 8));
+		resource_entries.listAppend(ChecklistEntryMake("__item expensive camera", url, ChecklistSubentryMake(photosLeft + " clan photos takeable", description), 8).ChecklistEntrySetCombinationTag("daily buffs").ChecklistEntrySetIDTag("Clan Photobooth daily buffs"));
 	}
-	//this here town ain't big enough for the two of us
-    int sheriffings = clampi(3 - get_property_int("_assertYourAuthorityCast"), 0, 3);
-	if (sheriffings > 0)
-	{
-		if (lookupItem("sheriff badge").equipped_amount() == 1 && lookupItem("sheriff moustache").equipped_amount() == 1 && lookupItem("sheriff pistol").equipped_amount() == 1)
-		{
-			description.listAppend(HTMLGenerateSpanFont("Assert your authority!", "blue"));
-		} 
-		else 
-		{
+}
+
+RegisterResourceGenerationFunction("AssertAuthorityGenerateResource");
+void AssertAuthorityGenerateResource(ChecklistEntry [int] resource_entries) {
+	if (!lookupItem("sheriff badge").have() && !lookupItem("sheriff moustache").have() && !lookupItem("sheriff pistol").have()) return;
+	// Need all 3 to get the skill.
+	int authorityCasts = clampi(3 - get_property_int("_assertYourAuthorityCast"), 0, 3);
+	if (authorityCasts > 0 && lookupSkill("Assert your Authority").skill_is_usable()) {
+		string url = "";
+		string [int] description;
+		description.listAppend("Win a fight without taking a turn.");
+		if (!lookupItem("sheriff badge").equipped() && !lookupItem("sheriff moustache").equipped() && !lookupItem("sheriff pistol").equipped()) {
 			description.listAppend(HTMLGenerateSpanFont("Equip your sheriff gear first.", "red"));
+			url = "inventory.php?ftext=sheriff";
 		}
-	resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", url, ChecklistSubentryMake(sheriffings + " Sheriff Authority free kill(s)", description), 5));
+		resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", url, ChecklistSubentryMake(pluralise(instakills_left, "Assert your Authority", "Authoritah Assertions"), description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Assert your authority free kills"));
 	}
 }
 
