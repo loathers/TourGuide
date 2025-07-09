@@ -152,6 +152,7 @@ void initialiseIOTMsUsable()
     	//FIXME all
         __iotms_usable[lookupItem("Clan Carnival Game")] = true;
         __iotms_usable[$item[clan floundry]] = true;
+        __iotms_usable[lookupItem("photo booth sized crate")] = true;
     }
 
     if (lookupItem("candy cane sword cane").available_amount() > 0) //Dec 2023
