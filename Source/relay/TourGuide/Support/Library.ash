@@ -1402,22 +1402,8 @@ boolean item_is_pvp_stealable(item it)
 
 int effective_familiar_weight(familiar f)
 {
-	if (f == $familiar[none]) return 0;
-    int weight = f.familiar_weight();
-    
-    boolean is_moved = false;
-    string [int] familiars_used_on = get_property("_feastedFamiliars").split_string_alternate(";");
-    foreach key, f_name in familiars_used_on
-    {
-        if (f_name.to_familiar() == f)
-        {
-            is_moved = true;
-            break;
-        }
-    }
-    if (is_moved)
-        weight += 10;
-    return weight;
+    if (f == $familiar[none]) return 0;
+    return (familiar_weight(f) + f.soup_weight + (f.feasted ? 10 : 0));
 }
 
 boolean year_is_leap_year(int year)
