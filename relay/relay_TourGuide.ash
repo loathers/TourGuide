@@ -56784,7 +56784,7 @@ void AssertAuthorityGenerateResource(ChecklistEntry [int] resource_entries) {
 			description.listAppend(HTMLGenerateSpanFont("Equip your sheriff gear first.", "red"));
 			url = "inventory.php?ftext=sheriff";
 		}
-		resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", url, ChecklistSubentryMake(pluralise(instakills_left, "Assert your Authority", "Authoritah Assertions"), description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Assert your authority free kills"));
+		resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", url, ChecklistSubentryMake(pluralise(authorityCasts, "Assert your Authority", "Authoritah Assertions"), description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Assert your authority free kills"));
 	}
 }
 
