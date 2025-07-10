@@ -56760,7 +56760,7 @@ RegisterResourceGenerationFunction("IOTMVIPPhotoBoothGenerateResource");
 void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (!__iotms_usable[lookupItem("photo booth sized crate")] || !(get_clan_lounge() contains lookupItem("photo booth sized crate"))) return;
 	string [int] description;
-	string url = "inventory.php?ftext=sheriff";
+	string url = "clan_viplounge.php?action=photobooth";
 	int photosLeft = clampi(3 - get_property_int("_photoBoothEffects"), 0, 3);
 	if (photosLeft > 0) {
 		description.listAppend(HTMLGenerateSpanFont("Get your photo taken:", "black"));
@@ -56769,14 +56769,15 @@ void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries) {
 		description.listAppend(HTMLGenerateSpanFont("photobooth space: this sucks", "black"));
 		resource_entries.listAppend(ChecklistEntryMake("__item expensive camera", url, ChecklistSubentryMake(photosLeft + " clan photos takeable", description), 8).ChecklistEntrySetCombinationTag("daily buffs").ChecklistEntrySetIDTag("Clan Photobooth daily buffs"));
 	}
+	int equipmentLeft = clampi(3 - get_property_int("_photoBoothEquipment"), 0, 3);
 }
 
 RegisterResourceGenerationFunction("AssertAuthorityGenerateResource");
 void AssertAuthorityGenerateResource(ChecklistEntry [int] resource_entries) {
-	if (!lookupItem("sheriff badge").have() && !lookupItem("sheriff moustache").have() && !lookupItem("sheriff pistol").have()) return;
+	if (!lookupItem("sheriff badge").have() || !lookupItem("sheriff moustache").have() || !lookupItem("sheriff pistol").have()) return;
 	// Need all 3 to get the skill.
 	int authorityCasts = clampi(3 - get_property_int("_assertYourAuthorityCast"), 0, 3);
-	if (authorityCasts > 0 && lookupSkill("Assert your Authority").skill_is_usable()) {
+	if (authorityCasts > 0) {
 		string url = "";
 		string [int] description;
 		description.listAppend("Win a fight without taking a turn.");
