@@ -56770,6 +56770,12 @@ void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries) {
 		resource_entries.listAppend(ChecklistEntryMake("__item expensive camera", url, ChecklistSubentryMake(photosLeft + " clan photos takeable", description), 8).ChecklistEntrySetCombinationTag("daily buffs").ChecklistEntrySetIDTag("Clan Photobooth daily buffs"));
 	}
 	int equipmentLeft = clampi(3 - get_property_int("_photoBoothEquipment"), 0, 3);
+	if (equipmentLeft > 0) {
+		description.listAppend(HTMLGenerateSpanFont("Borrow Props:", "black"));
+		description.listAppend(HTMLGenerateSpanFont("3x Sheriff equipment - gives 3 free kills", "black"));
+		// TODO: expand this for in-run choices.
+		resource_entries.listAppend(ChecklistEntryMake("__item photo booth supply list", url, ChecklistSubentryMake(equipmentLeft + " props borrowable", description), 1).ChecklistEntrySetCombinationTag("daily equips").ChecklistEntrySetIDTag("Clan Photobooth daily equips"));
+	}
 }
 
 RegisterResourceGenerationFunction("AssertAuthorityGenerateResource");
