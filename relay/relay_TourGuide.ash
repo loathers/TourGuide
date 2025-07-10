@@ -56763,7 +56763,6 @@ void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries) {
 	int photosLeft = clampi(3 - get_property_int("_photoBoothEffects"), 0, 3);
 	if (photosLeft > 0) {
 		string [int] description;
-		description.listAppend(HTMLGenerateSpanFont("Get your photo taken:", "black"));
 		description.listAppend(HTMLGenerateSpanFont("photobooth west: +50% init, +noncom%", "black"));
 		description.listAppend(HTMLGenerateSpanFont("photobooth tower: +com%", "black"));
 		description.listAppend(HTMLGenerateSpanFont("photobooth space: this sucks", "black"));
@@ -56772,7 +56771,6 @@ void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries) {
 	int equipmentLeft = clampi(3 - get_property_int("_photoBoothEquipment"), 0, 3);
 	if (equipmentLeft > 0) {
 		string [int] description;
-		description.listAppend(HTMLGenerateSpanFont("Borrow Props:", "black"));
 		description.listAppend(HTMLGenerateSpanFont("3x Sheriff equipment - gives 3 free kills", "black"));
 		// TODO: expand this for in-run choices.
 		resource_entries.listAppend(ChecklistEntryMake("__item photo booth supply list", url, ChecklistSubentryMake(equipmentLeft + " props borrowable", description), 1).ChecklistEntrySetCombinationTag("daily equips").ChecklistEntrySetIDTag("Clan Photobooth daily equips"));
