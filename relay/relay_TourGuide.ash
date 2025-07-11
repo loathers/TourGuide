@@ -56714,7 +56714,7 @@ void IOTMBatWingsGenerateResource(ChecklistEntry [int] resource_entries) {
 			description.listAppend(HTMLGenerateSpanFont("Equip your bat wings.", "red"));
 			url = "inventory.php?ftext=bat+wings";
 		}
-		resource_entries.listAppend(ChecklistEntryMake("__item bat wings", url, ChecklistSubentryMake(pluralise(batWingSwoopsLeft, "Swoop", "Swoops"), description), 0).ChecklistEntrySetCombinationTag("steals").ChecklistEntrySetIDTag("Bat Wings Swoops"));
+		resource_entries.listAppend(ChecklistEntryMake("__item bat wings", url, ChecklistSubentryMake(pluralise(batWingSwoopsLeft, "Bat Wings Swoop", "Bat Wings Swoops"), description), 0).ChecklistEntrySetCombinationTag("steals").ChecklistEntrySetIDTag("Bat Wings Swoops"));
 	}
 	if (batWingRestsLeft > 0) {
 		string [int] description;
@@ -56724,7 +56724,7 @@ void IOTMBatWingsGenerateResource(ChecklistEntry [int] resource_entries) {
 			description.listAppend(HTMLGenerateSpanFont("Equip your bat wings.", "red"));
 			url = "inventory.php?ftext=bat+wings";
 		}
-		resource_entries.listAppend(ChecklistEntryMake("__item bat wings", url, ChecklistSubentryMake(pluralise(batWingRestsLeft, "Rest", "Rests"), description), 0).ChecklistEntrySetCombinationTag("regen").ChecklistEntrySetIDTag("Bat Wings heals"));
+		resource_entries.listAppend(ChecklistEntryMake("__item bat wings", url, ChecklistSubentryMake(pluralise(batWingRestsLeft, "Bat Wings Rest", "Bat Wings Rests"), description), 0).ChecklistEntrySetCombinationTag("regen").ChecklistEntrySetIDTag("Bat Wings heals"));
 	}
 	if (batWingFreeFlapsLeft > 0) {
 		string [int] description;
@@ -56734,7 +56734,7 @@ void IOTMBatWingsGenerateResource(ChecklistEntry [int] resource_entries) {
 			description.listAppend(HTMLGenerateSpanFont("Equip your bat wings.", "red"));
 			url = "inventory.php?ftext=bat+wings";
 		}
-		resource_entries.listAppend(ChecklistEntryMake("__item bat wings", url, ChecklistSubentryMake(pluralise(batWingFreeFlapsLeft, "Free fight", "Free fights"), description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Bat Wings free fights"));
+		resource_entries.listAppend(ChecklistEntryMake("__item bat wings", url, ChecklistSubentryMake(pluralise(batWingFreeFlapsLeft, "Bat Wings Free Fight", "Bat Wings Free Fights"), description), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Bat Wings free fights"));
 	}
 }
 
