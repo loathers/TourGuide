@@ -176,6 +176,9 @@ void initialiseIOTMsUsable()
     if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
         __iotms_usable[lookupItem("tearaway pants")] = true;
         
+    if (lookupItem("bat wings").have()) // Oct 2024
+        __iotms_usable[lookupItem("bat wings")] = true;
+        
     if (get_property_boolean("crAlways") || get_property_boolean("_crToday")) // 2025 IotY
         __iotms_usable[lookupItem("CyberRealm keycode")] = true;
 
