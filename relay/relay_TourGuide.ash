@@ -56882,7 +56882,7 @@ void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
 }
 
 
-// 2024
+// 2025
 //CyberRealm
 RegisterTaskGenerationFunction("IOTYCyberRealmGenerateTasks");
 void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -57053,6 +57053,159 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 		}
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", url, ChecklistSubentryMake("McHugeLarge ski set skills", description), 1));
+}
+
+//leprecondo
+RegisterTaskGenerationFunction("IOTMLeprecondoGenerateTasks");
+void IOTMLeprecondoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if ($item[leprecondo].available_amount() == 0) return;
+	string url = "inv_use.php?pwd=" + my_hash() + "&which=99&whichitem=11861";
+	string [int] description;
+	
+	int lepCondoChanges = clampi(3 - get_property_int("_leprecondoRearrangements"), 0, 3);
+	string lepCondoSetup = (get_property("leprecondoInstalled"));
+	if (lepCondoSetup == "0,0,0,0") {
+		description.listAppend("Decorate the Leprecondo");
+		task_entries.listAppend(ChecklistEntryMake("__item leprecondo", url, ChecklistSubentryMake("Decorate your Leprecondo", "", description), -11));
+    }
+}
+
+RegisterResourceGenerationFunction("IOTMLeprecondoGenerateResource");
+void IOTMLeprecondoGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if ($item[leprecondo].available_amount() == 0) return;
+	string url = "inv_use.php?pwd=" + my_hash() + "&which=99&whichitem=11861";
+	string [int] description;
+	
+	int lepCondoChanges = clampi(3 - get_property_int("_leprecondoRearrangements"), 0, 3);
+	string lepCondoCurrent = (get_property("leprecondoCurrentNeed"));
+	string lepCondoCycle = (get_property("leprecondoNeedOrder"));
+	string lepCondoSetup = (get_property("leprecondoInstalled"));
+		description.listAppend("Current setup: " + lepCondoSetup + ".");
+		if (lepCondoChanges > 0) {
+			description.listAppend(HTMLGenerateSpanFont("Can redecorate " + lepCondoChanges + " more times today.", "green"));
+		}
+		description.listAppend("Need cycle: " + lepCondoCycle + ".");
+		description.listAppend("Current need: " + lepCondoCurrent + ".");
+
+		int nextCondoTurn = get_property_int("leprecondoLastNeedChange");
+	
+		if (nextCondoTurn +5 <= turns_played()) {
+			description.listAppend(HTMLGenerateSpanFont("Condo trigger time!", "blue"));
+		}
+		else {
+			description.listAppend(HTMLGenerateSpanFont("Condo trigger in " + (nextCondoTurn +5 - turns_played()) + " advs.", "blue"));
+		}
+	int punchOutChanges = (get_property_int("preworkoutPowderUses"));
+	if (punchOutChanges > 0)
+	{
+		resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "", ChecklistSubentryMake(pluralise(get_property_int("preworkoutPowderUses"), "Condo Punch", "Condo Punches"), "", "Free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("condo punch banish"));
+	}
+		
+	resource_entries.listAppend(ChecklistEntryMake("__item leprecondo", url, ChecklistSubentryMake("Leprecondo stuff", description), 11));
+}
+
+//shower thoughts
+RegisterTaskGenerationFunction("IOTMAprilShowerThoughtsGenerateTasks");
+void IOTMAprilShowerThoughtsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if ($item[April Shower Thoughts shield].available_amount() == 0) return;
+	string url = "inventory.php?action=shower&pwd=" + my_hash();
+	string [int] description;
+	
+	boolean showerGlobs = get_property_boolean("_aprilShowerGlobsCollected"); 
+	if (showerGlobs == false) {
+		description.listAppend("Collect globs");
+		task_entries.listAppend(ChecklistEntryMake("__item April Shower Thoughts shield", url, ChecklistSubentryMake("Shower for Globs", "", description), -11));
+    }
+	if (lookupItem("april shower thoughts shield").equipped_amount() == 1)
+	{
+		string main_title = HTMLGenerateSpanFont("April Shower Powers", "black");
+		boolean showerNEYR = get_property_boolean("_aprilShowerNorthernExplosion"); 
+		if (showerNEYR == false) {
+			description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
+			task_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("april shower thoughts calendar tasks"));
+		}
+	}
+}
+
+RegisterResourceGenerationFunction("IOTMAprilShowerThoughtsGenerateResource");
+void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entries)
+{
+	if ($item[April Shower Thoughts shield].available_amount() == 0) return;
+	string url = "shop.php?whichshop=showerthoughts";
+	string [int] description;
+	
+	string main_title = HTMLGenerateSpanFont("April Shower Powers", "black");
+	boolean showerNEYR = get_property_boolean("_aprilShowerNorthernExplosion"); 
+	if (showerNEYR == false) {
+		description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
+	}
+	int globCount = available_amount($item[glob of wet paper]);
+	{
+		description.listAppend("Craft your shower thoughts!");
+	}
+	resource_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", "", ChecklistSubentryMake(main_title, description), 10).ChecklistEntrySetIDTag("april shower thoughts calendar resource"));
+}
+
+//peridot of peril
+RegisterTaskGenerationFunction("IOTMPeridotGenerateTasks");
+void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if ($item[peridot of peril].available_amount() == 0) return;
+	string url = "inventory.php?ftext=peridot+of+peril";
+	string [int] description;
+	
+	if (lookupItem("peridot of peril").equipped_amount() == 1)
+	{
+		description.listAppend(HTMLGenerateSpanFont("PERIDOT POWER!", "green"));
+		string main_title = HTMLGenerateSpanFont("Peridot picking power", "green");
+		task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("peridot task"));
+	}
+	else if (lookupItem("peridot of peril").equipped_amount() == 0 && (__misc_state["in run"]))
+	{
+		description.listAppend(HTMLGenerateSpanFont("Equip the peridot to map monsters", "red"));
+		optional_task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake("Peridot picking power", description), 10).ChecklistEntrySetIDTag("peridot task"));
+	}
+}
+
+//prismatic beret
+RegisterResourceGenerationFunction("IOTMPrismaticBeretGenerateResource");
+void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    if ($item[prismatic beret].available_amount() == 0) return;
+	
+    string url = "inventory.php?ftext=prismatic+beret";
+	int busksLeft = clampi(5 - get_property_int("_beretBuskingUses"), 0, 5);
+	string [int] description;
+	string title = HTMLGenerateSpanFont(busksLeft + " Prismatic Beret Busks", "purple");
+	
+	int total;
+	item thing;
+	foreach it in $slots[hat, shirt, pants] {
+		thing = equipped_item(it);
+		if (thing != $item[none])
+		total += get_power(thing);
+	}
+	
+	if (busksLeft > 0) 
+	{
+		if (lookupSkill("tao of the terrapin").have_skill()) {
+			total = total*2;
+		}
+		description.listAppend("Gain buffs based on current equipment Power");
+		description.listAppend("Currently " + (HTMLGenerateSpanFont(total, "blue")) + " Power");
+		
+		if (lookupItem("prismatic beret").equipped_amount() == 0) {
+			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk!", "red"));
+		}
+		if (lookupFamiliar("mad hatrack").familiar_is_usable()); {
+			description.listAppend(HTMLGenerateSpanFont("(You can put it on your hatrack)", "blue"));
+		}
+		
+		resource_entries.listAppend(ChecklistEntryMake("__item prismatic beret", url, ChecklistSubentryMake(title, "", description)));
+	}
 }
 
 
