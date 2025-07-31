@@ -10,8 +10,15 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 	string title = HTMLGenerateSpanFont(busksLeft + " Prismatic Beret Busks", "purple");
 	
 	int total;
+	int shartpower;
 	item thing;
-	foreach it in $slots[hat, shirt, pants] {
+	item shart2;
+	foreach shart in $slots[shirt] {
+		shart2 = equipped_item(shart);
+		if (shart2 != $item[none])
+		shartpower += get_power(shart2);
+	}
+	foreach it in $slots[hat, pants] {
 		thing = equipped_item(it);
 		if (thing != $item[none])
 		total += get_power(thing);
@@ -23,7 +30,7 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 			total = total*2;
 		}
 		description.listAppend("Gain buffs based on current equipment Power");
-		description.listAppend("Currently " + (HTMLGenerateSpanFont(total, "blue")) + " Power");
+		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " Power");
 		
 		if (lookupItem("prismatic beret").equipped_amount() == 0) {
 			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk!", "red"));
