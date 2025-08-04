@@ -1,11 +1,10 @@
-
 //Ski set
 RegisterResourceGenerationFunction("IOTMSkiSetGenerateResource");
 void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if ($item[McHugeLarge duffel bag].available_amount() < 1) return;
         
-	if ($item[McHugeLarge duffel bag].available_amount() > 0 && $item[McHugeLarge right ski].available_amount() == 0);
+	if ($item[McHugeLarge duffel bag].available_amount() > 0 && $item[McHugeLarge right ski].available_amount() == 0)
 	{
 		resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", "inventory.php?ftext=McHugeLarge+duffel+bag", ChecklistSubentryMake("McHugeLarge duffel bag", "", "Open it!"), 0).ChecklistEntrySetIDTag("McHugeLarge duffel bag resource"));
     }
