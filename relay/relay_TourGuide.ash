@@ -57227,13 +57227,13 @@ void IOTMCoolerYetiGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	int famExpNeededFor400 = (400 - yetiExperience);
 	string fightsForYeti;
 	
-	#if (!get_property_boolean("_impossibleCold")) {
+	if (!get_property_boolean("_coolerYetiAdventures")) {
 		if (yetiExperience >= 400) {
 			description.listAppend("" + HTMLGenerateSpanFont("Doublebooze ready!", "blue"));
 			string url = "main.php?talktoyeti=1";
 			task_entries.listAppend(ChecklistEntryMake("__item dreadsylvanian cold-fashioned", url, ChecklistSubentryMake("Yeti booze time", description), -11).ChecklistEntrySetIDTag("cooler yeti booze time"));
 		}
-	#}
+	}
 }
 
 RegisterResourceGenerationFunction("IOTMCoolerYetiGenerateResource");
@@ -57255,12 +57255,12 @@ void IOTMCoolerYetiGenerateResource(ChecklistEntry [int] resource_entries)
 	else {
 		fightsForYeti = "cannot get";
 	}
-#	if (!get_property_boolean("_impossibleCold")) {
+	if (!get_property_boolean("_coolerYetiAdventures")) {
 		if (yetiExperience >= 400) {
 			description.listAppend(HTMLGenerateSpanOfClass("Doubles next booze adv", "r_bold") + " costs 400 fxp.");
 			url = "main.php?talktoyeti=1";
 		}
-#	}
+	}
 	if (yetiExperience >= 225) {
 		description.listAppend(HTMLGenerateSpanOfClass("100 advs of +100% item/meat", "r_bold") + " costs 225 fxp.");
 	}
