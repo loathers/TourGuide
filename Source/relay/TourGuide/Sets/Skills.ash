@@ -41,11 +41,11 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (lookupSkill("Expert Corner-Cutter").skill_is_usable()) {
             free_crafts_left += clampi(5 - get_property_int("_expertCornerCutterUsed"), 0, 5);
-        }    
+        }
         if (get_property_int("homebodylCharges") > 0) {
             free_crafts_left += (get_property_int("homebodylCharges"));
         }
-        // adding cookbookbat free crafts into crafting tile        
+        // adding cookbookbat free crafts into crafting tile
         if (lookupFamiliar("Cookbookbat").familiar_is_usable()) {
             string [int] description;
 			free_cooks_left += clampi(5 - get_property_int("_cookbookbatCrafting"), 0, 5);
@@ -57,15 +57,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 		// holiday multitasking
 		if (lookupSkill("Holiday Multitasking").skill_is_usable()) {
             free_crafts_left += clampi(3 - get_property_int("_holidayMultitaskingUsed"), 0, 3);
-        }    
+        }
         // elf guard cooking
         if (lookupSkill("Elf Guard Cooking").skill_is_usable()) {
-            string [int] description;
-			free_cooks_left += clampi(3 - get_property_int("_elfGuardCookingUsed"), 0, 3);
-			string title = "free cooking";
-			if (free_cooks_left > 0) {
-			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_cooks_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "COOKING only" : "", description));
-			}
+            free_crafts_left += clampi(3 - get_property_int("_elfGuardCookingUsed"), 0, 3);
         }
 		// cocktails of the age of sail
         if (lookupSkill("Old-School Cocktailcrafting").skill_is_usable()) {
@@ -152,29 +147,29 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     property_summons_to_skills["_perfectFreezeUsed"] = listMake($skill[Perfect Freeze]);
     property_summons_to_skills["_communismUsed"] = listMake($skill[Communism!]);
     property_summons_to_skills["_preventScurvy"] = listMake(lookupSkill("Prevent Scurvy and Sobriety"));
-    
+
     skills_to_title_notes[$skill[summon annoyance]] = get_property_int("summonAnnoyanceCost") + " swagger";
-    
-    
-    
-    
-    
+
+
+
+
+
     if (my_path().id == PATH_AVATAR_OF_SNEAKY_PETE) {
         property_summons_to_skills["_petePartyThrown"] = listMake($skill[Throw Party]);
         property_summons_to_skills["_peteRiotIncited"] = listMake($skill[Incite Riot]);
-        
+
         int audience_max = 30;
         int hate_useful_max = 25; //ashes and soda max out early; more audience hatred only gives crates and grenades, not of absolute importance
         if ($item[Sneaky Pete's leather jacket].equipped_amount() > 0 || $item[Sneaky Pete's leather jacket (collar popped)].equipped_amount() > 0) {
             audience_max = 50;
             hate_useful_max = 41;
         }
-            
+
         if (my_audience() < audience_max)
             skills_to_details[$skill[Throw Party]] = "Ideally have " + audience_max + " audience love before casting.";
         else
             skills_to_details[$skill[Throw Party]] = "Gain party supplies.";
-        
+
         if (my_audience() > -hate_useful_max)
             skills_to_details[$skill[Incite Riot]] = "Ideally have " + hate_useful_max + " audience hate before casting.";
         else
@@ -194,9 +189,9 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         property_summons_to_skills["_demandSandwich"] = listMake($skill[Demand Sandwich]);
         property_summon_limits["_demandSandwich"] = 3;
     }
-    
+
     property_summons_to_skills["_requestSandwichSucceeded"] = listMake($skill[Request Sandwich]);
-    
+
     property_summons_to_skills["grimoire1Summons"] = listMake($skill[Summon Hilarious Objects]);
     property_summons_to_skills["grimoire2Summons"] = listMake($skill[Summon Tasteful Items]);
     property_summons_to_skills["grimoire3Summons"] = listMake($skill[Summon Alice's Army Cards]);
@@ -211,10 +206,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     skills_to_details[lookupSkill("Incredible Self-Esteem")] = "Gives or extends affirmation buffs.";
     if (__misc_state["in run"] && lookupItem("Daily Affirmation: Always be Collecting").available_amount() > 0 && lookupItem("Daily Affirmation: Always be Collecting").to_effect().have_effect() == 0)
         skills_to_details[lookupSkill("Incredible Self-Esteem")] += "|Possibly use Always be Collecting affirmation before casting.";
-    
+
     foreach s in $skills[Summon Hilarious Objects,Summon Tasteful Items,Summon Alice's Army Cards,Summon Geeky Gifts]
         skills_to_urls[s] = "campground.php?action=bookshelf";
-    
+
 
 
     int muscle_basestat = my_basestat($stat[muscle]);
@@ -256,8 +251,8 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
             string details = skills_to_details[s];
             if (details != "")
                 description.listAppend(details);
-                
-                
+
+
             if (url.length() == 0) {
                 if (skills_to_urls contains s)
                     url = skills_to_urls[s];
@@ -277,13 +272,13 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         entry.should_indent_after_first_subentry = true;
         resource_entries.listAppend(entry);
     }
-    
-    
+
+
     if (lookupSkill("Evoke Eldritch Horror").skill_is_usable() && !get_property_boolean("_eldritchHorrorEvoked")) {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Evoke eldritch horror skill free fight"));
     }
     if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS && my_path().id != PATH_COMMUNITY_SERVICE) {
         resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage&action=fv_scientist", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Daily forest tentacle free fight"));
     }
-    
+
 }
