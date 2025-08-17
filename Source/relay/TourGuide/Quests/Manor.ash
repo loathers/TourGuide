@@ -57,6 +57,7 @@ void QManorInit()
         QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_SEA) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     state.quest_name = "Spookyraven Manor Unlock";
     state.image_name = "Spookyraven Manor";
     
