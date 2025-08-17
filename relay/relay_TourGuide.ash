@@ -2321,10 +2321,7 @@ static {
     int PATH_SMOL = 49; // easier to type
     int PATH_A_SHRUNKEN_ADVENTURER_AM_I = 49;
     int PATH_WEREPROFESSOR = 50;
-<<<<<<< HEAD
-=======
     int PATH_SEA = 55;
->>>>>>> origin/Bundled-under-the-sea
 }
 
 float numeric_modifier_replacement(item it, string modifier_string) {
@@ -9847,12 +9844,9 @@ void QLevel2Init()
 	QuestStateParseMafiaQuestProperty(state, "questL02Larva");
 	if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished"); 
 	
-<<<<<<< HEAD
-=======
     // Finish this quest if you are in 11,037 Leagues Under the Sea, so the tiles never generate.
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
 	state.quest_name = "Spooky Forest Quest";
 	state.image_name = "Spooky Forest";
 	state.council_quest = true;
@@ -9942,15 +9936,11 @@ void QLevel3Init()
 	//lastTavernSquare
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL03Rat");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can do quest in GG
     if (my_path().id == PATH_SEA) state.finished = true;
->>>>>>> origin/Bundled-under-the-sea
 	
 	state.quest_name = "Typical Tavern Quest";
 	state.image_name = "Typical Tavern";
@@ -10098,17 +10088,12 @@ void QLevel4Init()
     //step3 -> 3 areas unlocked
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL04Bat");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-	
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path().id == PATH_GREY_GOO) state.finished = true; 
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
 	state.quest_name = "Boss Bat Quest";
 	state.image_name = "Boss Bat";
 	state.council_quest = true;
@@ -10271,19 +10256,11 @@ void QLevel5Init()
 	//questL05Goblin
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL05Goblin");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-	state.quest_name = "Knob Goblin Quest";
-	state.image_name = "cobb's knob";
-	state.council_quest = true;
-	
-=======
 
 	state.quest_name = "Knob Goblin Quest";
 	state.image_name = "cobb's knob";
 	state.council_quest = true;
 
->>>>>>> origin/Bundled-under-the-sea
 	
 	if (my_level() >= 5 || my_path().id == PATH_EXPLOSIONS)
 		state.startable = true;
@@ -10295,13 +10272,10 @@ void QLevel5Init()
 		QuestStateParseMafiaQuestPropertyValue(state, "started");
 	}
 		
-<<<<<<< HEAD
-=======
 	// Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path().id == PATH_GREY_GOO) state.finished = true;
     if (my_path().id == PATH_SEA) state.finished = true;
->>>>>>> origin/Bundled-under-the-sea
 		
 	__quest_state["Level 5"] = state;
 	__quest_state["Knob Goblin King"] = state;
@@ -10312,11 +10286,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Level 5"].in_progress)
 		return;
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO || __misc_state["in aftercore"])
-=======
     if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_SEA || __misc_state["in aftercore"])
->>>>>>> origin/Bundled-under-the-sea
         return;
     string url = "place.php?whichplace=plains";
 	//if the quest isn't started and we have unlocked the barracks, wait until it's started:
@@ -10532,16 +10502,12 @@ void QLevel6Init()
 	//questL06Friar
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL06Friar");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can do quest in GG
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
 	state.quest_name = "Deep Fat Friars' Quest";
 	state.image_name = "forest friars";
 	state.council_quest = true;
@@ -10731,16 +10697,12 @@ void QLevel7Init()
 	//questL07Cyrptic
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL07Cyrptic");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
 
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path().id == PATH_GREY_GOO) state.finished = true;
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
 	state.quest_name = "Cyrpt Quest";
 	state.image_name = "cyrpt";
 	state.council_quest = true;
@@ -11585,16 +11547,12 @@ void QLevel8Init()
 	//questL08Trapper
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL08Trapper");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can do quest in GG
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
 	state.quest_name = "Trapper Quest";
 	state.image_name = "trapper";
 	state.council_quest = true;
@@ -11892,16 +11850,12 @@ void QLevel9Init()
 	//booPeakProgress
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL09Topping");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can do quest in GG
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
 	state.quest_name = "Highland Lord Quest";
 	state.image_name = "orc chasm";
 	state.council_quest = true;
@@ -12587,9 +12541,6 @@ void QLevel10Init()
 	//questL10Garbage
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL10Garbage");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     
     // Finish the quest state in paths that don't need the tile.
@@ -12597,7 +12548,6 @@ void QLevel10Init()
     if (my_path().id == PATH_GREY_GOO) state.finished = true;
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
 	state.quest_name = "Castle Quest";
 	state.image_name = "castle";
 	state.council_quest = true;
@@ -12973,16 +12923,12 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Ron");
-<<<<<<< HEAD
-        if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
             
         // Finish the quest state in paths that don't need the tile.
         if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
         if (my_path().id == PATH_GREY_GOO) state.finished = true; 
         if (my_path().id == PATH_SEA) state.finished = true;
         
->>>>>>> origin/Bundled-under-the-sea
         state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
         state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
         
@@ -13001,16 +12947,12 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Shen");
-<<<<<<< HEAD
-        if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
         
         // Finish the quest state in paths that don't need the tile.
         if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
         if (my_path().id == PATH_GREY_GOO) state.finished = true; 
         if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
         state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
         state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
         
@@ -13410,16 +13352,12 @@ void QLevel11PyramidInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Pyramid");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path().id == PATH_GREY_GOO) state.finished = true;
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
     state.quest_name = "Pyramid Quest";
     state.image_name = "Pyramid";
     __quest_state["Level 11 Pyramid"] = state;
@@ -13645,16 +13583,12 @@ void QLevel11DesertInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Desert");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path().id == PATH_GREY_GOO) state.finished = true;
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
     state.quest_name = "Desert Quest";
     state.image_name = "Pyramid"; //"__item instant karma";
     
@@ -13895,16 +13829,12 @@ void QLevel11PalindomeInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Palindome");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path().id == PATH_GREY_GOO) state.finished = true;
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
     state.quest_name = "Palindome Quest";
     state.image_name = "Palindome";
     
@@ -14236,16 +14166,12 @@ void QLevel11ManorInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Manor");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path().id == PATH_GREY_GOO) state.finished = true;
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
     state.quest_name = "Lord Spookyraven Quest";
     state.image_name = "Spookyraven manor";
     
@@ -14564,16 +14490,12 @@ int numberOfDenseLianaFoughtInShrine(location shrine)
 void QLevel11HiddenCityInit() {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Worship");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     if (my_path().id == PATH_GREY_GOO) state.finished = true;
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
     state.quest_name = "Hidden City Quest";
     state.image_name = "Hidden City";
     
@@ -15065,9 +14987,6 @@ void QLevel11HiddenTempleInit()
     }
     else
         QuestStateParseMafiaQuestPropertyValue(state, "unstarted");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_EXPLOSIONS || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
         
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
@@ -15075,7 +14994,6 @@ void QLevel11HiddenTempleInit()
     if (my_path().id == PATH_GREY_GOO) state.finished = true; 
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
     state.quest_name = "Hidden Temple Unlock";
     state.image_name = "spooky forest";
 
@@ -15087,10 +15005,7 @@ void QLevel11HiddenTempleGenerateTasks(ChecklistEntry [int] task_entries, Checkl
 	if (!__quest_state["Hidden Temple Unlock"].in_progress)
         return;
     if (my_path().id == PATH_G_LOVER) return;
-<<<<<<< HEAD
-=======
     if (my_path().id == PATH_SEA) return;
->>>>>>> origin/Bundled-under-the-sea
         
     QuestState base_quest_state = __quest_state["Hidden Temple Unlock"];
     ChecklistSubentry subentry;
@@ -15225,16 +15140,12 @@ void QLevel11Init()
 	{
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11MacGuffin");
-<<<<<<< HEAD
-    	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
         
         // Finish the quest state in paths that don't need the tile.
         if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
         if (my_path().id == PATH_GREY_GOO) state.finished = true;
         if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
 		state.quest_name = "MacGuffin Quest";
 		state.image_name = "MacGuffin";
 		state.council_quest = true;
@@ -15559,16 +15470,12 @@ void QLevel12Init()
 	//state_boolean["Orchard Finished"]
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL12War");
-<<<<<<< HEAD
-    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-=======
     
     // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
     // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can complete in gg
     if (my_path().id == PATH_SEA) state.finished = true;
 
->>>>>>> origin/Bundled-under-the-sea
 	state.quest_name = "Island War Quest";
 	state.image_name = "island war";
 	state.council_quest = true;
@@ -17228,11 +17135,7 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-<<<<<<< HEAD
-    if (__misc_state["in aftercore"] || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_GREY_GOO || (!state.in_progress && my_path().id == PATH_ACTUALLY_ED_THE_UNDYING)) //FIXME mafia may track the ed L13 quest under this variable
-=======
     if (__misc_state["in aftercore"] || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_SEA || my_path().id == PATH_GREY_GOO || (!state.in_progress && my_path().id == PATH_ACTUALLY_ED_THE_UNDYING)) //FIXME mafia may track the ed L13 quest under this variable
->>>>>>> origin/Bundled-under-the-sea
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	if (__misc_state["Example mode"])
         QuestStateParseMafiaQuestPropertyValue(state, "step6");
@@ -18558,10 +18461,7 @@ void QManorInit()
         QuestStateParseMafiaQuestPropertyValue(state, "started");
     }
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-<<<<<<< HEAD
-=======
     if (my_path().id == PATH_SEA) QuestStateParseMafiaQuestPropertyValue(state, "finished");
->>>>>>> origin/Bundled-under-the-sea
     state.quest_name = "Spookyraven Manor Unlock";
     state.image_name = "Spookyraven Manor";
     
@@ -20314,20 +20214,6 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 
 void QSeaInit()
 {
-<<<<<<< HEAD
-    
-    //Have they adventured anywhere underwater?
-    boolean have_adventured_in_relevant_area = false;
-    foreach l in $locations[the briny deeps, the brinier deepers, the briniest deepests, an octopus's garden,the wreck of the edgar fitzsimmons, the mer-kin outpost, madness reef,the marinara trench, the dive bar,anemone mine, the coral corral, mer-kin elementary school,mer-kin library,mer-kin gymnasium,mer-kin colosseum,the caliginous abyss] {
-        if (l.turnsAttemptedInLocation() > 0 || my_location() == l) {
-            have_adventured_in_relevant_area = true;
-            break;
-        }
-    }
-    //don't list the quest unless they've started on the path under the sea:
-    if (!have_adventured_in_relevant_area && $items[Mer-kin trailmap,Mer-kin lockkey,Mer-kin stashbox,wriggling flytrap pellet,damp old boot,Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note,black glass].available_amount() == 0)
-        return;
-=======
     // While in 11,037 leagues under the sea, you want this showing no matter what.
 
     if (my_path().id != 55){
@@ -20343,7 +20229,6 @@ void QSeaInit()
         if (!have_adventured_in_relevant_area && $items[Mer-kin trailmap,Mer-kin lockkey,Mer-kin stashbox,wriggling flytrap pellet,damp old boot,Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note,black glass].available_amount() == 0)
             return;        
     }
->>>>>>> origin/Bundled-under-the-sea
         
     
     if (true) {
@@ -20410,12 +20295,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         //gladiator:
         if (at_gladiator_boss) {
             description.listAppend("Buff muscle, equip a powerful weapon.");
-<<<<<<< HEAD
-            description.listAppend("Delevel him with jam band bootlegs for a bit, then attack with your weapon.");
-=======
             description.listAppend("Delevel him for a bit, then attack with your weapon.");
             if ($item[crayon shavings].available_amount() > 0) description.listAppend("|*Your crayon shavings are great for this!");
->>>>>>> origin/Bundled-under-the-sea
             description.listAppend("Make sure not to have anything along that will attack him. (familiars, etc)");
             //umm... this probably won't be updated:
             string [int] things_to_do;
@@ -20434,11 +20315,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 string line = "Possibly ";
                 if ($item[dark porquoise ring].available_amount() == 0)
                     line += "acquire and ";
-<<<<<<< HEAD
-                line += "equip a dark porquoise ring to use less jam band bootlegs.";
-=======
                 line += "equip a dark porquoise ring to use fewer delevelers.";
->>>>>>> origin/Bundled-under-the-sea
                 description.listAppend(line);
             }
             if ($effect[Ruthlessly Efficient].have_effect() == 0) {
@@ -20531,11 +20408,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             potential_healers[$item[mer-kin healscroll]] = "mer-kin healscroll (full HP)";
             potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
             potential_healers[$item[soggy used band-aid]] = "soggy used band-aid (full HP)";
-<<<<<<< HEAD
-=======
             potential_healers[$item[sea gel]] = "sea gel (+500 HP)";
             potential_healers[$item[waterlogged scroll of healing]] = "waterlogged scroll of healing (+250 HP)";
->>>>>>> origin/Bundled-under-the-sea
             potential_healers[$item[extra-strength red potion]] = "extra-strength red potion (+200 HP)";
             potential_healers[$item[red pixel potion]] = "red pixel potion (+100-120 HP)";
             potential_healers[$item[red potion]] = "red potion (+100 HP)";
@@ -20746,11 +20620,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     string get_fishy, how_to_get_fishy;
     if ($effect[fishy].have_effect() == 0) {
         get_fishy = "Acquire fishy.";
-<<<<<<< HEAD
-        how_to_get_fishy = "|*Easy way: Lucky adventure in the brinier deeps, 50 turns.";
-=======
         how_to_get_fishy = "|*Easy way: Lucky adventure in the brinier deeps, 20 turns.";
->>>>>>> origin/Bundled-under-the-sea
         if ($item[fishy pipe].available_amount() > 0 && !get_property_boolean("_fishyPipeUsed"))
             how_to_get_fishy += "|*Use fishy pipe.";
         if (monkees_quest_state.state_string["skate park status"] == "ice" && !get_property_boolean("_skateBuff1"))
@@ -20885,10 +20755,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 //Find grandpa in one of the three zones.
                 need_minus_combat_modifier = true;
                 temple_subentry.entries.listAppend("Find grandpa sea monkee in " + class_grandpa_location + ".|" + pluraliseWordy(grandpa_ncs_remaining, "non-combat remains", "non-combats remain").capitaliseFirstLetter() + ".");
-<<<<<<< HEAD
-=======
                 if(grandpa_ncs_remaining == 3) temple_subentry.entries.listAppend("|*Make sure you talk to little brother, too; the quest only starts when you talk to him!");
->>>>>>> origin/Bundled-under-the-sea
             } else if (monkees_quest_state.mafia_internal_step == 4) {
                 //Talk to little brother.
                 temple_subentry.entries.listAppend("Talk to little brother.");
@@ -24963,12 +24830,9 @@ void Q8BitInit()
     // Set the state as "started" if you have the continuum transfunctioner.
     if (!state.started && $items[continuum transfunctioner].available_amount() > 0)
         state.started = true;
-<<<<<<< HEAD
-=======
         
     // Finish this quest if you are in 11,037 Leagues Under the Sea, so the tiles never generate.
     if (my_path().id == PATH_SEA) state.finished = true;
->>>>>>> origin/Bundled-under-the-sea
 
     // Finish this quest if you are in community service, so the tiles never generate.
     if (my_path().id == PATH_COMMUNITY_SERVICE) state.finished = true;
@@ -26617,11 +26481,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         skills_to_urls[$skill[Summon Confiscated Things]] = "campground.php?action=bookshelf";
     }
     property_summons_to_skills["_candySummons"] = listMake($skill[Summon Crimbo Candy]);
-<<<<<<< HEAD
-    property_summons_to_skills["_summonResortPassUsed"] = listMake($skill[Summon Kokomo Resort Pass]);
-=======
     property_summons_to_skills["_summonResortPassesUsed"] = listMake($skill[Summon Kokomo Resort Pass]);
->>>>>>> origin/Bundled-under-the-sea
     property_summons_to_skills["_incredibleSelfEsteemCast"] = listMake(lookupSkill("Incredible Self-Esteem"));
     skills_to_details[lookupSkill("Incredible Self-Esteem")] = "Gives or extends affirmation buffs.";
     if (__misc_state["in run"] && lookupItem("Daily Affirmation: Always be Collecting").available_amount() > 0 && lookupItem("Daily Affirmation: Always be Collecting").to_effect().have_effect() == 0)
@@ -32090,11 +31950,7 @@ void SDemonSummonGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterTaskGenerationFunction("SAreaUnlocksGenerateTasks");
 void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-<<<<<<< HEAD
-	if (!__misc_state["desert beach available"] && __misc_state["in run"] && my_path().id != PATH_NUCLEAR_AUTUMN)
-=======
 	if (!__misc_state["desert beach available"] && __misc_state["in run"] && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_SEA)
->>>>>>> origin/Bundled-under-the-sea
 	{
         string url;
 		ChecklistSubentry subentry;
@@ -32170,10 +32026,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 	{
 		ChecklistSubentry subentry;
 		subentry.header = "Unlock mysterious island";
-<<<<<<< HEAD
-=======
         if (my_path().id == PATH_SEA) return;
->>>>>>> origin/Bundled-under-the-sea
 		if (my_path().id == PATH_COMMUNITY_SERVICE)
         {
         	subentry.header += "?";
@@ -34608,20 +34461,6 @@ void generatePullList(Checklist [int] checklists)
     }
 
     // As with machete, these are just flat-out great pulls, quest relevant or not
-<<<<<<< HEAD
-    if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && !have_outfit_components("eXtreme Cold-Weather Gear"))
-    {
-        item [int] missing_ninja_components = items_missing($items[ninja carabiner, ninja crampons, ninja rope]);
-        if (missing_ninja_components.count() > 0)
-        {
-            string description = missing_ninja_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
-            
-            if (numeric_modifier("cold resistance") < 5.0)
-                description += "|Will require five " + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " resist to use properly.";
-            pullable_item_list.listAppend(GPItemMake("Ninja peak climbing", "__item " + missing_ninja_components[0], description));
-        }
-    }
-=======
     // 2025 UPDATE: ... or, well, they were. lol.
     // if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && !have_outfit_components("eXtreme Cold-Weather Gear"))
     // {
@@ -34635,7 +34474,6 @@ void generatePullList(Checklist [int] checklists)
     //         pullable_item_list.listAppend(GPItemMake("Ninja peak climbing", "__item " + missing_ninja_components[0], description));
     //     }
     // }
->>>>>>> origin/Bundled-under-the-sea
 
     // Literally just 3 straight turnsave to pull scrips if you need em, lol
     string [int] scrip_reasons;
@@ -34656,11 +34494,7 @@ void generatePullList(Checklist [int] checklists)
 	}
 
     // Zepp mob, if done via faceroll, is 40+ turns. This stuff is massive value in ignoring that.
-<<<<<<< HEAD
-    if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
-=======
     if (my_path().id != PATH_SEA && __quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
->>>>>>> origin/Bundled-under-the-sea
     {
         item [int] missing_freebird_components = items_missing( __misc_state["Torso aware"] ? $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches,lynyrd musk] : $items[lynyrdskin cap,lynyrdskin breeches,lynyrd musk] );
         
@@ -34749,11 +34583,7 @@ void generatePullList(Checklist [int] checklists)
 	    pullable_item_list.listAppend(GPItemMake($item[stench jelly], "Skips ahead to an NC, saves 2-3 turns each.", 20));
 
     // Quest-y pull; just save searching for an NC, like an NC forcer, but also save the turn spent!
-<<<<<<< HEAD
-    if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && $item[spooky-gro fertilizer].item_is_usable())
-=======
     if (my_path().id != PATH_SEA && !get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && $item[spooky-gro fertilizer].item_is_usable())
->>>>>>> origin/Bundled-under-the-sea
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2-ish turns while unlocking temple."));
 	
     if (my_path().id != PATH_COMMUNITY_SERVICE && $item[11-leaf clover].item_is_usable())
@@ -35950,11 +35780,7 @@ void setUpState()
 	if ($item[wand of nagamar].available_amount() > 0)
 		wand_of_nagamar_needed = false;
 		
-<<<<<<< HEAD
-		
-=======
 	if (my_path().id == PATH_SEA) wand_of_nagamar_needed = false;
->>>>>>> origin/Bundled-under-the-sea
 		
 	if (!wand_of_nagamar_needed)
 	{
@@ -36488,11 +36314,7 @@ void generateMissingItems(Checklist [int] checklists)
     if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"]) {
         item camera = 7266.to_item();
         if (camera != $item[none]) {
-<<<<<<< HEAD
-            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")).ChecklistEntrySetIDTag("Instant camera reminder"));
-=======
             if (my_path().id != PATH_SEA) items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")).ChecklistEntrySetIDTag("Instant camera reminder"));
->>>>>>> origin/Bundled-under-the-sea
         }
     }
     
@@ -53349,13 +53171,8 @@ void IOTYCursedMagnifyingGlassGenerateResource(ChecklistEntry [int] resource_ent
 RegisterTaskGenerationFunction("IOTMCosmicBowlingBallGenerateTasks");
 void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-<<<<<<< HEAD
-	if (!get_property_boolean("hasCosmicBowlingBall") == true)
-		return;
-=======
 	if (!get_property_boolean("hasCosmicBowlingBall") == true) return;
 	if (!$item[cosmic bowling ball].is_unrestricted()) return; // Remove from standard-restricted paths
->>>>>>> origin/Bundled-under-the-sea
 	if (my_path() == $path[Legacy of Loathing]) return;
 	if (my_path().id == PATH_G_LOVER) return; // you can technically use it to bank buffs but the buffs don't work
 
@@ -53388,17 +53205,10 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 RegisterResourceGenerationFunction("IOTMCosmicBowlingBallGenerateResource");
 void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries)
 {
-<<<<<<< HEAD
-	if (!get_property_boolean("hasCosmicBowlingBall") == true)
-		return;
-	if (my_path() == $path[Legacy of Loathing]) return;
-	if (my_path().id == PATH_G_LOVER) return; // not generating tiles when nothing works right
-=======
 	if (!get_property_boolean("hasCosmicBowlingBall") == true) return;
 	if (my_path() == $path[Legacy of Loathing]) return;
 	if (my_path().id == PATH_G_LOVER) return; // not generating tiles when nothing works right
 	if (!$item[cosmic bowling ball].is_unrestricted()) return;
->>>>>>> origin/Bundled-under-the-sea
 
 	// Entries
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");
@@ -54148,14 +53958,9 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 {
 	# if (!__misc_state["in run"]) return; // Turned off because TES likes this tile to appear in aftercore
 	if (!get_property_boolean("hasAutumnaton")) return; // Don't show if they don't actually have Fall-E
-<<<<<<< HEAD
-	if (my_path() == $path[Legacy of Loathing]) return; // Cannot use fall-e in LoL
-    if (my_path().id == PATH_G_LOVER) return; // Cannot use fall-e in G-Lover 
-=======
 	if (!$item[autumn dollar].is_unrestricted()) return; // Remove from standard-restricted paths
 	if (my_path() == $path[Legacy of Loathing]) return; // Cannot use fall-e in LoL
 	if (my_path().id == PATH_G_LOVER) return; // Cannot use fall-e in G-Lover 
->>>>>>> origin/Bundled-under-the-sea
 	if (in_bad_moon()) return; // Cannot use fall-e in Bad Moon
 
 	int autobotsToday = get_property_int("_autumnatonQuests");
@@ -56442,13 +56247,9 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	// Added a check for all paths where you do not want the tile at all:
 	//   - Community Service & Grey Goo: irrelevant
 	//   - Avatar of Boris: cannot wield a weapon other than trusty or use a familiar
-<<<<<<< HEAD
-	boolean pathCheck = true;
-=======
 	//   - 11,037 Leagues Under the Sea: irrelevant
 	boolean pathCheck = true;
 	pathCheck = my_path().id == PATH_SEA ? false : true;
->>>>>>> origin/Bundled-under-the-sea
 	pathCheck = my_path().id == PATH_COMMUNITY_SERVICE ? false : true;
 	pathCheck = my_path().id == PATH_GREY_GOO ? false : true;
 	pathCheck = my_path().id == PATH_AVATAR_OF_BORIS ? false : true;
@@ -56923,13 +56724,8 @@ void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
 }
 
 // Tearaway Pants
-<<<<<<< HEAD
-RegisterResourceGenerationFunction("IOTMTearawayPantsGenerateTask");
-void IOTMTearawayPantsGenerateTask(ChecklistEntry [int] optional_task_entries)
-=======
 RegisterTaskGenerationFunction("IOTMTearawayPantsGenerateTask");
 void IOTMTearawayPantsGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
->>>>>>> origin/Bundled-under-the-sea
 {
     // Don't show the tile if you don't have the pants.
 	if (!__iotms_usable[lookupItem("tearaway pants")]) return;
@@ -57326,8 +57122,6 @@ void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries)
 
 
 //Ski set
-<<<<<<< HEAD
-=======
 RegisterTaskGenerationFunction("IOTMSkiSetGenerateTasks");
 void IOTMSkiSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -57340,19 +57134,10 @@ void IOTMSkiSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 }
 
 
->>>>>>> origin/Bundled-under-the-sea
 RegisterResourceGenerationFunction("IOTMSkiSetGenerateResource");
 void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if ($item[McHugeLarge duffel bag].available_amount() < 1) return;
-<<<<<<< HEAD
-        
-	if ($item[McHugeLarge duffel bag].available_amount() > 0 && $item[McHugeLarge right ski].available_amount() == 0);
-	{
-		resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", "inventory.php?ftext=McHugeLarge+duffel+bag", ChecklistSubentryMake("McHugeLarge duffel bag", "", "Open it!"), 0).ChecklistEntrySetIDTag("McHugeLarge duffel bag resource"));
-    }
-=======
->>>>>>> origin/Bundled-under-the-sea
 	
 	int skiAvalanchesLeft = clampi(3 - get_property_int("_mcHugeLargeAvalancheUses"), 0, 3);
 	int skiSlashesLeft = clampi(3 - get_property_int("_mcHugeLargeSlashUses"), 0, 3);
@@ -57365,19 +57150,11 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
     //fixme: currently not supported by sneako tile
 		if (lookupItem("McHugeLarge left ski").equipped_amount() == 1)
 		{
-<<<<<<< HEAD
-			description.listAppend(HTMLGenerateSpanFont("LEFT SKI equipped!", "blue"));
-		}
-		else if (lookupItem("McHugeLarge left ski").equipped_amount() == 0)
-		{
-			description.listAppend(HTMLGenerateSpanFont("Equip the LEFT SKI first.", "red"));
-=======
 			description.listAppend(HTMLGenerateSpanFont("|*LEFT SKI equipped!", "blue"));
 		}
 		else if (lookupItem("McHugeLarge left ski").equipped_amount() == 0)
 		{
 			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT SKI first.", "red"));
->>>>>>> origin/Bundled-under-the-sea
 		}
 	}
 	if (skiSlashesLeft > 0)
@@ -57385,26 +57162,16 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " slashes", "r_bold") + " left. Track a monster.");
 		if (lookupItem("McHugeLarge left pole").equipped_amount() == 1)
 		{
-<<<<<<< HEAD
-			description.listAppend(HTMLGenerateSpanFont("LEFT POLE equipped!", "blue"));
-		}
-		else if (lookupItem("McHugeLarge left pole").equipped_amount() == 0)
-		{
-			description.listAppend(HTMLGenerateSpanFont("Equip the LEFT POLE first.", "red"));
-=======
 			description.listAppend(HTMLGenerateSpanFont("|*LEFT POLE equipped!", "blue"));
 		}
 		else if (lookupItem("McHugeLarge left pole").equipped_amount() == 0)
 		{
 			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT POLE first.", "red"));
->>>>>>> origin/Bundled-under-the-sea
 		}
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", url, ChecklistSubentryMake("McHugeLarge ski set skills", description), 1));
 }
 
-<<<<<<< HEAD
-=======
 //leprecondo
 RegisterTaskGenerationFunction("IOTMLeprecondoGenerateTasks");
 void IOTMLeprecondoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -57561,7 +57328,7 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 		if (lookupItem("prismatic beret").equipped_amount() == 0) {
 			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk!", "red"));
 		}
-		if (lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted()); {
+		if (lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted()) {
 			description.listAppend(HTMLGenerateSpanFont("(You can put it on your hatrack)", "blue"));
 		}
 		
@@ -57760,7 +57527,6 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
     if(my_paradoxicity() < 13) description.listAppend("Boost to 13 Paradoxicity for +100% item & +50% booze drop!");
 	resource_entries.listAppend(ChecklistEntryMake("__item M&ouml;bius ring", url, ChecklistSubentryMake(title, "", description), 0));
 }
->>>>>>> origin/Bundled-under-the-sea
 
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
