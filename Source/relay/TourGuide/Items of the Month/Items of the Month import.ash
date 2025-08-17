@@ -168,3 +168,4 @@ import "relay/TourGuide/Items of the Month/2025/Peridot.ash";
 import "relay/TourGuide/Items of the Month/2025/Prismatic Beret.ash";
 import "relay/TourGuide/Items of the Month/2025/Cooler Yeti.ash";
 import "relay/TourGuide/Items of the Month/2025/Allied Radio Backpack.ash";
+import "relay/TourGuide/Items of the Month/2025/Mobius Ring.ash";
