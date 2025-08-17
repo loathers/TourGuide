@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("SAreaUnlocksGenerateTasks");
 void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!__misc_state["desert beach available"] && __misc_state["in run"] && my_path().id != PATH_NUCLEAR_AUTUMN)
+	if (!__misc_state["desert beach available"] && __misc_state["in run"] && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_SEA)
 	{
         string url;
 		ChecklistSubentry subentry;
@@ -77,6 +77,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 	{
 		ChecklistSubentry subentry;
 		subentry.header = "Unlock mysterious island";
+        if (my_path().id == PATH_SEA) return;
 		if (my_path().id == PATH_COMMUNITY_SERVICE)
         {
         	subentry.header += "?";

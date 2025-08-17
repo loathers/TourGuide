@@ -4,11 +4,11 @@ void QLevel5Init()
 	//questL05Goblin
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL05Goblin");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+
 	state.quest_name = "Knob Goblin Quest";
 	state.image_name = "cobb's knob";
 	state.council_quest = true;
-	
+
 	
 	if (my_level() >= 5 || my_path().id == PATH_EXPLOSIONS)
 		state.startable = true;
@@ -20,6 +20,10 @@ void QLevel5Init()
 		QuestStateParseMafiaQuestPropertyValue(state, "started");
 	}
 		
+	// Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
 		
 	__quest_state["Level 5"] = state;
 	__quest_state["Knob Goblin King"] = state;
@@ -30,7 +34,7 @@ void QLevel5GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
 {
 	if (!__quest_state["Level 5"].in_progress)
 		return;
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO || __misc_state["in aftercore"])
+    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_SEA || __misc_state["in aftercore"])
         return;
     string url = "place.php?whichplace=plains";
 	//if the quest isn't started and we have unlocked the barracks, wait until it's started:

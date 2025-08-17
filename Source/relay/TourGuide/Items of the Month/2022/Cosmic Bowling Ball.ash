@@ -2,8 +2,8 @@
 RegisterTaskGenerationFunction("IOTMCosmicBowlingBallGenerateTasks");
 void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (!get_property_boolean("hasCosmicBowlingBall") == true)
-		return;
+	if (!get_property_boolean("hasCosmicBowlingBall") == true) return;
+	if (!$item[cosmic bowling ball].is_unrestricted()) return; // Remove from standard-restricted paths
 	if (my_path() == $path[Legacy of Loathing]) return;
 	if (my_path().id == PATH_G_LOVER) return; // you can technically use it to bank buffs but the buffs don't work
 
@@ -36,10 +36,10 @@ void IOTMCosmicBowlingBallGenerateTasks(ChecklistEntry [int] task_entries, Check
 RegisterResourceGenerationFunction("IOTMCosmicBowlingBallGenerateResource");
 void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (!get_property_boolean("hasCosmicBowlingBall") == true)
-		return;
+	if (!get_property_boolean("hasCosmicBowlingBall") == true) return;
 	if (my_path() == $path[Legacy of Loathing]) return;
 	if (my_path().id == PATH_G_LOVER) return; // not generating tiles when nothing works right
+	if (!$item[cosmic bowling ball].is_unrestricted()) return;
 
 	// Entries
 	int bowlingUses = get_property_int("_cosmicBowlingSkillsUsed");

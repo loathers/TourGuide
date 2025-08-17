@@ -7,6 +7,9 @@ void QLevel2Init()
 	QuestStateParseMafiaQuestProperty(state, "questL02Larva");
 	if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished"); 
 	
+    // Finish this quest if you are in 11,037 Leagues Under the Sea, so the tiles never generate.
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Spooky Forest Quest";
 	state.image_name = "Spooky Forest";
 	state.council_quest = true;

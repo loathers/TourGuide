@@ -162,3 +162,10 @@ import "relay/TourGuide/Items of the Month/2024/TakerSpace.ash";
 // 2024
 import "relay/TourGuide/Items of the Month/2025/CyberRealm.ash";
 import "relay/TourGuide/Items of the Month/2025/McHugeLarge Ski Set.ash";
+import "relay/TourGuide/Items of the Month/2025/Leprecondo.ash";
+import "relay/TourGuide/Items of the Month/2025/April Shower Thoughts Calendar.ash";
+import "relay/TourGuide/Items of the Month/2025/Peridot.ash";
+import "relay/TourGuide/Items of the Month/2025/Prismatic Beret.ash";
+import "relay/TourGuide/Items of the Month/2025/Cooler Yeti.ash";
+import "relay/TourGuide/Items of the Month/2025/Allied Radio Backpack.ash";
+import "relay/TourGuide/Items of the Month/2025/Mobius Ring.ash";

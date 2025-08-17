@@ -5,7 +5,11 @@ void QLevel3Init()
 	//lastTavernSquare
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL03Rat");
+    
+    // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can do quest in GG
+    if (my_path().id == PATH_SEA) state.finished = true;
 	
 	state.quest_name = "Typical Tavern Quest";
 	state.image_name = "Typical Tavern";

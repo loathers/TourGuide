@@ -2,18 +2,21 @@
 
 void QSeaInit()
 {
-    
-    //Have they adventured anywhere underwater?
-    boolean have_adventured_in_relevant_area = false;
-    foreach l in $locations[the briny deeps, the brinier deepers, the briniest deepests, an octopus's garden,the wreck of the edgar fitzsimmons, the mer-kin outpost, madness reef,the marinara trench, the dive bar,anemone mine, the coral corral, mer-kin elementary school,mer-kin library,mer-kin gymnasium,mer-kin colosseum,the caliginous abyss] {
-        if (l.turnsAttemptedInLocation() > 0 || my_location() == l) {
-            have_adventured_in_relevant_area = true;
-            break;
+    // While in 11,037 leagues under the sea, you want this showing no matter what.
+
+    if (my_path().id != 55){
+        //Have they adventured anywhere underwater?
+        boolean have_adventured_in_relevant_area = false;
+        foreach l in $locations[the briny deeps, the brinier deepers, the briniest deepests, an octopus's garden,the wreck of the edgar fitzsimmons, the mer-kin outpost, madness reef,the marinara trench, the dive bar,anemone mine, the coral corral, mer-kin elementary school,mer-kin library,mer-kin gymnasium,mer-kin colosseum,the caliginous abyss] {
+            if (l.turnsAttemptedInLocation() > 0 || my_location() == l) {
+                have_adventured_in_relevant_area = true;
+                break;
+            }
         }
+        //don't list the quest unless they've started on the path under the sea:
+        if (!have_adventured_in_relevant_area && $items[Mer-kin trailmap,Mer-kin lockkey,Mer-kin stashbox,wriggling flytrap pellet,damp old boot,Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note,black glass].available_amount() == 0)
+            return;        
     }
-    //don't list the quest unless they've started on the path under the sea:
-    if (!have_adventured_in_relevant_area && $items[Mer-kin trailmap,Mer-kin lockkey,Mer-kin stashbox,wriggling flytrap pellet,damp old boot,Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note,black glass].available_amount() == 0)
-        return;
         
     
     if (true) {
@@ -80,7 +83,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         //gladiator:
         if (at_gladiator_boss) {
             description.listAppend("Buff muscle, equip a powerful weapon.");
-            description.listAppend("Delevel him with jam band bootlegs for a bit, then attack with your weapon.");
+            description.listAppend("Delevel him for a bit, then attack with your weapon.");
+            if ($item[crayon shavings].available_amount() > 0) description.listAppend("|*Your crayon shavings are great for this!");
             description.listAppend("Make sure not to have anything along that will attack him. (familiars, etc)");
             //umm... this probably won't be updated:
             string [int] things_to_do;
@@ -99,7 +103,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                 string line = "Possibly ";
                 if ($item[dark porquoise ring].available_amount() == 0)
                     line += "acquire and ";
-                line += "equip a dark porquoise ring to use less jam band bootlegs.";
+                line += "equip a dark porquoise ring to use fewer delevelers.";
                 description.listAppend(line);
             }
             if ($effect[Ruthlessly Efficient].have_effect() == 0) {
@@ -192,6 +196,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             potential_healers[$item[mer-kin healscroll]] = "mer-kin healscroll (full HP)";
             potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
             potential_healers[$item[soggy used band-aid]] = "soggy used band-aid (full HP)";
+            potential_healers[$item[sea gel]] = "sea gel (+500 HP)";
+            potential_healers[$item[waterlogged scroll of healing]] = "waterlogged scroll of healing (+250 HP)";
             potential_healers[$item[extra-strength red potion]] = "extra-strength red potion (+200 HP)";
             potential_healers[$item[red pixel potion]] = "red pixel potion (+100-120 HP)";
             potential_healers[$item[red potion]] = "red potion (+100 HP)";
@@ -402,7 +408,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
     string get_fishy, how_to_get_fishy;
     if ($effect[fishy].have_effect() == 0) {
         get_fishy = "Acquire fishy.";
-        how_to_get_fishy = "|*Easy way: Lucky adventure in the brinier deeps, 50 turns.";
+        how_to_get_fishy = "|*Easy way: Lucky adventure in the brinier deeps, 20 turns.";
         if ($item[fishy pipe].available_amount() > 0 && !get_property_boolean("_fishyPipeUsed"))
             how_to_get_fishy += "|*Use fishy pipe.";
         if (monkees_quest_state.state_string["skate park status"] == "ice" && !get_property_boolean("_skateBuff1"))
@@ -537,6 +543,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 //Find grandpa in one of the three zones.
                 need_minus_combat_modifier = true;
                 temple_subentry.entries.listAppend("Find grandpa sea monkee in " + class_grandpa_location + ".|" + pluraliseWordy(grandpa_ncs_remaining, "non-combat remains", "non-combats remain").capitaliseFirstLetter() + ".");
+                if(grandpa_ncs_remaining == 3) temple_subentry.entries.listAppend("|*Make sure you talk to little brother, too; the quest only starts when you talk to him!");
             } else if (monkees_quest_state.mafia_internal_step == 4) {
                 //Talk to little brother.
                 temple_subentry.entries.listAppend("Talk to little brother.");
