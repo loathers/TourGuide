@@ -19,7 +19,7 @@ void IOTMMobiusRingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     
     int [int] turnsBetweenNCs = {1:4, 2:7, 3:13, 4:19, 5:25, 6:31, 7:41, 8:41, 9:41, 10:41, 11:41, 12:51, 13:51, 14:51, 15:51, 16:51, 17:76};
     int turnsSinceLastNC = total_turns_played() - lastMobiusTurn;
-    int turnsUntilNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 1)] - turnsSinceLastNC);
+    int turnsUntilNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 1)] - (lastMobiusTurn == 0 ? my_turncount() : turnsSinceLastNC));
     int turnsUntilNextNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 2)] + turnsUntilNextNC);
 
     // This is sort of a dumb way to do this too, but alas.
@@ -63,7 +63,7 @@ void IOTMMobiusRingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     if (mobEquipped) ncDescription.listAppend("Keep your Möbius ring equipped for an NC");
     if (!mobEquipped) ncDescription.listAppend(HTMLGenerateSpanFont("Equip your Möbius ring for a shot at a Paradoxicity NC!", "red"));
 	
-    task_entries.listAppend(ChecklistEntryMake("__item M&ouml;bius ring", "", ChecklistSubentryMake(ncTitle, ncSubtitle, ncDescription), ncPriority).ChecklistEntrySetIDTag("morb ring nc task"));
+    if(turnsUntilNextNC == 0) task_entries.listAppend(ChecklistEntryMake("__item M&ouml;bius ring", "", ChecklistSubentryMake(ncTitle, ncSubtitle, ncDescription), ncPriority).ChecklistEntrySetIDTag("morb ring nc task"));
 
 }
 
@@ -87,7 +87,7 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
     
     int [int] turnsBetweenNCs = {1:4, 2:7, 3:13, 4:19, 5:25, 6:31, 7:41, 8:41, 9:41, 10:41, 11:41, 12:51, 13:51, 14:51, 15:51, 16:51, 17:76};
     int turnsSinceLastNC = total_turns_played() - lastMobiusTurn;
-    int turnsUntilNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 1)] - turnsSinceLastNC);
+    int turnsUntilNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 1)] - (lastMobiusTurn == 0 ? my_turncount() : turnsSinceLastNC));
     int turnsUntilNextNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 2)] + turnsUntilNextNC);
 
     // This is sort of a dumb way to do this too, but alas.
@@ -106,9 +106,8 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
     if (turnsUntilNextNC == 0) description.listAppend(HTMLGenerateSpanFont("You can encounter NC #" + (countMobiusNCs+1) +" right now!", "blue"));
     if (turnsUntilNextNC > 0) description.listAppend("You have "+pluralise(turnsUntilNextNC, " turn", " turns")+" turns to NC #" +(countMobiusNCs+1)+ ".");
         description.listAppend("|*You have at least "+pluralise(turnsUntilNextNextNC, " turn", " turns")+" until NC #"+(countMobiusNCs+2)+".");
-	description.listAppend("You have encountered " + countTimeCops +"/11 free time cops today.");
+	description.listAppend("" + countTimeCops +"/11 free time cops today. (currently @ "+currentTimeCopRate+"% rate)");
 	    if(countTimeCops > 11) description.listAppend(HTMLGenerateSpanFont("No free time cops remain; be careful wearing your ring!", "red"));
-		description.listAppend("|*At " + currentTimeCopRate + "% chance of cops; increase Paradoxicity for more.");
     if(my_paradoxicity() < 13) description.listAppend("Boost to 13 Paradoxicity for +100% item & +50% booze drop!");
 	resource_entries.listAppend(ChecklistEntryMake("__item M&ouml;bius ring", url, ChecklistSubentryMake(title, "", description), 0));
 }
