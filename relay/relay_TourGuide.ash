@@ -2321,6 +2321,7 @@ static {
     int PATH_SMOL = 49; // easier to type
     int PATH_A_SHRUNKEN_ADVENTURER_AM_I = 49;
     int PATH_WEREPROFESSOR = 50;
+    int PATH_SEA = 55;
 }
 
 float numeric_modifier_replacement(item it, string modifier_string) {
@@ -9843,6 +9844,9 @@ void QLevel2Init()
 	QuestStateParseMafiaQuestProperty(state, "questL02Larva");
 	if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished"); 
 	
+    // Finish this quest if you are in 11,037 Leagues Under the Sea, so the tiles never generate.
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Spooky Forest Quest";
 	state.image_name = "Spooky Forest";
 	state.council_quest = true;
@@ -9932,7 +9936,11 @@ void QLevel3Init()
 	//lastTavernSquare
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL03Rat");
+    
+    // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can do quest in GG
+    if (my_path().id == PATH_SEA) state.finished = true;
 	
 	state.quest_name = "Typical Tavern Quest";
 	state.image_name = "Typical Tavern";
@@ -10080,8 +10088,12 @@ void QLevel4Init()
     //step3 -> 3 areas unlocked
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL04Bat");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
-	
+    
+    // Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true; 
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Boss Bat Quest";
 	state.image_name = "Boss Bat";
 	state.council_quest = true;
@@ -10244,11 +10256,16 @@ void QLevel5Init()
 	//questL05Goblin
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL05Goblin");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    
+	// Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Knob Goblin Quest";
 	state.image_name = "cobb's knob";
 	state.council_quest = true;
-	
+
 	
 	if (my_level() >= 5 || my_path().id == PATH_EXPLOSIONS)
 		state.startable = true;
@@ -10486,7 +10503,12 @@ void QLevel6Init()
 	//questL06Friar
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL06Friar");
+    
+    // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can do quest in GG
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Deep Fat Friars' Quest";
 	state.image_name = "forest friars";
 	state.council_quest = true;
@@ -10676,7 +10698,12 @@ void QLevel7Init()
 	//questL07Cyrptic
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL07Cyrptic");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+
+    // Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Cyrpt Quest";
 	state.image_name = "cyrpt";
 	state.council_quest = true;
@@ -11521,7 +11548,12 @@ void QLevel8Init()
 	//questL08Trapper
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL08Trapper");
+    
+    // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can do quest in GG
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Trapper Quest";
 	state.image_name = "trapper";
 	state.council_quest = true;
@@ -11819,7 +11851,12 @@ void QLevel9Init()
 	//booPeakProgress
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL09Topping");
+    
+    // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can do quest in GG
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Highland Lord Quest";
 	state.image_name = "orc chasm";
 	state.council_quest = true;
@@ -12505,7 +12542,13 @@ void QLevel10Init()
 	//questL10Garbage
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL10Garbage");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    
+    
+    // Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Castle Quest";
 	state.image_name = "castle";
 	state.council_quest = true;
@@ -12881,7 +12924,12 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Ron");
-        if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+            
+        // Finish the quest state in paths that don't need the tile.
+        if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        if (my_path().id == PATH_GREY_GOO) state.finished = true; 
+        if (my_path().id == PATH_SEA) state.finished = true;
+        
         state.quest_name = "Zeppelin Quest"; //"Merry-Go-Ron";
         state.image_name = "__item copperhead charm (rampant)"; //__item bitchin ford anglia
         
@@ -12900,7 +12948,12 @@ void QLevel11CopperheadInit()
     if (true) {
         QuestState state;
         QuestStateParseMafiaQuestProperty(state, "questL11Shen");
-        if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        
+        // Finish the quest state in paths that don't need the tile.
+        if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        if (my_path().id == PATH_GREY_GOO) state.finished = true; 
+        if (my_path().id == PATH_SEA) state.finished = true;
+
         state.quest_name = "Copperhead Club Quest"; //"Of Mice and Shen";
         state.image_name = "__item copperhead charm"; //"__effect Ancient Annoying Serpent Poison";
         
@@ -13300,7 +13353,12 @@ void QLevel11PyramidInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Pyramid");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    
+    // Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
+
     state.quest_name = "Pyramid Quest";
     state.image_name = "Pyramid";
     __quest_state["Level 11 Pyramid"] = state;
@@ -13526,7 +13584,12 @@ void QLevel11DesertInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Desert");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    
+    // Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
+
     state.quest_name = "Desert Quest";
     state.image_name = "Pyramid"; //"__item instant karma";
     
@@ -13767,7 +13830,12 @@ void QLevel11PalindomeInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Palindome");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    
+    // Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
+
     state.quest_name = "Palindome Quest";
     state.image_name = "Palindome";
     
@@ -14099,7 +14167,12 @@ void QLevel11ManorInit()
 {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Manor");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    
+    // Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
+
     state.quest_name = "Lord Spookyraven Quest";
     state.image_name = "Spookyraven manor";
     
@@ -14418,7 +14491,12 @@ int numberOfDenseLianaFoughtInShrine(location shrine)
 void QLevel11HiddenCityInit() {
     QuestState state;
     QuestStateParseMafiaQuestProperty(state, "questL11Worship");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    
+    // Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
+
     state.quest_name = "Hidden City Quest";
     state.image_name = "Hidden City";
     
@@ -14910,7 +14988,13 @@ void QLevel11HiddenTempleInit()
     }
     else
         QuestStateParseMafiaQuestPropertyValue(state, "unstarted");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_EXPLOSIONS || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        
+    // Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_EXPLOSIONS) state.finished = true; 
+    if (my_path().id == PATH_GREY_GOO) state.finished = true; 
+    if (my_path().id == PATH_SEA) state.finished = true;
+
     state.quest_name = "Hidden Temple Unlock";
     state.image_name = "spooky forest";
 
@@ -15056,7 +15140,12 @@ void QLevel11Init()
 	{
 		QuestState state;
 		QuestStateParseMafiaQuestProperty(state, "questL11MacGuffin");
-    	if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        
+        // Finish the quest state in paths that don't need the tile.
+        if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+        if (my_path().id == PATH_GREY_GOO) state.finished = true;
+        if (my_path().id == PATH_SEA) state.finished = true;
+
 		state.quest_name = "MacGuffin Quest";
 		state.image_name = "MacGuffin";
 		state.council_quest = true;
@@ -15381,7 +15470,12 @@ void QLevel12Init()
 	//state_boolean["Orchard Finished"]
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL12War");
+    
+    // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can complete in gg
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Island War Quest";
 	state.image_name = "island war";
 	state.council_quest = true;
@@ -17041,7 +17135,7 @@ void QLevel13Init()
     
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL13Final");
-    if (__misc_state["in aftercore"] || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_GREY_GOO || (!state.in_progress && my_path().id == PATH_ACTUALLY_ED_THE_UNDYING)) //FIXME mafia may track the ed L13 quest under this variable
+    if (__misc_state["in aftercore"] || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_SEA || my_path().id == PATH_GREY_GOO || (!state.in_progress && my_path().id == PATH_ACTUALLY_ED_THE_UNDYING)) //FIXME mafia may track the ed L13 quest under this variable
         QuestStateParseMafiaQuestPropertyValue(state, "finished"); //never will start
 	if (__misc_state["Example mode"])
         QuestStateParseMafiaQuestPropertyValue(state, "step6");
@@ -24735,6 +24829,9 @@ void Q8BitInit()
     // Set the state as "started" if you have the continuum transfunctioner.
     if (!state.started && $items[continuum transfunctioner].available_amount() > 0)
         state.started = true;
+        
+    // Finish this quest if you are in 11,037 Leagues Under the Sea, so the tiles never generate.
+    if (my_path().id == PATH_SEA) state.finished = true;
 
     // Finish this quest if you are in community service, so the tiles never generate.
     if (my_path().id == PATH_COMMUNITY_SERVICE) state.finished = true;
@@ -53858,10 +53955,10 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 {
 	# if (!__misc_state["in run"]) return; // Turned off because TES likes this tile to appear in aftercore
 	if (!get_property_boolean("hasAutumnaton")) return; // Don't show if they don't actually have Fall-E
-	if (my_path() == $path[Legacy of Loathing]) return; // Cannot use fall-e in LoL
-    if (my_path().id == PATH_G_LOVER) return; // Cannot use fall-e in G-Lover 
-	if (in_bad_moon()) return; // Cannot use fall-e in Bad Moon
 	if (!$item[autumn dollar].is_unrestricted()) return; // Remove from standard-restricted paths
+	if (my_path() == $path[Legacy of Loathing]) return; // Cannot use fall-e in LoL
+	if (my_path().id == PATH_G_LOVER) return; // Cannot use fall-e in G-Lover 
+	if (in_bad_moon()) return; // Cannot use fall-e in Bad Moon
 
 	int autobotsToday = get_property_int("_autumnatonQuests");
 	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");
@@ -57300,7 +57397,7 @@ void IOTTAlliedRadioBackpackGenerateResource(ChecklistEntry [int] resource_entri
 	{
 		description.listAppend("Request an airdrop!");
 		description.listAppend("|*" + HTMLGenerateSpanOfClass("SNIPER SUPPORT", "r_bold") + " for a sneak!");
-		if (!usedIntel) description.listAppend("|*" + HTMLGenerateSpanOfClass("MATERIAL INTEL", "r_bold") + " for +100% item!"+HTMLGenerateSpanFont("(10 turns)", "gray", "0.9em"));
+		if (!usedIntel) description.listAppend("|*" + HTMLGenerateSpanOfClass("MATERIAL INTEL", "r_bold") + " for +100% item! "+HTMLGenerateSpanFont("(10 turns)", "gray", "0.9em"));
 		description.listAppend("|*" + HTMLGenerateSpanOfClass("FUEL or RATIONS", "r_bold") + " for weak turngen!");
 		resource_entries.listAppend(ChecklistEntryMake("__item allied radio backpack", url, ChecklistSubentryMake(title, "", description)));
 	}
@@ -57329,8 +57426,7 @@ void IOTMMobiusRingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     int turnsUntilNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 1)] - turnsSinceLastNC);
     int turnsUntilNextNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 2)] + turnsUntilNextNC);
 
-    // This is sort of a dumb way to do this too, but alas. Also incorrect, as
-    //   we don't have paradoxicity in mafia yet...
+    // This is sort of a dumb way to do this too, but alas.
     int [int] timeCopRate = {
         0:2, 1:2, 2:2, 3:2, 4:2, 
         5:4, 6:4, 7:4, 8:4, 9:4, 
@@ -57398,8 +57494,7 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
     int turnsUntilNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 1)] - turnsSinceLastNC);
     int turnsUntilNextNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 2)] + turnsUntilNextNC);
 
-    // This is sort of a dumb way to do this too, but alas. Also incorrect, as
-    //   we don't have paradoxicity in mafia yet...
+    // This is sort of a dumb way to do this too, but alas.
     int [int] timeCopRate = {
         0:2, 1:2, 2:2, 3:2, 4:2, 
         5:4, 6:4, 7:4, 8:4, 9:4, 
@@ -57412,14 +57507,13 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
     string url = "inventory.php?ftext=bius+ring";
 	string title = HTMLGenerateSpanFont(pluralise(turnsUntilNextNC, " turn", " turns") + " to your next Möbius NC", "black");
 	 
-	description.listAppend("You have encountered " + countMobiusNCs +" NCs so far today.");
-        if (turnsUntilNextNC == 0) description.listAppend("|*"+HTMLGenerateSpanFont("You can encounter an NC right now!", "blue"));
-        if (turnsUntilNextNC > 0) description.listAppend("|*You have "+pluralise(turnsUntilNextNC, " turn", " turns")+" turns to the next NC.");
-        description.listAppend("|*You have at least "+pluralise(turnsUntilNextNextNC, " turn", " turns")+" until the NC after that.");
+    if (turnsUntilNextNC == 0) description.listAppend(HTMLGenerateSpanFont("You can encounter NC #" + (countMobiusNCs+1) +" right now!", "blue"));
+    if (turnsUntilNextNC > 0) description.listAppend("You have "+pluralise(turnsUntilNextNC, " turn", " turns")+" turns to NC #" +(countMobiusNCs+1)+ ".");
+        description.listAppend("|*You have at least "+pluralise(turnsUntilNextNextNC, " turn", " turns")+" until NC #"+(countMobiusNCs+2)+".");
 	description.listAppend("You have encountered " + countTimeCops +"/11 free time cops today.");
 	    if(countTimeCops > 11) description.listAppend(HTMLGenerateSpanFont("No free time cops remain; be careful wearing your ring!", "red"));
-		description.listAppend("|*Currently at " + currentTimeCopRate + "% chance of cops; increase Paradoxicity for a higher rate.");
-    if(my_paradoxicity() < 13) description.listAppend("Try to get to 13 Paradoxicity for +100% item & +50% booze drop on your ring!");
+		description.listAppend("|*At " + currentTimeCopRate + "% chance of cops; increase Paradoxicity for more.");
+    if(my_paradoxicity() < 13) description.listAppend("Boost to 13 Paradoxicity for +100% item & +50% booze drop!");
 	resource_entries.listAppend(ChecklistEntryMake("__item M&ouml;bius ring", url, ChecklistSubentryMake(title, "", description), 0));
 }
 
