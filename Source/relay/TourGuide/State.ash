@@ -550,7 +550,7 @@ void setUpState()
 	if ($item[wand of nagamar].available_amount() > 0)
 		wand_of_nagamar_needed = false;
 		
-		
+	if (my_path().id == PATH_SEA) wand_of_nagamar_needed = false;
 		
 	if (!wand_of_nagamar_needed)
 	{
