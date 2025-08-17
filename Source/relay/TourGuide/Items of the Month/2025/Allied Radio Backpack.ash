@@ -13,9 +13,9 @@ void IOTTAlliedRadioBackpackGenerateResource(ChecklistEntry [int] resource_entri
 	if (radioDropsLeft > 0) 
 	{
 		description.listAppend("Request an airdrop!");
-		description.listAppend("|*SNIPER SUPPORT for +1 Sneak! +100% item, or weak turngen");
-		if (!usedIntel) description.listAppend("|*MATERIAL INTEL for 10 turns of +100% item!");
-		description.listAppend("|*FUEL or RATIONS for weak turngen");
+		description.listAppend("|*" + HTMLGenerateSpanOfClass("SNIPER SUPPORT", "r_bold") + " for a sneak!");
+		if (!usedIntel) description.listAppend("|*" + HTMLGenerateSpanOfClass("MATERIAL INTEL", "r_bold") + " for +100% item!"+HTMLGenerateSpanFont("(10 turns)", "gray", "0.9em"));
+		description.listAppend("|*" + HTMLGenerateSpanOfClass("FUEL or RATIONS", "r_bold") + " for weak turngen!");
 		resource_entries.listAppend(ChecklistEntryMake("__item allied radio backpack", url, ChecklistSubentryMake(title, "", description)));
 	}
 }
