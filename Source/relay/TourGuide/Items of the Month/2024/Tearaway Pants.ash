@@ -1,5 +1,5 @@
 // Tearaway Pants
-RegisterResourceGenerationFunction("IOTMTearawayPantsGenerateTask");
+RegisterTaskGenerationFunction("IOTMTearawayPantsGenerateTask");
 void IOTMTearawayPantsGenerateTask(ChecklistEntry [int] optional_task_entries)
 {
     // Don't show the tile if you don't have the pants.

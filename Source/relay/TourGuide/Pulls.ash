@@ -357,18 +357,19 @@ void generatePullList(Checklist [int] checklists)
     }
 
     // As with machete, these are just flat-out great pulls, quest relevant or not
-    if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && !have_outfit_components("eXtreme Cold-Weather Gear"))
-    {
-        item [int] missing_ninja_components = items_missing($items[ninja carabiner, ninja crampons, ninja rope]);
-        if (missing_ninja_components.count() > 0)
-        {
-            string description = missing_ninja_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
+    // 2025 UPDATE: ... or, well, they were. lol.
+    // if (!__quest_state["Level 8"].state_boolean["Mountain climbed"] && !have_outfit_components("eXtreme Cold-Weather Gear"))
+    // {
+    //     item [int] missing_ninja_components = items_missing($items[ninja carabiner, ninja crampons, ninja rope]);
+    //     if (missing_ninja_components.count() > 0)
+    //     {
+    //         string description = missing_ninja_components.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".";
             
-            if (numeric_modifier("cold resistance") < 5.0)
-                description += "|Will require five " + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " resist to use properly.";
-            pullable_item_list.listAppend(GPItemMake("Ninja peak climbing", "__item " + missing_ninja_components[0], description));
-        }
-    }
+    //         if (numeric_modifier("cold resistance") < 5.0)
+    //             description += "|Will require five " + HTMLGenerateSpanOfClass("cold", "r_element_cold") + " resist to use properly.";
+    //         pullable_item_list.listAppend(GPItemMake("Ninja peak climbing", "__item " + missing_ninja_components[0], description));
+    //     }
+    // }
 
     // Literally just 3 straight turnsave to pull scrips if you need em, lol
     string [int] scrip_reasons;
@@ -389,7 +390,7 @@ void generatePullList(Checklist [int] checklists)
 	}
 
     // Zepp mob, if done via faceroll, is 40+ turns. This stuff is massive value in ignoring that.
-    if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
+    if (my_path().id != PATH_SEA && __quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
     {
         item [int] missing_freebird_components = items_missing( __misc_state["Torso aware"] ? $items[lynyrdskin cap,lynyrdskin tunic,lynyrdskin breeches,lynyrd musk] : $items[lynyrdskin cap,lynyrdskin breeches,lynyrd musk] );
         
@@ -478,7 +479,7 @@ void generatePullList(Checklist [int] checklists)
 	    pullable_item_list.listAppend(GPItemMake($item[stench jelly], "Skips ahead to an NC, saves 2-3 turns each.", 20));
 
     // Quest-y pull; just save searching for an NC, like an NC forcer, but also save the turn spent!
-    if (!get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && $item[spooky-gro fertilizer].item_is_usable())
+    if (my_path().id != PATH_SEA && !get_property_ascension("lastTempleUnlock") && $item[spooky-gro fertilizer].item_amount() == 0 && $item[spooky-gro fertilizer].item_is_usable())
         pullable_item_list.listAppend(GPItemMake($item[spooky-gro fertilizer], "Saves 2-ish turns while unlocking temple."));
 	
     if (my_path().id != PATH_COMMUNITY_SERVICE && $item[11-leaf clover].item_is_usable())

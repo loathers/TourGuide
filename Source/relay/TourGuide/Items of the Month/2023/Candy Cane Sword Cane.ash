@@ -13,7 +13,9 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	// Added a check for all paths where you do not want the tile at all:
 	//   - Community Service & Grey Goo: irrelevant
 	//   - Avatar of Boris: cannot wield a weapon other than trusty or use a familiar
+	//   - 11,037 Leagues Under the Sea: irrelevant
 	boolean pathCheck = true;
+	pathCheck = my_path().id == PATH_SEA ? false : true;
 	pathCheck = my_path().id == PATH_COMMUNITY_SERVICE ? false : true;
 	pathCheck = my_path().id == PATH_GREY_GOO ? false : true;
 	pathCheck = my_path().id == PATH_AVATAR_OF_BORIS ? false : true;

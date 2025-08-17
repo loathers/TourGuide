@@ -123,7 +123,7 @@ void generateMissingItems(Checklist [int] checklists)
     if (__quest_state["Level 11 Palindome"].state_boolean["Need instant camera"]) {
         item camera = 7266.to_item();
         if (camera != $item[none]) {
-            items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")).ChecklistEntrySetIDTag("Instant camera reminder"));
+            if (my_path().id != PATH_SEA) items_needed_entries.listAppend(ChecklistEntryMake("__item " + camera, $location[the haunted bedroom].getClickableURLForLocation(), ChecklistSubentryMake("Disposable instant camera", "", "Found in the Haunted Bedroom.")).ChecklistEntrySetIDTag("Instant camera reminder"));
         }
     }
     

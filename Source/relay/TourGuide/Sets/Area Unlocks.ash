@@ -77,6 +77,7 @@ void SAreaUnlocksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry
 	{
 		ChecklistSubentry subentry;
 		subentry.header = "Unlock mysterious island";
+        if (my_path().id == PATH_SEA) return;
 		if (my_path().id == PATH_COMMUNITY_SERVICE)
         {
         	subentry.header += "?";
