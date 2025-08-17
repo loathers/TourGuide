@@ -7,6 +7,9 @@ void Q8BitInit()
     // Set the state as "started" if you have the continuum transfunctioner.
     if (!state.started && $items[continuum transfunctioner].available_amount() > 0)
         state.started = true;
+        
+    // Finish this quest if you are in 11,037 Leagues Under the Sea, so the tiles never generate.
+    if (my_path().id == PATH_SEA) state.finished = true;
 
     // Finish this quest if you are in community service, so the tiles never generate.
     if (my_path().id == PATH_COMMUNITY_SERVICE) state.finished = true;

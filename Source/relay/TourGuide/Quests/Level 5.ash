@@ -4,11 +4,16 @@ void QLevel5Init()
 	//questL05Goblin
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL05Goblin");
-    if (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    
+	// Finish the quest state in paths that don't need the tile.
+    if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    if (my_path().id == PATH_GREY_GOO) state.finished = true;
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Knob Goblin Quest";
 	state.image_name = "cobb's knob";
 	state.council_quest = true;
-	
+
 	
 	if (my_level() >= 5 || my_path().id == PATH_EXPLOSIONS)
 		state.startable = true;

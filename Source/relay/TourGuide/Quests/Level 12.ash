@@ -12,7 +12,12 @@ void QLevel12Init()
 	//state_boolean["Orchard Finished"]
 	QuestState state;
 	QuestStateParseMafiaQuestProperty(state, "questL12War");
+    
+    // Finish the quest state in paths that don't need the tile.
     if (my_path().id == PATH_COMMUNITY_SERVICE) QuestStateParseMafiaQuestPropertyValue(state, "finished");
+    // if (my_path().id == PATH_GREY_GOO) state.finished = true; // can complete in gg
+    if (my_path().id == PATH_SEA) state.finished = true;
+
 	state.quest_name = "Island War Quest";
 	state.image_name = "island war";
 	state.council_quest = true;
