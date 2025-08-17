@@ -22,8 +22,7 @@ void IOTMMobiusRingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     int turnsUntilNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 1)] - turnsSinceLastNC);
     int turnsUntilNextNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 2)] + turnsUntilNextNC);
 
-    // This is sort of a dumb way to do this too, but alas. Also incorrect, as
-    //   we don't have paradoxicity in mafia yet...
+    // This is sort of a dumb way to do this too, but alas.
     int [int] timeCopRate = {
         0:2, 1:2, 2:2, 3:2, 4:2, 
         5:4, 6:4, 7:4, 8:4, 9:4, 
@@ -91,8 +90,7 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
     int turnsUntilNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 1)] - turnsSinceLastNC);
     int turnsUntilNextNextNC = max(0, turnsBetweenNCs[min(17, countMobiusNCs + 2)] + turnsUntilNextNC);
 
-    // This is sort of a dumb way to do this too, but alas. Also incorrect, as
-    //   we don't have paradoxicity in mafia yet...
+    // This is sort of a dumb way to do this too, but alas.
     int [int] timeCopRate = {
         0:2, 1:2, 2:2, 3:2, 4:2, 
         5:4, 6:4, 7:4, 8:4, 9:4, 
@@ -105,13 +103,12 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
     string url = "inventory.php?ftext=bius+ring";
 	string title = HTMLGenerateSpanFont(pluralise(turnsUntilNextNC, " turn", " turns") + " to your next Möbius NC", "black");
 	 
-	description.listAppend("You have encountered " + countMobiusNCs +" NCs so far today.");
-        if (turnsUntilNextNC == 0) description.listAppend("|*"+HTMLGenerateSpanFont("You can encounter an NC right now!", "blue"));
-        if (turnsUntilNextNC > 0) description.listAppend("|*You have "+pluralise(turnsUntilNextNC, " turn", " turns")+" turns to the next NC.");
-        description.listAppend("|*You have at least "+pluralise(turnsUntilNextNextNC, " turn", " turns")+" until the NC after that.");
+    if (turnsUntilNextNC == 0) description.listAppend(HTMLGenerateSpanFont("You can encounter NC #" + (countMobiusNCs+1) +" right now!", "blue"));
+    if (turnsUntilNextNC > 0) description.listAppend("You have "+pluralise(turnsUntilNextNC, " turn", " turns")+" turns to NC #" +(countMobiusNCs+1)+ ".");
+        description.listAppend("|*You have at least "+pluralise(turnsUntilNextNextNC, " turn", " turns")+" until NC #"+(countMobiusNCs+2)+".");
 	description.listAppend("You have encountered " + countTimeCops +"/11 free time cops today.");
 	    if(countTimeCops > 11) description.listAppend(HTMLGenerateSpanFont("No free time cops remain; be careful wearing your ring!", "red"));
-		description.listAppend("|*Currently at " + currentTimeCopRate + "% chance of cops; increase Paradoxicity for a higher rate.");
-    if(my_paradoxicity() < 13) description.listAppend("Try to get to 13 Paradoxicity for +100% item & +50% booze drop on your ring!");
+		description.listAppend("|*At " + currentTimeCopRate + "% chance of cops; increase Paradoxicity for more.");
+    if(my_paradoxicity() < 13) description.listAppend("Boost to 13 Paradoxicity for +100% item & +50% booze drop!");
 	resource_entries.listAppend(ChecklistEntryMake("__item M&ouml;bius ring", url, ChecklistSubentryMake(title, "", description), 0));
 }

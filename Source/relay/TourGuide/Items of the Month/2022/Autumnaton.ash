@@ -8,7 +8,6 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	if (my_path() == $path[Legacy of Loathing]) return; // Cannot use fall-e in LoL
 	if (my_path().id == PATH_G_LOVER) return; // Cannot use fall-e in G-Lover 
 	if (in_bad_moon()) return; // Cannot use fall-e in Bad Moon
-	if (!$item[autumn dollar].is_unrestricted()) return; // Remove from standard-restricted paths
 
 	int autobotsToday = get_property_int("_autumnatonQuests");
 	int turncountWhereAutobotReturns = get_property_int("autumnatonQuestTurn");
