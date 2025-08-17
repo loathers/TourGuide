@@ -5,6 +5,7 @@ void IOTMAutumnatonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	# if (!__misc_state["in run"]) return; // Turned off because TES likes this tile to appear in aftercore
 	if (!get_property_boolean("hasAutumnaton")) return; // Don't show if they don't actually have Fall-E
 	if (my_path() == $path[Legacy of Loathing]) return; // Cannot use fall-e in LoL
+	if (my_path() == $path[Standard]) return; // Cannot use fall-e in Standard
     if (my_path().id == PATH_G_LOVER) return; // Cannot use fall-e in G-Lover 
 	if (in_bad_moon()) return; // Cannot use fall-e in Bad Moon
 
