@@ -106,13 +106,12 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
 	string title = HTMLGenerateSpanFont(pluralise(turnsUntilNextNC, " turn", " turns") + " to your next Möbius NC", "black");
 	 
 	description.listAppend("You have encountered " + countMobiusNCs +" NCs so far today.");
-        if (turnsUntilNextNC == 0) description.listAppend("|*"+HTMLGenerateSpanFont("You can encounter an NC right now!", "red"));
+        if (turnsUntilNextNC == 0) description.listAppend("|*"+HTMLGenerateSpanFont("You can encounter an NC right now!", "blue"));
         if (turnsUntilNextNC > 0) description.listAppend("|*You have "+pluralise(turnsUntilNextNC, " turn", " turns")+" turns to the next NC.");
         description.listAppend("|*You have at least "+pluralise(turnsUntilNextNextNC, " turn", " turns")+" until the NC after that.");
-	description.listAppend("You have encountered " + countTimeCops +" time cops so far today.");
-	    if(countTimeCops < 11) description.listAppend(pluralise(max(11-countTimeCops,0),"free time cop remains."," free time cops remain."));
+	description.listAppend("You have encountered " + countTimeCops +"/11 free time cops today.");
 	    if(countTimeCops > 11) description.listAppend(HTMLGenerateSpanFont("No free time cops remain; be careful wearing your ring!", "red"));
-		description.listAppend("|*You have a " + currentTimeCopRate + "% chance of encountering a time cop on any given adventure with the ring equipped. Increase Paradoxicity to gradually increase that rate!");
+		description.listAppend("|*Currently at " + currentTimeCopRate + "% chance of cops; increase Paradoxicity for a higher rate.");
     if(my_paradoxicity() < 13) description.listAppend("Try to get to 13 Paradoxicity for +100% item & +50% booze drop on your ring!");
 	resource_entries.listAppend(ChecklistEntryMake("__item M&ouml;bius ring", url, ChecklistSubentryMake(title, "", description), 0));
 }
