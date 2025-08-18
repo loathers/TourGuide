@@ -55027,6 +55027,25 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         )
     };
 
+    // For sea path, need knowledge of which clues are accessible to suggest things.
+
+    MonkeyWish [int] seaPathWishes = {
+        new MonkeyWish(
+            $item[mer-kin knucklebone],
+            $effect[none],
+            "1x dreadscroll clue",
+            ,
+            locationAvailable($location[mer-kin library])
+        ),
+        new MonkeyWish(
+            $item[mer-kin cowbell],
+            $effect[none],
+            "1x dreadscroll clue",
+            locationAvailable($location[mer-kin library]),
+            true
+        ),
+    }
+
     MonkeyWish [int] aftercoreWishes = {
         new MonkeyWish(
             $item[bag of foreign bribes],
@@ -55035,11 +55054,14 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             locationAvailable($location[The Ice Hotel]),
             true
         )
-    };
+    }
+    
+    // Rejecting bad wishes for CS, Goo, and Sea path
+    boolean inNonQuestPath = (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_SEA);
 
     int monkeyWishesLeft = clampi(5 - get_property_int("_monkeyPawWishesUsed"), 0, 5);
     string [int] options;
-    if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE) {
+    if (__misc_state["in run"] && !inNonQuestPath) {
         options.listAppendList(showWishes(inRunWishes));
     }
     if (!__misc_state["in run"]) {
@@ -57452,7 +57474,7 @@ void IOTMMobiusRingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	string url = "inventory.php?ftext=bius+ring";
 	string [int] copDescription;
     string copSubTitle = "Forecast is "+currentTimeCopRate+"% chance of cops";
-	string copTitle = HTMLGenerateSpanFont(pluralise(min(11-countTimeCops, 0), "free Time Cops fought today", "free Time Cops fought today"), "black");
+	string copTitle = HTMLGenerateSpanFont(pluralise(max(11-countTimeCops, 0), "free Time Cops fought today", "free Time Cops fought today"), "black");
     boolean copsNoLongerFree = countTimeCops > 11;
     int priority = 10;
 
