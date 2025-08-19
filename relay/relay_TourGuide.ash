@@ -54488,6 +54488,17 @@ void IOTMRockGardenGenerateResource(ChecklistEntry [int] resource_entries) {
     }
 
     resource_entries.listAppend(ChecklistEntryMake("__item rock garden guide", url, ChecklistSubentryMake("Rock garden resources", "", description)).ChecklistEntrySetIDTag("rock garden resource"));
+	
+    // Groveling Gravel: item-crunching instakill
+    boolean instakills_usable = my_path().id != PATH_G_LOVER && my_path().id != PATH_POCKET_FAMILIARS && my_path().id != 52; // avant guard
+
+    if (instakills_usable && availableGravels > 0)
+    {
+        string [int] gravelDescription;
+        gravelDescription.listAppend("Use groveling gravel for a no-drop freekill.");
+        resource_entries.listAppend(ChecklistEntryMake("__item groveling gravel", "", ChecklistSubentryMake(pluralise(availableGravels, "groveling gravel", "groveling gravels"), "", gravelDescription), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("groveling gravel free kill"));
+        
+    }
 }
 
 boolean hasAnySkillOf(string [int] skillNames) {
@@ -56292,11 +56303,10 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	//   - Community Service & Grey Goo: irrelevant
 	//   - Avatar of Boris: cannot wield a weapon other than trusty or use a familiar
 	//   - 11,037 Leagues Under the Sea: irrelevant
-	boolean pathCheck = true;
-	pathCheck = my_path().id == PATH_SEA ? false : true;
-	pathCheck = my_path().id == PATH_COMMUNITY_SERVICE ? false : true;
-	pathCheck = my_path().id == PATH_GREY_GOO ? false : true;
-	pathCheck = my_path().id == PATH_AVATAR_OF_BORIS ? false : true;
+	if (my_path().id == PATH_SEA) return;
+	if (my_path().id == PATH_COMMUNITY_SERVICE) return;
+	if (my_path().id == PATH_GREY_GOO) return;
+	if (my_path().id == PATH_AVATAR_OF_BORIS) return;
 
 	// Only show when in run, for obvious reasons.
 	if (__misc_state["in run"] && pathCheck)
@@ -56993,46 +57003,49 @@ void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries)
         return;
 
     string [int] description;
-	string url = "inventory.php?ftext=sheriff";
+	string url = "clan_viplounge.php?action=photobooth";
 	
     int photosLeft = clampi(3 - get_property_int("_photoBoothEffects"), 0, 3);
 	if (photosLeft > 0)
 	{
 		description.listAppend(HTMLGenerateSpanFont("Get your photo taken:", "black"));
-		description.listAppend(HTMLGenerateSpanFont("photobooth west: +50% init, +noncom%", "black"));
-		description.listAppend(HTMLGenerateSpanFont("photobooth tower: +com%", "black"));
-		description.listAppend(HTMLGenerateSpanFont("photobooth space: this sucks", "black"));
+		description.listAppend(HTMLGenerateSpanFont("|*photobooth west: +50% init, +noncom%", "black"));
+		description.listAppend(HTMLGenerateSpanFont("|*photobooth tower: +com%", "black"));
+		description.listAppend(HTMLGenerateSpanFont("|*photobooth space: this sucks", "black"));
 		
 		resource_entries.listAppend(ChecklistEntryMake("__item expensive camera", url, ChecklistSubentryMake(photosLeft + " clan photos takeable", description), 8));
 	}
-	//this here town ain't big enough for the two of us
-    int sheriffings = clampi(3 - get_property_int("_assertYourAuthorityCast"), 0, 3);
-	if (sheriffings > 0)
-	{
-		if (lookupItem("sheriff badge").equipped_amount() == 1 && lookupItem("sheriff moustache").equipped_amount() == 1 && lookupItem("sheriff pistol").equipped_amount() == 1)
-		{
-			description.listAppend(HTMLGenerateSpanFont("Assert your authority!", "blue"));
-		} 
-		else 
-		{
-			description.listAppend(HTMLGenerateSpanFont("Equip your sheriff gear first.", "red"));
-		}
-	resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", url, ChecklistSubentryMake(sheriffings + " Sheriff Authority free kill(s)", description), 5));
-	}
-}
 
+	//Assert Your Authority: item-crunching instakill
+	//  "this here town ain't big enough for the two of us"
+
+    int sheriffings_left = clampi(3 - get_property_int("_assertYourAuthorityCast"), 0, 3);
+    boolean you_are_the_sheriff = (lookupItem("sheriff badge").available_amount() > 0 && lookupItem("sheriff moustache").available_amount() > 0 && lookupItem("sheriff pistol").available_amount() > 0);
+    boolean instakills_usable = my_path().id != PATH_G_LOVER && my_path().id != PATH_POCKET_FAMILIARS && my_path().id != 52; // avant guard
+
+    if (sheriffings_left > 0 && instakills_usable && you_are_the_sheriff)
+    {
+        string [int] authorityDescription;
+        authorityDescription.listAppend("Assert Your Authority for a no-drop freekill.");
+        
+		if (lookupItem("sheriff badge").equipped_amount() != 1 && lookupItem("sheriff moustache").equipped_amount() != 1 && lookupItem("sheriff pistol").equipped_amount() != 1)
+        {
+        	authorityDescription.listAppend(HTMLGenerateSpanFont("Equip your sheriff gear first.", "red"));
+            url = "inventory.php?ftext=sheriff";
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", url, ChecklistSubentryMake(pluralise(sheriffings_left, "authority assertion", "authority assertions"), "", authorityDescription), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("assert your authority free kill"));
+        
+    }
+}
 RegisterResourceGenerationFunction("IOTMPeaceTurkeyGenerateResource");
 void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (!lookupFamiliar("Peace Turkey").familiar_is_usable()) return;
 
 	// Purkey Title
-//still needs a fix for famwt when not active (currently returns 0 but still functions)
     int turkeyProc = 24;
-	if (my_familiar() == lookupFamiliar("peace turkey"));
-	{
-		int turkeyProc = 24 + sqrt(effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());	
-	}
+	turkeyProc = 24 + square_root(effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
+	
 	int PeasCount = available_amount($item[whirled peas]);
 	int PeaSoupCount = available_amount($item[handful of split pea soup]);
 	string [int] description;
@@ -57245,11 +57258,11 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
     //fixme: currently not supported by sneako tile
 		if (lookupItem("McHugeLarge left ski").equipped_amount() == 1)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*LEFT SKI equipped!", "blue")+"");
+			description.listAppend("|*"+HTMLGenerateSpanFont("LEFT SKI", "blue")+" equipped.");
 		}
 		else if (lookupItem("McHugeLarge left ski").equipped_amount() == 0)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT SKI first.", "red")+"");
+			description.listAppend("|*Equip the "+HTMLGenerateSpanFont("LEFT SKI", "red")+" first.");
 		}
 	}
 	if (skiSlashesLeft > 0)
@@ -57257,16 +57270,15 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " slashes", "r_bold") + " left. Track a monster.");
 		if (lookupItem("McHugeLarge left pole").equipped_amount() == 1)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*LEFT POLE equipped!", "blue")+"");
+			description.listAppend("|*"+HTMLGenerateSpanFont("LEFT POLE", "blue")+" equipped.");
 		}
 		else if (lookupItem("McHugeLarge left pole").equipped_amount() == 0)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT POLE first.", "red")+"");
+			description.listAppend("|*Equip the "+HTMLGenerateSpanFont("LEFT POLE", "red")+" first.");
 		}
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", url, ChecklistSubentryMake("McHugeLarge ski set skills", description), 1));
 }
-
 //leprecondo
 RegisterTaskGenerationFunction("IOTMLeprecondoGenerateTasks");
 void IOTMLeprecondoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -57547,7 +57559,7 @@ void IOTMMobiusRingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	string url = "inventory.php?ftext=bius+ring";
 	string [int] copDescription;
     string copSubTitle = "Forecast is "+currentTimeCopRate+"% chance of cops";
-	string copTitle = HTMLGenerateSpanFont(pluralise(max(11-countTimeCops, 0), "free Time Cops fought today", "free Time Cops fought today"), "black");
+	string copTitle = HTMLGenerateSpanFont(pluralise(min(countTimeCops, 11), "free Time Cops fought today", "free Time Cops fought today"), "black");
     boolean copsNoLongerFree = countTimeCops > 11;
     int priority = 10;
 
