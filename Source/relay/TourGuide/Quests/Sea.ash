@@ -533,7 +533,9 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                     need_minus_combat_modifier = true;
                     temple_subentry.entries.listAppend("Adventure in the Mer-Kin outpost, find non-combat.|" + nc_details);
                 } else {
+                    int turns_spent = $location[The Mer-Kin Outpost].turns_spent;
                     temple_subentry.entries.listAppend("Adventure in the Mer-Kin outpost to acquire a lockkey.");
+                    if (my_path().id == PATH_SEA && turns_spent < 26) temple_subentry.entries.listAppend((24 - turns_spent) +" to " + (26 - turns_spent) + " total delay remaining.");
                     temple_subentry.entries.listAppend("Unless you discovered the currents already (can't tell), in which case go ask grandpa about currents.");
                 }
             } else if (monkees_quest_state.mafia_internal_step == 6 || grandpa_ncs_remaining == 0) {
