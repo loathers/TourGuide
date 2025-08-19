@@ -300,20 +300,37 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
     };
 
     // For sea path, need knowledge of which clues are accessible to suggest things.
+        /*
+            Mer-kin Library 1 -> dreadScroll1
+            Mer-kin healscroll -> dreadScroll2
+            Deep Dark Visions -> dreadScroll3
+            Mer-kin knucklebone -> dreadScroll4
+            Mer-kin killscroll -> dreadScroll5
+            Mer-kin Library 2 -> dreadScroll6
+            Mer-kin worktea -> dreadScroll7
+            Mer-kin Library 3 -> dreadScroll8
+        */
 
     MonkeyWish [int] seaPathWishes = {
         new MonkeyWish(
             $item[mer-kin knucklebone],
             $effect[none],
             "1x dreadscroll clue",
-            ,
+            get_property_int("dreadscroll5") >=1,
             locationAvailable($location[mer-kin library])
         ),
         new MonkeyWish(
-            $item[mer-kin cowbell],
+            $item[mer-kin worktea],
             $effect[none],
-            "1x dreadscroll clue",
-            locationAvailable($location[mer-kin library]),
+            "1x dreadscroll clue... with sushi!",
+            get_property_int("dreadscroll7") >=1,
+            locationAvailable($location[mer-kin library])
+        ),
+        new MonkeyWish(
+            $item[none],
+            $effect[Frosty],
+            "init/item/meat",
+            true,
             true
         ),
     }
