@@ -333,7 +333,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             true,
             true
         ),
-    }
+    };
 
     MonkeyWish [int] aftercoreWishes = {
         new MonkeyWish(
@@ -343,7 +343,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             locationAvailable($location[The Ice Hotel]),
             true
         )
-    }
+    };
     
     // Rejecting bad wishes for CS, Goo, and Sea path
     boolean inNonQuestPath = (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_SEA);
