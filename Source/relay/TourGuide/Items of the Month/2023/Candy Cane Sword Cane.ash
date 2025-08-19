@@ -14,11 +14,10 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	//   - Community Service & Grey Goo: irrelevant
 	//   - Avatar of Boris: cannot wield a weapon other than trusty or use a familiar
 	//   - 11,037 Leagues Under the Sea: irrelevant
-	boolean pathCheck = true;
-	pathCheck = my_path().id == PATH_SEA ? false : true;
-	pathCheck = my_path().id == PATH_COMMUNITY_SERVICE ? false : true;
-	pathCheck = my_path().id == PATH_GREY_GOO ? false : true;
-	pathCheck = my_path().id == PATH_AVATAR_OF_BORIS ? false : true;
+	if (my_path().id == PATH_SEA) return;
+	if (my_path().id == PATH_COMMUNITY_SERVICE) return;
+	if (my_path().id == PATH_GREY_GOO) return;
+	if (my_path().id == PATH_AVATAR_OF_BORIS) return;
 
 	// Only show when in run, for obvious reasons.
 	if (__misc_state["in run"] && pathCheck)

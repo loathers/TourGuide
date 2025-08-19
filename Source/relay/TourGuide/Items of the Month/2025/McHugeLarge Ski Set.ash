@@ -28,11 +28,11 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
     //fixme: currently not supported by sneako tile
 		if (lookupItem("McHugeLarge left ski").equipped_amount() == 1)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*LEFT SKI equipped!", "blue")+"");
+			description.listAppend("|*"+HTMLGenerateSpanFont("LEFT SKI", "blue")+" equipped.");
 		}
 		else if (lookupItem("McHugeLarge left ski").equipped_amount() == 0)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT SKI first.", "red")+"");
+			description.listAppend("|*Equip the "+HTMLGenerateSpanFont("LEFT SKI", "red")+" first.");
 		}
 	}
 	if (skiSlashesLeft > 0)
@@ -40,11 +40,11 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " slashes", "r_bold") + " left. Track a monster.");
 		if (lookupItem("McHugeLarge left pole").equipped_amount() == 1)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*LEFT POLE equipped!", "blue")+"");
+			description.listAppend("|*"+HTMLGenerateSpanFont("LEFT POLE", "blue")+" equipped.");
 		}
 		else if (lookupItem("McHugeLarge left pole").equipped_amount() == 0)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT POLE first.", "red")+"");
+			description.listAppend("|*Equip the "+HTMLGenerateSpanFont("LEFT POLE", "red")+" first.");
 		}
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", url, ChecklistSubentryMake("McHugeLarge ski set skills", description), 1));

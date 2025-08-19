@@ -89,4 +89,15 @@ void IOTMRockGardenGenerateResource(ChecklistEntry [int] resource_entries) {
     }
 
     resource_entries.listAppend(ChecklistEntryMake("__item rock garden guide", url, ChecklistSubentryMake("Rock garden resources", "", description)).ChecklistEntrySetIDTag("rock garden resource"));
+	
+    // Groveling Gravel: item-crunching instakill
+    boolean instakills_usable = my_path().id != PATH_G_LOVER && my_path().id != PATH_POCKET_FAMILIARS && my_path().id != 52; // avant guard
+
+    if (instakills_usable && availableGravels > 0)
+    {
+        string [int] gravelDescription;
+        gravelDescription.listAppend("Use groveling gravel for a no-drop freekill.");
+        resource_entries.listAppend(ChecklistEntryMake("__item groveling gravel", "", ChecklistSubentryMake(pluralise(availableGravels, "groveling gravel", "groveling gravels"), "", gravelDescription), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("groveling gravel free kill"));
+        
+    }
 }
