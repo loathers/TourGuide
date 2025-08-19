@@ -20215,8 +20215,7 @@ void QNemesisGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
 void QSeaInit()
 {
     // While in 11,037 leagues under the sea, you want this showing no matter what.
-
-    if (my_path().id != 55){
+    if (my_path().id != PATH_SEA){
         //Have they adventured anywhere underwater?
         boolean have_adventured_in_relevant_area = false;
         foreach l in $locations[the briny deeps, the brinier deepers, the briniest deepests, an octopus's garden,the wreck of the edgar fitzsimmons, the mer-kin outpost, madness reef,the marinara trench, the dive bar,anemone mine, the coral corral, mer-kin elementary school,mer-kin library,mer-kin gymnasium,mer-kin colosseum,the caliginous abyss] {
@@ -20229,6 +20228,8 @@ void QSeaInit()
         if (!have_adventured_in_relevant_area && $items[Mer-kin trailmap,Mer-kin lockkey,Mer-kin stashbox,wriggling flytrap pellet,damp old boot,Grandma's Map,Grandma's Chartreuse Yarn,Grandma's Fuchsia Yarn,Grandma's Note,black glass].available_amount() == 0)
             return;        
     }
+
+    if (my_path().id == PATH_SEA) QuestStateParseMafiaQuestPropertyValue(state, "started");
         
     
     if (true) {
@@ -55065,7 +55066,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             true,
             true
         ),
-    }
+    };
 
     MonkeyWish [int] aftercoreWishes = {
         new MonkeyWish(
@@ -55075,7 +55076,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             locationAvailable($location[The Ice Hotel]),
             true
         )
-    }
+    };
     
     // Rejecting bad wishes for CS, Goo, and Sea path
     boolean inNonQuestPath = (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_SEA);
