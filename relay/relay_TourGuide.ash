@@ -20229,13 +20229,13 @@ void QSeaInit()
             return;        
     }
 
-    if (my_path().id == PATH_SEA) QuestStateParseMafiaQuestPropertyValue(state, "started");
         
     
     if (true) {
         QuestState state;
         
         state.state_string["path"] = get_property("merkinQuestPath");
+        
         if (state.state_string["path"] == "done")
             QuestStateParseMafiaQuestPropertyValue(state, "finished");
         else
@@ -56309,7 +56309,7 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 	if (my_path().id == PATH_AVATAR_OF_BORIS) return;
 
 	// Only show when in run, for obvious reasons.
-	if (__misc_state["in run"] && pathCheck)
+	if (__misc_state["in run"])
 	{
 		string url = "inventory.php?ftext=candy+cane+sword+cane";
 		// This is the description for the supernag. The supernag is in the task_entries, buried within conditional ifs and only shows up if you're in the zone.
