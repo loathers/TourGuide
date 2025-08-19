@@ -20745,7 +20745,9 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                     need_minus_combat_modifier = true;
                     temple_subentry.entries.listAppend("Adventure in the Mer-Kin outpost, find non-combat.|" + nc_details);
                 } else {
+                    int turns_spent = $location[The Mer-Kin Outpost].turns_spent;
                     temple_subentry.entries.listAppend("Adventure in the Mer-Kin outpost to acquire a lockkey.");
+                    if (my_path().id == PATH_SEA && turns_spent < 26) temple_subentry.entries.listAppend((24 - turns_spent) +" to " + (26 - turns_spent) + " total delay remaining.");
                     temple_subentry.entries.listAppend("Unless you discovered the currents already (can't tell), in which case go ask grandpa about currents.");
                 }
             } else if (monkees_quest_state.mafia_internal_step == 6 || grandpa_ncs_remaining == 0) {
@@ -26896,6 +26898,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if ($item[harold's bell].available_amount() > 0 && $item[harold's bell].item_is_usable())
             resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Takes a turn, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
         
+	    if ($item[anchor bomb].available_amount() > 0 )
+            resource_entries.listAppend(ChecklistEntryMake("__item anchor bomb", "", ChecklistSubentryMake(pluralise($item[anchor bomb]), "", "Free run/banish. (30 turns)"), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
         if ($item[lost key].available_amount() > 0 && $item[lost key].item_is_usable()){
             string [int] details;
             details.listAppend("Lost pill bottle is mini-fridge, take a nap, open the pill bottle.");
@@ -55028,20 +55032,37 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
     };
 
     // For sea path, need knowledge of which clues are accessible to suggest things.
+        /*
+            Mer-kin Library 1 -> dreadScroll1
+            Mer-kin healscroll -> dreadScroll2
+            Deep Dark Visions -> dreadScroll3
+            Mer-kin knucklebone -> dreadScroll4
+            Mer-kin killscroll -> dreadScroll5
+            Mer-kin Library 2 -> dreadScroll6
+            Mer-kin worktea -> dreadScroll7
+            Mer-kin Library 3 -> dreadScroll8
+        */
 
     MonkeyWish [int] seaPathWishes = {
         new MonkeyWish(
             $item[mer-kin knucklebone],
             $effect[none],
             "1x dreadscroll clue",
-            ,
+            get_property_int("dreadscroll5") >=1,
             locationAvailable($location[mer-kin library])
         ),
         new MonkeyWish(
-            $item[mer-kin cowbell],
+            $item[mer-kin worktea],
             $effect[none],
-            "1x dreadscroll clue",
-            locationAvailable($location[mer-kin library]),
+            "1x dreadscroll clue... with sushi!",
+            get_property_int("dreadscroll7") >=1,
+            locationAvailable($location[mer-kin library])
+        ),
+        new MonkeyWish(
+            $item[none],
+            $effect[Frosty],
+            "init/item/meat",
+            true,
             true
         ),
     }
@@ -56360,6 +56381,43 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 }
 
 
+// Wardrobe-o-Matic
+RegisterTaskGenerationFunction("IOTMWardrobeOMaticGenerateTasks");
+void IOTMWardrobeOMaticGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+    // Don't generate a tile if the user doesn't have the wardrobe.
+    if (!lookupItem("wardrobe-o-matic").have()) return;
+
+    // If the property is populated, the user has opened the wardrobe.
+    boolean openedWardrobe = length(get_property("_futuristicHatModifier"))>10;
+
+    // Don't generate a tile if the user has opened the wardrobe today.
+    if (openedWardrobe) return;
+
+    string [int] description;
+    string url = "inventory.php?ftext=drobe-o-matic";
+    string main_title = "Open your Wardrobe-O-Matic";  
+    string subtitle;
+    int priority = 11;
+    boolean isMainTask = false;
+
+    // If they're > 15, promote to tasks. If they're >20, promote to supernag.
+    if (my_level() >= 15) isMainTask = true;
+    if (my_level() >= 20) priority = -11;  
+
+    // Level needed for your next wardrobe tier
+    if (my_level() < 5) subtitle = "advances @ level 5";
+    if (my_level() < 10) subtitle = "advances @ level 10";
+    if (my_level() < 15) subtitle = "advances @ level 15... with new mods!";
+    if (my_level() < 20) subtitle = "advances @ level 20";
+
+    // Add a little note if you've maxed it.
+    description.listAppend("Acquire some questionably useful clothing!");
+    if (my_level() < 20) description.listAppend(HTMLGenerateSpanFont("You're level "+my_level()+"? It can't get any better, open it!", "blue"));
+
+    if (isMainTask)  task_entries.listAppend(ChecklistEntryMake("__item wardrobe-o-matic", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("Wardrobe-o-Matic"));
+    if (!isMainTask) optional_task_entries.listAppend(ChecklistEntryMake("__item wardrobe-o-matic", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("Wardrobe-o-Matic"));
+    
+}
 
 // 2024
 //2024
@@ -56621,6 +56679,7 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] description, hoverDescription;
 
     int templeResetAscension = get_property_int("lastTempleAdventures");
+    string mayamSymbolsUsed = get_property("_mayamSymbolsUsed");
     addToBothDescriptions(description, hoverDescription, "Happy Mayam New Year!");
 
     ChecklistEntry entry;
@@ -56629,11 +56688,17 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
     entry.tags.id = "Mayam Calendar";
     entry.importance_level = 8;
 
-    if (!get_property("_mayamSymbolsUsed").contains_text("yam4") ||
-        !get_property("_mayamSymbolsUsed").contains_text("clock") ||
-        !get_property("_mayamSymbolsUsed").contains_text("explosion") ||
+    if (!mayamSymbolsUsed.contains_text("yam4") ||
+        !mayamSymbolsUsed.contains_text("clock") ||
+        !mayamSymbolsUsed.contains_text("explosion") ||
         my_ascensions() > templeResetAscension)
     {
+        // do not generate the tile if in sea path and no picks left
+        if (mayamSymbolsUsed.contains_text("yam4") &&
+        mayamSymbolsUsed.contains_text("clock") &&
+        mayamSymbolsUsed.contains_text("explosion") &&
+        my_path().id == PATH_SEA) return;
+
         description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
         hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
 
@@ -56655,14 +56720,21 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
 
         string [int] resonances;
-        resonances.listAppend(HTMLGenerateSpanOfClass("15-turn banisher", "r_bold") + ": Vessel + Yam + Cheese + Explosion");
-        resonances.listAppend(HTMLGenerateSpanOfClass("Yam and swiss", "r_bold") + ": Yam + Meat + Cheese + Yam");
-        resonances.listAppend(HTMLGenerateSpanOfClass("+55% meat accessory", "r_bold") + ": Yam + Meat + Eyepatch + Yam");
-        resonances.listAppend(HTMLGenerateSpanOfClass("+100% Food drops", "r_bold") + ": Yam + Yam + Cheese + Clock");
-        
-        addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
 
-        if (my_ascensions() > templeResetAscension) {
+        // adding some filtering to remove from resonance list if cannot make
+        if (!mayamSymbolsUsed.contains_text("vessel") && !mayamSymbolsUsed.contains_text("yam2") && !mayamSymbolsUsed.contains_text("cheese") && !mayamSymbolsUsed.contains_text("explosion"))
+            resonances.listAppend(HTMLGenerateSpanOfClass("15-turn banisher", "r_bold") + ": Vessel + Yam + Cheese + Explosion");
+        if (!mayamSymbolsUsed.contains_text("yam1") && !mayamSymbolsUsed.contains_text("meat") && !mayamSymbolsUsed.contains_text("cheese") && !mayamSymbolsUsed.contains_text("yam4"))
+            resonances.listAppend(HTMLGenerateSpanOfClass("Yam and swiss", "r_bold") + ": Yam + Meat + Cheese + Yam");
+        if (!mayamSymbolsUsed.contains_text("yam1") && !mayamSymbolsUsed.contains_text("meat") && !mayamSymbolsUsed.contains_text("eyepatch") && !mayamSymbolsUsed.contains_text("yam4"))
+            resonances.listAppend(HTMLGenerateSpanOfClass("+55% meat accessory", "r_bold") + ": Yam + Meat + Eyepatch + Yam");
+        if (!mayamSymbolsUsed.contains_text("yam1") && !mayamSymbolsUsed.contains_text("yam2") && !mayamSymbolsUsed.contains_text("cheese") && !mayamSymbolsUsed.contains_text("clock"))
+            resonances.listAppend(HTMLGenerateSpanOfClass("+100% Food drops", "r_bold") + ": Yam + Yam + Cheese + Clock");
+        
+        if (length(resonances) > 0)
+            addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+
+        if (my_ascensions() > templeResetAscension && my_path().id != PATH_SEA) {
             addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanFont("Temple reset available!", "r_bold") + "");
         }
 
@@ -57172,11 +57244,11 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
     //fixme: currently not supported by sneako tile
 		if (lookupItem("McHugeLarge left ski").equipped_amount() == 1)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*LEFT SKI equipped!", "blue"));
+			description.listAppend(HTMLGenerateSpanFont("|*LEFT SKI equipped!", "blue")+"");
 		}
 		else if (lookupItem("McHugeLarge left ski").equipped_amount() == 0)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT SKI first.", "red"));
+			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT SKI first.", "red")+"");
 		}
 	}
 	if (skiSlashesLeft > 0)
@@ -57184,11 +57256,11 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " slashes", "r_bold") + " left. Track a monster.");
 		if (lookupItem("McHugeLarge left pole").equipped_amount() == 1)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*LEFT POLE equipped!", "blue"));
+			description.listAppend(HTMLGenerateSpanFont("|*LEFT POLE equipped!", "blue")+"");
 		}
 		else if (lookupItem("McHugeLarge left pole").equipped_amount() == 0)
 		{
-			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT POLE first.", "red"));
+			description.listAppend(HTMLGenerateSpanFont("|*Equip the LEFT POLE first.", "red")+"");
 		}
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", url, ChecklistSubentryMake("McHugeLarge ski set skills", description), 1));
