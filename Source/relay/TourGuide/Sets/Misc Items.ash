@@ -332,6 +332,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if ($item[harold's bell].available_amount() > 0 && $item[harold's bell].item_is_usable())
             resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Takes a turn, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
         
+	    if ($item[anchor bomb].available_amount() > 0 )
+            resource_entries.listAppend(ChecklistEntryMake("__item anchor bomb", "", ChecklistSubentryMake(pluralise($item[anchor bomb]), "", "Free run/banish. (30 turns)"), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
         if ($item[lost key].available_amount() > 0 && $item[lost key].item_is_usable()){
             string [int] details;
             details.listAppend("Lost pill bottle is mini-fridge, take a nap, open the pill bottle.");
