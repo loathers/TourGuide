@@ -17,13 +17,13 @@ void QSeaInit()
             return;        
     }
 
-    if (my_path().id == PATH_SEA) QuestStateParseMafiaQuestPropertyValue(state, "started");
         
     
     if (true) {
         QuestState state;
         
         state.state_string["path"] = get_property("merkinQuestPath");
+        
         if (state.state_string["path"] == "done")
             QuestStateParseMafiaQuestPropertyValue(state, "finished");
         else
