@@ -3,9 +3,6 @@
 //    - Remind the user to get an LED candle.
 //    - Recommend halloween monsters for habitation.
 
-// CANNOT DO YET:
-//    - Add halloween fights to freebies combination tag; need better mafia tracking...
-
 RegisterResourceGenerationFunction("IOTMJillv2GenerateResource");
 void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -29,7 +26,7 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("You haven't gotten a map to halloween town yet! Try using your Jill for a map at ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
     }
     else if (mapsDropped < 2) { // The third map drop chance is less than 1 in a thousand - not something that is particularly useful to hunt for
-        description.listAppend("You have a map; the next map is at a ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
+        description.listAppend("You already got a map; the next map is at a ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
     }
     
 	int habitatRecallsLeft = clampi(3 - get_property_int("_monsterHabitatsRecalled"), 0, 3);
@@ -41,6 +38,17 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
     if (!get_property_boolean("ledCandleDropped") && $item[LED Candle].item_amount() < 1) {
         description.listAppend("Fight a dude for an LED candle, to tune your Jill!");
     }
+
+    // Populate a free fights count of trick-or-treat fights.
+	string trickOrTreatMap = get_property("_trickOrTreatBlock");
+	string[int] splitToT = split_string(trickOrTreatMap, "");
+    int freeFightsLeft;
+
+	foreach house in splitToT {
+		if (splitToT[house] == "D") {freeFightsLeft +=1;}
+	}
+
+    if (freeFightsLeft > 0) {resource_entries.listAppend(ChecklistEntryMake("__familiar jill-of-all-trades", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake(pluralise(freeFightsLeft, "Trick or Treat fight", "Trick or Treat fights"), "", ""), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("trick or treat free fights"));}
 
     // If we have nothing to say, do not display the tile
     if (count(description) == 0) return;

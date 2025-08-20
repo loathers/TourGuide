@@ -69,7 +69,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
     // Don't generate these tiles if they cannot actually use their leaves
     if (!__iotms_usable[$item[A Guide to Burning Leaves]]) return;
 
-    string url = "campground.php?preaction=burningleaves";
+    string url = "campground.php?preaction=leaves";
 
     // Make two tiles for spending leaves
     int leafCount = $item[inflammable leaf].item_amount();
@@ -292,7 +292,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Have enough leaves, if you let the leaflets drop their bounty!");
         }
         else {
-            description.listAppend(HTMLGenerateSpanFont("Can summon "+leafletsUserCanSummon+" of your "+fightsRemaining+" leaflets... get more leaves!", "orange"));
+            description.listAppend("Can summon "+leafletsUserCanSummon+" of your "+fightsRemaining+" leaflets... "+HTMLGenerateSpanFont("get more leaves!", "orange"));
         }
 
         subentries.listAppend(ChecklistSubentryMake(pluralise(fightsRemaining, "free flaming leaflet fight", "free flaming leaflet fights"), "", description));
@@ -301,4 +301,27 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
         tags.combination = "daily free fight";
         resource_entries.listAppend(ChecklistEntryMake("__item tied-up flaming leaflet", url, subentries, tags, 0));
     }
+}
+
+RegisterTaskGenerationFunction("BurningLeavesRakeReminder");
+void SneakActiveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    // Don't generate this tile if they cannot actually use their leaves
+    if (!__iotms_usable[$item[A Guide to Burning Leaves]]) return;
+
+    string url = "campground.php?preaction=burningleaves";
+    // Use the new preference to tell if there's an NC forcer active
+    if ($item[rake].available_amount() > 0) return;
+    
+    // If they don't have a rake, remind them to get one
+    ChecklistEntry entry;
+    
+	entry.url = "campground.php?preaction=leaves";
+	entry.image_lookup_name = "__item Inflammable leaf";
+    entry.tags.id = "Rake and Tiny Rake reminder";
+    entry.importance_level = 7;
+
+    entry.subentries.listAppend(ChecklistSubentryMake("It's mulch madness -- go get your rakes","","Visit your pile of burning leaves for rakes... for more leaves!")); 
+
+    optional_task_entries.listAppend(entry);
 }

@@ -149,6 +149,40 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         return final;
     }
 
+    SneakSource getAlliedRadio() {
+        SneakSource final;
+
+        final.sourceName = 'allied radio backpack';
+        final.url = "inventory.php?action=requestdrop&pwd=" + my_hash();
+        final.imageLookupName = "__item allied radio backpack";
+
+        int naturalRadiosLeft = clampi(3 - get_property_int("_alliedRadioDropsUsed"), 0, 3);
+        int handheldRadios = $item[handheld allied radio].available_amount();
+        int totalRadios = naturalRadiosLeft + handheldRadios;
+        
+        final.sneakCondition = (__iotms_usable[$item[Allied Radio Backpack]] && naturalRadiosLeft > 0) || handheldRadios > 0;
+        final.sneakCount = totalRadios;
+        final.tileDescription = `<b>{totalRadios}x allied radio snipers</b> left`;
+        return final;
+
+    }
+
+    SneakSource getTubas() {
+        SneakSource final;
+
+        final.sourceName = 'apriling tuba';
+        final.url = "inventory.php?ftext=apriling+band+tuba";
+        final.imageLookupName = "__item Apriling band tuba";
+
+        int aprilingBandTubaUsesLeft = clampi(3 - get_property_int("_aprilBandTubaUses"), 0, 3);
+        
+        final.sneakCondition = (aprilingBandTubaUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0);
+        final.sneakCount = aprilingBandTubaUsesLeft;
+        final.tileDescription = `<b>{spikosLeft}x apriling tuba oompa oompas</b> left`;
+        return final;
+
+    }
+
     // Having generated these, we now get to generate a tile that combines them.
 
     SneakSource [string] sneakSources;
@@ -158,9 +192,11 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     sneakSources["jello"] = getStenchJellies();
     sneakSources["pillo"] = getSneakisol();
     sneakSources["claro"] = getClaras();
+    sneakSources["tubao"] = getTubas();
+    sneakSources["radio"] = getAlliedRadio();
 
     // Making it use the order we want; almost most recent to oldest, but pills on the bottom.
-    string [int] sneakOrder = listMake("cinco","spiko","jello","claro","pillo");
+    string [int] sneakOrder = listMake("radio","tubao","cinco","spiko","jello","claro","pillo");
 
     ChecklistEntry entry;
     
@@ -366,7 +402,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     // Having done this, you now append the NCs remaining subentry to the end of the core entry, with an on_mouse_over bit as well.
 
     // However, I am going to be lazy, and not append either of these in the event the user is in CS/GG.
-    if (my_path().id != PATH_COMMUNITY_SERVICE && my_path().id != PATH_GREY_GOO) {
+    if (my_path().id != PATH_COMMUNITY_SERVICE && my_path().id != PATH_GREY_GOO && my_path().id != PATH_SEA) {
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", HTMLGenerateSpanOfClass("Mouse over for the best sneaks!", "r_bold r_element_spooky_desaturated")));
         entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", table.HTMLGenerateSimpleTableLines(false)));
     }
