@@ -178,7 +178,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         
         final.sneakCondition = (aprilingBandTubaUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0);
         final.sneakCount = aprilingBandTubaUsesLeft;
-        final.tileDescription = `<b>{spikosLeft}x apriling tuba oompa oompas</b> left`;
+        final.tileDescription = `<b>{aprilingBandTubaUsesLeft}x apriling tuba oompa oompas</b> left`;
         return final;
 
     }

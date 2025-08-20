@@ -304,7 +304,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
 }
 
 RegisterTaskGenerationFunction("BurningLeavesRakeReminder");
-void SneakActiveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void BurningLeavesRakeReminder(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     // Don't generate this tile if they cannot actually use their leaves
     if (!__iotms_usable[$item[A Guide to Burning Leaves]]) return;
