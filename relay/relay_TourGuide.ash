@@ -33680,7 +33680,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         
         final.sneakCondition = (aprilingBandTubaUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0);
         final.sneakCount = aprilingBandTubaUsesLeft;
-        final.tileDescription = `<b>{spikosLeft}x apriling tuba oompa oompas</b> left`;
+        final.tileDescription = `<b>{aprilingBandTubaUsesLeft}x apriling tuba oompa oompas</b> left`;
         return final;
 
     }
@@ -56372,7 +56372,7 @@ void IOTMBurningLeavesGenerateResource(ChecklistEntry [int] resource_entries)
 }
 
 RegisterTaskGenerationFunction("BurningLeavesRakeReminder");
-void SneakActiveTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+void BurningLeavesRakeReminder(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     // Don't generate this tile if they cannot actually use their leaves
     if (!__iotms_usable[$item[A Guide to Burning Leaves]]) return;
