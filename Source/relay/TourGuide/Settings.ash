@@ -1,5 +1,5 @@
 //These settings are for development. Don't worry about editing them.
-string __version = "2.2.2"; // pushed to 2.2.1 on jill/leaves tiles
+string __version = "2.3.1"; // pushed to 2.2.1 on jill/leaves tiles, 2.3.1 on sea path upgrades
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
