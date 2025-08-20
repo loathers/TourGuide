@@ -26448,6 +26448,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     property_summon_limits["_grimoireGeekySummons"] = 1;
     property_summon_limits["_grimoireConfiscatorSummons"] = 1;
     property_summon_limits["_candySummons"] = 1;
+    property_summon_limits["_summonResortPassesUsed"] = 1;
 
     if ($skill[advanced saucecrafting].have_skill() && $skill[advanced saucecrafting].skill_is_usable())
         property_summons_to_skills["reagentSummons"] = listMake($skill[advanced saucecrafting], $skill[the way of sauce]);
@@ -26521,9 +26522,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         skills_to_urls[$skill[Summon Confiscated Things]] = "campground.php?action=bookshelf";
     }
     property_summons_to_skills["_candySummons"] = listMake($skill[Summon Crimbo Candy]);
-
-    // _summonResortPassUsed is boolean, _summonResortPassesUsed (the old one) is 1/0
-    property_summons_to_skills["_summonResortPassUsed"] = listMake($skill[Summon Kokomo Resort Pass]);
+    property_summons_to_skills["_summonResortPassesUsed"] = listMake($skill[Summon Kokomo Resort Pass]);
     property_summons_to_skills["_incredibleSelfEsteemCast"] = listMake(lookupSkill("Incredible Self-Esteem"));
     skills_to_details[lookupSkill("Incredible Self-Esteem")] = "Gives or extends affirmation buffs.";
     if (__misc_state["in run"] && lookupItem("Daily Affirmation: Always be Collecting").available_amount() > 0 && lookupItem("Daily Affirmation: Always be Collecting").to_effect().have_effect() == 0)
@@ -33669,6 +33668,22 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     }
 
+    SneakSource getAvalanches() {
+        SneakSource final;
+
+        final.sourceName = 'McHugeLarge Avalanche';
+        final.url = "inventory.php?ftext=McHugeLarge+left+ski ";
+        final.imageLookupName = "__item McHugeLarge left ski";
+
+        int avalanchesLeft = clampi(3 - get_property_int("_mcHugeLargeAvalancheUses"), 0, 3);
+        
+        final.sneakCondition = (avalanchesLeft > 0 && available_amount($item[McHugeLarge duffel bag]) > 0);
+        final.sneakCount = avalanchesLeft;
+        final.tileDescription = `<b>{avalanchesLeft}x McHugeLarge avalanches</b> left`;
+        return final;
+
+    }
+
     SneakSource getTubas() {
         SneakSource final;
 
@@ -33695,10 +33710,11 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     sneakSources["pillo"] = getSneakisol();
     sneakSources["claro"] = getClaras();
     sneakSources["tubao"] = getTubas();
+    sneakSources["mchgo"] = getAvalanches();
     sneakSources["radio"] = getAlliedRadio();
 
     // Making it use the order we want; almost most recent to oldest, but pills on the bottom.
-    string [int] sneakOrder = listMake("radio","tubao","cinco","spiko","jello","claro","pillo");
+    string [int] sneakOrder = listMake("radio","mchgo","tubao","cinco","spiko","jello","claro","pillo");
 
     ChecklistEntry entry;
     
