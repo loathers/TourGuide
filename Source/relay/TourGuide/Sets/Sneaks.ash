@@ -167,6 +167,22 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     }
 
+    SneakSource getAvalanches() {
+        SneakSource final;
+
+        final.sourceName = 'McHugeLarge Avalanche';
+        final.url = "inventory.php?ftext=McHugeLarge+left+ski ";
+        final.imageLookupName = "__item McHugeLarge left ski";
+
+        int avalanchesLeft = clampi(3 - get_property_int("_mcHugeLargeAvalancheUses"), 0, 3);
+        
+        final.sneakCondition = (avalanchesLeft > 0 && available_amount($item[McHugeLarge duffel bag]) > 0);
+        final.sneakCount = avalanchesLeft;
+        final.tileDescription = `<b>{avalanchesLeft}x McHugeLarge avalanches</b> left`;
+        return final;
+
+    }
+
     SneakSource getTubas() {
         SneakSource final;
 
@@ -193,10 +209,11 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     sneakSources["pillo"] = getSneakisol();
     sneakSources["claro"] = getClaras();
     sneakSources["tubao"] = getTubas();
+    sneakSources["mchgo"] = getAvalanches();
     sneakSources["radio"] = getAlliedRadio();
 
     // Making it use the order we want; almost most recent to oldest, but pills on the bottom.
-    string [int] sneakOrder = listMake("radio","tubao","cinco","spiko","jello","claro","pillo");
+    string [int] sneakOrder = listMake("radio","mchgo","tubao","cinco","spiko","jello","claro","pillo");
 
     ChecklistEntry entry;
     
