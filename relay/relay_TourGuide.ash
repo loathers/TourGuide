@@ -56560,14 +56560,13 @@ void IOTMCandyCaneSwordGenerateTasks(ChecklistEntry [int] task_entries, Checklis
 
 
 // Wardrobe-o-Matic
-void GenerateWardrobeDescription(slot currSlot, int tier) {
+string GenerateWardrobeDescription(slot currSlot, int tier) {
 
     // Helper function to translate the wardrobe mods to useful strings.
     string entry = "";
-    string [modifier] allWardrobeMods = futuristic_wardrobe(currSlot, tier);
 
     // Only displaying useful equipment mods.
-    foreach mod, value in allWardrobeMods {
+    foreach mod, value in futuristic_wardrobe(currSlot, tier) {
         if (mod == $modifier[Item Drop]) entry += value+"% +item ";
         if (mod == $modifier[Monster Level]) entry += value+" +ML ";
         if (mod == $modifier[Meat Drop]) entry += value+"% +meat ";
