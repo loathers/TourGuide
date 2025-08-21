@@ -103,10 +103,10 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         iotmWorksheds.listAppend($item[cold medicine cabinet]);
         iotmWorksheds.listAppend($item[model train set]);
         iotmWorksheds.listAppend($item[TakerSpace letter of Marque]);
-        
+
         item workshedInCampground = $item[none];
 
-        foreach it in iotmWorkshed {
+        foreach it in iotmWorksheds {
             if (__campground[it] > 0) {
                 workshedInCampground = it;
                 description.listAppend("Currently have "+HTMLGenerateSpanOfClass(it.to_string(),"r_bold")+" in your shed, for "+shedDesc[it]);
