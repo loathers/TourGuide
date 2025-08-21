@@ -79,6 +79,50 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             }
         }
     }
+
+    // New optional task noting the user should use a workshed. Recommends IOTM worksheds in inventory.
+    if (!get_property_boolean("_workshedItemUsed")) {
+        string url = "inventory.php";
+        string [int] description;
+        string [int] shed_options;
+        string main_title = "Consider changing your workshed";
+
+        // IOTM Workshed Descriptions
+        string [item] shedDesc = {
+            $item[Asdon Martin keyfob (on ring)]:"banishes & buffs",
+            $item[diabolic pizza cube]:"3-fullness pizza boons",
+            $item[cold medicine cabinet]:"25 freekills in exchange for your sanity",
+            $item[model train set]:"bridge parts, stats, and meat",
+            $item[TakerSpace letter of Marque]:"island access",
+        };
+
+        // FIXME: Add new worksheds as time goes on.
+        item [int] iotmWorksheds = $items[Asdon Martin keyfob (on ring),diabolic pizza cube,cold medicine cabinet,model train set,TakerSpace letter of Marque];
+        item workshedInCampground = $item[none];
+
+        foreach it in iotmWorkshed {
+            if (__campground[it] > 0) {
+                workshedInCampground = it;
+                description.listAppend("Currently have "+HTMLGenerateSpanOfClass(it.name,"r_bold")+" in your shed, for "+shedDesc[it]);
+            } else if (it.available_amount() > 0) {
+                shed_options.listAppend(HTMLGenerateSpanOfClass(it.name,"r_bold")+", for "+shedDesc[it]);
+            }
+        }
+
+        // return if user has no other options, no need to generate the tile
+        if (shed_options.length() == 0) return;
+
+        if (workshedInCampground == $item[none]) {
+            description.listAppend(HTMLGenerateSpanFont("No workshed currently installed!"));
+            main_title = "Install a useful workshed";
+        }
+
+        description.listAppend("Potential IOTM worksheds:|*" + shed_options.listJoinComponents("|*"));
+
+        optional_task_entries.listAppend(ChecklistEntryMake("__item tiny house", url, ChecklistSubentryMake(main_title, "", description), 2).ChecklistEntrySetIDTag("Workshed installation reminder"));
+        
+        
+    }
 }
 
 void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
