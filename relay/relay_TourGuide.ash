@@ -20310,6 +20310,9 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
     boolean can_fight_dad_sea_monkee = temple_quest_state.state_boolean["can fight dad sea monkee"];
     boolean have_any_outfit = temple_quest_state.state_boolean["have one outfit"] || temple_quest_state.state_boolean["can fight dad sea monkee"];
     
+    // Going to use a "in sea path" to turn off many pieces.
+    boolean inSeaPath = my_path().id == PATH_SEA;
+
     if (!have_any_outfit) {
         subentry.entries.listAppend("Acquire crappy mer-kin disguise from grandma sea monkee.");
         return;
@@ -20326,16 +20329,36 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         at_scholar_boss = true;
     }
     at_boss = at_gladiator_boss || at_scholar_boss;
+
+    // Try to keep both tile halves up in sea path.
+
+    boolean stillGottaKillShub = false;
+    boolean stillGottaKillYogurt = false;
+
+    if (inSeaPath) {
+        stillGottaKillShub = true;
+        stillGottaKillYogurt = true;
+
+        if (!get_property_boolean("shubJigguwattDefeated")) stillGottaKillShub = false;
+        if (!get_property_boolean("yogUrtDefeated")) stillGottaKillYogurt = false;
+    }
     
-    if (!at_boss || at_gladiator_boss) {
+    if (!at_boss || at_gladiator_boss || stillGottaKillShub) {
         string [int] description;
         string [int] modifiers;
         //gladiator:
         if (at_gladiator_boss) {
+            // Used to check passive damage for warning.
+            int famCanDamage = to_int(my_familiar().elemental_damage) + to_int(my_familiar().physical_damage);
+            int passiveDamage = to_int(numeric_modifier($modifier[thorns]) + numeric_modifier($modifier[damage aura]) + numeric_modifier($modifier[sporadic damage aura]) + numeric_modifier($modifier[sporadic thorns]));
+            
             description.listAppend("Buff muscle, equip a powerful weapon.");
             description.listAppend("Delevel him for a bit, then attack with your weapon.");
             if ($item[crayon shavings].available_amount() > 0) description.listAppend("|*Your crayon shavings are great for this!");
             description.listAppend("Make sure not to have anything along that will attack him. (familiars, etc)");
+            if (passiveDamage > 0) description.listAppend(HTMLGenerateSpanFont("WARNING: You have passive damage on. Remove it, he'll kill you!", "red"));
+            if (famCanDamage > 0) description.listAppend(HTMLGenerateSpanFont("WARNING: You have a damaging familiar equipped. Change your familiar!", "red"));
+
             //umm... this probably won't be updated:
             string [int] things_to_do;
             foreach it in $items[hand in glove,MagiMechTech NanoMechaMech,bottle opener belt buckle,old school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,replica plastic pumpkin bucket,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants] {
@@ -20349,7 +20372,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             if (things_to_do.count() > 0)
                 description.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", "red"));
             
-            if ($item[dark porquoise ring].equipped_amount() == 0) {
+            if (!inSeaPath && $item[dark porquoise ring].equipped_amount() == 0) {
                 string line = "Possibly ";
                 if ($item[dark porquoise ring].available_amount() == 0)
                     line += "acquire and ";
@@ -20378,6 +20401,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                         shrap_suggestion += " (use your used copy of warbear metalworking primer)";
                     } else
                         shrap_suggestion += " (from warbear metalworking primer)";
+                    // Cannot use shrap in sea path. Well, maybe when it's unrestricted. But do you even get whosits?
+                    if (inSeaPath) shrap_suggestion = "";
                 }
                 modifiers.listAppend("spell damage percent");
                 modifiers.listAppend("mysticality");
@@ -20434,28 +20459,40 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         if (description.count() > 0)
             subentry.entries.listAppend("Gladiator path" +  HTMLGenerateIndentedText(modifier_string + description.listJoinComponents("<hr>")));
     }
-    if (!at_boss || at_scholar_boss) {
+    if (!at_boss || at_scholar_boss || stillGottaKillYogurt) {
         string [int] description;
         string [int] modifiers;
         //scholar:
         if (at_scholar_boss) {
-            description.listAppend("Wear several mer-kin prayerbeads and possibly a mer-kin gutgirdle.");
-            description.listAppend("Avoid wearing any +hp gear or buffs. Ideally, you want low HP.");
+            
+            // Used to check fam damage for warning.
+            int famCanDamage = to_int(my_familiar().elemental_damage) + to_int(my_familiar().physical_damage);
+            int passiveDamage = to_int(numeric_modifier($modifier[thorns]) + numeric_modifier($modifier[damage aura]) + numeric_modifier($modifier[sporadic damage aura]) + numeric_modifier($modifier[sporadic thorns]));
+            
+            int prayerbeadsEquipped = $item[mer-kin prayerbeads].equipped_amount();
+            int prayerbeadsAvailable = clampi($item[mer-kin prayerbeads].item_amount(),0,3);
+            
+            description.listAppend("Wear mer-kin prayerbeads. "+HTMLGenerateSpanFont(prayerbeadsEquipped+"/"+prayerbeadsAvailable+" of your beads equipped.",(prayerbeadsEquipped == prayerbeadsAvailable ? "black" : "red"))+(!inSeaPath ? "" : " Consider a gutgirdle, too?"));
+            description.listAppend("Avoid wearing any +HP gear or buffs. Ideally, you want low HP.");
+
+            if (passiveDamage > 0) description.listAppend(HTMLGenerateSpanFont("WARNING: You have passive damage on. Remove it, she'll kill you!", "red"));
+            if (famCanDamage > 0) description.listAppend(HTMLGenerateSpanFont("WARNING: You have a damaging familiar equipped. Change your familiar!", "red"));
+
             description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.<br>After that, your stats are restored. Fully heal, then " + HTMLGenerateSpanOfClass("attack with elemental damage", "r_bold") + ".");
             string [item] potential_healers;
             potential_healers[$item[mer-kin healscroll]] = "mer-kin healscroll (full HP)";
-            potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
-            potential_healers[$item[soggy used band-aid]] = "soggy used band-aid (full HP)";
+            if (!inSeaPath) potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
+            if (!inSeaPath) potential_healers[$item[soggy used band-aid]] = "soggy used band-aid (full HP)";
             potential_healers[$item[sea gel]] = "sea gel (+500 HP)";
             potential_healers[$item[waterlogged scroll of healing]] = "waterlogged scroll of healing (+250 HP)";
-            potential_healers[$item[extra-strength red potion]] = "extra-strength red potion (+200 HP)";
+            if (!inSeaPath) potential_healers[$item[extra-strength red potion]] = "extra-strength red potion (+200 HP)";
             potential_healers[$item[red pixel potion]] = "red pixel potion (+100-120 HP)";
-            potential_healers[$item[red potion]] = "red potion (+100 HP)";
+            if (!inSeaPath) potential_healers[$item[red potion]] = "red potion (+100 HP)";
             potential_healers[$item[filthy poultice]] = "filthy poultice (+80-120 HP)";
             potential_healers[$item[gauze garter]] = "gauze garter (+80-120 HP)";
             potential_healers[$item[green pixel potion]] = "green pixel potion (+40-60 HP)";
-            potential_healers[$item[cartoon heart]] = "cartoon heart (40-60 HP)";
-            potential_healers[$item[red plastic oyster egg]] = "red plastic oyster egg (+35-40 HP)";
+            if (!inSeaPath) potential_healers[$item[cartoon heart]] = "cartoon heart (40-60 HP)";
+            if (!inSeaPath) potential_healers[$item[red plastic oyster egg]] = "red plastic oyster egg (+35-40 HP)";
             string [int] description_healers;
             
             foreach it in potential_healers {
@@ -20694,7 +20731,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 if ($item[sea lasso].item_amount() == 0)
                     line += HTMLGenerateSpanFont((in_ronin() ? "Acquire" : "Buy") + " and use a sea lasso in each combat.", "red");
                 else
-                    line += "Use a sea lasso in each combat.";
+                    line += "Use a sea lasso in each combat. (Currently at "+get_property_int("lassoTrainingCount")+"/21 lasso skill.)";
                 if ($item[sea cowboy hat].equipped_amount() == 0)
                     line += "|*Wear a sea cowboy hat to improve roping.";
                 if ($item[sea chaps].equipped_amount() == 0)
@@ -20704,11 +20741,11 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 professional_roper = true;
                 string line;
                 if ($item[sea lasso].item_amount() == 0)
-                    line += "Buy a sea lasso.";
+                    line += "Acquire a sea lasso.";
                 if ($item[sea cowbell].item_amount() < 3) {
                     int needed_amount = MAX(3 - $item[sea cowbell].item_amount(), 0);
                     if (line != "") line += " ";
-                    line += "Buy " + pluraliseWordy(needed_amount, "sea cowbell", "sea cowbells") + ".";
+                    line += "Acquire " + pluraliseWordy(needed_amount, "sea cowbell", "sea cowbells") + ".";
                 }
                 if (line != "")
                     temple_subentry.entries.listAppend(line);
@@ -20765,8 +20802,10 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 //Then stash box. Mention monster source.
                 //Use trailmap.
                 //Ask grandpa about currents.
-                if ($item[Mer-kin trailmap].available_amount() > 0) {
-                    temple_subentry.entries.listAppend("Use Mer-kin trailmap.");
+                if (get_property_boolean("intenseCurrents") && !get_property_boolean("corralUnlocked")) {
+                    temple_subentry.entries.listAppend("Ask Grandpa about "+HTMLGenerateSpanOfClass("currents", "r_bold")+" to unlock the corral.");
+                } else if ($item[Mer-kin trailmap].available_amount() > 0) {
+                    temple_subentry.entries.listAppend("Use Mer-kin trailmap, then ask Grandpa about the Currents.");
                 } else if ($item[Mer-kin stashbox].available_amount() > 0) {
                     temple_subentry.entries.listAppend("Open stashbox.");
                 } else if ($item[Mer-kin lockkey].available_amount() > 0) {
@@ -20786,7 +20825,6 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                     int turns_spent = $location[The Mer-Kin Outpost].turns_spent;
                     temple_subentry.entries.listAppend("Adventure in the Mer-Kin outpost to acquire a lockkey.");
                     if (my_path().id == PATH_SEA && turns_spent < 26) temple_subentry.entries.listAppend((24 - turns_spent) +" to " + (26 - turns_spent) + " total delay remaining.");
-                    temple_subentry.entries.listAppend("Unless you discovered the currents already (can't tell), in which case go ask grandpa about currents.");
                 }
             } else if (monkees_quest_state.mafia_internal_step == 6 || grandpa_ncs_remaining == 0) {
                 url = "monkeycastle.php?who=3";
@@ -20855,9 +20893,10 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 
     if (should_output_sea_monkey_questline) {
         if (monkees_quest_state.mafia_internal_step == 13) {
-            //Have black glass; only need to find mom. No progress tracking yet (the progress mechanic for this zone is not yet fully understood...)
+            //Have black glass; only need to find mom. The NC requires 40 progress. 
+            //   You get 1 from fighting an abyss monster, and 1 each from comb/scale/jumper. 40 -> 10 turns!
             string line;
-            line += "Adventure in the Caliginous Abyss. Find Mom Sea Monkey.";
+            line += "Fight native Caliginous Abyss monsters to find " + HTMLGenerateSpanOfClass("Mom Sea Monkee.","r_bold");
             if ($item[shark jumper].equipped_amount() == 0)
                 line += "|*Wear a shark jumper to speed up area.";
             if ($item[scale-mail underwear].equipped_amount() == 0)
@@ -20865,7 +20904,14 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             if ($effect[Jelly Combed].have_effect() == 0)
                 line += "|*Use a Comb jelly to speed up area.";
 
+            int perFightProgress = 1;
+            perFightProgress += to_int($item[shark jumper].equipped_amount()>0);
+            perFightProgress += to_int($item[scale-mail underwear].equipped_amount()>0);
+            perFightProgress += to_int($effect[Jelly Combed].have_effect() > 0);
+            string perFightProgressString = (perFightProgress == 4 ? "4" : HTMLGenerateSpanFont(perFightProgress,"red"));
+
             sea_monkey_subentry.entries.listAppend(line);
+            sea_monkey_subentry.entries.listAppend("Currently at "+get_property_int("momSeaMonkeeProgress")+"/40 progress. Gain "+perFightProgressString+" per fight.");
 
             if ($item[black glass].equipped_amount() == 0) {
                 url = "inventory.php?ftext=black+glass";
@@ -26596,10 +26642,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     
     
     if (lookupSkill("Evoke Eldritch Horror").skill_is_usable() && !get_property_boolean("_eldritchHorrorEvoked")) {
-        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Evoke eldritch horror skill free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Evoke eldritch horror skill free fight"));
     }
-    if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS && my_path().id != PATH_COMMUNITY_SERVICE) {
-        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage&action=fv_scientist", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Daily forest tentacle free fight"));
+    if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS && my_path().id != PATH_COMMUNITY_SERVICE && my_path().id != PATH_SEA) {
+        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage&action=fv_scientist", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Daily forest tentacle free fight"));
     }
     
 }
@@ -27481,17 +27527,17 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[bowl of scorpions].available_amount() > 0 && get_property_int("_drunkPygmyBanishes") < 11 && my_path().id != PATH_G_LOVER && get_property_ascension("hiddenTavernUnlock"))
     {
         int uses_remaining = MIN($item[bowl of scorpions].available_amount(), clampi(11 - get_property_int("_drunkPygmyBanishes"), 0, 11));
-        resource_entries.listAppend(ChecklistEntryMake("__item bowl of scorpions", "inventory.php?which=3&ftext=bowl+of+scorpions", ChecklistSubentryMake(pluralise(uses_remaining,$item[bowl of scorpions]), "", "Free fight when brought to Bowling Alley."), importance_level_unimportant_item).ChecklistEntrySetIDTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item bowl of scorpions", "inventory.php?which=3&ftext=bowl+of+scorpions", ChecklistSubentryMake(pluralise(uses_remaining,$item[bowl of scorpions]), "", "Free fight when brought to Bowling Alley."), 5).ChecklistEntrySetIDTag("daily free fight"));
     }
 	
 	if ($item[glark cable].available_amount() > 0 && get_property_int("_glarkCableUses") < 5 && my_path().id != PATH_G_LOVER)
     {
         int uses_remaining = MIN($item[glark cable].available_amount(), clampi(5 - get_property_int("_glarkCableUses"), 0, 5));
-        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free fight on the Red Zeppelin."), importance_level_unimportant_item).ChecklistEntrySetIDTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free fight on the Red Zeppelin."), 5).ChecklistEntrySetIDTag("daily free fight"));
     } 
     if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3 && $item[lynyrd snare].item_is_usable()) { // && in_run && __misc_state["need to level"])
         int uses_remaining = MIN($item[lynyrd snare].available_amount(), clampi(3 - get_property_int("_lynyrdSnareUses"), 0, 3));
-        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
     }
     if (in_run && $item[red box].available_amount() > 0 && $item[red box].item_is_usable()) {
         resource_entries.listAppend(ChecklistEntryMake("__item red box", "inventory.php?ftext=red+box", ChecklistSubentryMake(pluralise($item[red box]), "", "Open for stuff."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Red box resource"));
@@ -27865,7 +27911,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if (glitch_in_closet >= 1)
             description.listAppend("Uncloset " + (glitch_in_closet > 1 ? "some" : "one") + " to " + (glitch_amount > 1 ? "increase" : "multiply") + " its power and reward.");
 
-        resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "inventory.php?ftext=%5Bglitch+season+reward+name%5D", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "inventory.php?ftext=%5Bglitch+season+reward+name%5D", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
     }
 }
 
@@ -30950,7 +30996,7 @@ void SSealClubberInfernalSealsGenerateResource(ChecklistEntry [int] resource_ent
     
     resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", description), 10).ChecklistEntrySetIDTag("Seal clubber summon resource"));
     
-    resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", "See dedicated tile."), 10).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Seal clubber summon free fight")); //add an anchor to the dedicated tile??
+    resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", "See dedicated tile."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Seal clubber summon free fight")); //add an anchor to the dedicated tile??
 }
 
 void SSealClubberGenerateResource(ChecklistEntry [int] resource_entries)
@@ -46732,7 +46778,7 @@ void IOTMMachineElfFamiliarGenerateResource(ChecklistEntry [int] resource_entrie
                 description.listAppend("Possibly run the machine elf elsewhere first, for transmutable potions.");
         }
         //entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description));
-        resource_entries.listAppend(ChecklistEntryMake(entry.image_lookup_name, entry.url, ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description)).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Machine elf free fights"));
+        resource_entries.listAppend(ChecklistEntryMake(entry.image_lookup_name, entry.url, ChecklistSubentryMake(pluralise(free_fights_remaining, "free elf fight", "free elf fights"), modifiers, description),0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Machine elf free fights"));
     }
     if (entry.subentries.count() > 0)
     {
@@ -48666,7 +48712,7 @@ void IOTMWitchessGenerateResource(ChecklistEntry [int] resource_entries)
         
         image_name = "__itemsize __monster Witchess Pawn";
         //subentries.listAppend(ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description));
-        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description)).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Witchess set free fights"));
+        resource_entries.listAppend(ChecklistEntryMake(image_name, "campground.php?action=witchess", ChecklistSubentryMake(pluralise(fights_remaining, "witchess fight", "witchess fights"), "", description),0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Witchess set free fights"));
     }
     if (!get_property_boolean("_witchessBuff") && mafiaIsPastRevision(16879) && !__misc_state["familiars temporarily blocked"] && $effect[puzzle champ].effect_is_usable())
     {
@@ -49695,7 +49741,7 @@ void IOTMGodLobsterGenerateResource(ChecklistEntry [int] resource_entries)
 	if (other_equipment_to_switch_to.count() > 0)
 		description.listAppend("Could switch equipment to " + other_equipment_to_switch_to.listJoinComponents(", ", "or") + ".");
 	
-    resource_entries.listAppend(ChecklistEntryMake("__familiar god lobster", url, ChecklistSubentryMake(pluralise(free_fights_left, "free God Lobster fight", "free God Lobster fights"), "", description)).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("God lobster daily fights"));
+    resource_entries.listAppend(ChecklistEntryMake("__familiar god lobster", url, ChecklistSubentryMake(pluralise(free_fights_left, "free God Lobster fight", "free God Lobster fights"), "", description),0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("God lobster daily fights"));
 }
 
 //Songboom
@@ -50093,7 +50139,7 @@ void IOTMNeverendingPartyGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("ML buff: " + listMake("Backyard", "Candle wax").listJoinComponents(__html_right_arrow_character));
     }
     if (free_fights_left > 0)
-        resource_entries.listAppend(ChecklistEntryMake("__item party hat", "place.php?whichplace=town_wrong", ChecklistSubentryMake(pluralise(free_fights_left, "free party fight", "free party fights"), modifiers, description), lookupLocations("The Neverending Party")).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Neverending party free fights"));
+        resource_entries.listAppend(ChecklistEntryMake("__item party hat", "place.php?whichplace=town_wrong", ChecklistSubentryMake(pluralise(free_fights_left, "free party fight", "free party fights"), modifiers, description), 0, lookupLocations("The Neverending Party")).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Neverending party free fights"));
     
 }
 
@@ -50239,7 +50285,7 @@ void IOTMVotingBootGenerateResource(ChecklistEntry [int] resource_entries)
     
     int vote_free_fights_left = 3 - get_property_int("_voteFreeFights");
     if (get_property_int("_voteFreeFights") < 3) {
-        resource_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", "", ChecklistSubentryMake(pluralise(vote_free_fights_left, "voting monster", "voting monsters"), "", "Free fight."), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Voting booth voting monster free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item &quot;I Voted!&quot; sticker", "", ChecklistSubentryMake(pluralise(vote_free_fights_left, "voting monster", "voting monsters"), "", "Free fights with wandering activists."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Voting booth voting monster free fight"));
     }
 }
 
@@ -51783,7 +51829,7 @@ void IOTMBetterShroomsAndGardensGenerateResource(ChecklistEntry [int] resource_e
     if (piranhas.entries.count() > 0) {
         entry.subentries.listAppend(piranhas);
 		// Want this part to appear both in the garden's tile, and the free fights tile, so making a new entry
-		resource_entries.listAppend(ChecklistEntryMake("__item Better Shrooms and Gardens catalog", "campground.php", piranhas).ChecklistEntrySetCombinationTag("daily free fight"));
+		resource_entries.listAppend(ChecklistEntryMake("__item Better Shrooms and Gardens catalog", "campground.php", piranhas, 0).ChecklistEntrySetCombinationTag("daily free fight"));
     }
 	
     ChecklistSubentry shroom = getMushroomState();
@@ -53260,7 +53306,7 @@ void IOTYCursedMagnifyingGlassGenerateResource(ChecklistEntry [int] resource_ent
         url = invSearch("cursed magnifying glass");
 		description.listAppend((13 - cursedGlassCounter).pluralise("combat", "combats") + " until next void fight.");
 		
-		resource_entries.listAppend(ChecklistEntryMake("__item void stone", "", ChecklistSubentryMake(pluralise(free_void_fights_left, "void glass monster", "void glass monsters"), "", description), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Cursed magnifying glass free fight"));
+		resource_entries.listAppend(ChecklistEntryMake("__item void stone", "", ChecklistSubentryMake(pluralise(free_void_fights_left, "void glass monster", "void glass monsters"), "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Cursed magnifying glass free fight"));
     }
 }
 //Cosmic Bowling Ball
@@ -54275,8 +54321,7 @@ void IOTMOliversPlaceGenerateResource(ChecklistEntry [int] resource_entries)
 
     if (free_oliver_fights_left > 0) {
         description.listAppend("Consider dragging wanderers into the speakeasy.");
-
-        resource_entries.listAppend(ChecklistEntryMake("__item Marltini", "", ChecklistSubentryMake(pluralise(free_oliver_fights_left, "Oliver's Tavern fight", "Oliver's Tavern fights"), "", description), 9).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Oliver's Tavern free fights"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Marltini", "", ChecklistSubentryMake(pluralise(free_oliver_fights_left, "Oliver's Tavern fight", "Oliver's Tavern fights"), "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Oliver's Tavern free fights"));
     }
 }
 string [string, string] stationDescriptions;
@@ -54548,7 +54593,7 @@ void IOTMRockGardenGenerateResource(ChecklistEntry [int] resource_entries) {
 
     if (!get_property_boolean("_molehillMountainUsed") && available_amount($item[molehill mountain]) > 0)
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item molehill mountain", url = "inventory.php?ftext=molehill+mountain", ChecklistSubentryMake("Molehill moleman", "", "Free scaling fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Molehill free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item molehill mountain", url = "inventory.php?ftext=molehill+mountain", ChecklistSubentryMake("Molehill moleman", "", "Free scaling fight. (Kinda hard.)"), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Molehill free fight"));
     }
 
     int availableGravels = available_amount($item[groveling gravel]);
@@ -54829,7 +54874,7 @@ void IOTMClosedCircuitPayPhoneGenerateResource(ChecklistEntry [int] resource_ent
     if (!get_property_boolean("_shadowAffinityToday")) {
         string [int] affinityDescription;
         affinityDescription.listAppend("Call Rufus to get 11+ free Shadow Rift combats.");
-        resource_entries.listAppend(ChecklistEntryMake("__effect Shadow Affinity", url, ChecklistSubentryMake("Shadow Affinity free fights", "", affinityDescription), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Shadow affinity free fights"));
+        resource_entries.listAppend(ChecklistEntryMake("__effect Shadow Affinity", url, ChecklistSubentryMake("Shadow Affinity free fights", "", affinityDescription), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Shadow affinity free fights"));
     }
 }
 
@@ -56074,7 +56119,7 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
 		if (splitToT[house] == "D") {freeFightsLeft +=1;}
 	}
 
-    if (freeFightsLeft > 0) {resource_entries.listAppend(ChecklistEntryMake("__familiar jill-of-all-trades", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake(pluralise(freeFightsLeft, "Trick or Treat fight", "Trick or Treat fights"), "", ""), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("trick or treat free fights"));}
+    if (freeFightsLeft > 0) {resource_entries.listAppend(ChecklistEntryMake("__familiar jill-of-all-trades", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake(pluralise(freeFightsLeft, "Trick or Treat fight", "Trick or Treat fights"), "", "Equip an outfit and mess with some halloweenies."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("trick or treat free fights"));}
 
     // If we have nothing to say, do not display the tile
     if (count(description) == 0) return;
@@ -57347,7 +57392,7 @@ void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries)
     if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
         string url = "place.php?whichplace=CyberRealm";
 		description.listAppend("Hack into the system!");
-		resource_entries.listAppend(ChecklistEntryMake("__skill stats+++", url, ChecklistSubentryMake(pluralise(CyberFree, "CyberRealm fight", "CyberRealm fights"), "", description), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("CyberRealm free fight"));
+		resource_entries.listAppend(ChecklistEntryMake("__skill stats+++", url, ChecklistSubentryMake(pluralise(CyberFree, "CyberRealm fight", "CyberRealm fights"), "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("CyberRealm free fight"));
     }
 }
 
