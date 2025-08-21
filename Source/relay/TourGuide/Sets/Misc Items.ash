@@ -97,15 +97,21 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         };
 
         // FIXME: Add new worksheds as time goes on.
-        item [int] iotmWorksheds = $items[Asdon Martin keyfob (on ring),diabolic pizza cube,cold medicine cabinet,model train set,TakerSpace letter of Marque];
+        item [int] iotmWorksheds; 
+        iotmWorksheds.listAppend($item[Asdon Martin keyfob (on ring)]);
+        iotmWorksheds.listAppend($item[diabolic pizza cube]);
+        iotmWorksheds.listAppend($item[cold medicine cabinet]);
+        iotmWorksheds.listAppend($item[model train set]);
+        iotmWorksheds.listAppend($item[TakerSpace letter of Marque]);
+        
         item workshedInCampground = $item[none];
 
         foreach it in iotmWorkshed {
             if (__campground[it] > 0) {
                 workshedInCampground = it;
-                description.listAppend("Currently have "+HTMLGenerateSpanOfClass(it.name,"r_bold")+" in your shed, for "+shedDesc[it]);
+                description.listAppend("Currently have "+HTMLGenerateSpanOfClass(it.to_string(),"r_bold")+" in your shed, for "+shedDesc[it]);
             } else if (it.available_amount() > 0) {
-                shed_options.listAppend(HTMLGenerateSpanOfClass(it.name,"r_bold")+", for "+shedDesc[it]);
+                shed_options.listAppend(HTMLGenerateSpanOfClass(it.to_string(),"r_bold")+", for "+shedDesc[it]);
             }
         }
 
@@ -113,7 +119,7 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         if (shed_options.length() == 0) return;
 
         if (workshedInCampground == $item[none]) {
-            description.listAppend(HTMLGenerateSpanFont("No workshed currently installed!"));
+            description.listAppend(HTMLGenerateSpanFont("No workshed currently installed!", "red"));
             main_title = "Install a useful workshed";
         }
 
