@@ -26754,10 +26754,10 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         iotmWorksheds.listAppend($item[cold medicine cabinet]);
         iotmWorksheds.listAppend($item[model train set]);
         iotmWorksheds.listAppend($item[TakerSpace letter of Marque]);
-        
+
         item workshedInCampground = $item[none];
 
-        foreach it in iotmWorkshed {
+        foreach it in iotmWorksheds {
             if (__campground[it] > 0) {
                 workshedInCampground = it;
                 description.listAppend("Currently have "+HTMLGenerateSpanOfClass(it.to_string(),"r_bold")+" in your shed, for "+shedDesc[it]);
@@ -56154,11 +56154,11 @@ void IOTMJillMapGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [
     if (fightsParsed == 0 && usedMap) {
         main_title = "Visit your Trick-or-Treat block!";
         string url = "place.php?whichplace=town&action=town_trickortreat";
-        description.append("Might have a star house... 👀");
+        description.listAppend("Might have a star house... 👀");
     }
 
     if (fightsParsed == 0 && !usedMap) {
-        description.append("Use your map for five free fights & some candy!");
+        description.listAppend("Use your map for five free fights & some candy!");
     }
 
     optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", url, ChecklistSubentryMake(main_title, "", description), 7).ChecklistEntrySetIDTag("map to a candy-rich block"));
