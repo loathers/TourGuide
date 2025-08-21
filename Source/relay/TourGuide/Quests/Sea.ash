@@ -61,6 +61,9 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
     boolean can_fight_dad_sea_monkee = temple_quest_state.state_boolean["can fight dad sea monkee"];
     boolean have_any_outfit = temple_quest_state.state_boolean["have one outfit"] || temple_quest_state.state_boolean["can fight dad sea monkee"];
     
+    // Going to use a "in sea path" to turn off many pieces.
+    boolean inSeaPath = my_path().id == PATH_SEA;
+
     if (!have_any_outfit) {
         subentry.entries.listAppend("Acquire crappy mer-kin disguise from grandma sea monkee.");
         return;
@@ -77,16 +80,36 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         at_scholar_boss = true;
     }
     at_boss = at_gladiator_boss || at_scholar_boss;
+
+    // Try to keep both tile halves up in sea path.
+
+    boolean stillGottaKillShub = false;
+    boolean stillGottaKillYogurt = false;
+
+    if (inSeaPath) {
+        stillGottaKillShub = true;
+        stillGottaKillYogurt = true;
+
+        if (!get_property_boolean("shubJigguwattDefeated")) stillGottaKillShub = false;
+        if (!get_property_boolean("yogUrtDefeated")) stillGottaKillYogurt = false;
+    }
     
-    if (!at_boss || at_gladiator_boss) {
+    if (!at_boss || at_gladiator_boss || stillGottaKillShub) {
         string [int] description;
         string [int] modifiers;
         //gladiator:
         if (at_gladiator_boss) {
+            // Used to check passive damage for warning.
+            int famCanDamage = to_int(my_familiar().elemental_damage) + to_int(my_familiar().physical_damage);
+            int passiveDamage = to_int(numeric_modifier($modifier[thorns]) + numeric_modifier($modifier[damage aura]) + numeric_modifier($modifier[sporadic damage aura]) + numeric_modifier($modifier[sporadic thorns]));
+            
             description.listAppend("Buff muscle, equip a powerful weapon.");
             description.listAppend("Delevel him for a bit, then attack with your weapon.");
             if ($item[crayon shavings].available_amount() > 0) description.listAppend("|*Your crayon shavings are great for this!");
             description.listAppend("Make sure not to have anything along that will attack him. (familiars, etc)");
+            if (passiveDamage > 0) description.listAppend(HTMLGenerateSpanFont("WARNING: You have passive damage on. Remove it, he'll kill you!", "red"));
+            if (famCanDamage > 0) description.listAppend(HTMLGenerateSpanFont("WARNING: You have a damaging familiar equipped. Change your familiar!", "red"));
+
             //umm... this probably won't be updated:
             string [int] things_to_do;
             foreach it in $items[hand in glove,MagiMechTech NanoMechaMech,bottle opener belt buckle,old school calculator watch,ant hoe,ant pick,ant pitchfork,ant rake,ant sickle,fishy wand,moveable feast,oversized fish scaler,replica plastic pumpkin bucket,plastic pumpkin bucket,tiny bowler,cup of infinite pencils,double-ice box,smirking shrunken head,mr. haggis,stapler bear,dubious loincloth,muddy skirt,bottle of Goldschn&ouml;ckered,acid-squirting flower,ironic oversized sunglasses,hippy protest button,cannonball charrrm bracelet,groovy prism necklace,spiky turtle shoulderpads,double-ice cap,parasitic headgnawer,eelskin hat,balloon shield,hot plate,Ol' Scratch's stove door,Oscus's garbage can lid,eelskin shield,eelskin pants] {
@@ -100,7 +123,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             if (things_to_do.count() > 0)
                 description.listAppend(HTMLGenerateSpanFont(things_to_do.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".", "red"));
             
-            if ($item[dark porquoise ring].equipped_amount() == 0) {
+            if (!inSeaPath && $item[dark porquoise ring].equipped_amount() == 0) {
                 string line = "Possibly ";
                 if ($item[dark porquoise ring].available_amount() == 0)
                     line += "acquire and ";
@@ -129,6 +152,8 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
                         shrap_suggestion += " (use your used copy of warbear metalworking primer)";
                     } else
                         shrap_suggestion += " (from warbear metalworking primer)";
+                    // Cannot use shrap in sea path. Well, maybe when it's unrestricted. But do you even get whosits?
+                    if (inSeaPath) shrap_suggestion = "";
                 }
                 modifiers.listAppend("spell damage percent");
                 modifiers.listAppend("mysticality");
@@ -185,28 +210,40 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
         if (description.count() > 0)
             subentry.entries.listAppend("Gladiator path" +  HTMLGenerateIndentedText(modifier_string + description.listJoinComponents("<hr>")));
     }
-    if (!at_boss || at_scholar_boss) {
+    if (!at_boss || at_scholar_boss || stillGottaKillYogurt) {
         string [int] description;
         string [int] modifiers;
         //scholar:
         if (at_scholar_boss) {
-            description.listAppend("Wear several mer-kin prayerbeads and possibly a mer-kin gutgirdle.");
-            description.listAppend("Avoid wearing any +hp gear or buffs. Ideally, you want low HP.");
+            
+            // Used to check fam damage for warning.
+            int famCanDamage = to_int(my_familiar().elemental_damage) + to_int(my_familiar().physical_damage);
+            int passiveDamage = to_int(numeric_modifier($modifier[thorns]) + numeric_modifier($modifier[damage aura]) + numeric_modifier($modifier[sporadic damage aura]) + numeric_modifier($modifier[sporadic thorns]));
+            
+            int prayerbeadsEquipped = $item[mer-kin prayerbeads].equipped_amount();
+            int prayerbeadsAvailable = clampi($item[mer-kin prayerbeads].item_amount(),0,3);
+            
+            description.listAppend("Wear mer-kin prayerbeads. "+HTMLGenerateSpanFont(prayerbeadsEquipped+"/"+prayerbeadsAvailable+" of your beads equipped.",(prayerbeadsEquipped == prayerbeadsAvailable ? "black" : "red"))+(!inSeaPath ? "" : " Consider a gutgirdle, too?"));
+            description.listAppend("Avoid wearing any +HP gear or buffs. Ideally, you want low HP.");
+
+            if (passiveDamage > 0) description.listAppend(HTMLGenerateSpanFont("WARNING: You have passive damage on. Remove it, she'll kill you!", "red"));
+            if (famCanDamage > 0) description.listAppend(HTMLGenerateSpanFont("WARNING: You have a damaging familiar equipped. Change your familiar!", "red"));
+
             description.listAppend("Each round, use a different healing item, until you lose the Suckrament effect.<br>After that, your stats are restored. Fully heal, then " + HTMLGenerateSpanOfClass("attack with elemental damage", "r_bold") + ".");
             string [item] potential_healers;
             potential_healers[$item[mer-kin healscroll]] = "mer-kin healscroll (full HP)";
-            potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
-            potential_healers[$item[soggy used band-aid]] = "soggy used band-aid (full HP)";
+            if (!inSeaPath) potential_healers[$item[scented massage oil]] = "scented massage oil (full HP)";
+            if (!inSeaPath) potential_healers[$item[soggy used band-aid]] = "soggy used band-aid (full HP)";
             potential_healers[$item[sea gel]] = "sea gel (+500 HP)";
             potential_healers[$item[waterlogged scroll of healing]] = "waterlogged scroll of healing (+250 HP)";
-            potential_healers[$item[extra-strength red potion]] = "extra-strength red potion (+200 HP)";
+            if (!inSeaPath) potential_healers[$item[extra-strength red potion]] = "extra-strength red potion (+200 HP)";
             potential_healers[$item[red pixel potion]] = "red pixel potion (+100-120 HP)";
-            potential_healers[$item[red potion]] = "red potion (+100 HP)";
+            if (!inSeaPath) potential_healers[$item[red potion]] = "red potion (+100 HP)";
             potential_healers[$item[filthy poultice]] = "filthy poultice (+80-120 HP)";
             potential_healers[$item[gauze garter]] = "gauze garter (+80-120 HP)";
             potential_healers[$item[green pixel potion]] = "green pixel potion (+40-60 HP)";
-            potential_healers[$item[cartoon heart]] = "cartoon heart (40-60 HP)";
-            potential_healers[$item[red plastic oyster egg]] = "red plastic oyster egg (+35-40 HP)";
+            if (!inSeaPath) potential_healers[$item[cartoon heart]] = "cartoon heart (40-60 HP)";
+            if (!inSeaPath) potential_healers[$item[red plastic oyster egg]] = "red plastic oyster egg (+35-40 HP)";
             string [int] description_healers;
             
             foreach it in potential_healers {
@@ -445,7 +482,7 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 if ($item[sea lasso].item_amount() == 0)
                     line += HTMLGenerateSpanFont((in_ronin() ? "Acquire" : "Buy") + " and use a sea lasso in each combat.", "red");
                 else
-                    line += "Use a sea lasso in each combat.";
+                    line += "Use a sea lasso in each combat. (Currently at "+get_property_int("lassoTrainingCount")+"/21 lasso skill.)";
                 if ($item[sea cowboy hat].equipped_amount() == 0)
                     line += "|*Wear a sea cowboy hat to improve roping.";
                 if ($item[sea chaps].equipped_amount() == 0)
@@ -455,11 +492,11 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 professional_roper = true;
                 string line;
                 if ($item[sea lasso].item_amount() == 0)
-                    line += "Buy a sea lasso.";
+                    line += "Acquire a sea lasso.";
                 if ($item[sea cowbell].item_amount() < 3) {
                     int needed_amount = MAX(3 - $item[sea cowbell].item_amount(), 0);
                     if (line != "") line += " ";
-                    line += "Buy " + pluraliseWordy(needed_amount, "sea cowbell", "sea cowbells") + ".";
+                    line += "Acquire " + pluraliseWordy(needed_amount, "sea cowbell", "sea cowbells") + ".";
                 }
                 if (line != "")
                     temple_subentry.entries.listAppend(line);
@@ -516,8 +553,10 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                 //Then stash box. Mention monster source.
                 //Use trailmap.
                 //Ask grandpa about currents.
-                if ($item[Mer-kin trailmap].available_amount() > 0) {
-                    temple_subentry.entries.listAppend("Use Mer-kin trailmap.");
+                if (get_property_boolean("intenseCurrents") && !get_property_boolean("corralUnlocked")) {
+                    temple_subentry.entries.listAppend("Ask Grandpa about "+HTMLGenerateSpanOfClass("currents", "r_bold")+" to unlock the corral.");
+                } else if ($item[Mer-kin trailmap].available_amount() > 0) {
+                    temple_subentry.entries.listAppend("Use Mer-kin trailmap, then ask Grandpa about the Currents.");
                 } else if ($item[Mer-kin stashbox].available_amount() > 0) {
                     temple_subentry.entries.listAppend("Open stashbox.");
                 } else if ($item[Mer-kin lockkey].available_amount() > 0) {
@@ -537,7 +576,6 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
                     int turns_spent = $location[The Mer-Kin Outpost].turns_spent;
                     temple_subentry.entries.listAppend("Adventure in the Mer-Kin outpost to acquire a lockkey.");
                     if (my_path().id == PATH_SEA && turns_spent < 26) temple_subentry.entries.listAppend((24 - turns_spent) +" to " + (26 - turns_spent) + " total delay remaining.");
-                    temple_subentry.entries.listAppend("Unless you discovered the currents already (can't tell), in which case go ask grandpa about currents.");
                 }
             } else if (monkees_quest_state.mafia_internal_step == 6 || grandpa_ncs_remaining == 0) {
                 url = "monkeycastle.php?who=3";
@@ -606,9 +644,10 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
 
     if (should_output_sea_monkey_questline) {
         if (monkees_quest_state.mafia_internal_step == 13) {
-            //Have black glass; only need to find mom. No progress tracking yet (the progress mechanic for this zone is not yet fully understood...)
+            //Have black glass; only need to find mom. The NC requires 40 progress. 
+            //   You get 1 from fighting an abyss monster, and 1 each from comb/scale/jumper. 40 -> 10 turns!
             string line;
-            line += "Adventure in the Caliginous Abyss. Find Mom Sea Monkey.";
+            line += "Fight native Caliginous Abyss monsters to find " + HTMLGenerateSpanOfClass("Mom Sea Monkee.","r_bold");
             if ($item[shark jumper].equipped_amount() == 0)
                 line += "|*Wear a shark jumper to speed up area.";
             if ($item[scale-mail underwear].equipped_amount() == 0)
@@ -616,7 +655,14 @@ void QSeaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] o
             if ($effect[Jelly Combed].have_effect() == 0)
                 line += "|*Use a Comb jelly to speed up area.";
 
+            int perFightProgress = 1;
+            perFightProgress += to_int($item[shark jumper].equipped_amount()>0);
+            perFightProgress += to_int($item[scale-mail underwear].equipped_amount()>0);
+            perFightProgress += to_int($effect[Jelly Combed].have_effect() > 0);
+            string perFightProgressString = (perFightProgress == 4 ? "4" : HTMLGenerateSpanFont(perFightProgress,"red"));
+
             sea_monkey_subentry.entries.listAppend(line);
+            sea_monkey_subentry.entries.listAppend("Currently at "+get_property_int("momSeaMonkeeProgress")+"/40 progress. Gain "+perFightProgressString+" per fight.");
 
             if ($item[black glass].equipped_amount() == 0) {
                 url = "inventory.php?ftext=black+glass";
