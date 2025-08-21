@@ -48,22 +48,22 @@ void IOTMWardrobeOMaticGenerateTasks(ChecklistEntry [int] task_entries, Checklis
     if (currentTier == 4) {subtitle = "advances @ level 20";}
     if (currentTier == 5) {subtitle = "as good as it gets!";}
 
-    // Grab useful mods via the helper function
-    string hatMods = GenerateWardrobeDescription($slot[hat], currentTier);
-    string shirtMods = GenerateWardrobeDescription($slot[shirt], currentTier);
-    string famEquipMods = GenerateWardrobeDescription($slot[familiar], currentTier);
+    // // Grab useful mods via the helper function
+    // string hatMods = GenerateWardrobeDescription($slot[hat], currentTier);
+    // string shirtMods = GenerateWardrobeDescription($slot[shirt], currentTier);
+    // string famEquipMods = GenerateWardrobeDescription($slot[familiar], currentTier);
 
-    foreach it in [hatMods, shirtMods, famEquipMods] {
-        if (it == "") it += HTMLGenerateSpanFont("no useful modifiers", "gray");
-    }
+    // foreach it in [hatMods, shirtMods, famEquipMods] {
+    //     if (it == "") it += HTMLGenerateSpanFont("no useful modifiers", "gray");
+    // }
 
     // Add a little note if you've maxed it.
     description.listAppend("Acquire some questionably useful clothing!");
     if (my_level() > 19) description.listAppend(HTMLGenerateSpanFont("You're level "+my_level()+"? It can't get any better, open it!", "blue"));
 
-    description.listAppend(HTMLGenerateSpanOfClass("Hat: ", "r_bold")+hatMods);
-    description.listAppend(HTMLGenerateSpanOfClass("Shirt: ", "r_bold")+shirtMods);
-    description.listAppend(HTMLGenerateSpanOfClass("Fam Equip: ", "r_bold")+famEquipMods);
+    // description.listAppend(HTMLGenerateSpanOfClass("Hat: ", "r_bold")+hatMods);
+    // description.listAppend(HTMLGenerateSpanOfClass("Shirt: ", "r_bold")+shirtMods);
+    // description.listAppend(HTMLGenerateSpanOfClass("Fam Equip: ", "r_bold")+famEquipMods);
 
     if (isMainTask)  task_entries.listAppend(ChecklistEntryMake("__item wardrobe-o-matic", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("Wardrobe-o-Matic"));
     if (!isMainTask) optional_task_entries.listAppend(ChecklistEntryMake("__item wardrobe-o-matic", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("Wardrobe-o-Matic"));
