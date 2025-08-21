@@ -1,3 +1,50 @@
+RegisterTaskGenerationFunction("IOTMJillMapGenerateTask");
+void IOTMJillMapGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+
+    boolean mapAvailable = ($item[map to a candy-rich block].available_amount() > 0);
+
+    // Don't generate a tile if the user doesn't have a map.
+    if (!mapAvailable) return;
+
+    boolean usedMap = get_property_boolean("_mapToACandyRichBlockUsed");	
+
+    // Populate a free fights count of trick-or-treat fights.
+	string trickOrTreatMap = get_property("_trickOrTreatBlock");
+	string[int] splitToT = split_string(trickOrTreatMap, "");
+
+    int fightsParsed;
+
+	foreach house in splitToT {
+		if (splitToT[house] == "D") {fightsParsed +=1;}
+		if (splitToT[house] == "d") {fightsParsed +=1;}
+	}
+
+    string [int] description;
+    string url = "inventory.php?ftext=candy-rich";
+    string main_title = "Use your Map to a Candy-Rich Block.";  
+
+    // Do not generate the tile if the user has access to trick-or-treat zones because it's Halloween
+    if (getHolidaysToday()["Halloween"]) return;
+
+    // Do not generate the tile if the user has access to trick-or-treat zones and has visited it
+    if (fightsParsed > 0 && usedMap) return;
+
+    // Still generate it even if they've used the map because mafia needs one T&T visit to generate the pref for the freefight tile
+    if (fightsParsed == 0 && usedMap) {
+        main_title = "Visit your Trick-or-Treat block!";
+        string url = "place.php?whichplace=town&action=town_trickortreat";
+        description.append("Might have a star house... 👀");
+    }
+
+    if (fightsParsed == 0 && !usedMap) {
+        description.append("Use your map for five free fights & some candy!");
+    }
+
+    optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", url, ChecklistSubentryMake(main_title, "", description), 7).ChecklistEntrySetIDTag("map to a candy-rich block"));
+    
+
+}
+
 // TILE SPEC: 
 //    - Remind the user to get a halloween map. 
 //    - Remind the user to get an LED candle.
