@@ -58,7 +58,7 @@ void IOTMRockGardenGenerateResource(ChecklistEntry [int] resource_entries) {
 
     if (!get_property_boolean("_molehillMountainUsed") && available_amount($item[molehill mountain]) > 0)
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item molehill mountain", url = "inventory.php?ftext=molehill+mountain", ChecklistSubentryMake("Molehill moleman", "", "Free scaling fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Molehill free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item molehill mountain", url = "inventory.php?ftext=molehill+mountain", ChecklistSubentryMake("Molehill moleman", "", "Free scaling fight. (Kinda hard.)"), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Molehill free fight"));
     }
 
     int availableGravels = available_amount($item[groveling gravel]);

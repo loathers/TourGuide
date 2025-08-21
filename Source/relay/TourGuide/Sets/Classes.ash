@@ -156,7 +156,7 @@ void SSealClubberInfernalSealsGenerateResource(ChecklistEntry [int] resource_ent
     
     resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", description), 10).ChecklistEntrySetIDTag("Seal clubber summon resource"));
     
-    resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", "See dedicated tile."), 10).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Seal clubber summon free fight")); //add an anchor to the dedicated tile??
+    resource_entries.listAppend(ChecklistEntryMake("__item figurine of an ancient seal", url, ChecklistSubentryMake(pluralise(summons_remaining, "seal summon", "seal summons"), "", "See dedicated tile."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Seal clubber summon free fight")); //add an anchor to the dedicated tile??
 }
 
 void SSealClubberGenerateResource(ChecklistEntry [int] resource_entries)

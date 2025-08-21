@@ -876,17 +876,17 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[bowl of scorpions].available_amount() > 0 && get_property_int("_drunkPygmyBanishes") < 11 && my_path().id != PATH_G_LOVER && get_property_ascension("hiddenTavernUnlock"))
     {
         int uses_remaining = MIN($item[bowl of scorpions].available_amount(), clampi(11 - get_property_int("_drunkPygmyBanishes"), 0, 11));
-        resource_entries.listAppend(ChecklistEntryMake("__item bowl of scorpions", "inventory.php?which=3&ftext=bowl+of+scorpions", ChecklistSubentryMake(pluralise(uses_remaining,$item[bowl of scorpions]), "", "Free fight when brought to Bowling Alley."), importance_level_unimportant_item).ChecklistEntrySetIDTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item bowl of scorpions", "inventory.php?which=3&ftext=bowl+of+scorpions", ChecklistSubentryMake(pluralise(uses_remaining,$item[bowl of scorpions]), "", "Free fight when brought to Bowling Alley."), 5).ChecklistEntrySetIDTag("daily free fight"));
     }
 	
 	if ($item[glark cable].available_amount() > 0 && get_property_int("_glarkCableUses") < 5 && my_path().id != PATH_G_LOVER)
     {
         int uses_remaining = MIN($item[glark cable].available_amount(), clampi(5 - get_property_int("_glarkCableUses"), 0, 5));
-        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free fight on the Red Zeppelin."), importance_level_unimportant_item).ChecklistEntrySetIDTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free fight on the Red Zeppelin."), 5).ChecklistEntrySetIDTag("daily free fight"));
     } 
     if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3 && $item[lynyrd snare].item_is_usable()) { // && in_run && __misc_state["need to level"])
         int uses_remaining = MIN($item[lynyrd snare].available_amount(), clampi(3 - get_property_int("_lynyrdSnareUses"), 0, 3));
-        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
     }
     if (in_run && $item[red box].available_amount() > 0 && $item[red box].item_is_usable()) {
         resource_entries.listAppend(ChecklistEntryMake("__item red box", "inventory.php?ftext=red+box", ChecklistSubentryMake(pluralise($item[red box]), "", "Open for stuff."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Red box resource"));
@@ -1260,6 +1260,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if (glitch_in_closet >= 1)
             description.listAppend("Uncloset " + (glitch_in_closet > 1 ? "some" : "one") + " to " + (glitch_amount > 1 ? "increase" : "multiply") + " its power and reward.");
 
-        resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "inventory.php?ftext=%5Bglitch+season+reward+name%5D", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "inventory.php?ftext=%5Bglitch+season+reward+name%5D", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
     }
 }

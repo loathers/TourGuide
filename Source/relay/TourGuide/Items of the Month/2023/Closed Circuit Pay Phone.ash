@@ -171,6 +171,6 @@ void IOTMClosedCircuitPayPhoneGenerateResource(ChecklistEntry [int] resource_ent
     if (!get_property_boolean("_shadowAffinityToday")) {
         string [int] affinityDescription;
         affinityDescription.listAppend("Call Rufus to get 11+ free Shadow Rift combats.");
-        resource_entries.listAppend(ChecklistEntryMake("__effect Shadow Affinity", url, ChecklistSubentryMake("Shadow Affinity free fights", "", affinityDescription), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Shadow affinity free fights"));
+        resource_entries.listAppend(ChecklistEntryMake("__effect Shadow Affinity", url, ChecklistSubentryMake("Shadow Affinity free fights", "", affinityDescription), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Shadow affinity free fights"));
     }
 }

@@ -48,7 +48,7 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
 		if (splitToT[house] == "D") {freeFightsLeft +=1;}
 	}
 
-    if (freeFightsLeft > 0) {resource_entries.listAppend(ChecklistEntryMake("__familiar jill-of-all-trades", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake(pluralise(freeFightsLeft, "Trick or Treat fight", "Trick or Treat fights"), "", ""), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("trick or treat free fights"));}
+    if (freeFightsLeft > 0) {resource_entries.listAppend(ChecklistEntryMake("__familiar jill-of-all-trades", "place.php?whichplace=town&action=town_trickortreat", ChecklistSubentryMake(pluralise(freeFightsLeft, "Trick or Treat fight", "Trick or Treat fights"), "", "Equip an outfit and mess with some halloweenies."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("trick or treat free fights"));}
 
     // If we have nothing to say, do not display the tile
     if (count(description) == 0) return;
