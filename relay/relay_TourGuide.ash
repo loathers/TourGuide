@@ -26757,7 +26757,7 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
         item workshedInCampground = $item[none];
 
-        foreach it in iotmWorksheds {
+        foreach key, it in iotmWorksheds {
             if (__campground[it] > 0) {
                 workshedInCampground = it;
                 description.listAppend("Currently have "+HTMLGenerateSpanOfClass(it.to_string(),"r_bold")+" in your shed, for "+shedDesc[it]);
