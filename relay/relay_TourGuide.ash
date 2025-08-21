@@ -26730,6 +26730,50 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             }
         }
     }
+
+    // New optional task noting the user should use a workshed. Recommends IOTM worksheds in inventory.
+    if (!get_property_boolean("_workshedItemUsed")) {
+        string url = "inventory.php";
+        string [int] description;
+        string [int] shed_options;
+        string main_title = "Consider changing your workshed";
+
+        // IOTM Workshed Descriptions
+        string [item] shedDesc = {
+            $item[Asdon Martin keyfob (on ring)]:"banishes & buffs",
+            $item[diabolic pizza cube]:"3-fullness pizza boons",
+            $item[cold medicine cabinet]:"25 freekills in exchange for your sanity",
+            $item[model train set]:"bridge parts, stats, and meat",
+            $item[TakerSpace letter of Marque]:"island access",
+        };
+
+        // FIXME: Add new worksheds as time goes on.
+        item [int] iotmWorksheds = $items[Asdon Martin keyfob (on ring),diabolic pizza cube,cold medicine cabinet,model train set,TakerSpace letter of Marque];
+        item workshedInCampground = $item[none];
+
+        foreach it in iotmWorkshed {
+            if (__campground[it] > 0) {
+                workshedInCampground = it;
+                description.listAppend("Currently have "+HTMLGenerateSpanOfClass(it.name,"r_bold")+" in your shed, for "+shedDesc[it]);
+            } else if (it.available_amount() > 0) {
+                shed_options.listAppend(HTMLGenerateSpanOfClass(it.name,"r_bold")+", for "+shedDesc[it]);
+            }
+        }
+
+        // return if user has no other options, no need to generate the tile
+        if (shed_options.length() == 0) return;
+
+        if (workshedInCampground == $item[none]) {
+            description.listAppend(HTMLGenerateSpanFont("No workshed currently installed!"));
+            main_title = "Install a useful workshed";
+        }
+
+        description.listAppend("Potential IOTM worksheds:|*" + shed_options.listJoinComponents("|*"));
+
+        optional_task_entries.listAppend(ChecklistEntryMake("__item tiny house", url, ChecklistSubentryMake(main_title, "", description), 2).ChecklistEntrySetIDTag("Workshed installation reminder"));
+        
+        
+    }
 }
 
 void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
@@ -56067,6 +56111,53 @@ void IOTMBookofFactsGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 
 	resource_entries.listAppend(ChecklistEntryMake("__item book of facts", "", ChecklistSubentryMake(("Miscellaneous valuable BOFA drops"), "", BOFAdropsDescription), 8).ChecklistEntrySetIDTag("bofa tatters"));
+}
+
+RegisterTaskGenerationFunction("IOTMJillMapGenerateTask");
+void IOTMJillMapGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+
+    boolean mapAvailable = ($item[map to a candy-rich block].available_amount() > 0);
+
+    // Don't generate a tile if the user doesn't have a map.
+    if (!mapAvailable) return;
+
+    boolean usedMap = get_property_boolean("_mapToACandyRichBlockUsed");	
+
+    // Populate a free fights count of trick-or-treat fights.
+	string trickOrTreatMap = get_property("_trickOrTreatBlock");
+	string[int] splitToT = split_string(trickOrTreatMap, "");
+
+    int fightsParsed;
+
+	foreach house in splitToT {
+		if (splitToT[house] == "D") {fightsParsed +=1;}
+		if (splitToT[house] == "d") {fightsParsed +=1;}
+	}
+
+    string [int] description;
+    string url = "inventory.php?ftext=candy-rich";
+    string main_title = "Use your Map to a Candy-Rich Block.";  
+
+    // Do not generate the tile if the user has access to trick-or-treat zones because it's Halloween
+    if (getHolidaysToday()["Halloween"]) return;
+
+    // Do not generate the tile if the user has access to trick-or-treat zones and has visited it
+    if (fightsParsed > 0 && usedMap) return;
+
+    // Still generate it even if they've used the map because mafia needs one T&T visit to generate the pref for the freefight tile
+    if (fightsParsed == 0 && usedMap) {
+        main_title = "Visit your Trick-or-Treat block!";
+        string url = "place.php?whichplace=town&action=town_trickortreat";
+        description.append("Might have a star house... 👀");
+    }
+
+    if (fightsParsed == 0 && !usedMap) {
+        description.append("Use your map for five free fights & some candy!");
+    }
+
+    optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", url, ChecklistSubentryMake(main_title, "", description), 7).ChecklistEntrySetIDTag("map to a candy-rich block"));
+    
+
 }
 
 // TILE SPEC: 
