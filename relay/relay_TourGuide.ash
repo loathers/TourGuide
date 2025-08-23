@@ -20470,7 +20470,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             int passiveDamage = to_int(numeric_modifier($modifier[thorns]) + numeric_modifier($modifier[damage aura]) + numeric_modifier($modifier[sporadic damage aura]) + numeric_modifier($modifier[sporadic thorns]));
             
             int prayerbeadsEquipped = $item[mer-kin prayerbeads].equipped_amount();
-            int prayerbeadsAvailable = clampi($item[mer-kin prayerbeads].item_amount(),0,3);
+            int prayerbeadsAvailable = clampi($item[mer-kin prayerbeads].item_amount()+prayerbeadsEquipped,0,3);
             
             description.listAppend("Wear mer-kin prayerbeads. "+HTMLGenerateSpanFont(prayerbeadsEquipped+"/"+prayerbeadsAvailable+" of your beads equipped.",(prayerbeadsEquipped == prayerbeadsAvailable ? "black" : "red"))+(!inSeaPath ? "" : " Consider a gutgirdle, too?"));
             description.listAppend("Avoid wearing any +HP gear or buffs. Ideally, you want low HP.");
@@ -20509,6 +20509,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             } else {
                 if ($item[Mer-kin dreadscroll].available_amount() == 0) {
                     description.listAppend("Adventure in the library. Find the dreadscroll.");
+                    description.listAppend(pluralise(clampi(5-$location[The Mer-Kin Library].turns_spent,0,5),"turn","turns")+" of delay remaining.");
                     modifiers.listAppend("-combat");
                 } else {
                     if ($effect[deep-tainted mind].have_effect() > 0)
@@ -26768,6 +26769,9 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
         // return if user has no other options, no need to generate the tile
         if (shed_options.length() == 0) return;
+
+        // do not generate if user has just one workshed and has installed it.
+        if (shed_options.length() == 1 && workshedInCampground != $item[none]) return;
 
         if (workshedInCampground == $item[none]) {
             description.listAppend(HTMLGenerateSpanFont("No workshed currently installed!", "red"));
@@ -37654,7 +37658,7 @@ void generateDailyResources(Checklist [int] checklists)
                 options.listAppend(generateHotDogLine("One with everything", "+50% mysticality, 50 turns.", 2));
             if (my_primestat() == $stat[moxie])
                 options.listAppend(generateHotDogLine("Sly Dog", "+50% moxie, 50 turns.", 2));
-            if (__misc_state["Chateau Mantegna available"] && !$skill[Dog Tired].have_skill())
+            if (!$skill[Dog Tired].have_skill())
                 options.listAppend(generateHotDogLine("Sleeping dog", "5 free rests/day (stats at chateau or cinch rests)", 2));
         }
             
@@ -37665,8 +37669,10 @@ void generateDailyResources(Checklist [int] checklists)
         
     if (!get_property_boolean("_olympicSwimmingPoolItemFound") && __misc_state["VIP available"] && $item[Olympic-sized Clan crate].is_unrestricted())
         resource_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "", ChecklistSubentryMake("Dive for swimming pool item", "", "\"swim item\" in GCLI"), 5).ChecklistEntrySetIDTag("VIP swimming pool item"));
+    
     if (!get_property_boolean("_olympicSwimmingPool") && __misc_state["VIP available"] && $item[Olympic-sized Clan crate].is_unrestricted())
         resource_entries.listAppend(ChecklistEntryMake("__item inflatable duck", "clan_viplounge.php?action=swimmingpool", ChecklistSubentryMake("Swim in VIP pool", "50 turns", listMake("+20 ML, +30% init", "Or -combat")), 5).ChecklistEntrySetIDTag("VIP swimming pool buff"));
+    
     if (!get_property_boolean("_aprilShower") && __misc_state["VIP available"] && $item[Clan shower].is_unrestricted()) {
         string [int] description;
         if (__misc_state["need to level"])
@@ -37698,7 +37704,7 @@ void generateDailyResources(Checklist [int] checklists)
         description.listAppend("Or +10% item, +50% init. (stylishly)");
         resource_entries.listAppend(ChecklistEntryMake("__item pool cue", "clan_viplounge.php?action=pooltable", ChecklistSubentryMake(pluralise(games_available, "pool table game", "pool table games"), "10 turns", description), 5).ChecklistEntrySetIDTag("VIP table pool resource"));
     }
-    if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived") && my_path().id != PATH_COMMUNITY_SERVICE && !__misc_state["in CS aftercore"]) {
+    if (__quest_state["Level 6"].finished && !get_property_boolean("friarsBlessingReceived") && my_path().id != PATH_SEA && my_path().id != PATH_COMMUNITY_SERVICE && !__misc_state["in CS aftercore"]) {
         string [int] description;
         if (!__misc_state["familiars temporarily blocked"]) {
             description.listAppend("+Familiar experience.");
@@ -37716,14 +37722,13 @@ void generateDailyResources(Checklist [int] checklists)
             description.listAppend("+Familiar experience.");
             should_output = true;
         }
+        // trying to get this stupid thing to not show in the sea
+        if (my_path().id == PATH_SEA) {
+            should_output == false;
+        }
         if (should_output)
             resource_entries.listAppend(ChecklistEntryMake("Monk", "friars.php", ChecklistSubentryMake("Forest Friars buff", "20 turns", description), 10).ChecklistEntrySetIDTag("Friars blessing resource"));
     }
-    
-    
-    
-    
-    
     
     if (!get_property_boolean("_madTeaParty") && __misc_state["VIP available"] && $item[Clan looking glass].is_unrestricted() && $item[&quot;DRINK ME&quot; potion].item_is_usable()){
         string [int] description;
@@ -57162,11 +57167,19 @@ void IOTMSeptemberCenserGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[Sept-Ember Censer].available_amount() == 0) return;
 
     int septEmbers = get_property_int("availableSeptEmbers");
-    string [int] description;
+
+    // Tile is unnecessary if you don't have embers remaining.
+    if (septEmbers == 0) return;
+
+    string [int] description;    
+    string url = "shop.php?whichshop=september";
+    string title = "Spend your "+pluralise(septEmbers,"ember","embers");
+
+    // Math for the statgain from spading
     float coldResistance = numeric_modifier("cold resistance");
     int mainstatGain = (7 * (coldResistance) ** 1.7) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
-    string url = "shop.php?whichshop=september";
-    string title = "Sept-Ember Censer";
+
+    // General amount counts
     int bembershootCount = $item[bembershoot].available_amount();
     int mouthwashCount = $item[Mmm-brr! brand mouthwash].available_amount();
     int structureCount = $item[structural ember].available_amount();
@@ -57176,29 +57189,70 @@ void IOTMSeptemberCenserGenerateResource(ChecklistEntry [int] resource_entries)
 
     if (septEmbers > 0)
     {
-        description.listAppend(`Have {HTMLGenerateSpanFont(septEmbers, "red")} Sept-Embers to make stuff with!`);
+        description.listAppend("Stoke the embers in your Sept-Ember Censer");
     }
 
-    description.listAppend(`1 embers: +5 cold res accessory (You have {HTMLGenerateSpanFont(bembershootCount, "red")})`);
-    description.listAppend(`2 embers: mmm-brr! mouthwash for {HTMLGenerateSpanFont(mainstatGain, "blue")} mainstat. (You have {HTMLGenerateSpanFont(mouthwashCount, "red")})`);
+    description.listAppend(`|*1 embers: +5 cold res accessory (You have {HTMLGenerateSpanFont(bembershootCount, "red")})`);
+    description.listAppend(`|*2 embers: mmm-brr! mouthwash for {HTMLGenerateSpanFont(mainstatGain, "blue")} mainstat. (You have {HTMLGenerateSpanFont(mouthwashCount, "red")})`);
 
     if (structureUsed) {
-        description.listAppend((HTMLGenerateSpanFont("Already used structural ember today", "red")));
+        description.listAppend((HTMLGenerateSpanFont("|*Already used structural ember today", "blue")));
     } else {
-        description.listAppend("4 embers: +5/5 bridge parts (1/day)");
+        description.listAppend("|*4 embers: +5/5 bridge parts (1/day)");
     }
 
     if (hulkFought) {
-        description.listAppend((HTMLGenerateSpanFont("Already fought embering hulk today", "red")));
+        description.listAppend((HTMLGenerateSpanFont("|*Already fought embering hulk today", "blue")));
     } else {
-        description.listAppend("6 embers: embering hulk (1/day)");
+        description.listAppend("|*6 embers: embering hulk (1/day)");
     }
 
-    description.listAppend(`(You have {HTMLGenerateSpanFont(hunkCount, "red")} hunks)`);
+    if (!__misc_state["in run"]) description.listAppend(`(You have {HTMLGenerateSpanFont(hunkCount, "blue")} hunks)`);
 
     resource_entries.listAppend(ChecklistEntryMake("__item sept-ember censer", url, ChecklistSubentryMake(title, "", description), 8));
 }
 
+// Helper function on the KoLmafia wiki that I just decided to use for this
+float roundFloat(float number, int place) {
+    float value = round(number*10.00**-place)*10.0**place; 
+    return value;
+}
+
+RegisterTaskGenerationFunction("MmmBrrMouthwashGenerateTask");
+void MmmBrrMouthwashGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+
+    // Check a few things. Don't need this tile over level 11.
+    int mouthwashCount = $item[Mmm-brr! brand mouthwash].available_amount();
+    boolean doNotNeedToLevel = my_level() > 11;
+
+    if (mouthwashCount == 0 || doNotNeedToLevel) return;
+
+    string [int] description;
+    string url = "inventory.php?ftext=brand+mouthwash";
+    string main_title = "Level up with your Mmm-brr Mouthwash";  
+    string subtitle;
+
+    // Math for the statgain from spading
+    float coldResistance = numeric_modifier("cold resistance");
+    int mainstatGain = (7 * (coldResistance) ** 1.7) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
+    float levelFromMouthwash = roundFloat(square_root(my_basestat(my_primestat()) + mainstatGain*mouthwashCount),2);
+
+    subtitle="currently @ " + coldResistance + " cold res";
+
+    description.listAppend("You currently have "+pluralise(mouthwashCount, "mouthwash","mouthwashes")+" at "+mainstatGain+" mainstat apiece");
+    description.listAppend("|*Will gain "+(mainstatGain*mouthwashCount)+" stats when used");
+    description.listAppend("|*This will get you to level "+levelFromMouthwash);
+
+    if (levelFromMouthwash < 12) {
+        description.listAppend("Consider stacking more "+HTMLGenerateSpanOfClass("cold resistance", "r_element_cold")+" for a higher level");
+    }
+
+    // FIXME: add possible recommendations for obvious sources? probably a nice hoverover thing...
+
+    optional_task_entries.listAppend(ChecklistEntryMake("__item mmm-brr mouthwash", url, ChecklistSubentryMake(main_title, subtitle, description), 8).ChecklistEntrySetIDTag("mmm brr mouthwash math"));
+    
+
+}
 // Bat Wings
 RegisterTaskGenerationFunction("IOTMRomanBatWingsTasks");
 void IOTMRomanBatWingsTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
