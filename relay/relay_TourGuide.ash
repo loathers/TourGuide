@@ -37712,20 +37712,25 @@ void generateDailyResources(Checklist [int] checklists)
         }
         else
             description.listAppend("+30% food drop.");
+
         description.listAppend("Or +30% booze drop.");
         boolean should_output = true;
+        
         if (!__misc_state["in run"]) {
             should_output = false;
         }
+        
         if (!should_output && familiar_weight(my_familiar()) < 20 && my_familiar() != $familiar[none]) {
             description.listClear();
             description.listAppend("+Familiar experience.");
             should_output = true;
         }
+        
         // trying to get this stupid thing to not show in the sea
         if (my_path().id == PATH_SEA) {
-            should_output == false;
+            should_output = false;
         }
+        
         if (should_output)
             resource_entries.listAppend(ChecklistEntryMake("Monk", "friars.php", ChecklistSubentryMake("Forest Friars buff", "20 turns", description), 10).ChecklistEntrySetIDTag("Friars blessing resource"));
     }
