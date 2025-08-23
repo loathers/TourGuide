@@ -221,7 +221,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             int passiveDamage = to_int(numeric_modifier($modifier[thorns]) + numeric_modifier($modifier[damage aura]) + numeric_modifier($modifier[sporadic damage aura]) + numeric_modifier($modifier[sporadic thorns]));
             
             int prayerbeadsEquipped = $item[mer-kin prayerbeads].equipped_amount();
-            int prayerbeadsAvailable = clampi($item[mer-kin prayerbeads].item_amount(),0,3);
+            int prayerbeadsAvailable = clampi($item[mer-kin prayerbeads].item_amount()+prayerbeadsEquipped,0,3);
             
             description.listAppend("Wear mer-kin prayerbeads. "+HTMLGenerateSpanFont(prayerbeadsEquipped+"/"+prayerbeadsAvailable+" of your beads equipped.",(prayerbeadsEquipped == prayerbeadsAvailable ? "black" : "red"))+(!inSeaPath ? "" : " Consider a gutgirdle, too?"));
             description.listAppend("Avoid wearing any +HP gear or buffs. Ideally, you want low HP.");
@@ -260,6 +260,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             } else {
                 if ($item[Mer-kin dreadscroll].available_amount() == 0) {
                     description.listAppend("Adventure in the library. Find the dreadscroll.");
+                    description.listAppend(pluralise(clampi(5-$location[The Mer-Kin Library].turns_spent,0,5),"turn","turns")+" of delay remaining.");
                     modifiers.listAppend("-combat");
                 } else {
                     if ($effect[deep-tainted mind].have_effect() > 0)

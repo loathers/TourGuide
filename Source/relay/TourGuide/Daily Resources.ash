@@ -110,6 +110,10 @@ void generateDailyResources(Checklist [int] checklists)
             description.listAppend("+Familiar experience.");
             should_output = true;
         }
+        // trying to get this stupid thing to not show in the sea
+        if (my_path().id == PATH_SEA) {
+            should_output == false;
+        }
         if (should_output)
             resource_entries.listAppend(ChecklistEntryMake("Monk", "friars.php", ChecklistSubentryMake("Forest Friars buff", "20 turns", description), 10).ChecklistEntrySetIDTag("Friars blessing resource"));
     }

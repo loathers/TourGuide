@@ -118,6 +118,9 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         // return if user has no other options, no need to generate the tile
         if (shed_options.length() == 0) return;
 
+        // do not generate if user has just one workshed and has installed it.
+        if (shed_options.length() == 1 && workshedInCampground != $item[none]) return;
+
         if (workshedInCampground == $item[none]) {
             description.listAppend(HTMLGenerateSpanFont("No workshed currently installed!", "red"));
             main_title = "Install a useful workshed";
