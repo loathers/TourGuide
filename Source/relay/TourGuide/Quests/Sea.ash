@@ -260,7 +260,7 @@ void QSeaGenerateTempleEntry(ChecklistSubentry subentry, StringHandle image_name
             } else {
                 if ($item[Mer-kin dreadscroll].available_amount() == 0) {
                     description.listAppend("Adventure in the library. Find the dreadscroll.");
-                    description.listAppend(pluralise(clampi(5-$location[The Mer-Kin Library].turns_spent,0,5),"turn","turns")+" of delay remaining.");
+                    description.listAppend(pluralise(clampi(5-$location[Mer-Kin Library].turns_spent,0,5),"turn","turns")+" of delay remaining.");
                     modifiers.listAppend("-combat");
                 } else {
                     if ($effect[deep-tainted mind].have_effect() > 0)
