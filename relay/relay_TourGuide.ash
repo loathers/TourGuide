@@ -53618,8 +53618,8 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 		description.listAppend("You should probably guzzle your sweat now.");
 	}
 	else {
-		description.listAppend(HTMLGenerateSpanOfClass(fam_sweat_o_meter + "/" + sweatCalcSweat, "r_bold") + " drams of stillsuit sweat for next adventure.");
-		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " combats on current familiar)");
+		description.listAppend(HTMLGenerateSpanOfClass(fam_sweat_o_meter + "/" + sweatCalcSweat, "r_bold") + " drams of sweat for +1 adv.");
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " sweat for +1 adv. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " fights on this fam)");
 	}
 
 	// Still generate the "warning, not generating sweat" supernag so long as familiars aren't blocked
@@ -53630,19 +53630,16 @@ void IOTMTinyStillsuitGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
 	else if ($item[tiny stillsuit].equipped_amount() == 1) {
-		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat from current familiar!", "purple") + "");
+		description.listAppend("" + HTMLGenerateSpanFont("Currently sweating active fam!", "purple") + "");
 	} else {
-		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
+		description.listAppend("" + HTMLGenerateSpanFont("Currently sweating another fam!", "fuchsia") + "");
     }	
 	title = HTMLGenerateSpanFont(sweatAdvs + " adv stillsuit sweat booze", "purple");
 	
 	// However, if the user is in a path where they can't use stillsuit or cannot drink the distillate right now, do not show this supernag.
 	if (!inStillsuitPath || !canGuzzleSweat) return;
 
-	if (__misc_state["in run"] && sweatAdvs > 6) {
-		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
-	}
-	else if (!__misc_state["in run"] && sweatAdvs > 10) {
+	if (sweatAdvs > 10) {
 		task_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -11).ChecklistEntrySetIDTag("tiny stillsuit task"));
 	}
 }
@@ -53695,27 +53692,27 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
 		sweatCalcSweat = 10;
 	}
 	
-	if (fam_sweat_o_meter > 358) {
-		description.listAppend("" + HTMLGenerateSpanOfClass("11", "r_bold") + " advs when guzzling now (costs 1 liver).");
+	if (fam_sweat_o_meter > 449) {
+		description.listAppend("" + HTMLGenerateSpanOfClass("12", "r_bold") + " advs when guzzling now (costs 1 liver).");
 		description.listAppend("You should probably guzzle your sweat now.");
 	}
 	else if (fam_sweat_o_meter > 10) {
 		description.listAppend("" + HTMLGenerateSpanOfClass(sweatAdvs, "r_bold") + " advs when guzzling now (costs 1 liver).");
-		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " combats on current familiar)");
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " sweat for +1 adv. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " fights on this fam)");
 	}
 	else {
 		description.listAppend("" + HTMLGenerateSpanFont("Not enough sweat to guzzle.", "red") + "");
-		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " more sweat until +1 more adventure. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " combats on current familiar)");
+		description.listAppend("" + HTMLGenerateSpanOfClass(sweatCalcSweat - fam_sweat_o_meter, "r_bold") + " sweat for +1 adv. (" + (1+ (sweatCalcSweat - fam_sweat_o_meter)/3) + " fights on this fam)");
 	}
 		
     if ($item[tiny stillsuit].item_amount() == 1) {
-		description.listAppend("" + HTMLGenerateSpanFont("Not collecting sweat from any familiar right now.", "red") + "");
+		description.listAppend("" + HTMLGenerateSpanFont("Not sweating any familiar.", "red") + "");
 		url = "familiar.php";
 	}
 	else if ($item[tiny stillsuit].equipped_amount() == 1) {
-		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat from current familiar!", "purple") + "");
+		description.listAppend("" + HTMLGenerateSpanFont("Currently sweating active fam!", "purple") + "");
 	} else {
-		description.listAppend("" + HTMLGenerateSpanFont("Currently collecting sweat on a different familiar!", "fuchsia") + "");
+		description.listAppend("" + HTMLGenerateSpanFont("Currently sweating another fam!", "fuchsia") + "");
     }
 
 	title = HTMLGenerateSpanFont(fam_sweat_o_meter + "/" + sweatCalcSweat + " drams of stillsuit sweat", "purple");
@@ -53774,6 +53771,7 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
 	description.listAppend(stillSweatTypeTooltip);
     resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
 }
+
 //Jurassic parka
 RegisterTaskGenerationFunction("IOTMJurassicParkaGenerateTasks");
 void IOTMJurassicParkaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
