@@ -3,7 +3,7 @@ RegisterTaskGenerationFunction("IOTMSkeletonOfCrimboPastGenerateTasks");
 void IOTMSkeletonOfCrimboPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     if (!lookupFamiliar("skeleton of crimbo past").familiar_is_usable()) return;
-	string url = "familiar.php";
+	string url = "main.php?talktosocp=1";
 	string [int] description;
 	
 	int fightKnucklebones = get_property_int("_knuckleboneDrops");
@@ -23,7 +23,7 @@ RegisterResourceGenerationFunction("IOTMSkeletonOfCrimboPastGenerateResource");
 void IOTMSkeletonOfCrimboPastGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (!lookupFamiliar("skeleton of crimbo past").familiar_is_usable()) return;
-	string url = "familiar.php";
+	string url = "main.php?talktosocp=1";
 	string [int] description;
 	string title;
 	
