@@ -57377,8 +57377,8 @@ void IOTMMobiusRingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	string url = "inventory.php?ftext=bius+ring";
 	string [int] copDescription;
     string copSubTitle = "Forecast is "+currentTimeCopRate+"% chance of cops";
-	string copTitle = HTMLGenerateSpanFont(pluralise(min(11-countTimeCops, 0), "free Time Cops fought today", "free Time Cops fought today"), "black");
-    boolean copsNoLongerFree = countTimeCops > 11;
+	string copTitle = HTMLGenerateSpanFont(pluralise(min(countTimeCops, 11), "free Time Cop fought today", "free Time Cops fought today"), "black");
+    boolean copsNoLongerFree = countTimeCops >= 11;
     int priority = 10;
 
 	if (mobEquipped) {
@@ -57448,10 +57448,11 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
     if (turnsUntilNextNC > 0) description.listAppend("You have "+pluralise(turnsUntilNextNC, " turn", " turns")+" turns to NC #" +(countMobiusNCs+1)+ ".");
         description.listAppend("|*You have at least "+pluralise(turnsUntilNextNextNC, " turn", " turns")+" until NC #"+(countMobiusNCs+2)+".");
 	description.listAppend("" + countTimeCops +"/11 free time cops today. (currently @ "+currentTimeCopRate+"% rate)");
-	    if(countTimeCops > 11) description.listAppend(HTMLGenerateSpanFont("No free time cops remain; be careful wearing your ring!", "red"));
+	    if(countTimeCops >= 11) description.listAppend(HTMLGenerateSpanFont("No free time cops remain; be careful wearing your ring!", "red"));
     if(my_paradoxicity() < 13) description.listAppend("Boost to 13 Paradoxicity for +100% item & +50% booze drop!");
 	resource_entries.listAppend(ChecklistEntryMake("__item M&ouml;bius ring", url, ChecklistSubentryMake(title, "", description), 0));
 }
+
 
 
 RegisterTaskGenerationFunction("PathActuallyEdtheUndyingGenerateTasks");
