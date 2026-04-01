@@ -4363,10 +4363,6 @@ location hippyCampInDisguise() {
     return camp;
 }
 
-boolean isAprilFools() {
-    return (now_to_string("MMdd") == "0401");
-}
-
 
 //Quest status stores all/most of our quest information in an internal format that's easier to understand.
 record QuestState
@@ -61009,9 +61005,6 @@ void runMain(string relay_filename)
 	generateChecklists(ordered_output_checklists);
 	
     string guide_title = "TourGuide";
-    if (isAprilFools()) {
-        guide_title = "Glup Shitto Stole Rogue V's Targeting Computer";
-    }
     if (limit_mode() == "batman")
         guide_title = "Bat-Guide";
 	
@@ -61077,9 +61070,6 @@ void runMain(string relay_filename)
         bottom_margin = "margin-bottom:" + bottom_offset + "em;";
     
     string horizontal_container_styles = "position:relative;max-width:" + max_width_setting + "px;" + bottom_margin;
-    if (isAprilFools()) {
-        horizontal_container_styles += "transform: rotate3d(1, 1.5, 0.2, 30deg); transform-origin: 10px top";
-    }
     PageWrite(HTMLGenerateTagPrefix("div", mapMake("class", "r_centre", "id", "Guide_horizontal_container", "style", horizontal_container_styles))); //centre holding container
     
     
@@ -61217,9 +61207,6 @@ void runMain(string relay_filename)
         
         // Title
         string titleStyles = "font-weight:bold; font-size:1.5em;";
-        if (isAprilFools()) {
-            titleStyles = titleStyles + "background-image: linear-gradient(-225deg,#231557 0%,#44107a 15%,#ff1361 30%,#fff800 60%);background-size: auto auto;background-clip: border-box;background-size: 200% auto;color: #fff;background-clip: text;text-fill-color: transparent;-webkit-background-clip: text;-webkit-text-fill-color: transparent;display: inline-block";
-        }
         PageWrite(HTMLGenerateSpanOfStyle(guide_title, titleStyles));
 
         // Day + Turn Count
