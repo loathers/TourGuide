@@ -54,6 +54,7 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] description, hoverDescription;
 
     int templeResetAscension = get_property_int("lastTempleAdventures");
+    string mayamSymbolsUsed = get_property("_mayamSymbolsUsed");
     addToBothDescriptions(description, hoverDescription, "Happy Mayam New Year!");
 
     ChecklistEntry entry;
@@ -62,11 +63,17 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
     entry.tags.id = "Mayam Calendar";
     entry.importance_level = 8;
 
-    if (!get_property("_mayamSymbolsUsed").contains_text("yam4") ||
-        !get_property("_mayamSymbolsUsed").contains_text("clock") ||
-        !get_property("_mayamSymbolsUsed").contains_text("explosion") ||
+    if (!mayamSymbolsUsed.contains_text("yam4") ||
+        !mayamSymbolsUsed.contains_text("clock") ||
+        !mayamSymbolsUsed.contains_text("explosion") ||
         my_ascensions() > templeResetAscension)
     {
+        // do not generate the tile if in sea path and no picks left
+        if (mayamSymbolsUsed.contains_text("yam4") &&
+        mayamSymbolsUsed.contains_text("clock") &&
+        mayamSymbolsUsed.contains_text("explosion") &&
+        my_path().id == PATH_SEA) return;
+
         description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
         hoverDescription.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
 
@@ -88,14 +95,21 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend(HTMLGenerateSpanFont(" ", "r_bold") + "");
 
         string [int] resonances;
-        resonances.listAppend(HTMLGenerateSpanOfClass("15-turn banisher", "r_bold") + ": Vessel + Yam + Cheese + Explosion");
-        resonances.listAppend(HTMLGenerateSpanOfClass("Yam and swiss", "r_bold") + ": Yam + Meat + Cheese + Yam");
-        resonances.listAppend(HTMLGenerateSpanOfClass("+55% meat accessory", "r_bold") + ": Yam + Meat + Eyepatch + Yam");
-        resonances.listAppend(HTMLGenerateSpanOfClass("+100% Food drops", "r_bold") + ": Yam + Yam + Cheese + Clock");
-        
-        addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
 
-        if (my_ascensions() > templeResetAscension) {
+        // adding some filtering to remove from resonance list if cannot make
+        if (!mayamSymbolsUsed.contains_text("vessel") && !mayamSymbolsUsed.contains_text("yam2") && !mayamSymbolsUsed.contains_text("cheese") && !mayamSymbolsUsed.contains_text("explosion"))
+            resonances.listAppend(HTMLGenerateSpanOfClass("15-turn banisher", "r_bold") + ": Vessel + Yam + Cheese + Explosion");
+        if (!mayamSymbolsUsed.contains_text("yam1") && !mayamSymbolsUsed.contains_text("meat") && !mayamSymbolsUsed.contains_text("cheese") && !mayamSymbolsUsed.contains_text("yam4"))
+            resonances.listAppend(HTMLGenerateSpanOfClass("Yam and swiss", "r_bold") + ": Yam + Meat + Cheese + Yam");
+        if (!mayamSymbolsUsed.contains_text("yam1") && !mayamSymbolsUsed.contains_text("meat") && !mayamSymbolsUsed.contains_text("eyepatch") && !mayamSymbolsUsed.contains_text("yam4"))
+            resonances.listAppend(HTMLGenerateSpanOfClass("+55% meat accessory", "r_bold") + ": Yam + Meat + Eyepatch + Yam");
+        if (!mayamSymbolsUsed.contains_text("yam1") && !mayamSymbolsUsed.contains_text("yam2") && !mayamSymbolsUsed.contains_text("cheese") && !mayamSymbolsUsed.contains_text("clock"))
+            resonances.listAppend(HTMLGenerateSpanOfClass("+100% Food drops", "r_bold") + ": Yam + Yam + Cheese + Clock");
+        
+        if (length(resonances) > 0)
+            addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+
+        if (my_ascensions() > templeResetAscension && my_path().id != PATH_SEA) {
             addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanFont("Temple reset available!", "r_bold") + "");
         }
 

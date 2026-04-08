@@ -299,6 +299,42 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         )
     };
 
+    // For sea path, need knowledge of which clues are accessible to suggest things.
+        /*
+            Mer-kin Library 1 -> dreadScroll1
+            Mer-kin healscroll -> dreadScroll2
+            Deep Dark Visions -> dreadScroll3
+            Mer-kin knucklebone -> dreadScroll4
+            Mer-kin killscroll -> dreadScroll5
+            Mer-kin Library 2 -> dreadScroll6
+            Mer-kin worktea -> dreadScroll7
+            Mer-kin Library 3 -> dreadScroll8
+        */
+
+    MonkeyWish [int] seaPathWishes = {
+        new MonkeyWish(
+            $item[mer-kin knucklebone],
+            $effect[none],
+            "1x dreadscroll clue",
+            get_property_int("dreadscroll5") >=1,
+            locationAvailable($location[mer-kin library])
+        ),
+        new MonkeyWish(
+            $item[mer-kin worktea],
+            $effect[none],
+            "1x dreadscroll clue... with sushi!",
+            get_property_int("dreadscroll7") >=1,
+            locationAvailable($location[mer-kin library])
+        ),
+        new MonkeyWish(
+            $item[none],
+            $effect[Frosty],
+            "init/item/meat",
+            true,
+            true
+        ),
+    };
+
     MonkeyWish [int] aftercoreWishes = {
         new MonkeyWish(
             $item[bag of foreign bribes],
@@ -308,10 +344,13 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
             true
         )
     };
+    
+    // Rejecting bad wishes for CS, Goo, and Sea path
+    boolean inNonQuestPath = (my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_SEA);
 
     int monkeyWishesLeft = clampi(5 - get_property_int("_monkeyPawWishesUsed"), 0, 5);
     string [int] options;
-    if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE) {
+    if (__misc_state["in run"] && !inNonQuestPath) {
         options.listAppendList(showWishes(inRunWishes));
     }
     if (!__misc_state["in run"]) {

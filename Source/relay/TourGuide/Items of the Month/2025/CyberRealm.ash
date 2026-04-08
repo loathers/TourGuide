@@ -13,10 +13,11 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	string url = "place.php?whichplace=CyberRealm";
 	string image_name = "__skill stats+++";
 		
+		// If in-run, do not show the FITMW nag.
 		if ($item[familiar-in-the-middle wrapper].equipped_amount() == 1) {
 			description.listAppend(HTMLGenerateSpanFont("FITMW equipped. Extra 1 per fight.", "blue"));
 		}
-		else if ($item[familiar-in-the-middle wrapper].equipped_amount() == 0) {
+		else if ($item[familiar-in-the-middle wrapper].equipped_amount() == 0 && !__misc_state["in run"]) {
 			description.listAppend(HTMLGenerateSpanFont("Equip your FITMW for an extra 1 per fight.", "red"));
 		}
 		
@@ -121,6 +122,6 @@ void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries)
     if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
         string url = "place.php?whichplace=CyberRealm";
 		description.listAppend("Hack into the system!");
-		resource_entries.listAppend(ChecklistEntryMake("__skill stats+++", url, ChecklistSubentryMake(pluralise(CyberFree, "CyberRealm fight", "CyberRealm fights"), "", description), 8).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("CyberRealm free fight"));
+		resource_entries.listAppend(ChecklistEntryMake("__skill stats+++", url, ChecklistSubentryMake(pluralise(CyberFree, "CyberRealm fight", "CyberRealm fights"), "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("CyberRealm free fight"));
     }
 }
