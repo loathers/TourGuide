@@ -6,6 +6,7 @@ void IOTMShrunkenHeadGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     //   - if active monster, item drop chance for the active items on your head monster
     //   - if head equipped, what enchantment the monster you're fighting gives you
     //   - convert current targets to hoverover recommendations w/ filtering
+    //   - add shrunken head combo to location bar
     
     if ($item[shrunken head].available_amount() == 0) return;
 	string url = "inventory.php?ftext=shrunken+head";
