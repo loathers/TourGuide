@@ -1001,7 +1001,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             string mHeartText = mHeart.length() ? "("+mHeart+")" : "";
 
             // This is where monstername is printed. Ergo...
-            if (if (__iotms_usable[lookupItem("Heartstone")])) 
+            if (__iotms_usable[lookupItem("Heartstone")])
                 fl_entries.listAppend(m.capitaliseFirstLetter()+mHeartText);
             else
                 fl_entries.listAppend(m.capitaliseFirstLetter());
@@ -1037,7 +1037,17 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 fl_entry_styles[fl_entries.count() - 1] = "text-align:left;font-size:0.8em";
             }
         }
-        
+
+        // ----------- NEW BIT FROM SCOTCH ABOUT SHRUNKEN HEAD -------------
+        if (true)
+        {
+            if (__iotms_usable[lookupItem("Shrunken Head")]) {
+                string headEffects = shrunken_Head_Zombie(m).listJoinComponents(", ");
+                fl_entries.listAppend(headEffects);
+                fl_entry_styles[fl_entries.count() - 1] = "text-align:left;font-size:0.8em";
+            }
+        }
+
         //FIXME handle canceling NC
         buffer rate_buffer;
         if (m.attributes.contains_text("ULTRARARE"))
