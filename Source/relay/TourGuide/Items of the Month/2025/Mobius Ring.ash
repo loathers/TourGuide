@@ -36,8 +36,8 @@ void IOTMMobiusRingGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	string url = "inventory.php?ftext=bius+ring";
 	string [int] copDescription;
     string copSubTitle = "Forecast is "+currentTimeCopRate+"% chance of cops";
-	string copTitle = HTMLGenerateSpanFont(pluralise(min(countTimeCops, 11), "free Time Cop fought today", "free Time Cops fought today"), "black");
-    boolean copsNoLongerFree = countTimeCops >= 11;
+	string copTitle = HTMLGenerateSpanFont(pluralise(min(countTimeCops, 11), "free Time Cops fought today", "free Time Cops fought today"), "black");
+    boolean copsNoLongerFree = countTimeCops > 11;
     int priority = 10;
 
 	if (mobEquipped) {

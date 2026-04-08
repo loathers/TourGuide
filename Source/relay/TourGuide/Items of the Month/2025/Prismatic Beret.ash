@@ -42,7 +42,7 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 		if (lookupItem("prismatic beret").equipped_amount() == 0) {
 			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk!", "red"));
 		}
-		if (lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted()); {
+		if (lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted()) {
 			description.listAppend(HTMLGenerateSpanFont("(You can put it on your hatrack)", "blue"));
 		}
 		

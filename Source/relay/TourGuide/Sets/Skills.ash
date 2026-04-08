@@ -133,6 +133,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     property_summon_limits["_grimoireGeekySummons"] = 1;
     property_summon_limits["_grimoireConfiscatorSummons"] = 1;
     property_summon_limits["_candySummons"] = 1;
+    property_summon_limits["_summonResortPassesUsed"] = 1;
 
     if ($skill[advanced saucecrafting].have_skill() && $skill[advanced saucecrafting].skill_is_usable())
         property_summons_to_skills["reagentSummons"] = listMake($skill[advanced saucecrafting], $skill[the way of sauce]);
@@ -280,10 +281,10 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
     
     
     if (lookupSkill("Evoke Eldritch Horror").skill_is_usable() && !get_property_boolean("_eldritchHorrorEvoked")) {
-        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Evoke eldritch horror skill free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "skillz.php", ChecklistSubentryMake("Evoke Eldritch Horror", "", "Free fight."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Evoke eldritch horror skill free fight"));
     }
-    if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS && my_path().id != PATH_COMMUNITY_SERVICE) {
-        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage&action=fv_scientist", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Daily forest tentacle free fight"));
+    if (!get_property_boolean("_eldritchTentacleFought") && my_path().id != PATH_EXPLOSIONS && my_path().id != PATH_COMMUNITY_SERVICE && my_path().id != PATH_SEA) {
+        resource_entries.listAppend(ChecklistEntryMake("__skill Evoke Eldritch Horror", "place.php?whichplace=forestvillage&action=fv_scientist", ChecklistSubentryMake("Science Tent Tentacle", "", "Free fight."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Daily forest tentacle free fight"));
     }
     
 }

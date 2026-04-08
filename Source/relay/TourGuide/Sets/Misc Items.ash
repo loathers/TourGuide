@@ -79,6 +79,59 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             }
         }
     }
+
+    // New optional task noting the user should use a workshed. Recommends IOTM worksheds in inventory.
+    if (!get_property_boolean("_workshedItemUsed")) {
+        string url = "inventory.php";
+        string [int] description;
+        string [int] shed_options;
+        string main_title = "Consider changing your workshed";
+
+        // IOTM Workshed Descriptions
+        string [item] shedDesc = {
+            $item[Asdon Martin keyfob (on ring)]:"banishes & buffs",
+            $item[diabolic pizza cube]:"3-fullness pizza boons",
+            $item[cold medicine cabinet]:"25 freekills in exchange for your sanity",
+            $item[model train set]:"bridge parts, stats, and meat",
+            $item[TakerSpace letter of Marque]:"island access",
+        };
+
+        // FIXME: Add new worksheds as time goes on.
+        item [int] iotmWorksheds; 
+        iotmWorksheds.listAppend($item[Asdon Martin keyfob (on ring)]);
+        iotmWorksheds.listAppend($item[diabolic pizza cube]);
+        iotmWorksheds.listAppend($item[cold medicine cabinet]);
+        iotmWorksheds.listAppend($item[model train set]);
+        iotmWorksheds.listAppend($item[TakerSpace letter of Marque]);
+
+        item workshedInCampground = $item[none];
+
+        foreach key, it in iotmWorksheds {
+            if (__campground[it] > 0) {
+                workshedInCampground = it;
+                description.listAppend("Currently have "+HTMLGenerateSpanOfClass(it.to_string(),"r_bold")+" in your shed, for "+shedDesc[it]);
+            } else if (it.available_amount() > 0) {
+                shed_options.listAppend(HTMLGenerateSpanOfClass(it.to_string(),"r_bold")+", for "+shedDesc[it]);
+            }
+        }
+
+        // return if user has no other options, no need to generate the tile
+        if (shed_options.length() == 0) return;
+
+        // do not generate if user has just one workshed and has installed it.
+        if (shed_options.length() == 1 && workshedInCampground != $item[none]) return;
+
+        if (workshedInCampground == $item[none]) {
+            description.listAppend(HTMLGenerateSpanFont("No workshed currently installed!", "red"));
+            main_title = "Install a useful workshed";
+        }
+
+        description.listAppend("Potential IOTM worksheds:|*" + shed_options.listJoinComponents("|*"));
+
+        optional_task_entries.listAppend(ChecklistEntryMake("__item tiny house", url, ChecklistSubentryMake(main_title, "", description), 2).ChecklistEntrySetIDTag("Workshed installation reminder"));
+        
+        
+    }
 }
 
 void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
@@ -332,6 +385,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if ($item[harold's bell].available_amount() > 0 && $item[harold's bell].item_is_usable())
             resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Takes a turn, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
         
+	    if ($item[anchor bomb].available_amount() > 0 )
+            resource_entries.listAppend(ChecklistEntryMake("__item anchor bomb", "", ChecklistSubentryMake(pluralise($item[anchor bomb]), "", "Free run/banish. (30 turns)"), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
         if ($item[lost key].available_amount() > 0 && $item[lost key].item_is_usable()){
             string [int] details;
             details.listAppend("Lost pill bottle is mini-fridge, take a nap, open the pill bottle.");
@@ -874,17 +929,17 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if ($item[bowl of scorpions].available_amount() > 0 && get_property_int("_drunkPygmyBanishes") < 11 && my_path().id != PATH_G_LOVER && get_property_ascension("hiddenTavernUnlock"))
     {
         int uses_remaining = MIN($item[bowl of scorpions].available_amount(), clampi(11 - get_property_int("_drunkPygmyBanishes"), 0, 11));
-        resource_entries.listAppend(ChecklistEntryMake("__item bowl of scorpions", "inventory.php?which=3&ftext=bowl+of+scorpions", ChecklistSubentryMake(pluralise(uses_remaining,$item[bowl of scorpions]), "", "Free fight when brought to Bowling Alley."), importance_level_unimportant_item).ChecklistEntrySetIDTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item bowl of scorpions", "inventory.php?which=3&ftext=bowl+of+scorpions", ChecklistSubentryMake(pluralise(uses_remaining,$item[bowl of scorpions]), "", "Free fight when brought to Bowling Alley."), 5).ChecklistEntrySetIDTag("daily free fight"));
     }
 	
 	if ($item[glark cable].available_amount() > 0 && get_property_int("_glarkCableUses") < 5 && my_path().id != PATH_G_LOVER)
     {
         int uses_remaining = MIN($item[glark cable].available_amount(), clampi(5 - get_property_int("_glarkCableUses"), 0, 5));
-        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free fight on the Red Zeppelin."), importance_level_unimportant_item).ChecklistEntrySetIDTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free fight on the Red Zeppelin."), 5).ChecklistEntrySetIDTag("daily free fight"));
     } 
     if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3 && $item[lynyrd snare].item_is_usable()) { // && in_run && __misc_state["need to level"])
         int uses_remaining = MIN($item[lynyrd snare].available_amount(), clampi(3 - get_property_int("_lynyrdSnareUses"), 0, 3));
-        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
     }
     if (in_run && $item[red box].available_amount() > 0 && $item[red box].item_is_usable()) {
         resource_entries.listAppend(ChecklistEntryMake("__item red box", "inventory.php?ftext=red+box", ChecklistSubentryMake(pluralise($item[red box]), "", "Open for stuff."), importance_level_unimportant_item).ChecklistEntrySetIDTag("Red box resource"));
@@ -1258,6 +1313,6 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if (glitch_in_closet >= 1)
             description.listAppend("Uncloset " + (glitch_in_closet > 1 ? "some" : "one") + " to " + (glitch_amount > 1 ? "increase" : "multiply") + " its power and reward.");
 
-        resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "inventory.php?ftext=%5Bglitch+season+reward+name%5D", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "inventory.php?ftext=%5Bglitch+season+reward+name%5D", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
     }
 }
