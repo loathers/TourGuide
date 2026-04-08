@@ -8,10 +8,15 @@ void IOTMShrunkenHeadGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     //   - convert current targets to hoverover recommendations w/ filtering
     //   - add shrunken head combo to location bar
     
-    if ($item[shrunken head].available_amount() == 0) return;
+	if (__iotms_usable[lookupItem("Shrunken Head")]) return;
+
+    monster headZombie = get_property("shrunkenHeadZombieMonster").to_monster();
+    int headZombieHP = get_property_int("shrunkenHeadZombieHP");
+
 	string url = "inventory.php?ftext=shrunken+head";
 	string [int] description;
 	
+    // Generate a task if head is equipped that shares possible good reanimations
 	if (lookupItem("shrunken head").equipped_amount() > 0)
 	{
 		description.listAppend("Consider reanimating one of the following foes:");

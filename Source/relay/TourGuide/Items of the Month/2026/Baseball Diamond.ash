@@ -10,6 +10,8 @@ void IOTMBaseballDiamondGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     //   - recruit monsters for your baseball lineup if <9 
     //   - current lineup hoverover
     //   - maybe a supernag if you have a useful freekill + YR in the last 3 monsters?
+    
+	if (__iotms_usable[lookupItem("Baseball Diamond")]) return;
 }
 
 RegisterResourceGenerationFunction("IOTMBaseballDiamondGenerateResource");
@@ -21,4 +23,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     //       => use shrunken head for YR
     //       => repeated nonfree monsters for freekill
     //       => feesh for ML
+    
+    if (__iotms_usable[lookupItem("Baseball Diamond")]) return;
+
 }

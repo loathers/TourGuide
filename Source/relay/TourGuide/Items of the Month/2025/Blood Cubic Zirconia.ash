@@ -10,7 +10,7 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
     //   - match pheromone styling to other banishes
 
 
-    if ($item[blood cubic zirconia].available_amount() == 0) return;
+	if (__iotms_usable[lookupItem("blood cubic zirconia")]) return;
 	string url = "inventory.php?ftext=blood+cubic+zirconia";
 	string [int] description;
 	int bczRefracts = get_property_int("_bczRefractedGazeCasts");

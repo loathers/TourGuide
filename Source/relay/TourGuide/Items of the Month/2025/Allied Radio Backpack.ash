@@ -2,7 +2,7 @@
 RegisterResourceGenerationFunction("IOTTAlliedRadioBackpackGenerateResource");
 void IOTTAlliedRadioBackpackGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if ($item[allied radio backpack].available_amount() == 0) return;
+	if (__iotms_usable[lookupItem("allied radio backpack")]) return;
 	
     string url = "inventory.php?action=requestdrop&pwd=" + my_hash();
 	int radioDropsLeft = clampi(3 - get_property_int("_alliedRadioDropsUsed"), 0, 3);

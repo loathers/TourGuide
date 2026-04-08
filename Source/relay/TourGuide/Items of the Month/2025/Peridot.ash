@@ -2,7 +2,7 @@
 RegisterTaskGenerationFunction("IOTMPeridotGenerateTasks");
 void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    if ($item[peridot of peril].available_amount() == 0) return;
+	if (__iotms_usable[lookupItem("Peridot of Peril")]) return;
 	string url = "inventory.php?ftext=peridot+of+peril";
 	string [int] description;
 	

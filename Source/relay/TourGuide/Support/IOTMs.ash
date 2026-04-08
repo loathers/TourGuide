@@ -193,22 +193,49 @@ void initialiseIOTMsUsable()
     if (lookupItem("Leprecondo").available_amount() > 0) //Mar 2025
         __iotms_usable[lookupItem("Leprecondo")] = true;
 
-    if (lookupItem("April Shower Thoughts shield").available_amount() > 0) //Apr 2024
+    if (lookupItem("April Shower Thoughts shield").available_amount() > 0) //Apr 2025
         __iotms_usable[lookupItem("April Shower Thoughts shield")] = true;
 
-    if (lookupItem("Peridot of Peril").available_amount() > 0) //May 2024
+    if (lookupItem("Peridot of Peril").available_amount() > 0) //May 2025
         __iotms_usable[lookupItem("Peridot of Peril")] = true;
 
-    if (lookupItem("prismatic beret").available_amount() > 0) //Jun 2024
+    if (lookupItem("prismatic beret").available_amount() > 0) //Jun 2025
         __iotms_usable[lookupItem("prismatic beret")] = true;
     
     // july 2025 -- yeti, familiar, unneeded
 
-    if (lookupItem("M&ouml;bius ring").available_amount() > 0) //Aug 2024
+    if (lookupItem("M&ouml;bius ring").available_amount() > 0) //Aug 2025
         __iotms_usable[lookupItem("M&ouml;bius ring")] = true;
         
-    if (lookupItem("allied radio backpack").available_amount() > 0) //Aug 2024
+    if (lookupItem("allied radio backpack").available_amount() > 0) //Aug 2025
         __iotms_usable[lookupItem("allied radio backpack")] = true;
+    
+    if (lookupItem("monodent of the sea").available_amount() > 0) //Sep 2025
+        __iotms_usable[lookupItem("monodent of the sea")] = true;
+    
+    if (lookupItem("blood cubic zirconia").available_amount() > 0) //Oct 2025
+        __iotms_usable[lookupItem("blood cubic zirconia")] = true;
+    
+    if (get_property_boolean("hasShrunkenHead")) //nov 2025
+        __iotms_usable[lookupItem("shrunken head")] = true;
+    
+    // Dec 2025 -- crimbo skeleton, unneeded
+
+    if (lookupItem("the eternity codpiece").available_amount() > 0) //Jan 2026
+        __iotms_usable[lookupItem("the eternity codpiece")] = true;
+
+    if (lookupItem("legendary seal-clubbing club").available_amount() > 0) //Jan 2026
+        __iotms_usable[lookupItem("legendary seal-clubbing club")] = true;
+        
+    if (lookupItem("Heartstone").available_amount() > 0) //Feb 2026
+        __iotms_usable[lookupItem("Heartstone")] = true;
+        
+    if (lookupItem("archaeologist's spade").available_amount() > 0) //Mar 2026
+        __iotms_usable[lookupItem("archaeologist's spade")] = true;
+        
+    if (lookupItem("Baseball Diamond").available_amount() > 0) //Apr 2026
+        __iotms_usable[lookupItem("Baseball Diamond")] = true;
+    
         
     //Can't use many things in G-Lover
     if (my_path().id == PATH_G_LOVER) //Path 33
