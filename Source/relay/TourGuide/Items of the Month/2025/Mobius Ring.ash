@@ -107,7 +107,7 @@ void IOTMMobiusRingGenerateResource(ChecklistEntry [int] resource_entries)
     if (turnsUntilNextNC > 0) description.listAppend("You have "+pluralise(turnsUntilNextNC, " turn", " turns")+" turns to NC #" +(countMobiusNCs+1)+ ".");
         description.listAppend("|*You have at least "+pluralise(turnsUntilNextNextNC, " turn", " turns")+" until NC #"+(countMobiusNCs+2)+".");
 	description.listAppend("" + countTimeCops +"/11 free time cops today. (currently @ "+currentTimeCopRate+"% rate)");
-	    if(countTimeCops > 11) description.listAppend(HTMLGenerateSpanFont("No free time cops remain; be careful wearing your ring!", "red"));
+	    if(countTimeCops >= 11) description.listAppend(HTMLGenerateSpanFont("No free time cops remain; be careful wearing your ring!", "red"));
     if(my_paradoxicity() < 13) description.listAppend("Boost to 13 Paradoxicity for +100% item & +50% booze drop!");
 	resource_entries.listAppend(ChecklistEntryMake("__item M&ouml;bius ring", url, ChecklistSubentryMake(title, "", description), 0));
 }
