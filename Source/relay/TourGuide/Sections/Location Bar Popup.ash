@@ -997,7 +997,14 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 style = "font-size:1.2em;";
             style += "text-align:left;padding-top:2px;";
             
-            fl_entries.listAppend(m.capitaliseFirstLetter());
+            string mHeart = heartstone_middle_letter(m);
+            string mHeartText = mHeart.length() ? "("+mHeart+")" : "";
+
+            // This is where monstername is printed. Ergo...
+            if (if (__iotms_usable[lookupItem("Heartstone")])) 
+                fl_entries.listAppend(m.capitaliseFirstLetter()+mHeartText);
+            else
+                fl_entries.listAppend(m.capitaliseFirstLetter());
             fl_entry_classes[fl_entries.count() - 1] = "r_bold r_location_bar_ellipsis_entry";
             fl_entry_styles[fl_entries.count() - 1] = style;
             fl_entry_width_weight[fl_entries.count() - 1] = width_weight;

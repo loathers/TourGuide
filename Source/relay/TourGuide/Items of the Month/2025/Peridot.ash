@@ -2,6 +2,9 @@
 RegisterTaskGenerationFunction("IOTMPeridotGenerateTasks");
 void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+	// TODO: tile additions 
+	//   - add a resource tile outlining useful monsters currently accessible w/ peridot
+
 	if (__iotms_usable[lookupItem("Peridot of Peril")]) return;
 	string url = "inventory.php?ftext=peridot+of+peril";
 	string [int] description;

@@ -2,6 +2,10 @@
 RegisterResourceGenerationFunction("IOTMPrismaticBeretGenerateResource");
 void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 {
+	// TODO: tile additions 
+	//   - add beret busk you will get here
+	//   - maybe add easily accessible hats/pants too
+
 	if (__iotms_usable[lookupItem("prismatic beret")]) return;
 	
     string url = "inventory.php?ftext=prismatic+beret";
