@@ -41953,7 +41953,14 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 style = "font-size:1.2em;";
             style += "text-align:left;padding-top:2px;";
             
-            fl_entries.listAppend(m.capitaliseFirstLetter());
+            string mHeart = heartstone_middle_letter(m);
+            string mHeartText = mHeart.length() ? "("+mHeart+")" : "";
+
+            // This is where monstername is printed. Ergo...
+            if (__iotms_usable[lookupItem("Heartstone")])
+                fl_entries.listAppend(m.capitaliseFirstLetter()+mHeartText);
+            else
+                fl_entries.listAppend(m.capitaliseFirstLetter());
             fl_entry_classes[fl_entries.count() - 1] = "r_bold r_location_bar_ellipsis_entry";
             fl_entry_styles[fl_entries.count() - 1] = style;
             fl_entry_width_weight[fl_entries.count() - 1] = width_weight;
@@ -41986,7 +41993,17 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 fl_entry_styles[fl_entries.count() - 1] = "text-align:left;font-size:0.8em";
             }
         }
-        
+
+        // ----------- NEW BIT FROM SCOTCH ABOUT SHRUNKEN HEAD -------------
+        if (true)
+        {
+            if (__iotms_usable[lookupItem("Shrunken Head")]) {
+                string headEffects = shrunken_Head_Zombie(m).listJoinComponents(", ");
+                fl_entries.listAppend(headEffects);
+                fl_entry_styles[fl_entries.count() - 1] = "text-align:left;font-size:0.8em";
+            }
+        }
+
         //FIXME handle canceling NC
         buffer rate_buffer;
         if (m.attributes.contains_text("ULTRARARE"))
@@ -47693,7 +47710,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         int punches_left = clampi(3 - get_property_int("_shatteringPunchUsed"), 0, 3);
         if (punches_left > 0)
         {
-            string [int] description;
+             description;
             description.listAppend("Win a fight without taking a turn.");
             
             
@@ -47808,12 +47825,12 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         }
         
         //Output in order of upcoming appearance:
-        string [int] winnings_order;
+         winnings_order;
         foreach winning in winnings
             winnings_order.listAppend(winning);
         sort winnings_order by winnings[value];
         
-        string [int] various_winnings_upcoming;
+         various_winnings_upcoming;
         foreach key, winning in winnings_order
         {
             int timing = winnings[winning];
@@ -47832,7 +47849,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         if (setting != "TOURNAMENT" && (!__misc_state["in run"] || wins >= 50))
         {
             //Skill scrolls:
-            string [int] switchables;
+             switchables;
             if (get_property_int("snojoMuscleWins") < 50 && setting != "MUSCLE")
                 switchables.listAppend("muscle");
             if (get_property_int("snojoMoxieWins") < 50 && setting != "MOXIE")
@@ -57760,6 +57777,9 @@ void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entri
 RegisterTaskGenerationFunction("IOTMPeridotGenerateTasks");
 void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
+	// TODO: tile additions 
+	//   - add a resource tile outlining useful monsters currently accessible w/ peridot
+
 	if (__iotms_usable[lookupItem("Peridot of Peril")]) return;
 	string url = "inventory.php?ftext=peridot+of+peril";
 	string [int] description;
@@ -57780,6 +57800,10 @@ void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 RegisterResourceGenerationFunction("IOTMPrismaticBeretGenerateResource");
 void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 {
+	// TODO: tile additions 
+	//   - add beret busk you will get here
+	//   - maybe add easily accessible hats/pants too
+
 	if (__iotms_usable[lookupItem("prismatic beret")]) return;
 	
     string url = "inventory.php?ftext=prismatic+beret";
