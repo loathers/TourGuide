@@ -7,7 +7,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         int punches_left = clampi(3 - get_property_int("_shatteringPunchUsed"), 0, 3);
         if (punches_left > 0)
         {
-             description;
+            string [int] description;
             description.listAppend("Win a fight without taking a turn.");
             
             
@@ -122,12 +122,12 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         }
         
         //Output in order of upcoming appearance:
-         winnings_order;
+        string [int] winnings_order;
         foreach winning in winnings
             winnings_order.listAppend(winning);
         sort winnings_order by winnings[value];
         
-         various_winnings_upcoming;
+        string [int] various_winnings_upcoming;
         foreach key, winning in winnings_order
         {
             int timing = winnings[winning];
@@ -146,7 +146,7 @@ void IOTMSnojoGenerateResource(ChecklistEntry [int] resource_entries)
         if (setting != "TOURNAMENT" && (!__misc_state["in run"] || wins >= 50))
         {
             //Skill scrolls:
-             switchables;
+            string [int] switchables;
             if (get_property_int("snojoMuscleWins") < 50 && setting != "MUSCLE")
                 switchables.listAppend("muscle");
             if (get_property_int("snojoMoxieWins") < 50 && setting != "MOXIE")
