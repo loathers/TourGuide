@@ -8,7 +8,7 @@ void IOTMSkeletonOfCrimboPastGenerateTasks(ChecklistEntry [int] task_entries, Ch
 	
 	int fightKnucklebones = get_property_int("_knuckleboneDrops");
 	int restKnucklebones = get_property_int("_knuckleboneRests");
-	int totalKnucklebonesLeft = clampi(100 - (fightKnucklebones + restKnucklebones), 0, 100);
+	int totalKnucklebonesLeft = clampi(100 - (fightKnucklebones), 0, 100);
 	description.listAppend(5 - restKnucklebones + " rest knucklebones available.");
 	
 	if (totalKnucklebonesLeft == 0 && my_familiar() == lookupFamiliar("skeleton of crimbo past")) {
@@ -29,7 +29,7 @@ void IOTMSkeletonOfCrimboPastGenerateResource(ChecklistEntry [int] resource_entr
 	
 	int fightKnucklebones = get_property_int("_knuckleboneDrops");
 	int restKnucklebones = get_property_int("_knuckleboneRests");
-	int totalKnucklebonesLeft = clampi(100 - (fightKnucklebones + restKnucklebones), 0, 100);
+	int totalKnucklebonesLeft = clampi(100 - (fightKnucklebones), 0, 100);
 	
 	description.listAppend(5 - restKnucklebones + " rest knucklebones available.");
 	
@@ -38,6 +38,13 @@ void IOTMSkeletonOfCrimboPastGenerateResource(ChecklistEntry [int] resource_entr
 	}
 	else if (totalKnucklebonesLeft > 0) {
 		title = (HTMLGenerateSpanFont(totalKnucklebonesLeft + " knucklebone drops left", "green"));
+		description.listAppend("90% - skeleton");
+		description.listAppend("70% - orc / pirate");
+		description.listAppend("50% - dude / elf / hobo");
+		description.listAppend("30% - beast / demon / goblin / humanoid / undead");
+		description.listAppend("20% - fish / penguin / weird");
+		description.listAppend("10% - construct / bug");
+		description.listAppend("0% - constellation / elemental / hippy / horror / mer-kin / plant / slime");
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__familiar skeleton of crimbo past", url, ChecklistSubentryMake(title, description), 11));
 }

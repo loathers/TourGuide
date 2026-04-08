@@ -26,6 +26,14 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 		else if (bczRefracts >= 13) {
 			description.listAppend(HTMLGenerateSpanFont("Next Refract costs " + refractCost + " mys. EXPENSIVE!", "red") + "");
 		}
+			if (lookupItem("monodent of the sea").equipped_amount() == 0)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Seadent not equipped", "red"));		
+			}
+			else if (lookupItem("monodent of the sea").equipped_amount() > 0)
+			{
+				description.listAppend(HTMLGenerateSpanFont("Seadent FLEESH ok!", "blue"));		
+			}
 		if (bczBullets < 13) {
 			description.listAppend("Next Bullet costs " + HTMLGenerateSpanFont(bulletCost + "", "red") + " mox");
 		}
@@ -85,4 +93,14 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 	description.listAppend("Next Pheromone costs " + HTMLGenerateSpanFont(pheromoneCost + "", "brown") + " mox");
 		
 	resource_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(HTMLGenerateSpanFont("BCZ: Blood Cubic Zirconia skills", "brown"), description), 11).ChecklistEntrySetIDTag("bcz important skills"));
+	
+	
+	
+	int pheromoneBlasts = get_property_int("markYourTerritoryCharges");
+	if (pheromoneBlasts > 0)
+    {
+        string [int] description2;
+		description2.listAppend("Instakill no items/meat");
+		resource_entries.listAppend(ChecklistEntryMake("__skill mark your territory", "", ChecklistSubentryMake(pluralise(pheromoneBlasts, "BCZ pheromone", "BCZ pheromones"), "", description2), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("BCZ pheromone banish"));
+    }
 }
