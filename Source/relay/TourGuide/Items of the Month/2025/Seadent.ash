@@ -6,7 +6,7 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
     //   - remove indigo/blue, no need for color on this
 
 
-	if (__iotms_usable[lookupItem("monodent of the sea")]) return;
+	if (!__iotms_usable[lookupItem("monodent of the sea")]) return;
 	
     string url = "inventory.php?ftext=dent+of+the+sea";
 	int monodentLightningsLeft = clampi(11 - get_property_int("_seadentLightningUsed"), 0, 11);

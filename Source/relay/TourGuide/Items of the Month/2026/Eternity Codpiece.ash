@@ -15,6 +15,6 @@ void IOTMEternityCodpieceGenerateResource(ChecklistEntry [int] resource_entries)
     item cod4 = equipped_item($slot[codpiece4]);
     item cod5 = equipped_item($slot[codpiece5]);
 
-    if (__iotms_usable[lookupItem("The Eternity Codpiece")]) return;
+    if (!__iotms_usable[lookupItem("The Eternity Codpiece")]) return;
 
 }

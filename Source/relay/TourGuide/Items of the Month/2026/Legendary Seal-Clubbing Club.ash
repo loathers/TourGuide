@@ -7,7 +7,7 @@ RegisterTaskGenerationFunction("IOTMLegendaryClubGenerateTasks");
 
 void IOTMLegendaryClubGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (__iotms_usable[lookupItem("legendary seal-clubbing club")]) return;
+	if (!__iotms_usable[lookupItem("legendary seal-clubbing club")]) return;
 	string url = "inventory.php?ftext=legendary+seal-clubbing+club";
 	string [int] description;
 	string title;

@@ -11,7 +11,7 @@ void IOTMBaseballDiamondGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     //   - current lineup hoverover
     //   - maybe a supernag if you have a useful freekill + YR in the last 3 monsters?
     
-	if (__iotms_usable[lookupItem("Baseball Diamond")]) return;
+	if (!__iotms_usable[lookupItem("Baseball Diamond")]) return;
 }
 
 RegisterResourceGenerationFunction("IOTMBaseballDiamondGenerateResource");
@@ -24,6 +24,6 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     //       => repeated nonfree monsters for freekill
     //       => feesh for ML
     
-    if (__iotms_usable[lookupItem("Baseball Diamond")]) return;
+    if (!__iotms_usable[lookupItem("Baseball Diamond")]) return;
 
 }

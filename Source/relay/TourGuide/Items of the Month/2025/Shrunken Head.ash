@@ -8,7 +8,7 @@ void IOTMShrunkenHeadGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
     //   - convert current targets to hoverover recommendations w/ filtering
     //   - add shrunken head combo to location bar
     
-	if (__iotms_usable[lookupItem("Shrunken Head")]) return;
+	if (!__iotms_usable[lookupItem("Shrunken Head")]) return;
 
     monster headZombie = get_property("shrunkenHeadZombieMonster").to_monster();
     int headZombieHP = get_property_int("shrunkenHeadZombieHP");
