@@ -179,4 +179,5 @@ import "relay/TourGuide/Items of the Month/2025/Skeleton of Crimbo Past.ash";
 import "relay/TourGuide/Items of the Month/2026/Eternity Codpiece.ash";
 import "relay/TourGuide/Items of the Month/2026/Legendary Seal-Clubbing Club.ash";
 import "relay/TourGuide/Items of the Month/2026/Heartstone.ash";
+import "relay/TourGuide/Items of the Month/2026/Archaeologist's Spade.ash";
 import "relay/TourGuide/Items of the Month/2026/Baseball Diamond.ash";

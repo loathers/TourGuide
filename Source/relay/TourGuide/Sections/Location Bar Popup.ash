@@ -405,6 +405,76 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
         items_presenting.listAppend(info);
     }
 
+    // ----------- NEW BIT FROM SCOTCH ABOUT BOFA -------------
+    if ($skill[just the facts].have_skill())
+    {
+        // Adding BOFA items/effects to the item table this time
+        LBPItemInformation info;
+
+        info.image_url = "images/itemimages/" + $item[book of facts].smallimage;
+        
+        string bofaText;
+        string bofaType = m.fact_type().to_lower_case();
+        string fact;
+        boolean displayBOFA = true;
+
+        // Setting return conditions for things that we don't need to add to the table
+        if (bofaType == "none") displayBOFA = false;
+        if (bofaType == "stats") displayBOFA = false;
+        if (bofaType == "hp") displayBOFA = false;
+        if (bofaType == "mp") displayBOFA = false;
+        if (bofaType == "meat") displayBOFA = false;
+        if (bofaType == "modifier") displayBOFA = false;
+
+        // TODO: filter out junk results
+        if (bofaType == "item") {
+            info.item_name = HTMLGenerateSpanFont(m.item_fact().name,"r_element_spooky_desaturated");
+            info.image_url = "images/itemimages/" + m.item_fact().smallimage;
+        }
+        if (bofaType == "effect") info.item_name = HTMLGenerateSpanFont(`{m.effect_fact().name} ({m.numeric_fact()})`,"r_element_spooky_desaturated");
+        
+        info.tags.listAppend("Book of Facts ("+bofaType+")");
+        
+        // If the user has already gotten their pocket wishes or scraps, don't append it.
+        if (bofaType == "item" && m.item_fact().name == "pocket wish" && get_property_int("_bookOfFactsWishes") > 2) displayBOFA = false;
+        if (bofaType == "item" && m.item_fact().name == "tattered scrap of paper" && get_property_int("_bookOfFactsWishes") > 10) displayBOFA = false;
+
+        if (displayBOFA) items_presenting.listAppend(info);
+        
+    }
+
+    // ----------- NEW BIT FROM SCOTCH ABOUT SHRUNKEN HEAD -------------
+    if (lookupItem("shrunken head").equipped_amount() > 0 && get_property_int("shrunkenHeadZombieHP") == 0)
+    {
+        // Adding a table element for shrunken head effects
+        LBPItemInformation info;
+
+        string headEffects = shrunken_Head_Zombie(m).listJoinComponents(", ");
+        string [string] abilityCompression = {
+            "Item Drop Bonus":"item%",
+            "Meat Drop Bonus":"meat%",
+            "Physical Attack":"atk",
+            "Hot Attack": HTMLGenerateSpanFont("atk","r_element_hot_desaturated"),
+            "Cold Attack": HTMLGenerateSpanFont("atk","r_element_cold_desaturated"),
+            "Sleaze Attack": HTMLGenerateSpanFont("atk","r_element_sleaze_desaturated"),
+            "Stench Attack": HTMLGenerateSpanFont("atk","r_element_stench_desaturated"),
+            "Spooky Attack": HTMLGenerateSpanFont("atk","r_element_spooky_desaturated"),
+            "MP Regen": "mp",
+            "HP Regen": "hp",
+        };
+
+        foreach key,value in abilityCompression
+        {
+              headEffects = headEffects.replace_string(key, value);
+        }
+        info.image_url = "images/itemimages/" + $item[shrunken head].smallimage;
+        info.item_name = "Zombie Powers";
+        
+        info.tags.listAppend(headEffects);
+        items_presenting.listAppend(info);
+
+    }
+
     
     int columns = 3;
     if (items_presenting.count() % 2 == 0 && items_presenting.count() % 3 != 0 && items_presenting.count() < 8)
@@ -997,55 +1067,10 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 style = "font-size:1.2em;";
             style += "text-align:left;padding-top:2px;";
             
-            string mHeart = heartstone_middle_letter(m);
-            string mHeartText = mHeart.length() ? "("+mHeart+")" : "";
-
-            // This is where monstername is printed. Ergo...
-            if (__iotms_usable[lookupItem("Heartstone")])
-                fl_entries.listAppend(m.capitaliseFirstLetter()+mHeartText);
-            else
-                fl_entries.listAppend(m.capitaliseFirstLetter());
+            fl_entries.listAppend(m.capitaliseFirstLetter());
             fl_entry_classes[fl_entries.count() - 1] = "r_bold r_location_bar_ellipsis_entry";
             fl_entry_styles[fl_entries.count() - 1] = style;
             fl_entry_width_weight[fl_entries.count() - 1] = width_weight;
-        }
-        
-        // ----------- NEW BIT FROM SCOTCH ABOUT BOFA -------------
-        if (true)
-        {
-            if ($skill[just the facts].have_skill()) {
-                string bofaText;
-                string bofaEffect = m.fact_type();
-                string factAppend;
-
-                // TODO: Bunch of stuff, this is a first implementation. Goals:
-                //   - Try to figure out a nicer way to format this.
-                //   - Filter out the "junk" BOFA results.
-                if (bofaEffect == "item") factAppend = HTMLGenerateSpanFont(m.item_fact().name,"red");
-                if (bofaEffect == "effect") factAppend = HTMLGenerateSpanFont(`{m.effect_fact().name} ({m.numeric_fact()})`,"blue");
-                bofaText = `{factAppend}`;
-
-                // I tried to put this a few places. First I tried in the stats
-                //   sidebar, then I tried under the name, then I tried as an
-                //   appended item. I ended up preferring having it generate in 
-                //   visibly in large zones with cutoff entries. I am pretty sure
-                //   the "best" solution is a more elegant way to add it to the
-                //   item list, but this initial implementation is good enough for
-                //   now, I think. 
-
-                fl_entries.listAppend(bofaText);
-                fl_entry_styles[fl_entries.count() - 1] = "text-align:left;font-size:0.8em";
-            }
-        }
-
-        // ----------- NEW BIT FROM SCOTCH ABOUT SHRUNKEN HEAD -------------
-        if (true)
-        {
-            if (__iotms_usable[lookupItem("Shrunken Head")]) {
-                string headEffects = shrunken_Head_Zombie(m).listJoinComponents(", ");
-                fl_entries.listAppend(headEffects);
-                fl_entry_styles[fl_entries.count() - 1] = "text-align:left;font-size:0.8em";
-            }
         }
 
         //FIXME handle canceling NC
@@ -1137,9 +1162,6 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         
         
         
-        
-        
-        
         int item_count_displaying = m.item_drops_array().count();
         if (item_count_displaying > 0 && try_for_minimal_display && !monster_cannot_be_encountered)
         {
@@ -1149,6 +1171,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
         
         if (!monster_cannot_be_encountered)
         {
+
             string [int] stats_l1;
             string [int] stats_l2;
             //if (m.base_hp > 0)
@@ -1181,10 +1204,17 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                         stats_l1.listAppend(average_meat.round() + " meat");
                 }
             }
+            
+            // Add heart to the phyla row
+            if (__iotms_usable[lookupItem("Heartstone")])    
+                stats_l1.listAppend("♡ = "+heartstone_middle_letter(m));
+            
             if (m.base_attack > 0)
                 stats_l2.listAppend(m.base_attack + " ML");
+            
             if (spelunking)
                 stats_l2.listAppend(m.base_hp + " HP");
+
             if ($skill[Extract Oil].have_skill())
             {
                 string oil_type = lookupAWOLOilForMonster(m);
