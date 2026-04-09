@@ -41371,7 +41371,6 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
         
         string bofaText;
         string bofaType = m.fact_type().to_lower_case();
-        string fact;
         boolean displayBOFA = true;
 
         // Setting return conditions for things that we don't need to add to the table
@@ -41384,10 +41383,10 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
 
         // TODO: filter out junk results
         if (bofaType == "item") {
-            info.item_name = HTMLGenerateSpanFont(m.item_fact().name,"r_element_spooky_desaturated");
+            info.item_name = m.item_fact().name;
             info.image_url = "images/itemimages/" + m.item_fact().smallimage;
         }
-        if (bofaType == "effect") info.item_name = HTMLGenerateSpanFont(`{m.effect_fact().name} ({m.numeric_fact()})`,"r_element_spooky_desaturated");
+        if (bofaType == "effect") info.item_name = `{m.effect_fact().name} ({m.numeric_fact()})`;
         
         info.tags.listAppend("Book of Facts ("+bofaType+")");
         
@@ -41425,7 +41424,7 @@ buffer generateItemInformationMethod2(location l, monster m, boolean try_for_min
         }
         info.image_url = "images/itemimages/" + $item[shrunken head].smallimage;
         info.item_name = "Zombie Powers";
-        
+
         info.tags.listAppend(headEffects);
         items_presenting.listAppend(info);
 
@@ -42162,7 +42161,7 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
             }
             
             // Add heart to the phyla row
-            if (__iotms_usable[lookupItem("Heartstone")])    
+            if (__iotms_usable[lookupItem("Heartstone")] && heartstone_middle_letter(m) != "")
                 stats_l1.listAppend("♡ = "+heartstone_middle_letter(m));
             
             if (m.base_attack > 0)
