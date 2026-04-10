@@ -578,7 +578,18 @@ buffer generateLocationBar(boolean displaying_navbar)
         //style.append("white-space:nowrap;");
         //style.append("text-overflow:clip;");
 
-        string l_name = l.to_string();
+        // If user has peridot and peridot has not been used yet, add a diamond
+	    string pp = "❖ ";
+        boolean peridotUsed = false;
+
+        foreach key,place in get_property("_perilLocations").split_string(",") {
+		    if (l.to_int() == place.to_int()) peridotUsed = true;
+	    }
+        
+        // Do not display if user does not have peridot
+        if (!__iotms_usable[lookupItem("Peridot of Peril")]) peridotUsed = true;
+
+        string l_name = peridotUsed ? l.to_string() : pp+l.to_string();
         
         if (__setting_location_bar_fixed_layout)
             l_name = HTMLGenerateDivOfClass(l_name, "r_location_bar_ellipsis_entry");
