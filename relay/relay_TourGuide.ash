@@ -42160,9 +42160,9 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 }
             }
             
-            // Add heart to the phyla row
+            // Add heart to the phyla row; coloring pink for TES
             if (__iotms_usable[lookupItem("Heartstone")] && heartstone_middle_letter(m) != "")
-                stats_l1.listAppend("♡ = "+heartstone_middle_letter(m));
+                stats_l1.listAppend(HTMLGenerateSpanOfClass("♡ = "+heartstone_middle_letter(m), "#ce538c"));
             
             if (m.base_attack > 0)
                 stats_l2.listAppend(m.base_attack + " ML");
@@ -42995,7 +42995,18 @@ buffer generateLocationBar(boolean displaying_navbar)
         //style.append("white-space:nowrap;");
         //style.append("text-overflow:clip;");
 
-        string l_name = l.to_string();
+        // If user has peridot and peridot has not been used yet, add a diamond
+	    string pp = "❖ ";
+        boolean peridotUsed = false;
+
+        foreach key,place in get_property("_perilLocations").split_string(",") {
+		    if (l.to_int() == place.to_int()) peridotUsed = true;
+	    }
+        
+        // Do not display if user does not have peridot
+        if (!__iotms_usable[lookupItem("Peridot of Peril")]) peridotUsed = true;
+
+        string l_name = peridotUsed ? l.to_string() : pp+l.to_string();
         
         if (__setting_location_bar_fixed_layout)
             l_name = HTMLGenerateDivOfClass(l_name, "r_location_bar_ellipsis_entry");
@@ -57808,6 +57819,7 @@ void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 {
 	// TODO: tile additions 
 	//   - add a resource tile outlining useful monsters currently accessible w/ peridot
+	//   - not a tile addition, but add a peridot icon to location bar if you can use peridot in the zone
 
 	if (!__iotms_usable[lookupItem("Peridot of Peril")]) return;
 	string url = "inventory.php?ftext=peridot+of+peril";
@@ -57824,6 +57836,106 @@ void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 		description.listAppend(HTMLGenerateSpanFont("Equip the peridot to map monsters", "red"));
 		optional_task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake("Peridot picking power", description), 10).ChecklistEntrySetIDTag("peridot task"));
 	}
+}
+
+Record PeriFight 
+{
+    location zone;
+    monster target;
+    boolean useful;
+    boolean canAdv;
+	boolean periUsed;
+};
+
+PeriFight makePeriFight(string z, string mon, boolean useful) {
+	PeriFight final;
+
+	final.zone = lookupLocation(z);
+	final.target = lookupMonster(mon);
+	final.useful = useful;
+	final.canAdv = can_adventure(final.zone);
+	final.periUsed = false;
+
+	foreach key,place in get_property("_perilLocations").split_string(",") {
+		if (place.to_int() == final.zone.to_int()) final.periUsed = true;
+	}
+
+	return final;
+}
+
+void listAppend(PeriFight [int] list, PeriFight entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+string stringPeriFight (PeriFight entry) {
+	return entry.target.to_string()+" "+HTMLGenerateSpanFont("("+entry.zone.to_string()+")", "0.5em");
+}
+
+RegisterResourceGenerationFunction("IOTMPeridotGenerateResource");
+void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
+	if (!__iotms_usable[lookupItem("Peridot of Peril")]) return;
+    
+	boolean peridotEquipped = lookupItem("peridot of peril").equipped_amount() > 0;
+	string [int] perilLocations = get_property("_perilLocations").split_string(",");
+
+	string title = "Use your Peridot of Peril";
+	string subtitle = "once a day in every zone";
+    string url = peridotEquipped ? "main.php" : "inventory.php?ftext=peridot+of+peril";
+    string [int] description;
+    PeriFight [int] periFolks;
+	string [int] peridotPicks;
+	string pp = HTMLGenerateSpanFont("❖ ","green");
+
+	// Populate periFolks, level by level...
+	// Level 5 (none for 2, 3, 4...)
+	periFolks.listAppend(makePeriFight("Cobb's Knob Harem","Knob Goblin Harem Girl",!have_outfit_components("Knob Goblin Harem Girl Disguise")));
+	// Level 7 (none for 6...)
+	periFolks.listAppend(makePeriFight("The Defiled Niche","dirty old lihc",!__quest_state["Cyrpt"].state_boolean["niche finished"]));
+	periFolks.listAppend(makePeriFight("The Defiled Nook","toothy sklelton",!__quest_state["Cyrpt"].state_boolean["nook finished"]));
+	// Level 9 (none for 8...)
+	periFolks.listAppend(makePeriFight("Twin Peak","bearpig topiary animal",get_property_int("twinPeakProgress") < 14));
+	// Level 10
+	periFolks.listAppend(makePeriFight("The Beanbat Chamber","beanbat",!__quest_state["Level 10"].state_boolean["beanstalk grown"] && $item[enchanted bean].available_amount() == 0));
+	periFolks.listAppend(makePeriFight("The Penultimate Fantasy Airship","quiet healer",__quest_state["Castle"].mafia_internal_step < 7));
+	// Level 11 (unlocks)
+	periFolks.listAppend(makePeriFight("The Hidden Temple","baa-relief sheep",!get_property_ascension("lastTempleUnlock")));
+	// Level 11 (spookyraven)
+	periFolks.listAppend(makePeriFight("The Haunted Library","writing desk",!get_property_ascension("lastSecondFloorUnlock")));
+	periFolks.listAppend(makePeriFight("The Haunted Bedroom","animated ornate nightstand",$location[the haunted ballroom].turnsAttemptedInLocation() == 0 && $item[Lady Spookyraven's finest gown].available_amount() == 0));
+	periFolks.listAppend(makePeriFight("The Haunted Wine Cellar","possessed wine rack",__quest_state["Level 11 Manor"].mafia_internal_step < 4 && $items[wine bomb, unstable fulminate, bottle of Chateau de Vinegar].available_amount() == 0));
+	periFolks.listAppend(makePeriFight("The Haunted Laundry Room","cabinet of Dr. Limpieza",__quest_state["Level 11 Manor"].mafia_internal_step < 4 && $items[wine bomb, unstable fulminate, blasting soda].available_amount() == 0));
+	periFolks.listAppend(makePeriFight("The Haunted Boiler Room","monstrous boiler",__quest_state["Level 11 Manor"].mafia_internal_step < 4 && $item[wine bomb].available_amount() != 0));
+	// Level 11 (hidden city)
+	periFolks.listAppend(makePeriFight("The Hidden Bowling Alley","pygmy bowler",get_property_int("hiddenBowlingAlleyProgress") < 6));
+	periFolks.listAppend(makePeriFight("The Hidden Hospital","pygmy witch surgeon",get_property_int("hiddenHospitalProgress") < 6));
+	periFolks.listAppend(makePeriFight("The Hidden Office Building","pygmy witch accountant",get_property_int("hiddenOfficeProgress") < 6));
+	// Level 11 (zeppelin)
+    // todo: red butler
+	// Level 11 (palindome)
+	periFolks.listAppend(makePeriFight("Inside the Palindome","racecar bob",!__quest_state["Level 11 Palindome"].finished));
+	// Level 12 
+    // todo: gremlins
+
+	foreach key,entry in periFolks {
+		if (entry.useful && entry.canadv) {
+			string color = entry.periUsed ? "gray" : "black";
+			peridotPicks.listAppend(HTMLGenerateSpanFont(stringPeriFight(entry),color, "0.9em"));
+		}
+	}
+
+	// If no Peridot Picks, no resource tile
+	if (peridotPicks.count() == 0) return;
+
+	description.listAppend("Select relevant, available monsters!");
+	if (!peridotEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Peridot of Peril","red"));
+	description.listAppend("<hr>|*"+pp+peridotPicks.listJoinComponents("<hr>|*"+pp));
+
+	resource_entries.listAppend(ChecklistEntryMake("__item Peridot of Peril", url, ChecklistSubentryMake(title, subtitle, description), 14).ChecklistEntrySetIDTag("peridot picking helper"));
+
 }
 //prismatic beret
 RegisterResourceGenerationFunction("IOTMPrismaticBeretGenerateResource");
@@ -58446,19 +58558,108 @@ void IOTMLegendaryClubGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	resource_entries.listAppend(ChecklistEntryMake("__item legendary seal-clubbing club", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Legendary seal-clubbing club skills", "orange"), description), 1).ChecklistEntrySetIDTag("LSSC skills"));
 }
-// heartstone
-// TODO: make the tile. also:
-//   - add some letter callout to location bar
+// heartstone 
 
 RegisterTaskGenerationFunction("IOTMHeartstoneGenerateTasks");
 void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) 
 {
-	// the heart must go on
+	// This is a TAPE-helper optional task tile.
 	if (!__iotms_usable[lookupItem("Heartstone")]) return;
 
-    // tasks should include
-    //   - recommended monster for next letter you should try to get (if T, A; if A, P; etc)
-    //   - jesus this is going to suck ass i hate this lol
+    // What are the heartstone's letters?
+    string heartLetters = get_property("heartstoneLetters");
+    if (heartLetters.length() > 3) heartLetters = "";
+    string hackerToday = "";
+
+    // Is the heartstone equipped?
+    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
+
+    // Generate boolean flags for accessibility of each monster
+    // --- T MONSTERS ----------------
+    boolean nightstandsDone = $item[Lady Spookyraven's finest gown].available_amount() > 0 || get_property("questM21Dance") == "finished";
+    string eightBitColor = get_property("8BitColor"); // and A/E
+    boolean fratGearDone = have_outfit_components("Frat Warrior Fatigues");
+    int shenDay = get_property_int("shenInitiationDay");
+    boolean hospitalDone = get_property("questL11Doctor") == "finished";
+    if ($item[server room key].available_amount() > 0 && get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) hackerToday = get_property("_cyberZone1Hacker");
+    // --- A MONSTERS ----------------
+    boolean forestDone = get_property_ascension("lastTempleUnlock") && get_property("questL02Larva") == "finished";
+    boolean oilPeakDone = get_property_boolean("oilPeakLit");
+    boolean tombRatsDone = "step3,finished".contains_text(get_property("questL11Pyramid"));
+    boolean oresDone = __quest_state["Level 8"].state_boolean["Past mine"];
+    // --- P MONSTERS ----------------
+    boolean warDone = __quest_state["Level 12"].finished;
+    // --- E MONSTERS ----------------
+    boolean castleDone = __quest_state["Castle"].mafia_internal_step > 8;
+    boolean zeppelinDone = __quest_state["Level 11 Ron"].mafia_internal_step > 4;
+    boolean copperheadDone = get_property("questL11Shen") == "finished";
+    boolean haveMobiusRing = $item[M&ouml;bius ring].available_amount() > 0;
+    // --- MISCELLANEOUS -------------
+    boolean chestMimicAccessible = lookupFamiliar("Chest Mimic").familiar_is_usable();
+
+    // Only generate tile if TAPE is achievable in this cycle
+    string nextLetter;
+    string title;
+    string subtitle;
+    string url;
+    string [int] description;
+    string [int] monsterList;
+
+    if (heartLetters == "") { 
+        nextLetter = "T"; 
+        title = "Heartstone: Spell TAPE";
+        subtitle = "give me a T!";
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("elegant animated nightstand", !nightstandsDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("tektite", eightBitColor == "green"));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("War Frat 151st Infantryman", !fratGearDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("The Frattlesnake", shenDay == 2));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("Pygmy Witch Nurse", !hospitalDone));
+        if (hackerToday.contains_text("blue")) monsterList.listAppend("Bluehat Hacker (zone 1!)");
+        if (hackerToday.contains_text("grey")) monsterList.listAppend("Greyhat Hacker (zone 1!)");
+    } else if (heartLetters == "T") { 
+        nextLetter = "A"; 
+        title = "Heartstone: Spell "+HTMLGenerateSpanFont("T","r_element_stench")+"APE";
+        subtitle = "give me an A!";
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("bar", !forestDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("fleaman", eightBitColor == "black"));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("oil cartel", !oilPeakDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("tomb rat king", !tombRatsDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("mountain man", !oresDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("Black Crayon Fish", chestMimicAccessible));
+        
+    } else if (heartLetters == "TA") { 
+        nextLetter = "P"; 
+        title = "Heartstone: Spell "+HTMLGenerateSpanFont("TA","r_element_stench")+"PE";
+        subtitle = "give me a P!";
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("War Hippy Baker", !warDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("War Hippy Naturopathic Homeopath", !warDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("Black Crayon Spiraling Shape", chestMimicAccessible));
+    } else if (heartLetters == "TAP") { 
+        nextLetter = "E"; 
+        title = "Heartstone: Spell "+HTMLGenerateSpanFont("TAP","r_element_stench")+"E";
+        subtitle = "give me an E!";
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("met", eightBitColor == "blue"));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("Foodie Giant", !castleDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("red skeleton", !zeppelinDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("tomb servant", !tombRatsDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("Keese", eightBitColor == "green"));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("ninja dressed as a waiter", !copperheadDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("Mobile Armored Sweat Lodge", !warDone));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("time cop", haveMobiusRing));
+    } else {
+        return;
+    }
+
+    // If unequipped, go to heartstone in inventory. Else, no URL.
+    if (!heartstoneEquipped) url = invSearch("heartstone");
+
+    // Generate tile description
+    description.listAppend("You need "+nextLetter+"; look for these monsters:|*");
+    description.listAppend("<hr>|*"+monsterList.listJoinComponents("<hr>|*"));
+    if (!heartstoneEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
+
+    optional_task_entries.listAppend(ChecklistEntryMake("__item heartstone", url, ChecklistSubentryMake(title, subtitle, description)).ChecklistEntrySetIDTag("Heartstone spell TAPE"));
+
 }
 
 RegisterResourceGenerationFunction("IOTMHeartstoneGenerateResource");
@@ -58466,9 +58667,14 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
 { 
 	// the heart must go on
 	if (!__iotms_usable[lookupItem("Heartstone")]) return;
+    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
 
     // What are the heartstone's letters?
     string heartLetters = get_property("heartstoneLetters");
+    if (heartLetters.length() > 3) heartLetters = "";
+    string url = heartstoneEquipped ? "" : invSearch("heartstone");
+    string [int] description;
+    string title = heartLetters != "" ? "Heartstone ("+heartLetters.to_upper_case()+")" : "Heartstone (no letters!)";
 
     // resource should include
     //   - better VHS tape tile; banishes will be in banish zone, but VHS tapes should get its own tile outside of 2002 now
@@ -58490,17 +58696,86 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
     int usesBUFF = get_property_int("heartstoneBuffUsed");
     int usesLUCK = get_property_int("heartstoneLuckUsed");
 
+    // Banish combination tag for GONE.
+    if (accessGONE && usesGONE < 5) {
+        string [int] banishDesc;
+        banishDesc.listAppend("Turn-taking banish, 50-turn duration.");
+        if (!heartstoneEquipped) banishDesc.listAppend("Equip your Heartstone.");
+        resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", "", ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", url, banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
+    }
+
+    description.listAppend("Steal Monster Hearts for useful items.");
+    if (usesLUCK + usesBUDS + usesGONE + usesBOOM < 16) {
+        description.listAppend("Also, use some cool skills:");
+        if (accessBOOM && usesBOOM < 5) description.listAppend("|*<b>"+pluralise(5-usesBOOM,"BOOM","BOOMs")+":</b> Instakill with ~150 substats");
+        if (accessGONE && usesGONE < 5) description.listAppend("|*<b>"+pluralise(5-usesGONE,"GONE","GONEs")+":</b> Turn-taking banish");
+        if (accessBUDS && usesBUDS < 5) description.listAppend("|*<b>"+pluralise(5-usesBUDS,"BUDS","BUDS")+":</b> 25 turns of +5 famwt, +1 famxp");
+        if (accessLUCK && usesLUCK < 1) description.listAppend("|*<b>"+pluralise(1-usesLUCK,"LUCK","LUCK")+":</b> A shot of "+HTMLGenerateSpanFont("Lucky!","green"));
+
+        // Remind user to pick up new heartstone skills if needed 
+        if (!accessBOOM || !accessGONE || !accessSTUN || !accessBUDS || !accessBUFF || !accessLUCK) {    
+            string [int] skillsNeeded;
+            if (!accessBOOM) skillsNeeded.listAppend("BOOM");
+            if (!accessGONE) skillsNeeded.listAppend("GONE");
+            if (!accessSTUN) skillsNeeded.listAppend("STUN");
+            if (!accessBUDS) skillsNeeded.listAppend("BUDS");
+            if (!accessBUFF) skillsNeeded.listAppend("BUFF");
+            if (!accessLUCK) skillsNeeded.listAppend("LUCK");
+
+            description.listAppend("Consider spelling the following words to unlock new skills: "+listJoinComponents(skillsNeeded, ", "));
+        }
+    
+    if (!heartstoneEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
+    resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Heartstone skills"));
+            
+
+    }
+
 }
 // archaeologist's spade
-
 RegisterResourceGenerationFunction("IOTMArchaeologistSpadeGenerateResource");
 void IOTMArchaeologistSpadeGenerateResource(ChecklistEntry [int] resource_entries) {
-    // TODO: include following info:
-    //   - digs left
-    //   - dig suggestions (maybe w/ "is this relevant" piece?)
 
     if (!__iotms_usable[lookupItem("Archaeologist's Spade")]) return;
 
+    // end if no digs left
+    int digsLeft = clampi(11 - get_property_int("_archSpadeDigs"), 0, 11);
+    if (digsLeft == 0) return;
+
+    string title;
+    string url;
+    string [int] description;
+
+    url = "inv_use.php?pwd=" + my_hash() + "&whichitem=12184";
+    title = pluralise(digsLeft, "Archaeologist's Spade dig","Archaeologist's Spade digs");
+
+    // freekill combination tag for skelly digs
+    resource_entries.listAppend(ChecklistEntryMake("__item Archaeologist's Spade", url, ChecklistSubentryMake(title, "", "Free kill a skeleton"), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("Archaeologist's Spade free kill"));
+
+    // general resource tile, near end of the line probably
+    description.listAppend("Excavate free skeletons!");
+
+    // how many useful skeletons do you have left?
+    int approxKitchenTurnsLeft = ceil(MAX(0, 21 - get_property_int("manorDrawerCount")) / 4) + to_int(lookupItem("Spookyraven billiards room key").available_amount() < 1);
+    if (approxKitchenTurnsLeft > 0) description.listAppend("|*<b>"+pluralise(approxKitchenTurnsLeft,"skelly","skellies")+"</b> in the Haunted Kitchen");
+    
+    int approxBallroomTurnsLeft = delayRemainingInLocation($location[the haunted ballroom]);
+    if (approxBallroomTurnsLeft > 0) description.listAppend("|*<b>"+pluralise(approxBallroomTurnsLeft,"skelly","skellies")+"</b> in the Haunted Ballroom");
+
+    int approxNookTurnsLeft = ceil(max(0,get_property_int("cyrptNookEvilness")-13-$item[evil eye].available_amount() * 3) / 3);
+    if (approxNookTurnsLeft > 0) description.listAppend("|*<b>"+pluralise(approxNookTurnsLeft,"skelly","skellies")+"</b> in the Defiled Nook");
+    
+    // only generate if you actually have a possibility of doing the garves snake
+    if (__shen_items_to_locations[get_property_item("shenQuestItem")] == $location[The VERY Unquiet Garves] || get_property_int("shenInitiationDay") == 0 || get_property("questL11Shen") != "finished") {
+        int approxGarvesTurnsLeft = ceil(max(0,5-$location[the unquiet garves].turns_spent));
+        if (approxGarvesTurnsLeft > 0) {
+            description.listAppend("|*<b>"+pluralise(approxGarvesTurnsLeft,"skelly","skellies")+"</b> in the Unquiet Garves");
+            if (get_property_int("shenInitiationDay") != 1) description.listAppend("|*(Start Shen on D2 for Garve skellies)");
+        }
+    }
+    
+    resource_entries.listAppend(ChecklistEntryMake("__item Archaeologist's Spade", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Archaeologist Spade skellies"));
+            
 }
 // baseball diamond
 // TODO: make the tile lol. things that would help this tile:
