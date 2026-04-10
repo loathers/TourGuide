@@ -1204,9 +1204,9 @@ buffer generateLocationPopup(float bottom_coordinates, boolean location_bar_loca
                 }
             }
             
-            // Add heart to the phyla row
+            // Add heart to the phyla row; coloring pink for TES
             if (__iotms_usable[lookupItem("Heartstone")] && heartstone_middle_letter(m) != "")
-                stats_l1.listAppend("♡ = "+heartstone_middle_letter(m));
+                stats_l1.listAppend(HTMLGenerateSpanOfClass("♡ = "+heartstone_middle_letter(m), "#ce538c"));
             
             if (m.base_attack > 0)
                 stats_l2.listAppend(m.base_attack + " ML");
