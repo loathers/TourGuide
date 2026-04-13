@@ -454,10 +454,10 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 
 void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_familiar() == $familiar[none] && !__misc_state["single familiar run"] && !__misc_state["familiars temporarily blocked"] && !($locations[The Bandit Crossroads,The Towering Mountains,The Mystic Wood,The Putrid Swamp,The Cursed Village,The Sprawling Cemetery,The Old Rubee Mine,The Foreboding Cave,The Faerie Cyrkle,The Druidic Campsite,Near the Witch's House,The Evil Cathedral,The Barrow Mounds,The Cursed Village Thieves' Guild,The Troll Fortress,The Labyrinthine Crypt,The Lair of the Phoenix,The Dragon's Moor,Duke Vampire's Chateau,The Master Thief's Chalet,The Spider Queen's Lair,The Archwizard's Tower,The Ley Nexus,The Ghoul King's Catacomb,The Ogre Chieftain's Keep] contains __last_adventure_location))
+	if (my_familiar() == $familiar[none] && !__misc_state["single familiar run"] && lookupItem("FantasyRealm G. E. M.").equipped_amount() > 0 && !__misc_state["familiars temporarily blocked"] && !($locations[The Bandit Crossroads,The Towering Mountains,The Mystic Wood,The Putrid Swamp,The Cursed Village,The Sprawling Cemetery,The Old Rubee Mine,The Foreboding Cave,The Faerie Cyrkle,The Druidic Campsite,Near the Witch's House,The Evil Cathedral,The Barrow Mounds,The Cursed Village Thieves' Guild,The Troll Fortress,The Labyrinthine Crypt,The Lair of the Phoenix,The Dragon's Moor,Duke Vampire's Chateau,The Master Thief's Chalet,The Spider Queen's Lair,The Archwizard's Tower,The Ley Nexus,The Ghoul King's Catacomb,The Ogre Chieftain's Keep] contains __last_adventure_location))
 	{
 		string image_name = "black cat";
-		optional_task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "")).ChecklistEntrySetIDTag("Bring familiar reminder"));
+		task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "It's dangerous to go alone!", -11)).ChecklistEntrySetIDTag("Bring familiar reminder"));
 	}
     
     if ($familiar[Crimbo Shrub].familiar_is_usable() && my_path().id != PATH_G_LOVER)

@@ -225,7 +225,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     string [int] description;
     int totalSneaks = 0;
 
-    string line = HTMLGenerateSpanOfClass("Force an NC with sneaky tricks!", "r_bold r_element_stench_desaturated");
+    string line = HTMLGenerateSpanOfClass("Force an NC with sneaky tricks!", "r_bold r_element_cold_desaturated");
 
     foreach it, sneakType in sneakOrder
     {
