@@ -25518,7 +25518,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 		final.imageLookupName = "__item astral energy drink";
 		
 		// # of AEDs available or possible
-		int availableAEDs = available_amount($item[[10883]astral energy drink]) + available_amount($item[carton of astral energy drinks])*6;
+		int availableAEDs = available_amount($item[[10883]astral energy drink]) + available_amount($item[[10882]carton of astral energy drinks])*6;
 		int spleenFitsThisManyAEDs = min(floor(spleenRemaining / 5),availableAEDs);
 
 		// usable if we have any clovers available/possible
@@ -25677,7 +25677,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 		int cloversAvailable = clampi(3 - get_property_int("_cloversPurchased"), 0, 3);
         if (cloversAvailable > 0)
         {
-			url = "hermit.php";
+			string url = "hermit.php";
             string title = HTMLGenerateSpanFont("Hey! You! GRAB YOUR CLOVERS!", "green");
             hermitDescription.listAppend(cloversAvailable + " in stock at the Hermit");
             resource_entries.listAppend(ChecklistEntryMake("__item 11-leaf clover", url, ChecklistSubentryMake(title, hermitDescription), -11).ChecklistEntrySetIDTag("Clover resource"));    
