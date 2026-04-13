@@ -157,7 +157,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
     	boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
     	int usesLUCK = get_property_int("heartstoneLuckUsed");
 
-        final.luckyCondition = accessLUCK && usesLUCK && __iotms_usable[lookupItem("heartstone")];
+        final.luckyCondition = accessLUCK && usesLUCK == 0 && __iotms_usable[lookupItem("heartstone")];
         final.luckyCount = usesLUCK ? 0 : 1; 
         final.tileDescription = `<b>{final.luckyCount}x Heartstone: LUCK</b> cast left`;
 
