@@ -23823,8 +23823,10 @@ void QStenchAirportGiveMeFuelGenerateTasks(ChecklistEntry [int] task_entries)
 
 void QStenchAirportGarbageGenerateTasks(ChecklistEntry [int] task_entries)
 {
-    if (get_property_boolean("_dinseyGarbageDisposed"))
-        return;
+    // Do not need this task in-run
+    if (get_property_boolean("_dinseyGarbageDisposed")) return;
+    if (__misc_state["in run"]) return;
+
     ChecklistSubentry subentry;
     subentry.header = "Turn in garbage";
     subentry.entries.listAppend("Maintenance Tunnels Access" + __html_right_arrow_character + "Waste Disposal.");
@@ -28230,6 +28232,7 @@ void SPulveriseGenerateResource(ChecklistEntry [int] resource_entries)
     pulveriseAppendOutputListForProducts(details, "handful of smithereens", $items[handful of smithereens], blacklist);
     
     //Elemental powder, for +1 resistances?
+    pulveriseAppendOutputListForProducts(details, "cold powder", $items[cold powder], blacklist);
     //Elemental nuggets, for +3 tower test? (very marginal)
     
     if (details.count() > 0)
@@ -28794,7 +28797,13 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             if (avoid_using_skeleton_key && $item[skeleton key].available_amount() > 0)
                 description.listAppend(HTMLGenerateSpanOfClass("Avoid using your skeleton key, you don't have many left.", "r_bold"));
 			
-			optional_task_entries.listAppend(ChecklistEntryMake("daily dungeon", url, ChecklistSubentryMake("Daily Dungeon", "", description), $locations[the daily dungeon]).ChecklistEntrySetIDTag("Daily dungeon today"));
+			if (rooms_left == 14) {
+                description.listAppend(pluraliseWordy(rooms_left, "room", "rooms").capitaliseFirstLetter() + " left.");
+				description.listAppend(HTMLGenerateSpanOfClass("Last room; claim your loot token!","r_element_hot"));
+				task_entries.listAppend(ChecklistEntryMake("daily dungeon", url, ChecklistSubentryMake("Daily Dungeon", "", description), -11).ChecklistEntrySetIDTag("Daily dungeon last-room supernag"));
+			} else {
+				optional_task_entries.listAppend(ChecklistEntryMake("daily dungeon", url, ChecklistSubentryMake("Daily Dungeon", "", description), $locations[the daily dungeon]).ChecklistEntrySetIDTag("Daily dungeon today"));
+			}
 		}
 	}
 
@@ -44700,17 +44709,15 @@ void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entri
             url = "inventory.php?ftext=plastic+vampire+fangs";
         }
     }
-
-    else if ($item[Interview With You (a Vampire)].available_amount() > 0) {
-        fang_source = $item[Interview With You (a Vampire)];
-        url = "inventory.php?ftext=interview+with+you";
-    }
-
-    else {
+    else if ($item[plastic vampire fangs].available_amount() > 0) {
         url = "place.php?whichplace=town";
         if ($item[plastic vampire fangs].equipped_amount() == 0) {
             url = "inventory.php?ftext=plastic+vampire+fangs";
         }
+    }
+    else ($item[Interview With You (a Vampire)].available_amount() > 0) {
+        fang_source = $item[Interview With You (a Vampire)];
+        url = "inventory.php?ftext=interview+with+you";
     }
 
     // Show the Isabella interview option if it is valid for the user.
@@ -47321,46 +47328,48 @@ void IOTMGingerbreadCityGenerateTasks(ChecklistEntry [int] task_entries, Checkli
 	}
 }
 
-RegisterTaskGenerationFunction("IOTMIntergnatGenerateTasks");
-void IOTMIntergnatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
+// Commenting out demon-finding intergnat task. 
+// TODO: refactor into new task that only generates if you happen to have the items needed for demon summoning in-run 
+// RegisterTaskGenerationFunction("IOTMIntergnatGenerateTasks");
+// void IOTMIntergnatGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+// {
     
-    if (!get_property_boolean("demonSummoned") && __misc_state["in run"] && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && $familiar[intergnat].familiar_is_usable() && my_path().id != PATH_AVATAR_OF_SNEAKY_PETE)
-    {
-        //Should we show this if they aren't using the intergnat? ... Yes?
-        //demonName12, thin black candle, scroll of ancient forbidden unspeakable evil
-        string [int] reasons;
-        if (!get_property("demonName12").contains_text("Neil ") && my_level() < 13) //13 is +50% init... it's kind of useful? But not worth mentioning if they don't have it by this point?
-        {
-            reasons.listAppend("learn demon name");
-        }
-        if ($item[thin black candle].available_amount() < 3)
-        {
-            if ($item[thin black candle].available_amount() < 2)
-                reasons.listAppend("collect " + int_to_wordy(3 - $item[thin black candle].available_amount()) + " more thin black candles");
-            else
-                reasons.listAppend("collect One More Thin black candle");
-        }
-        if ($item[scroll of ancient forbidden unspeakable evil].available_amount() == 0)
-        {
-            reasons.listAppend("collect a scroll of ancient forbidden unspeakable evil");
-        }
-        if (reasons.count() > 0)
-        {
-            string [int] description;
-            description.listAppend(reasons.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
-            string url = "";
-            string title = "Continue running Intergnat for demon summon";
-            if (my_familiar() != $familiar[intergnat])
-            {
-                url = "familiar.php";
-                title = "Possibly run Intergnat for demon summon";
-            }
-            //Don't use the intergnat icon, because animation is distracting:
-            optional_task_entries.listAppend(ChecklistEntryMake("__item thin black candle", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Intergnat summon Neil"));
-        }
-    }
-}
+//     if (!get_property_boolean("demonSummoned") && __misc_state["in run"] && !__quest_state["Level 13"].state_boolean["king waiting to be freed"] && $familiar[intergnat].familiar_is_usable() && my_path().id != PATH_AVATAR_OF_SNEAKY_PETE)
+//     {
+//         //Should we show this if they aren't using the intergnat? ... Yes?
+//         //demonName12, thin black candle, scroll of ancient forbidden unspeakable evil
+//         string [int] reasons;
+//         if (!get_property("demonName12").contains_text("Neil ") && my_level() < 13) //13 is +50% init... it's kind of useful? But not worth mentioning if they don't have it by this point?
+//         {
+//             reasons.listAppend("learn demon name");
+//         }
+//         if ($item[thin black candle].available_amount() < 3)
+//         {
+//             if ($item[thin black candle].available_amount() < 2)
+//                 reasons.listAppend("collect " + int_to_wordy(3 - $item[thin black candle].available_amount()) + " more thin black candles");
+//             else
+//                 reasons.listAppend("collect One More Thin black candle");
+//         }
+//         if ($item[scroll of ancient forbidden unspeakable evil].available_amount() == 0)
+//         {
+//             reasons.listAppend("collect a scroll of ancient forbidden unspeakable evil");
+//         }
+//         if (reasons.count() > 0)
+//         {
+//             string [int] description;
+//             description.listAppend(reasons.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
+//             string url = "";
+//             string title = "Continue running Intergnat for demon summon";
+//             if (my_familiar() != $familiar[intergnat])
+//             {
+//                 url = "familiar.php";
+//                 title = "Possibly run Intergnat for demon summon";
+//             }
+//             //Don't use the intergnat icon, because animation is distracting:
+//             optional_task_entries.listAppend(ChecklistEntryMake("__item thin black candle", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Intergnat summon Neil"));
+//         }
+//     }
+// }
 
 RegisterResourceGenerationFunction("IOTMIntergnatGenerateResource");
 void IOTMIntergnatGenerateResource(ChecklistEntry [int] resource_entries)
@@ -49548,6 +49557,11 @@ void IOTMTunnelOfLoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
 RegisterResourceGenerationFunction("IOTMTunnelOfLoveGenerateResource");
 void IOTMTunnelOfLoveGenerateResource(ChecklistEntry [int] resource_entries)
 {
+    
+    if (!get_property_boolean("_loveTunnelUsed")) {
+        resource_entries.listAppend(ChecklistEntryMake("__item pink candy heart", "place.php?whichplace=town_wrong", ChecklistSubentryMake("3 free L.O.V. dudes", "", "Free fights and useful items/buffs."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Love tunnel free fights"));
+    }
+
     //mostly the boomerang
     //what does sokka throw? a boomeraang!
     
@@ -49902,7 +49916,9 @@ RegisterTaskGenerationFunction("IOTMBoomBoxGenerateTasks");
 void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0) return;
-		 
+	
+	// leaving this for aftercore because TES likes this tile, but it is not needed in-run
+	if (__misc_state["in run"]) return;
  
 	string song = get_property("boomBoxSong");
 	int changes_left = get_property_int("_boomBoxSongsLeft"); //the boys are back in town, eleven times. everyone will love it
@@ -52547,7 +52563,14 @@ void IOTMCommerceGhostGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	int commerce_statgain2 = (my_level() * 25) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
 	boolean in_grey_you = my_class() == $class[grey goo]; // Grey You gains zero stats from your commerce ghost.
 
-	if (__misc_state["in run"] && $familiar[Ghost of Crimbo Commerce].familiar_is_usable() && !in_grey_you)
+	// reduce clutter by not showing this tile if user does not need it
+	if (!$familiar[Ghost of Crimbo Commerce].familiar_is_usable()) return;
+	if (my_level() > 12) return;
+	if (__iotms_usable[lookupItem("Neverending Party invitation envelope")]) return;
+	if ($item[Sept-Ember Censer].available_amount() > 0) return;
+
+	// only show if in-run
+	if (__misc_state["in run"] && !in_grey_you)
 	{
 		// Title
 		string url = "familiar.php";
@@ -53178,7 +53201,9 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 		nextBeardBuffDescription = nextBeardBuff[nextBeardBuffName];
 		nextBeardBuffEffect = boldIfValuable(nextBeardBuffName) + ", " + to_buffer(nextBeardBuffDescription);
 	}
-	description.listAppend("Next shavings effect: <br>" + nextBeardBuffEffect);
+
+	// Commenting out because you can always use the tooltip.
+	// description.listAppend("Next shavings effect: <br>" + nextBeardBuffEffect);
 
 	string [int][int] tooltip_table;
 	for i from lastBeardIndex() + 1 to lastBeardIndex() + 11 {
@@ -58983,8 +59008,8 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
         string title = "Play "+pluralise(clampi(3-inningsPlayed, 0, 3),"more inning","more innings")+" of Baseball";
         string [int] description;
         if (myTeam.count() < 9) {
-            if (baseballEquipped) description.listAppend("Collect "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" with your Baseball Diamond to play another inning.");
-            if (!baseballEquipped) description.listAppend("Equip your Baseball Diamond to collect "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play another inning.");
+            if (baseballEquipped) description.listAppend("Find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
+            if (!baseballEquipped) description.listAppend(HTMLGenerateSpanOfClass("Equip your Baseball Diamond","r_element_hot")+" to find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
         }
 
         if (myTeam.count() == 9) {
@@ -59009,7 +59034,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     int curveballFightsLeft = get_property_int("_curveballFightsLeft");
 
     if (curveballMonster != $monster[none]) {
-        subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name,"r_element_spooky")+" remaining", "naturally free fights!",""));
+        subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!",""));
     }
 
     // Some Cheddar sub-tile; annoying because I've never abstracted tracked monsters...
@@ -59020,31 +59045,32 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
         if (str == "Baseball Diamond") cheddarMonster = to_monster(trackedMonstersSplit[key-1]);
     }
     if (cheddarMonster != $monster[none]) {
-        subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanOfClass(curveballMonster.name,"r_element_stench")+" tracked by a Cheddarball", "an olfaction-esque tracker!",""));
+        subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanOfClass(cheddarMonster.name,"r_element_stench")+" tracked by a Cheddarball", "an olfaction-esque tracker!",""));
     }
 
     // Minor monster tracking sub-tile
-    monster screwballMonster = to_monster(get_property("_screwballMonster"));
-    monster beanballMonster = to_monster(get_property("_beanballMonster"));
-    monster skullballMonster = to_monster(get_property("_skullballMonster"));
+    // Currently commented out because we don't really need it
+    // monster screwballMonster = to_monster(get_property("_screwballMonster"));
+    // monster beanballMonster = to_monster(get_property("_beanballMonster"));
+    // monster skullballMonster = to_monster(get_property("_skullballMonster"));
 
-    string [int] minorTracking;
-    string minorSize = "0.9em";
+    // string [int] minorTracking;
+    // string minorSize = "0.9em";
 
-    if (screwballMonster != $monster[none]) {
-        minorTracking.listAppend(HTMLGenerateSpanFont("<b>+ML: </b>"+screwballMonster+")", "r_element_sleaze_desaturated", minorSize));
-    }
+    // if (screwballMonster != $monster[none]) {
+    //     minorTracking.listAppend(HTMLGenerateSpanFont("<b>+ML: </b>"+screwballMonster+")", "r_element_sleaze_desaturated", minorSize));
+    // }
 
-    if (beanballMonster != $monster[none]) {
-        minorTracking.listAppend(HTMLGenerateSpanFont("<b>Passive Stench: </b>"+beanballMonster, "r_element_stench_desaturated", minorSize));
-    }
+    // if (beanballMonster != $monster[none]) {
+    //     minorTracking.listAppend(HTMLGenerateSpanFont("<b>Passive Stench: </b>"+beanballMonster, "r_element_stench_desaturated", minorSize));
+    // }
 
-    if (skullballMonster != $monster[none]) {
-        minorTracking.listAppend(HTMLGenerateSpanFont("<b>Deleveled: </b>"+skullballMonster, "r_element_spooky_desaturated", minorSize));
+    // if (skullballMonster != $monster[none]) {
+    //     minorTracking.listAppend(HTMLGenerateSpanFont("<b>Deleveled: </b>"+skullballMonster, "r_element_spooky_desaturated", minorSize));
         
-    }
+    // }
 
-    if (minorTracking.count() > 0) subentries.listAppend(ChecklistSubentryMake("Baseball Modified Monsters","",minorTracking));
+    // if (minorTracking.count() > 0) subentries.listAppend(ChecklistSubentryMake("Baseball Modified Monsters","",minorTracking));
 
     // The iceball banish is tracked in the banish combo tile.
 
