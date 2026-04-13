@@ -160,7 +160,7 @@ import "relay/TourGuide/Items of the Month/2024/VIP Photobooth.ash";
 import "relay/TourGuide/Items of the Month/2024/Peace Turkey.ash";
 import "relay/TourGuide/Items of the Month/2024/TakerSpace.ash";
 
-// 2024
+// 2025
 import "relay/TourGuide/Items of the Month/2025/CyberRealm.ash";
 import "relay/TourGuide/Items of the Month/2025/McHugeLarge Ski Set.ash";
 import "relay/TourGuide/Items of the Month/2025/Leprecondo.ash";
@@ -170,3 +170,14 @@ import "relay/TourGuide/Items of the Month/2025/Prismatic Beret.ash";
 import "relay/TourGuide/Items of the Month/2025/Cooler Yeti.ash";
 import "relay/TourGuide/Items of the Month/2025/Allied Radio Backpack.ash";
 import "relay/TourGuide/Items of the Month/2025/Mobius Ring.ash";
+import "relay/TourGuide/Items of the Month/2025/Seadent.ash";
+import "relay/TourGuide/Items of the Month/2025/Blood Cubic Zirconia.ash";
+import "relay/TourGuide/Items of the Month/2025/Shrunken Head.ash";
+import "relay/TourGuide/Items of the Month/2025/Skeleton of Crimbo Past.ash";
+
+// 2026
+import "relay/TourGuide/Items of the Month/2026/Eternity Codpiece.ash";
+import "relay/TourGuide/Items of the Month/2026/Legendary Seal-Clubbing Club.ash";
+import "relay/TourGuide/Items of the Month/2026/Heartstone.ash";
+import "relay/TourGuide/Items of the Month/2026/Archaeologist's Spade.ash";
+import "relay/TourGuide/Items of the Month/2026/Baseball Diamond.ash";

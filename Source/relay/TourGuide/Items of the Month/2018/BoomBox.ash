@@ -3,7 +3,9 @@ RegisterTaskGenerationFunction("IOTMBoomBoxGenerateTasks");
 void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
 	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0) return;
-		 
+	
+	// leaving this for aftercore because TES likes this tile, but it is not needed in-run
+	if (__misc_state["in run"]) return;
  
 	string song = get_property("boomBoxSong");
 	int changes_left = get_property_int("_boomBoxSongsLeft"); //the boys are back in town, eleven times. everyone will love it

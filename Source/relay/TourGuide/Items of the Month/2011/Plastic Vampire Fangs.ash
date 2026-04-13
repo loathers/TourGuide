@@ -20,17 +20,15 @@ void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entri
             url = "inventory.php?ftext=plastic+vampire+fangs";
         }
     }
-
-    else if ($item[Interview With You (a Vampire)].available_amount() > 0) {
-        fang_source = $item[Interview With You (a Vampire)];
-        url = "inventory.php?ftext=interview+with+you";
-    }
-
-    else {
+    else if ($item[plastic vampire fangs].available_amount() > 0) {
         url = "place.php?whichplace=town";
         if ($item[plastic vampire fangs].equipped_amount() == 0) {
             url = "inventory.php?ftext=plastic+vampire+fangs";
         }
+    }
+    else {
+        fang_source = $item[Interview With You (a Vampire)];
+        url = "inventory.php?ftext=interview+with+you";
     }
 
     // Show the Isabella interview option if it is valid for the user.

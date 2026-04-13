@@ -41,41 +41,41 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if (lookupSkill("Expert Corner-Cutter").skill_is_usable()) {
             free_crafts_left += clampi(5 - get_property_int("_expertCornerCutterUsed"), 0, 5);
-        }    
+        }
         if (get_property_int("homebodylCharges") > 0) {
             free_crafts_left += (get_property_int("homebodylCharges"));
         }
+        if (get_property_int("craftingPlansCharges") >0) {
+            free_crafts_left += (get_property_int("craftingPlansCharges"));
+        }
+
         // adding cookbookbat free crafts into crafting tile        
         if (lookupFamiliar("Cookbookbat").familiar_is_usable()) {
-            string [int] description;
 			free_cooks_left += clampi(5 - get_property_int("_cookbookbatCrafting"), 0, 5);
-			string title = "free cooking";
-			if (free_cooks_left > 0) {
-			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_cooks_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "COOKING only" : "", description));
-			}
         }
 		// holiday multitasking
 		if (lookupSkill("Holiday Multitasking").skill_is_usable()) {
             free_crafts_left += clampi(3 - get_property_int("_holidayMultitaskingUsed"), 0, 3);
-        }    
+        }
         // elf guard cooking
         if (lookupSkill("Elf Guard Cooking").skill_is_usable()) {
-            string [int] description;
 			free_cooks_left += clampi(3 - get_property_int("_elfGuardCookingUsed"), 0, 3);
-			string title = "free cooking";
-			if (free_cooks_left > 0) {
-			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_cooks_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "COOKING only" : "", description));
-			}
         }
 		// cocktails of the age of sail
         if (lookupSkill("Old-School Cocktailcrafting").skill_is_usable()) {
-            string [int] description;
 			free_mixes_left += clampi(3 - get_property_int("_oldSchoolCocktailCraftingUsed"), 0, 3);
-			string title = "free mixing";
-			if (free_mixes_left > 0) {
-			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_mixes_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "MIXING only" : "", description));
-			}
         }
+
+        if (free_cooks_left > 0) {
+            string [int] description;
+			string title = "free cooking";
+			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_cooks_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "COOKING only" : "", description));
+		}
+		if (free_mixes_left > 0) {
+            string [int] description;
+			string title = "free mixing";
+			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_mixes_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "MIXING only" : "", description));
+		}
 
         int free_smiths_left = 0;
         if (__campground[$item[warbear auto-anvil]] > 0) {
@@ -105,8 +105,11 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
             craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_smiths_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "SMITHING only" : "", description));
         }
 
-        if (free_crafts_left > 0) {
-            string description = SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter();
+        int crafting_plans = $item[crafting plans].available_amount();
+        if (free_crafts_left > 0 || crafting_plans > 0) {
+            string [int] description; 
+            description.listAppend(SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter());
+            if (crafting_plans > 0) description.listAppend("Also, <b>"+pluralise($item[crafting plans])+"</b> for more free crafts.");
             craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_crafts_left, "free craft", "free crafts") + " remaining", free_smiths_left > 0 || jackhammer_crafts_later > 0 ? "Any crafting mode, including smithing" : "", description));
         }
 

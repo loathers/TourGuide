@@ -49,6 +49,11 @@ void IOTMTunnelOfLoveGenerateTasks(ChecklistEntry [int] task_entries, ChecklistE
 RegisterResourceGenerationFunction("IOTMTunnelOfLoveGenerateResource");
 void IOTMTunnelOfLoveGenerateResource(ChecklistEntry [int] resource_entries)
 {
+    
+    if (!get_property_boolean("_loveTunnelUsed")) {
+        resource_entries.listAppend(ChecklistEntryMake("__item pink candy heart", "place.php?whichplace=town_wrong", ChecklistSubentryMake("3 free L.O.V. dudes", "", "Free fights and useful items/buffs."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Love tunnel free fights"));
+    }
+
     //mostly the boomerang
     //what does sokka throw? a boomeraang!
     

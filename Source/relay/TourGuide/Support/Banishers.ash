@@ -107,6 +107,15 @@ static
     __banish_source_length["roar like a lion"] = 30; // not sure it is needed; it should generally be not more than 30
 	__banish_source_length["monkey slap"] = 1234567; // this, for some reason, was not properly respecting the reset condition. so imma just do this to hopefully solve it.
     __banish_source_length["spring kick"] = -1;
+    __banish_source_length["stuffed yam stinkbomb"] = 15;
+    __banish_source_length["throwin' ember"] = 30;
+    __banish_source_length["anchor bomb"] = 30;
+    __banish_source_length["handful of split pea soup"] = 30;
+    __banish_source_length["punch out your foe"] = 20;
+    __banish_source_length["sea *dent"] = -1;
+    __banish_source_length["mark your territory"] = -1;
+    __banish_source_length["heartstone: gone"] = 50;
+    __banish_source_length["baseball diamond"] = -1;
     
     int [string] __banish_simultaneous_limit;
     __banish_simultaneous_limit["beancannon"] = 5;
