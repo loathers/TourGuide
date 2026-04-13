@@ -95,7 +95,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
         if (str == "Baseball Diamond") cheddarMonster = to_monster(trackedMonstersSplit[key-1]);
     }
     if (cheddarMonster != $monster[none]) {
-        subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanOfClass(curveballMonster.name,"r_element_stench")+" tracked by a Cheddarball", "an olfaction-esque tracker!",""));
+        subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanOfClass(cheddarMonster.name,"r_element_stench")+" tracked by a Cheddarball", "an olfaction-esque tracker!",""));
     }
 
     // Minor monster tracking sub-tile
