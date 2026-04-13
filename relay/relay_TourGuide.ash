@@ -25436,6 +25436,8 @@ string [int] luckyOptions(int cloversAvailable) {
 	if (protestorsRemaining > 10 && protestorsPerClover > 15)
 		allTheLuckyStuff.listAppend("Zeppelin Mob (x"+projectedZeppClovers+")");
 		cloversAdjusted = MAX(cloversAdjusted - projectedZeppClovers, 3);
+	if (my_path().id == 56) //adventurer meats world
+		allTheLuckyStuff.listAppend("Knob Goblin Embezzler");
 	if (__misc_state["wand of nagamar needed"] && lettersStillNeeded > 0)
 		allTheLuckyStuff.listAppend("Wand of Nagamar");
 	if (roughUHTurnsNeeded > 5)
@@ -25454,21 +25456,223 @@ string [int] luckyOptions(int cloversAvailable) {
 
 	return selectedOptions;
 }
-		
+
 
 //Clovers and Lucky
 RegisterResourceGenerationFunction("LuckyGenerateResource");
 void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__misc_state["in run"]) return;
+
+	// SYNTAX FOR NEW LUCKY SOURCES
+	//   In order to centralize, we are using the SneakSource concept from the sneaks megatile.
+
+	record LuckySource {
+		string sourceName;
+		string url;
+		string imageLookupName;
+		boolean luckyCondition;
+		int luckyCount;
+		string tileDescription;
+	};
+
+	// Refactoring lucky to reflect/use TES megatile suggestion
+    // if (!__misc_state["in run"]) return;
+
+	// useful state variables
+    int spleenRemaining = spleen_limit() - my_spleen_use();
+    int stomachLeft = availableFullness();
+
+	// Build out all the lucky sources.
+
+	// EVERGREEN: 11-leaf clovers
+	LuckySource getClovers() {
+		LuckySource final;
+		final.sourceName = "clover";
+		final.url = invSearch("11-leaf clover");
+		final.imageLookupName = "__item 11-leaf clover";
+		
+		// # of clovers available
+		int cloversAvailable = clampi(3 - get_property_int("_cloversPurchased"), 0, 3);
+		if (my_path().id == PATH_ZOMBIE_SLAYER) cloversAvailable = 0;
+		if (my_path().id == PATH_NUCLEAR_AUTUMN) cloversAvailable = 0;
+		int cloversPossible = $item[11-leaf clover].available_amount() + cloversAvailable;
+	
+		// usable if we have any clovers available/possible
+		final.luckyCondition = cloversPossible > 0;
+
+		final.luckyCount = cloversPossible;
+		final.tileDescription = `<b>{cloversPossible}x clovers</b> left`;
+		final.tileDescription = cloversAvailable > 0 ? final.tileDescription + `, with {cloversAvailable}x at the Hermit`;
+
+		return final;
+	}
+
+	// EVERGREEN: Astral Energy Drinks
+	LuckySource getAEDs() {
+		LuckySource final;
+		final.sourceName = "astral energy drink";
+		final.url = invSearch("astral energy");
+		final.imageLookupName = "__item astral energy drink";
+		
+		// # of AEDs available or possible
+		int availableAEDs = available_amount($item[[10883]astral energy drink]) + available_amount($item[carton of astral energy drinks])*6;
+		int spleenFitsThisManyAEDs = min(floor(spleenRemaining / 5),availableAEDs);
+
+		// usable if we have any clovers available/possible
+		final.luckyCondition = availableAEDs > 0 && spleenFitsThisManyAEDs > 0;
+
+		final.luckyCount = spleenFitsThisManyAEDs;
+		final.tileDescription = `<b>{spleenFitsThisManyAEDs}x AEDs</b> to consume`;
+		final.tileDescription = availableAEDs - spleenFitsThisManyAEDs > 0 ? final.tileDescription + `, with {availableAEDs - spleenFitsThisManyAEDs}x ready for tomorrow`;
+
+		return final;
+	}
+
+	// 2026: Cast 1x "Heartstone: LUCK"
+	LuckySource getHeartstone() {
+        LuckySource final;
+
+        final.sourceName = `august scepter`;
+        final.url = 'skillz.php';
+        final.imageLookupName = "__item heartstone";
+
+        final.luckyCondition = __iotms_usable[$item[August Scepter]];
+        final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
+        final.tileDescription = `<b>{final.sneakCount}x August Scepter</b> cast left (Aug. 2)`;
+
+        return final;
+    }
+
+	// 2024: 3x plays of the apriling band saxophone 
+	LuckySource getSaxophones() {
+        LuckySource final;
+
+        final.sourceName = 'apriling tuba';
+        final.url = "inventory.php?ftext=apriling+band+tuba";
+        final.imageLookupName = "__item Apriling band tuba";
+
+        int aprilingBandSaxUsesLeft = clampi(3 - get_property_int("_aprilBandSaxUses"), 0, 3);
+        
+        final.luckyCondition = (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0);
+        final.luckyCount = aprilingBandSaxUsesLeft;
+        final.tileDescription = `<b>{aprilingBandSaxUsesLeft}x apriling sax solos</b> left`;
+        return final;
+
+    }
+	// 2024: moai statues (cool); no clovermint tho, no thank you
+	LuckySource getMoaiStatues() {
+        LuckySource final;
+
+        final.sourceName = `moai statuette`;
+        final.url = invSearch("lucky moai statuette");
+        final.imageLookupName = "__item lucky moai statuette";
+
+        final.luckyCondition = available_amount($item[lucky moai statuette]) > 0;
+        final.luckyCount = available_amount($item[lucky moai statuette])*3; 
+        final.tileDescription = `<b>{final.sneakCount}x clovers</b> via lucky moai`;
+
+        return final;
+    }
+
+	// 2023: Cast 1x "Aug. 2nd: Find an Eleven-Leaf Clover Day"
+    LuckySource getScepter() {
+        LuckySource final;
+
+        final.sourceName = `august scepter`;
+        final.url = 'skillz.php';
+        final.imageLookupName = "__item august scepter";
+
+        final.luckyCondition = __iotms_usable[$item[August Scepter]];
+        final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
+        final.tileDescription = `<b>{final.sneakCount}x August Scepter</b> cast left (Aug. 2)`;
+
+        return final;
+    }
+
+	// 2019: Select "Surprise Me" from the Eight Days a Week Pill Keeper
+	LuckySource getPillkeeper() {
+        LuckySource final;
+
+        final.sourceName = "pillkeeper";
+        final.url = "main.php?eowkeeper=1";
+        final.imageLookupName = "__item Eight Days a Week Pill Keeper";
+
+        // see # of free pillkeeepers remaining
+        int freeLuckLeft = get_property_boolean("_freePillKeeperUsed") ? 0 : 1;
+
+        // calculate possible spleen-based sneaks
+        int spleenLucks = floor(spleenRemaining / 3);
+
+        // usable if we have pill keeper plus free sneaks or spleen sneaks available
+        final.luckyCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeSneakLeft + spleenSneaks > 0);
+
+        // never noticed I didn't explicitly say this was pillkeeper in the tile lol
+        final.luckyCount = freeLuckLeft + spleenLucks;
+        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x PillKeeper</b> free lucky, `;
+        final.tileDescription = final.tileDescription + `and <b>{spleenSneaks}x</b> more for 3 spleen each`;
+        return final;
+    }
+
+	// 2014: 1x Lucky Lindy -- not including to start, too old
+	// 2013: 1x optimal dog -- not including to start, too old
+
+	// Populate a list of lucky sources with our cool functions
+	LuckySource [string] luckySources;
+
+	luckySources["clovo"] = getClovers();
+	luckySources["astro"] = getAEDs();
+	luckySources["stono"] = getHeartstone();
+	luckySources["saxxo"] = getSaxophones();
+	luckySources["mohio"] = getMoaiStatues();
+	luckySources["scepo"] = getScepter();
+	luckySources["pillo"] = getPillkeeper();
+
+	// For order, I am starting from things that are daily refresh -> can be saved
+	string [int] luckyOrder = listMake("stono","scepo","saxxo","pillo","clovo","astro","mohio");
+
+    ChecklistEntry entry;
+    
+	entry.url = "";
+	entry.image_lookup_name = "__item 11-leaf clover";
+    entry.tags.id = "Lucky sources available";
+    entry.importance_level = -1;
+
+    string [int] description;
+    int totalLuckyCharges = 0;
+	string line = HTMLGenerateSpanOfClass("Get a Lucky! adventure", "r_bold r_element_stench_desaturated");
+	string ll = HTMLGenerateSpanOfClass("✾", "r_element_stench");
+	string luckyText = HTMLGenerateSpanOfClass("Lucky!", "r_element_stench_desaturated");
+
+	foreach it, luckyType in sneakOrder
+    {
+        LuckySource lucko = luckySources[luckyType];
+        if (lucko.luckyCount > 0 && lucko.luckyCondition) {
+			if (totalLuckyCharges == 0) entry.url = lucko.url;
+            totalLuckyCharges += lucko.luckyCount;
+
+            line += "|*"+ll+lucko.tileDescription;
+        }
+
+    }
+
+    if (totalSneaks == 0) return;
+
+    // Append all the lines to a description
+    description.listAppend(line);
+	
+    // Add a description that falls away when you hoverover
+    entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalLuckyCharges, luckyText+" charge available", luckyText+" charges available"), "", description));
+
+	if (entry.subentries.count() > 0) resource_entries.listAppend(entry);
+	
+	// do not run old tile
+	if (false)
 	{
 		string [int] description;
 		string url;
 		description.listAppend(HTMLGenerateSpanFont("Have a Lucky adventure!", "green"));
 
 		// Figure out how many clovers you have available/possible and join the needed components
-		int cloversAvailable = clampi(3 - get_property_int("_cloversPurchased"), 0, 3);
-		int cloversPossible = $item[11-leaf clover].available_amount() + cloversAvailable;
 		description.listAppend(luckyOptions(cloversPossible).listJoinComponents(", "));
 
 		
@@ -26284,10 +26488,10 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
 
 void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if (my_familiar() == $familiar[none] && !__misc_state["single familiar run"] && !__misc_state["familiars temporarily blocked"] && !($locations[The Bandit Crossroads,The Towering Mountains,The Mystic Wood,The Putrid Swamp,The Cursed Village,The Sprawling Cemetery,The Old Rubee Mine,The Foreboding Cave,The Faerie Cyrkle,The Druidic Campsite,Near the Witch's House,The Evil Cathedral,The Barrow Mounds,The Cursed Village Thieves' Guild,The Troll Fortress,The Labyrinthine Crypt,The Lair of the Phoenix,The Dragon's Moor,Duke Vampire's Chateau,The Master Thief's Chalet,The Spider Queen's Lair,The Archwizard's Tower,The Ley Nexus,The Ghoul King's Catacomb,The Ogre Chieftain's Keep] contains __last_adventure_location))
+	if (my_familiar() == $familiar[none] && !__misc_state["single familiar run"] && lookupItem("FantasyRealm G. E. M.").equipped_amount() > 0 && !__misc_state["familiars temporarily blocked"] && !($locations[The Bandit Crossroads,The Towering Mountains,The Mystic Wood,The Putrid Swamp,The Cursed Village,The Sprawling Cemetery,The Old Rubee Mine,The Foreboding Cave,The Faerie Cyrkle,The Druidic Campsite,Near the Witch's House,The Evil Cathedral,The Barrow Mounds,The Cursed Village Thieves' Guild,The Troll Fortress,The Labyrinthine Crypt,The Lair of the Phoenix,The Dragon's Moor,Duke Vampire's Chateau,The Master Thief's Chalet,The Spider Queen's Lair,The Archwizard's Tower,The Ley Nexus,The Ghoul King's Catacomb,The Ogre Chieftain's Keep] contains __last_adventure_location))
 	{
 		string image_name = "black cat";
-		optional_task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "")).ChecklistEntrySetIDTag("Bring familiar reminder"));
+		task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "It's dangerous to go alone!", -11)).ChecklistEntrySetIDTag("Bring familiar reminder"));
 	}
     
     if ($familiar[Crimbo Shrub].familiar_is_usable() && my_path().id != PATH_G_LOVER)
@@ -33871,7 +34075,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     string [int] description;
     int totalSneaks = 0;
 
-    string line = HTMLGenerateSpanOfClass("Force an NC with sneaky tricks!", "r_bold r_element_stench_desaturated");
+    string line = HTMLGenerateSpanOfClass("Force an NC with sneaky tricks!", "r_bold r_element_cold_desaturated");
 
     foreach it, sneakType in sneakOrder
     {
