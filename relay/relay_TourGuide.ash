@@ -44715,7 +44715,7 @@ void IOTMPlasticVampireFangsGenerateResource(ChecklistEntry [int] resource_entri
             url = "inventory.php?ftext=plastic+vampire+fangs";
         }
     }
-    else ($item[Interview With You (a Vampire)].available_amount() > 0) {
+    else {
         fang_source = $item[Interview With You (a Vampire)];
         url = "inventory.php?ftext=interview+with+you";
     }
