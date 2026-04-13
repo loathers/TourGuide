@@ -78,7 +78,9 @@ void IOTMDaylightShavingsHelmetGenerateTasks(ChecklistEntry [int] task_entries, 
 		nextBeardBuffDescription = nextBeardBuff[nextBeardBuffName];
 		nextBeardBuffEffect = boldIfValuable(nextBeardBuffName) + ", " + to_buffer(nextBeardBuffDescription);
 	}
-	description.listAppend("Next shavings effect: <br>" + nextBeardBuffEffect);
+
+	// Commenting out because you can always use the tooltip.
+	// description.listAppend("Next shavings effect: <br>" + nextBeardBuffEffect);
 
 	string [int][int] tooltip_table;
 	for i from lastBeardIndex() + 1 to lastBeardIndex() + 11 {

@@ -7,7 +7,14 @@ void IOTMCommerceGhostGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	int commerce_statgain2 = (my_level() * 25) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
 	boolean in_grey_you = my_class() == $class[grey goo]; // Grey You gains zero stats from your commerce ghost.
 
-	if (__misc_state["in run"] && $familiar[Ghost of Crimbo Commerce].familiar_is_usable() && !in_grey_you)
+	// reduce clutter by not showing this tile if user does not need it
+	if (!$familiar[Ghost of Crimbo Commerce].familiar_is_usable()) return;
+	if (my_level() > 12) return;
+	if (__iotms_usable[lookupItem("Neverending Party invitation envelope")]) return;
+	if ($item[Sept-Ember Censer].available_amount() > 0) return;
+
+	// only show if in-run
+	if (__misc_state["in run"] && !in_grey_you)
 	{
 		// Title
 		string url = "familiar.php";

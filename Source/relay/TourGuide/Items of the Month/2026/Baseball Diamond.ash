@@ -58,8 +58,8 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
         string title = "Play "+pluralise(clampi(3-inningsPlayed, 0, 3),"more inning","more innings")+" of Baseball";
         string [int] description;
         if (myTeam.count() < 9) {
-            if (baseballEquipped) description.listAppend("Collect "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" with your Baseball Diamond to play another inning.");
-            if (!baseballEquipped) description.listAppend("Equip your Baseball Diamond to collect "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play another inning.");
+            if (baseballEquipped) description.listAppend("Find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
+            if (!baseballEquipped) description.listAppend(HTMLGenerateSpanOfClass("Equip your Baseball Diamond","r_element_hot")+" to find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
         }
 
         if (myTeam.count() == 9) {
@@ -84,7 +84,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     int curveballFightsLeft = get_property_int("_curveballFightsLeft");
 
     if (curveballMonster != $monster[none]) {
-        subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name,"r_element_spooky")+" remaining", "naturally free fights!",""));
+        subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!",""));
     }
 
     // Some Cheddar sub-tile; annoying because I've never abstracted tracked monsters...
@@ -99,27 +99,28 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     }
 
     // Minor monster tracking sub-tile
-    monster screwballMonster = to_monster(get_property("_screwballMonster"));
-    monster beanballMonster = to_monster(get_property("_beanballMonster"));
-    monster skullballMonster = to_monster(get_property("_skullballMonster"));
+    // Currently commented out because we don't really need it
+    // monster screwballMonster = to_monster(get_property("_screwballMonster"));
+    // monster beanballMonster = to_monster(get_property("_beanballMonster"));
+    // monster skullballMonster = to_monster(get_property("_skullballMonster"));
 
-    string [int] minorTracking;
-    string minorSize = "0.9em";
+    // string [int] minorTracking;
+    // string minorSize = "0.9em";
 
-    if (screwballMonster != $monster[none]) {
-        minorTracking.listAppend(HTMLGenerateSpanFont("<b>+ML: </b>"+screwballMonster+")", "r_element_sleaze_desaturated", minorSize));
-    }
+    // if (screwballMonster != $monster[none]) {
+    //     minorTracking.listAppend(HTMLGenerateSpanFont("<b>+ML: </b>"+screwballMonster+")", "r_element_sleaze_desaturated", minorSize));
+    // }
 
-    if (beanballMonster != $monster[none]) {
-        minorTracking.listAppend(HTMLGenerateSpanFont("<b>Passive Stench: </b>"+beanballMonster, "r_element_stench_desaturated", minorSize));
-    }
+    // if (beanballMonster != $monster[none]) {
+    //     minorTracking.listAppend(HTMLGenerateSpanFont("<b>Passive Stench: </b>"+beanballMonster, "r_element_stench_desaturated", minorSize));
+    // }
 
-    if (skullballMonster != $monster[none]) {
-        minorTracking.listAppend(HTMLGenerateSpanFont("<b>Deleveled: </b>"+skullballMonster, "r_element_spooky_desaturated", minorSize));
+    // if (skullballMonster != $monster[none]) {
+    //     minorTracking.listAppend(HTMLGenerateSpanFont("<b>Deleveled: </b>"+skullballMonster, "r_element_spooky_desaturated", minorSize));
         
-    }
+    // }
 
-    if (minorTracking.count() > 0) subentries.listAppend(ChecklistSubentryMake("Baseball Modified Monsters","",minorTracking));
+    // if (minorTracking.count() > 0) subentries.listAppend(ChecklistSubentryMake("Baseball Modified Monsters","",minorTracking));
 
     // The iceball banish is tracked in the banish combo tile.
 
