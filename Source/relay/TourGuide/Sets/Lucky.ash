@@ -154,10 +154,12 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
         final.sourceName = `august scepter`;
         final.url = 'skillz.php';
         final.imageLookupName = "__item heartstone";
+    	boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
+    	int usesLUCK = get_property_int("heartstoneLuckUsed");
 
-        final.luckyCondition = __iotms_usable[$item[August Scepter]];
-        final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
-        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug. 2)`;
+        final.luckyCondition = accessLUCK && usesLUCK && __iotms_usable[lookupItem("heartstone")];
+        final.luckyCount = usesLUCK ? 0 : 1; 
+        final.tileDescription = `<b>{final.luckyCount}x Heartstone: LUCK</b> cast left`;
 
         return final;
     }
@@ -228,7 +230,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
         // never noticed I didn't explicitly say this was pillkeeper in the tile lol
         final.luckyCount = freeLuckLeft + spleenLucks;
         final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x PillKeeper</b> free lucky, `;
-        final.tileDescription = final.tileDescription + `and <b>{spleenLucks}x</b> more for 3 spleen each`;
+        if (spleenLucks > 0) final.tileDescription = final.tileDescription + `and <b>{spleenLucks}x</b> more for 3 spleen each`;
         return final;
     }
 
