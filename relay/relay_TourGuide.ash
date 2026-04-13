@@ -25505,7 +25505,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
 		final.luckyCount = cloversPossible;
 		final.tileDescription = `<b>{cloversPossible}x clovers</b> left`;
-		final.tileDescription = cloversAvailable > 0 ? final.tileDescription + `, with {cloversAvailable}x at the Hermit`;
+		final.tileDescription = cloversAvailable > 0 ? final.tileDescription + `, with {cloversAvailable}x at the Hermit` : final.tileDescription;
 
 		return final;
 	}
@@ -25526,7 +25526,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
 		final.luckyCount = spleenFitsThisManyAEDs;
 		final.tileDescription = `<b>{spleenFitsThisManyAEDs}x AEDs</b> to consume`;
-		final.tileDescription = availableAEDs - spleenFitsThisManyAEDs > 0 ? final.tileDescription + `, with {availableAEDs - spleenFitsThisManyAEDs}x ready for tomorrow`;
+		final.tileDescription = availableAEDs - spleenFitsThisManyAEDs > 0 ? final.tileDescription + `, with {availableAEDs - spleenFitsThisManyAEDs}x ready for tomorrow` : final.tileDescription;
 
 		return final;
 	}
@@ -25541,7 +25541,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
         final.luckyCondition = __iotms_usable[$item[August Scepter]];
         final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
-        final.tileDescription = `<b>{final.sneakCount}x August Scepter</b> cast left (Aug. 2)`;
+        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug. 2)`;
 
         return final;
     }
@@ -25572,7 +25572,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
         final.luckyCondition = available_amount($item[lucky moai statuette]) > 0;
         final.luckyCount = available_amount($item[lucky moai statuette])*3; 
-        final.tileDescription = `<b>{final.sneakCount}x clovers</b> via lucky moai`;
+        final.tileDescription = `<b>{final.luckyCount}x clovers</b> via lucky moai`;
 
         return final;
     }
@@ -25587,7 +25587,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
         final.luckyCondition = __iotms_usable[$item[August Scepter]];
         final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
-        final.tileDescription = `<b>{final.sneakCount}x August Scepter</b> cast left (Aug. 2)`;
+        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug. 2)`;
 
         return final;
     }
@@ -25603,16 +25603,16 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
         // see # of free pillkeeepers remaining
         int freeLuckLeft = get_property_boolean("_freePillKeeperUsed") ? 0 : 1;
 
-        // calculate possible spleen-based sneaks
+        // calculate possible spleen-based lucky
         int spleenLucks = floor(spleenRemaining / 3);
 
-        // usable if we have pill keeper plus free sneaks or spleen sneaks available
-        final.luckyCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeSneakLeft + spleenSneaks > 0);
+        // usable if we have pill keeper plus free lucky or spleen lucky available
+        final.luckyCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeLuckLeft + spleenLucks > 0);
 
         // never noticed I didn't explicitly say this was pillkeeper in the tile lol
         final.luckyCount = freeLuckLeft + spleenLucks;
         final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x PillKeeper</b> free lucky, `;
-        final.tileDescription = final.tileDescription + `and <b>{spleenSneaks}x</b> more for 3 spleen each`;
+        final.tileDescription = final.tileDescription + `and <b>{spleenLucks}x</b> more for 3 spleen each`;
         return final;
     }
 
@@ -25646,7 +25646,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 	string ll = HTMLGenerateSpanOfClass("✾", "r_element_stench");
 	string luckyText = HTMLGenerateSpanOfClass("Lucky!", "r_element_stench_desaturated");
 
-	foreach it, luckyType in sneakOrder
+	foreach it, luckyType in luckyOrder
     {
         LuckySource lucko = luckySources[luckyType];
         if (lucko.luckyCount > 0 && lucko.luckyCondition) {
@@ -25658,7 +25658,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
     }
 
-    if (totalSneaks == 0) return;
+    if (totalLuckyCharges == 0) return;
 
     // Append all the lines to a description
     description.listAppend(line);
@@ -25667,37 +25667,14 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
     entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalLuckyCharges, luckyText+" charge available", luckyText+" charges available"), "", description));
 
 	if (entry.subentries.count() > 0) resource_entries.listAppend(entry);
-	
+
 	// do not run old tile
 	if (false)
 	{
-		string [int] description;
-		string url;
-		description.listAppend(HTMLGenerateSpanFont("Have a Lucky adventure!", "green"));
-
-		// Figure out how many clovers you have available/possible and join the needed components
-		description.listAppend(luckyOptions(cloversPossible).listJoinComponents(", "));
-
 		
-		
-		if ($item[11-leaf clover].available_amount() > 0)
-		{
-			url = invSearch("11-leaf clover");
-			resource_entries.listAppend(ChecklistEntryMake("__item 11-leaf clover", url, ChecklistSubentryMake(pluralise($item[11-leaf clover]), "Inhale leaves for good luck", description), 2).ChecklistEntrySetCombinationTag("fortune"));
-		}
-		if ($item[[10883]astral energy drink].available_amount() > 0 && $item[11-leaf clover].available_amount() == 0)
-		{
-			url = invSearch("astral energy drink");
-			resource_entries.listAppend(ChecklistEntryMake("__item [10883]astral energy drink", url, ChecklistSubentryMake(pluralise(available_amount($item[[10883]astral energy drink]),"astral energy drink", "astral energy drinks"), "Costs 5 spleen each", description), 2).ChecklistEntrySetCombinationTag("fortune"));
-		}
-		else if ($item[[10883]astral energy drink].available_amount() > 0 && $item[11-leaf clover].available_amount() > 0)
-		{
-			url = invSearch("astral energy drink");
-			resource_entries.listAppend(ChecklistEntryMake("__item [10883]astral energy drink", url, ChecklistSubentryMake(pluralise(available_amount($item[[10883]astral energy drink]),"astral energy drink", "astral energy drinks"), "Costs 5 spleen each", ""), 2).ChecklistEntrySetCombinationTag("fortune"));
-		}
-
 		// Add a reminder to buy clovers if you haven't yet
 		string [int] hermitDescription;
+		int cloversAvailable = clampi(3 - get_property_int("_cloversPurchased"), 0, 3);
         if (cloversAvailable > 0)
         {
 			url = "hermit.php";
@@ -26494,7 +26471,7 @@ void SFamiliarsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 	if (my_familiar() == $familiar[none] && !__misc_state["single familiar run"] && lookupItem("FantasyRealm G. E. M.").equipped_amount() > 0 && !__misc_state["familiars temporarily blocked"] && !($locations[The Bandit Crossroads,The Towering Mountains,The Mystic Wood,The Putrid Swamp,The Cursed Village,The Sprawling Cemetery,The Old Rubee Mine,The Foreboding Cave,The Faerie Cyrkle,The Druidic Campsite,Near the Witch's House,The Evil Cathedral,The Barrow Mounds,The Cursed Village Thieves' Guild,The Troll Fortress,The Labyrinthine Crypt,The Lair of the Phoenix,The Dragon's Moor,Duke Vampire's Chateau,The Master Thief's Chalet,The Spider Queen's Lair,The Archwizard's Tower,The Ley Nexus,The Ghoul King's Catacomb,The Ogre Chieftain's Keep] contains __last_adventure_location))
 	{
 		string image_name = "black cat";
-		task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "It's dangerous to go alone!", -11)).ChecklistEntrySetIDTag("Bring familiar reminder"));
+		task_entries.listAppend(ChecklistEntryMake(image_name, "familiar.php", ChecklistSubentryMake("Bring along a familiar", "", "It's dangerous to go alone!"), -11).ChecklistEntrySetIDTag("Bring familiar reminder"));
 	}
     
     if ($familiar[Crimbo Shrub].familiar_is_usable() && my_path().id != PATH_G_LOVER)
@@ -26649,9 +26626,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
 
         // adding cookbookbat free crafts into crafting tile        
         if (lookupFamiliar("Cookbookbat").familiar_is_usable()) {
-            string [int] description;
 			free_cooks_left += clampi(5 - get_property_int("_cookbookbatCrafting"), 0, 5);
-			string title = "free cooking";
         }
 		// holiday multitasking
 		if (lookupSkill("Holiday Multitasking").skill_is_usable()) {
@@ -26659,21 +26634,21 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         }
         // elf guard cooking
         if (lookupSkill("Elf Guard Cooking").skill_is_usable()) {
-            string [int] description;
 			free_cooks_left += clampi(3 - get_property_int("_elfGuardCookingUsed"), 0, 3);
-			string title = "free cooking";
         }
 		// cocktails of the age of sail
         if (lookupSkill("Old-School Cocktailcrafting").skill_is_usable()) {
-            string [int] description;
 			free_mixes_left += clampi(3 - get_property_int("_oldSchoolCocktailCraftingUsed"), 0, 3);
-			string title = "free mixing";
         }
 
         if (free_cooks_left > 0) {
+            string [int] description;
+			string title = "free cooking";
 			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_cooks_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "COOKING only" : "", description));
 		}
 		if (free_mixes_left > 0) {
+            string [int] description;
+			string title = "free mixing";
 			craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_mixes_left, title, title + "s") + " remaining", free_crafts_left > 0 ? "MIXING only" : "", description));
 		}
 
@@ -26709,7 +26684,7 @@ void SSkillsGenerateResource(ChecklistEntry [int] resource_entries)
         if (free_crafts_left > 0 || crafting_plans > 0) {
             string [int] description; 
             description.listAppend(SSkillsPotentialCraftingOptions().listJoinComponents(", ").capitaliseFirstLetter());
-            if (crafting_plans > 0) description.listAppend("Also, <b>"+pluralise($item[crafting plans])+"</b> for more free crafts.")
+            if (crafting_plans > 0) description.listAppend("Also, <b>"+pluralise($item[crafting plans])+"</b> for more free crafts.");
             craft_entry.subentries.listAppend(ChecklistSubentryMake(pluralise(free_crafts_left, "free craft", "free crafts") + " remaining", free_smiths_left > 0 || jackhammer_crafts_later > 0 ? "Any crafting mode, including smithing" : "", description));
         }
 
