@@ -60,7 +60,13 @@ static {
     int PATH_SMOL = 49; // easier to type
     int PATH_A_SHRUNKEN_ADVENTURER_AM_I = 49;
     int PATH_WEREPROFESSOR = 50;
+    int PATH_11_THINGS = 51;
+    int PATH_BODYGUARD = 52;
+    int PATH_ZOOT = 53;
+    int PATH_ZOOTOMIST = 53;
+    int PATH_HAT_TRICK = 54;
     int PATH_SEA = 55;
+    int PATH_MEAT = 56;
 }
 
 float numeric_modifier_replacement(item it, string modifier_string) {

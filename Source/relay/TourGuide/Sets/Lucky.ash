@@ -55,7 +55,7 @@ string [int] luckyOptions(int cloversAvailable) {
 	if (protestorsRemaining > 10 && protestorsPerClover > 15)
 		allTheLuckyStuff.listAppend("Zeppelin Mob (x"+projectedZeppClovers+")");
 		cloversAdjusted = MAX(cloversAdjusted - projectedZeppClovers, 3);
-	if (my_path().id == 56) //adventurer meats world
+	if (my_path().id == PATH_MEAT) //adventurer meats world
 		allTheLuckyStuff.listAppend("Knob Goblin Embezzler");
 	if (__misc_state["wand of nagamar needed"] && lettersStillNeeded > 0)
 		allTheLuckyStuff.listAppend("Wand of Nagamar");
@@ -314,7 +314,7 @@ void LuckyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 		int cloversAvailable = clampi(3 - get_property_int("_cloversPurchased"), 0, 3);
 		int cloversPossible = $item[11-leaf clover].available_amount() + cloversAvailable;
 		
-		if (__misc_state["in run"] && my_path().id == 44) { // path is grey you lol
+		if (__misc_state["in run"] && my_path().id == PATH_GREY_YOU) { // path is grey you lol
 			description.listAppend("1x ore, 1x freezerburned ice cube, 1x full-length mirror.");
 		}
 		else if (__misc_state["in run"]) {

@@ -472,7 +472,7 @@ string generateRandomMessage()
             random_messages.listAppend("a single perfect day");
             break;
         case PATH_POCKET_FAMILIARS:
-        	random_messages.listAppend("adorable slaves");
+        	random_messages.listAppend("adorable servants");
             break;
         case PATH_G_LOVER:
             random_messages.listAppend("get going, guuuurl");
@@ -485,6 +485,41 @@ string generateRandomMessage()
             random_messages.listAppend("what happened to my inventory?"); break;
         case PATH_EXPLOSIONS:
             random_messages.listAppend("kaboooooom"); break;
+        case PATH_OF_THE_PLUMBER:
+            random_messages.listAppend("it'sa me, tourguido"); break;
+        case PATH_LOW_KEY_SUMMER:
+            random_messages.listAppend("the key is that you find keys"); break;
+        case PATH_GREY_GOO:
+            random_messages.listAppend("gooooooooo"); break;
+        case PATH_YOU_ROBOT:
+            random_messages.listAppend("beep boop beep boop"); break;
+        case PATH_QUANTUM_TERRARIUM:
+            random_messages.listAppend("go watch quantum leap"); break;
+        case PATH_WILDFIRE:
+            random_messages.listAppend("aaaaa!! everything's on "+HTMLGenerateSpanFont("fire", "red")+"!!"); break;
+        case PATH_GREY_YOU:
+            random_messages.listAppend("are you manual, or straight gloopin'?"); break;
+        case PATH_JOURNEYMAN:
+            random_messages.listAppend("it's all part of the journey, man"); break;
+        case PATH_FALL_OF_THE_DINOSAURS:
+            random_messages.listAppend("autumn of the chickens just didn't have the same zip"); break;
+        case PATH_AVATAR_OF_SHADOWS_OVER_LOATHING:
+            random_messages.listAppend("enter the shadow realm"); break;
+        case PATH_LEGACY_OF_LOATHING:
+            random_messages.listAppend("100% jill ascension when"); break;
+        case PATH_WEREPROFESSOR:
+            random_messages.listAppend("what to were, what to were"); break;
+        case PATH_11_THINGS:
+            random_messages.listAppend("ridiculous path. not even funny."); break;
+        case PATH_BODYGUARD:
+            random_messages.listAppend("wanna fight?!??!?"); break;
+        case PATH_HAT_TRICK:
+            random_messages.listAppend("hat got your tongue?"); break;
+        case PATH_SEA:
+            random_messages.listAppend("gurgle gurgle gurgle"); break;
+        case PATH_MEAT:
+            random_messages.listAppend("to quote Doc Rivers, don't play with your meat"); break;
+        
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -493,6 +528,26 @@ string generateRandomMessage()
     
     if (in_ronin() && my_adventures() <= 3)
     	random_messages.listAppend("always tomorrow");
+
+    if (my_path().id == PATH_SMOL) {
+        // just adding all the quotes i remember from the mcelroy amelie sketch
+        random_messages.listAppend("cook an egg with a spoon, it's amelie!"); break;
+        random_messages.listAppend("fall in love again with me, amelie!"); break;
+        random_messages.listAppend("too small to fit on the blu-ray, they lose me"); break;
+        random_messages.listAppend("this laserdisc is gigantique"); break;
+        random_messages.listAppend("a plate for my egg dinner"); break;
+        random_messages.listAppend("spin around inside a VHS tape"); break;
+        random_messages.listAppend("amelie?"); break;
+    }
+
+    if (my_path().id == PATH_ZOOT) {
+        // just adding godric the grafted quotes nbd
+        random_messages.listAppend("lend me thy strength, o kindred"); break;
+        random_messages.listAppend("a lowly tarnished..."); break;
+        random_messages.listAppend("turns himself into a pickle, he's called pickle godrick"); break;
+        random_messages.listAppend("playing as a Lorde, specifically on Royals"); break;
+        random_messages.listAppend("deliver me unto greater heights"); break;
+    }
     
     random_messages.listAppend("I don't know either, sorry");
     
@@ -888,8 +943,10 @@ string generateRandomMessage()
                 random_messages.listAppend(lowercase_player_name + "! now is not the time to use that!"); break;
             case PATH_G_LOVER:
                 random_messages.listAppend("the Gs will continue until morale improves"); break;
-            case 46: // Fall of the Dinosaurs
+            case PATH_FALL_OF_THE_DINOSAURS: // Fall of the Dinosaurs
                 random_messages.listAppend("watch out for velociraptors"); break;
+            case PATH_ZOOT:
+                random_messages.listAppend("thou'rt unfit even to graft..."); break;
             default:
                 random_messages.listAppend("ow"); break;
         }
@@ -926,7 +983,7 @@ string generateRandomMessage()
     
     // Adding a few Legacy of Loathing replica messages
 
-    if (my_path() == $path[Legacy of Loathing])
+    if (my_path().id == PATH_LEGACY_OF_LOATHING)
     {
         random_messages.listAppend("make sure you get your hand turkey");
         random_messages.listAppend("hot legacy summer");
