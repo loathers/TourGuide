@@ -50,6 +50,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     int inningsPlayed = get_property_int("_baseballInnings");
     monster [int] myTeam = baseballBuddies();
     int monstersNeededToPlayBall = clampi(9-myTeam.count(),0,9);
+    if (get_property("baseballTeam") == "") monstersNeededToPlayBall = 0;
 
     // For this tile, we'll start with an overall "what should you use your remaining ballgames on" and transition into "what -have- you used these things on, currently"
 

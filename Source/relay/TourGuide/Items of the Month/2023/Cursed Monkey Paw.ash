@@ -390,11 +390,12 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         string url;
         url = "main.php";
-        description.listAppend("Turn-taking repeat-use banish. Lasts until you use it again!");
+        description.listAppend("Turn-taking banish, all-day duration.");
         if ($item[cursed monkey's paw].equipped_amount() == 0) {
-            description.listAppend("Equip your cursed monkey paw first.");
+		    description.listAppend(HTMLGenerateSpanFont("Equip the Monkey's Paw first.", "red"));
             url = "inventory.php?ftext=cursed+monkey";
         }
+
         resource_entries.listAppend(ChecklistEntryMake("__skill monkey slap", "", ChecklistSubentryMake("Monkey Slap usable", "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cursed monkey paw banish"));
     }
 }

@@ -14,6 +14,7 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
 	string monodentWaveZone = get_property("_seadentWaveZone");
 	string [int] description;
 	string title = "Monodent/Seadent powers";
+	boolean monodentIsEquipped = lookupItem("monodent of the sea").equipped_amount() > 0;
 	
 	if (!monodentWaveUsed) {
 		description.listAppend(HTMLGenerateSpanFont("Flood a zone for +30% item/meat", "blue"));		
@@ -34,13 +35,22 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Current upgrades: " + monodentUpgrades + "/100");
         description.listAppend((HTMLGenerateSpanFont(constructsNeededForNextPerk, "blue")) + " constructs needed for upgrade");
     }
-	if (lookupItem("monodent of the sea").equipped_amount() == 0)
+	if (!monodentIsEquipped)
     {
 		description.listAppend(HTMLGenerateSpanFont("Equip the Seadent first", "red"));		
 	}
-	if (lookupItem("monodent of the sea").equipped_amount() > 0)
+	if (monodentIsEquipped)
 	{
 		description.listAppend(HTMLGenerateSpanFont("Seadent lightning ready!", "blue"));		
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", url, ChecklistSubentryMake(title, "", description)));
+
+	// Banish combination tile
+	if (monodentLightningsLeft > 0)
+    {
+        string [int] banishDesc;
+		banishDesc.listAppend("Turn-taking, all-day banish.");
+		if (!monodentIsEquipped) banishDesc.listAppend(HTMLGenerateSpanFont("Equip the Seadent first", "red"));
+		resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", "", ChecklistSubentryMake(pluralise(monodentLightningsLeft, "lightning strike", "lightning strikes"), "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("seadent killbanish"));
+    }
 }

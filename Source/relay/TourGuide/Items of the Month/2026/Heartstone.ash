@@ -129,19 +129,19 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
     boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
 
     // How many times has the user used the skills?
-    int usesBOOM = get_property_int("heartstoneKillUsed");
-    int usesGONE = get_property_int("heartstoneBanishUsed");
-    int usesSTUN = get_property_int("heartstoneStunUsed");
-    int usesBUDS = get_property_int("heartstonePalsUsed");
-    int usesBUFF = get_property_int("heartstoneBuffUsed");
-    int usesLUCK = get_property_int("heartstoneLuckUsed");
+    int usesBOOM = get_property_int("_heartstoneKillUsed");
+    int usesGONE = get_property_int("_heartstoneBanishUsed");
+    int usesSTUN = get_property_int("_heartstoneStunUsed");
+    int usesBUDS = get_property_int("_heartstonePalsUsed");
+    int usesBUFF = get_property_int("_heartstoneBuffUsed");
+    int usesLUCK = get_property_boolean("_heartstoneLuckUsed").to_int();
 
     // Banish combination tag for GONE.
     if (accessGONE && usesGONE < 5) {
         string [int] banishDesc;
         banishDesc.listAppend("Turn-taking banish, 50-turn duration.");
         if (!heartstoneEquipped) banishDesc.listAppend("Equip your Heartstone.");
-        resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", "", ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", url, banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
     }
 
     description.listAppend("Steal Monster Hearts for useful items.");

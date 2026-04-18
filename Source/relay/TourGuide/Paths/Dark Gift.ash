@@ -10,15 +10,16 @@ void PathDarkGiftGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string url;
         string [int] description;
-        description.listAppend("Free run/banish.");
-        description.listAppend("There's a lot of them, so you might just want to use them as a free run?");
-        Banish banish_entry = BanishByName("Baleful Howl");
-        int turns_left_of_banish = banish_entry.BanishTurnsLeft();
-        if (turns_left_of_banish > 0)
-        {
-            //is this relevant? we don't describe this for pantsgiving
-            description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
-        }
+        description.listAppend("Free run, all-day banish.");
+        // description.listAppend("There's a lot of them, so you might just want to use them as a free run?");
+        // Banish banish_entry = BanishByName("Baleful Howl");
+        // int turns_left_of_banish = banish_entry.BanishTurnsLeft();
+        // Removing since we have the banis combo tile now.
+        // if (turns_left_of_banish > 0)
+        // {
+        //     //is this relevant? we don't describe this for pantsgiving
+        //     description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
+        // }
         resource_entries.listAppend(ChecklistEntryMake("__skill Baleful Howl", url, ChecklistSubentryMake(pluralise(banishes_left, "baleful howl", "baleful howls"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Dark gyffte path baleful howl banish"));
     }
 }

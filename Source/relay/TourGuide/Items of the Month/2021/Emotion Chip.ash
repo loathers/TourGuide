@@ -92,6 +92,6 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
     }
     
     if (entry.subentries.count() > 0) {
-        resource_entries.listAppend(entry);
+        resource_entries.listAppend(entry, "5");
     }
 }

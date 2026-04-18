@@ -38,10 +38,10 @@ void IOTMSpringShoesGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!__iotms_usable[lookupItem("spring shoes")]) return;
 
 	string [int] banishDescription;
-	banishDescription.listAppend("All day banish, doesn't end combat");
+	banishDescription.listAppend("Mid-combat, all-day banish.");
 	if (lookupItem("spring shoes").equipped_amount() == 0)
 	{
-		banishDescription.listAppend(HTMLGenerateSpanFont("Equip the spring shoes first.", "red"));
+		banishDescription.listAppend(HTMLGenerateSpanFont("Equip the spring shoes first", "red"));
 	}
-	resource_entries.listAppend(ChecklistEntryMake("__skill spring shoes", "", ChecklistSubentryMake("Spring Kick", "", banishDescription), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Spring shoes spring kick banish"));
+	resource_entries.listAppend(ChecklistEntryMake("__skill spring shoes", "still gotta kill the monster!", ChecklistSubentryMake("Spring Kick", "", banishDescription), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Spring shoes spring kick banish"));
 }
