@@ -85,6 +85,7 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
 	ChecklistEntry entry;
     entry.image_lookup_name = "__item emotion chip";
     entry.tags.id = "emotion chip resource";
+    entry.importance_level = 5;
 
     ChecklistSubentry emotions = getEmotions();
     if (emotions.entries.count() > 0) {
@@ -92,6 +93,6 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
     }
     
     if (entry.subentries.count() > 0) {
-        resource_entries.listAppend(entry, "5");
+        resource_entries.listAppend(entry);
     }
 }

@@ -531,22 +531,22 @@ string generateRandomMessage()
 
     if (my_path().id == PATH_SMOL) {
         // just adding all the quotes i remember from the mcelroy amelie sketch
-        random_messages.listAppend("cook an egg with a spoon, it's amelie!"); break;
-        random_messages.listAppend("fall in love again with me, amelie!"); break;
-        random_messages.listAppend("too small to fit on the blu-ray, they lose me"); break;
-        random_messages.listAppend("this laserdisc is gigantique"); break;
-        random_messages.listAppend("a plate for my egg dinner"); break;
-        random_messages.listAppend("spin around inside a VHS tape"); break;
-        random_messages.listAppend("amelie?"); break;
+        random_messages.listAppend("cook an egg with a spoon, it's amelie!"); 
+        random_messages.listAppend("fall in love again with me, amelie!");
+        random_messages.listAppend("too small to fit on the blu-ray, they lose me");
+        random_messages.listAppend("this laserdisc is gigantique"); 
+        random_messages.listAppend("a plate for my egg dinner"); 
+        random_messages.listAppend("spin around inside a VHS tape"); 
+        random_messages.listAppend("amelie?"); 
     }
 
     if (my_path().id == PATH_ZOOT) {
         // just adding godric the grafted quotes nbd
-        random_messages.listAppend("lend me thy strength, o kindred"); break;
-        random_messages.listAppend("a lowly tarnished..."); break;
-        random_messages.listAppend("turns himself into a pickle, he's called pickle godrick"); break;
-        random_messages.listAppend("playing as a Lorde, specifically on Royals"); break;
-        random_messages.listAppend("deliver me unto greater heights"); break;
+        random_messages.listAppend("lend me thy strength, o kindred"); 
+        random_messages.listAppend("a lowly tarnished..."); 
+        random_messages.listAppend("turns himself into a pickle, he's called pickle godrick"); 
+        random_messages.listAppend("playing as a Lorde, specifically on Royals"); 
+        random_messages.listAppend("deliver me unto greater heights"); 
     }
     
     random_messages.listAppend("I don't know either, sorry");
