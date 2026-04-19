@@ -25541,14 +25541,14 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 	LuckySource getHeartstone() {
         LuckySource final;
 
-        final.sourceName = `august scepter`;
+        final.sourceName = `heartstone`;
         final.url = 'skillz.php';
         final.imageLookupName = "__item heartstone";
     	boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
     	int usesLUCK = get_property_int("heartstoneLuckUsed");
 
         final.luckyCondition = accessLUCK && usesLUCK == 0 && __iotms_usable[lookupItem("heartstone")];
-        final.luckyCount = usesLUCK == 0 ? 0 : 1; 
+        final.luckyCount = usesLUCK == 1 ? 0 : 1; 
         final.tileDescription = `<b>{final.luckyCount}x Heartstone: LUCK</b> cast left`;
 
         return final;
@@ -25595,7 +25595,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
         final.luckyCondition = __iotms_usable[$item[August Scepter]];
         final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
-        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug. 2)`;
+        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug 2)`;
 
         return final;
     }
@@ -25619,7 +25619,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
         // never noticed I didn't explicitly say this was pillkeeper in the tile lol
         final.luckyCount = freeLuckLeft + spleenLucks;
-        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x PillKeeper</b> free lucky, `;
+        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x Pillkeeper</b> free lucky, `;
         if (spleenLucks > 0) final.tileDescription = final.tileDescription + `and <b>{spleenLucks}x</b> more for 3 spleen each`;
         return final;
     }
@@ -25651,7 +25651,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] description;
     int totalLuckyCharges = 0;
 	string line = HTMLGenerateSpanOfClass("Get a Lucky! adventure", "r_bold r_element_stench_desaturated");
-	string ll = HTMLGenerateSpanOfClass("✾", "r_element_stench");
+	string ll = HTMLGenerateSpanOfClass("✾ ", "r_element_stench");
 	string luckyText = HTMLGenerateSpanOfClass("Lucky!", "r_element_stench_desaturated");
 
 	foreach it, luckyType in luckyOrder
@@ -55713,7 +55713,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         url = "main.php";
         description.listAppend("Turn-taking kill, all-day banish.");
         if ($item[cursed monkey's paw].equipped_amount() == 0) {
-		    description.listAppend(HTMLGenerateSpanFont("Equip the Monkey's Paw first.", "red"));
+		    description.listAppend(HTMLGenerateSpanFont("Equip the Monkey's Paw first", "red"));
             url = "inventory.php?ftext=cursed+monkey";
         }
 
@@ -58236,19 +58236,62 @@ void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 
 }
 //prismatic beret
+
+string [string] modifierMapping;
+
+
+modifierMapping["Item Drop"] = "% item";
+modifierMapping["Meat Drop"] = "% meat";
+modifierMapping["Initiative"] = "% init";
+modifierMapping["Familiar Weight"] = " fam wt";
+modifierMapping["Familiar Experience"] = " fam xp";
+
+string generateBuffDescription(effect currEffect) {
+	string output = "<b>"+currEffect.name+"</b>";
+	string [int] relevantMods;
+	int modLevel = 0;
+	foreach modifier, shortmod in modifierMapping {
+		modLevel = numeric_modifier(currEffect, modifier).to_int();
+		if (modLevel > 0) relevantMods.listAppend(modLevel+shortmod);
+	}
+	if (relevantMods.count() > 0) output += ": "+listJoinComponents(relevantMods,", ");
+
+	return output;
+}
+
+string [int] generateBuskDescription(int [effect] currentBusks) {
+	string [int] output;
+
+	foreach busk,turns in currentBusks {
+		if (busk == $effect[none]) {
+			output.listAppend("Busk now for "+turns+" meat, and these effects:");
+		} else if (busk == $effect[dirty pear]) {
+			output.listAppend("|*<b>Dirty Pear</b>: Doubles "+HTMLGenerateSpanFont("sleaze damage", "r_element_sleaze"));
+		} else {
+			string color = have_effect(busk) > 0 ? "gray" : "black";
+			output.listAppend("|*"+generateBuffDescription(busk));
+		}
+
+	}
+
+	return output;
+}
+
 RegisterResourceGenerationFunction("IOTMPrismaticBeretGenerateResource");
 void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	// TODO: tile additions 
-	//   - add beret busk you will get here
 	//   - maybe add easily accessible hats/pants too
 
 	if (!__iotms_usable[lookupItem("prismatic beret")]) return;
 	
     string url = "inventory.php?ftext=prismatic+beret";
 	int busksLeft = clampi(5 - get_property_int("_beretBuskingUses"), 0, 5);
-	string [int] description;
-	string title = HTMLGenerateSpanFont(busksLeft + " Prismatic Beret Busks", "purple");
+	string title = HTMLGenerateSpanFont(busksLeft + " Prismatic Beret busks!", "purple");
+
+	int [effect] currentBusks = beret_busking_effects();
+
+	string [int] description = generateBuffDescription(currentBusks);
 	
 	int hatpower;
     int pantspower;
@@ -58277,14 +58320,13 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 	{
 		if (lookupSkill("tao of the terrapin").have_skill()) total += hatpower*2 + pantspower*2;
         if ($effect[Hammertime].have_effect() > 0) total += pantspower*3;
-		description.listAppend("Gain buffs based on current equipment Power");
 		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " Power");
 		
 		if (lookupItem("prismatic beret").equipped_amount() == 0) {
 			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk!", "red"));
 		}
 		if (lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted()) {
-			description.listAppend(HTMLGenerateSpanFont("(You can put it on your hatrack)", "blue"));
+			description.listAppend(HTMLGenerateSpanFont("|*(You can put it on your hatrack)", "blue"));
 		}
 		
 		resource_entries.listAppend(ChecklistEntryMake("__item prismatic beret", url, ChecklistSubentryMake(title, "", description)));
@@ -58496,7 +58538,7 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
 	// it is important to name things properly
 	string [int] dentPrefixes = { 'Mono', 'Bi', 'Tri', 'Qua', 'Penta', 'Hexa', 'Hepta', 'Octo', 'Nona', 'Deca' };
 	int constructs = get_property('seadentConstructKills').to_int();
-	int level = clamp(get_property('seadentLevel').to_int(), 1, 10);
+	int level = clampi(get_property('seadentLevel').to_int(), 1, 10);
 	string prefix = dentPrefixes[level - 1];
 
 	string monodentName = prefix + "dent of the sea";
@@ -58560,7 +58602,7 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
     //   - match pheromone styling to other banishes
 
 
-	if (__iotms_usable[lookupItem("blood cubic zirconia")]) return;
+	if (!__iotms_usable[lookupItem("blood cubic zirconia")]) return;
 	string url = "inventory.php?ftext=blood+cubic+zirconia";
 	string [int] description;
 	int bczRefracts = get_property_int("_bczRefractedGazeCasts");
@@ -58611,7 +58653,7 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 RegisterResourceGenerationFunction("IOTMBloodCubicZirconiaGenerateResource");
 void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if ($item[blood cubic zirconia].available_amount() == 0) return;
+    if (!__iotms_usable[lookupItem("blood cubic zirconia")]) return;
 	string url = "inventory.php?ftext=blood+cubic+zirconia";
 	string [int] description;
 	int bczBaths = get_property_int("_bczBloodBathCasts");
@@ -58655,10 +58697,37 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 	int pheromoneBlasts = get_property_int("markYourTerritoryCharges");
 	if (pheromoneBlasts > 0)
     {
-        string [int] description2;
-		description2.listAppend("Turn-taking kill, all-day banish.");
-		resource_entries.listAppend(ChecklistEntryMake("__skill mark your territory", "", ChecklistSubentryMake(pluralise(pheromoneBlasts, "cast of Mark Your Territory", "casts of Mark Your Territory"), "drink pheromone cocktails for more charges!", description2), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("BCZ pheromone banish"));
+		resource_entries.listAppend(ChecklistEntryMake("__skill mark your territory", "", ChecklistSubentryMake(pluralise(pheromoneBlasts, "cast of Mark Your Territory", "casts of Mark Your Territory"), "drink pheromone cocktails for more charges!", "Turn-taking kill, all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("BCZ pheromone banish"));
     }
+
+	// Freekill combination tile entry.
+	string header = "BCZ: Sweat Bullets";
+	string subtitle;
+	string [int] bulletDesc;
+
+	if (bczBullets > 0) subtitle= "have used "+pluralise(bczBullets,"bullet","bullets")+" today";
+
+	bulletDesc.listAppend("Win a fight without taking a turn.");
+	bulletDesc.listAppend("Next bullet costs "+bulletCost+" moxie substats");
+	if (lookupItem("blood cubic zirconia").equipped_amount() == 0) 
+		bulletDesc.listAppend(HTMLGenerateSpanFont("Equip the Blood Cubic Zirconia first", "red"));;
+
+	resource_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(header,subtitle,bulletDesc)).ChecklistEntrySetCombinationTag("free instakill"));
+
+	// void showShadowBrickFreeKills(ChecklistEntry [int] resource_entries) {
+	// 	int shadowBricks = available_amount($item[shadow brick]);
+	// 	int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
+	// 	if ($item[shadow brick].available_amount() > 0) {
+	// 		string header = $item[shadow brick].pluralise().capitaliseFirstLetter();
+	// 		if (shadowBrickUsesLeft < shadowBricks) {
+	// 			if (shadowBrickUsesLeft == 0)
+	// 				header += " (not usable today)";
+	// 			else
+	// 				header += " (" + shadowBrickUsesLeft + " usable today)";
+	// 		}
+	// 	resource_entries.listAppend(ChecklistEntryMake("__item shadow brick", "", ChecklistSubentryMake(header, "", "Win a fight without taking a turn.")).ChecklistEntrySetCombinationTag("free instakill"));
+    // 	}
+	// }
 }
 //shrunken head
 RegisterTaskGenerationFunction("IOTMShrunkenHeadGenerateTasks");
