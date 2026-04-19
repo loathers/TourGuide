@@ -7,7 +7,6 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
     //   - add refract recommendation system
     //   - shorten resource tile by switching the less-useful uses into a hoverover
     //   - small wording tweaks 
-    //   - match pheromone styling to other banishes
 
 
 	if (!__iotms_usable[lookupItem("blood cubic zirconia")]) return;
@@ -26,7 +25,7 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 	int bulletCost = bloodCast[min(bczBullets, 15)];
 	int equityCost = bloodCast[min(bczEquitys, 15)];
 	
-	if (lookupItem("blood cubic zirconia").equipped_amount() > 0)
+	if (gemstoneEquipped(lookupItem("blood cubic zirconia")))
 	{
 		if (bczRefracts < 13) {
 			description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost + "", "red") + " mys");
@@ -53,8 +52,9 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 		}
 		else if (bczEquitys >= 13) {
 			description.listAppend(HTMLGenerateSpanFont("Next Equity costs " + equityCost + " mox. EXPENSIVE!", "red") + "");
-		}	
-		task_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(HTMLGenerateSpanFont("BCZ: Blood Cubic Zirconia skills", "brown"), description), -11).ChecklistEntrySetIDTag("bcz important skills"));
+		}
+		// This was originally a supernag but I simply will not let this be -always- on my screen.	
+		task_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(HTMLGenerateSpanFont("BCZ: Blood Cubic Zirconia skills", "brown"), description), 11).ChecklistEntrySetIDTag("bcz important skills"));
 	}
 }
 
@@ -117,8 +117,8 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 
 	bulletDesc.listAppend("Win a fight without taking a turn.");
 	bulletDesc.listAppend("Next bullet costs "+bulletCost+" moxie substats");
-	if (lookupItem("blood cubic zirconia").equipped_amount() == 0) 
-		bulletDesc.listAppend(HTMLGenerateSpanFont("Equip the Blood Cubic Zirconia first", "red"));;
+	if (!gemstoneEquipped(lookupItem("blood cubic zirconia"))) 
+		bulletDesc.listAppend(HTMLGenerateSpanFont("Equip the Blood Cubic Zirconia first", "red"));
 
 	resource_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(header,subtitle,bulletDesc)).ChecklistEntrySetCombinationTag("free instakill"));
 

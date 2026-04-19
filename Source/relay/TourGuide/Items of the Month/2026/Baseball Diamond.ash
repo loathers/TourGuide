@@ -45,7 +45,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
 
     ChecklistSubentry [int] subentries;
 
-    boolean baseballEquipped = lookupItem("Baseball Diamond").equipped_amount() > 0;
+    boolean baseballEquipped = gemstoneEquipped(lookupItem("Baseball Diamond"));
     string url = baseballEquipped ? "inventory.php?which=2" : "inventory.php?ftext=baseball+diamond";
     int inningsPlayed = get_property_int("_baseballInnings");
     monster [int] myTeam = baseballBuddies();

@@ -1,27 +1,28 @@
 //prismatic beret
 
+// These are the only modifiers I care to give.
 string [string] modifierMapping;
-
-
-modifierMapping["Item Drop"] = "% item";
 modifierMapping["Meat Drop"] = "% meat";
+modifierMapping["Item Drop"] = "% item";
 modifierMapping["Initiative"] = "% init";
-modifierMapping["Familiar Weight"] = " fam wt";
-modifierMapping["Familiar Experience"] = " fam xp";
+modifierMapping["Familiar Weight"] = " famwt";
+modifierMapping["Familiar Experience"] = " famxp";
 
+// Generate a string description of the buffs by cycling through above modifiers.
 string generateBuffDescription(effect currEffect) {
 	string output = "<b>"+currEffect.name+"</b>";
 	string [int] relevantMods;
 	int modLevel = 0;
-	foreach modifier, shortmod in modifierMapping {
-		modLevel = numeric_modifier(currEffect, modifier).to_int();
-		if (modLevel > 0) relevantMods.listAppend(modLevel+shortmod);
+	foreach mod, shortmod in modifierMapping {
+		modLevel = numeric_modifier(currEffect, mod).to_int();
+		if (modLevel > 0) relevantMods.listAppend("+"+modLevel+shortmod);
 	}
 	if (relevantMods.count() > 0) output += ": "+listJoinComponents(relevantMods,", ");
 
 	return output;
 }
 
+// Cycle through all effects in the currently produced busks 
 string [int] generateBuskDescription(int [effect] currentBusks) {
 	string [int] output;
 
@@ -32,7 +33,7 @@ string [int] generateBuskDescription(int [effect] currentBusks) {
 			output.listAppend("|*<b>Dirty Pear</b>: Doubles "+HTMLGenerateSpanFont("sleaze damage", "r_element_sleaze"));
 		} else {
 			string color = have_effect(busk) > 0 ? "gray" : "black";
-			output.listAppend("|*"+generateBuffDescription(busk));
+			output.listAppend(HTMLGenerateSpanFont("|*"+generateBuffDescription(busk),color));
 		}
 
 	}
@@ -53,8 +54,9 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 	string title = HTMLGenerateSpanFont(busksLeft + " Prismatic Beret busks!", "purple");
 
 	int [effect] currentBusks = beret_busking_effects();
+    boolean canHatrack = lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted();
 
-	string [int] description = generateBuffDescription(currentBusks);
+	string [int] description = generateBuskDescription(currentBusks);
 	
 	int hatpower;
     int pantspower;
@@ -81,17 +83,19 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	if (busksLeft > 0) 
 	{
+        string hatrackText = canHatrack ? "(Can equip on hatrack)" : "";
+        boolean hatrackEquipped = equipped_item($slot[familiar]) == lookupItem("prismatic beret");
+        if (hatrackEquipped) hatrackText = "";
 		if (lookupSkill("tao of the terrapin").have_skill()) total += hatpower*2 + pantspower*2;
         if ($effect[Hammertime].have_effect() > 0) total += pantspower*3;
-		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " Power");
+		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " total hat/shirt/pants power. ");
 		
 		if (lookupItem("prismatic beret").equipped_amount() == 0) {
-			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk!", "red"));
+			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk! ", "red")+hatrackText);
 		}
-		if (lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted()) {
-			description.listAppend(HTMLGenerateSpanFont("|*(You can put it on your hatrack)", "blue"));
-		}
-		
+        if (canHatrack && !hatrackEquipped && lookupItem("prismatic beret").equipped_amount() > 0) {
+            description.listAppend("|*Consider equipping to your hatrack for more options.");
+        }
 		resource_entries.listAppend(ChecklistEntryMake("__item prismatic beret", url, ChecklistSubentryMake(title, "", description)));
 	}
 }

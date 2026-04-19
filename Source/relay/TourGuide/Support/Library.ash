@@ -1719,3 +1719,21 @@ location hippyCampInDisguise() {
 boolean isAprilFools() {
     return (now_to_string("MMdd") == "0401");
 }
+
+// For gems that can appear in the Eternity Codpiece, helper function
+//   that checks both general equip status + 
+boolean gemstoneInCodpiece(item gem) {
+    if ($slot[codpiece1].equipped_item() == gem) return true;
+    if ($slot[codpiece2].equipped_item() == gem) return true;
+    if ($slot[codpiece3].equipped_item() == gem) return true;
+    if ($slot[codpiece4].equipped_item() == gem) return true;
+    if ($slot[codpiece5].equipped_item() == gem) return true;
+    return false;
+}
+
+// For gems that can appear in Eternity Codpiece, check both gem + cod equip status
+boolean gemstoneEquipped(item gem) {
+    if (gemstoneInCodpiece(gem)) return $item[The Eternity Codpiece].equipped_amount() > 0;
+    if (gem.equipped_amount() > 0) return true;
+    return false;
+}

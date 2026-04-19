@@ -12,7 +12,7 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     string hackerToday = "";
 
     // Is the heartstone equipped?
-    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
+    boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
 
     // Generate boolean flags for accessibility of each monster
     // --- T MONSTERS ----------------
@@ -107,7 +107,7 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
 { 
 	// the heart must go on
 	if (!__iotms_usable[lookupItem("Heartstone")]) return;
-    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
+    boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
 
     // What are the heartstone's letters?
     string heartLetters = get_property("heartstoneLetters");
