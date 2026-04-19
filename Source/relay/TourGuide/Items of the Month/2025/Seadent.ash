@@ -11,7 +11,7 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
 	// it is important to name things properly
 	string [int] dentPrefixes = { 'Mono', 'Bi', 'Tri', 'Qua', 'Penta', 'Hexa', 'Hepta', 'Octo', 'Nona', 'Deca' };
 	int constructs = get_property('seadentConstructKills').to_int();
-	int level = clamp(get_property('seadentLevel').to_int(), 1, 10);
+	int level = clampi(get_property('seadentLevel').to_int(), 1, 10);
 	string prefix = dentPrefixes[level - 1];
 
 	string monodentName = prefix + "dent of the sea";
