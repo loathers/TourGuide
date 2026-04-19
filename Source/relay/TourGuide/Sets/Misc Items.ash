@@ -214,11 +214,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             //subentry.entries.listAppend(pluralise(banishes_available, "banish", "banishes") + " available.");
             string [int] tasks;
             string subtitle;
-            tasks.listAppend("Turn-taking, 30-turn banish.");
+            tasks.listAppend("Turn-taking kill, 30-turn banish.");
             if ($item[pantsgiving].equipped_amount() == 0)
                  subtitle = "equip pantsgiving";
             // tasks.listAppend("cast talk about politics");
-            resource_entries.listAppend(ChecklistEntryMake("__item pantsgiving", url, ChecklistSubentryMake(pluralise(banishes_available, "cast of Talk About Politics", "casts of Talk About Politics"), "", tasks), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Pantsgiving banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item pantsgiving", url, ChecklistSubentryMake(pluralise(banishes_available, "cast of Talk About Politics", "casts of Talk About Politics"), "does allow item/meat drops", tasks), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Pantsgiving banish"));
             
         }
         
@@ -1297,7 +1297,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
     }
     if ($item[mafia middle finger ring].available_amount() > 0 && !get_property_boolean("_mafiaMiddleFingerRingUsed")) {
-        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("Mafia middle finger ring", "", "Free run, 60-turn banish." + ($item[mafia middle finger ring].equipped_amount() == 0 ? " Equip first." : "")), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));   
+        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("1 cast of 'show them your ring'", "", "Free run, 60-turn banish." + ($item[mafia middle finger ring].equipped_amount() == 0 ? "|"+HTMLGenerateSpanFont("Equip the mafia middle finger ring first", "red") : "")), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));   
     }
 
     if (get_property_int("_glitchMonsterFights") == 0 && lookupItem("[glitch season reward name]").item_amount() > 0) {
