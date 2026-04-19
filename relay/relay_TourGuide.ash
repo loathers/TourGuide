@@ -4390,6 +4390,24 @@ boolean isAprilFools() {
     return (now_to_string("MMdd") == "0401");
 }
 
+// For gems that can appear in the Eternity Codpiece, helper function
+//   that checks both general equip status + 
+boolean gemstoneInCodpiece(item gem) {
+    if ($slot[codpiece1].equipped_item() == gem) return true;
+    if ($slot[codpiece2].equipped_item() == gem) return true;
+    if ($slot[codpiece3].equipped_item() == gem) return true;
+    if ($slot[codpiece4].equipped_item() == gem) return true;
+    if ($slot[codpiece5].equipped_item() == gem) return true;
+    return false;
+}
+
+// For gems that can appear in Eternity Codpiece, check both gem + cod equip status
+boolean gemstoneEquipped(item gem) {
+    if (gemstoneInCodpiece(gem)) return $item[The Eternity Codpiece].equipped_amount() > 0;
+    if (gem.equipped_amount() > 0) return true;
+    return false;
+}
+
 
 //Quest status stores all/most of our quest information in an internal format that's easier to understand.
 record QuestState
@@ -25691,6 +25709,61 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake("__item 11-leaf clover", url, ChecklistSubentryMake(title, hermitDescription), -11).ChecklistEntrySetIDTag("Clover resource"));    
         }
 	}
+
+	// int clovers_available = $items[11-leaf clover].available_amount() + $item[11-leaf clover].closet_amount();
+    
+	// TODO: This was the old clover recommender code. Might be usable for recs?
+
+    // if (my_path().id == PATH_BEES_HATE_YOU || my_path().id == PATH_G_LOVER)
+    //     clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
+    // if (clovers_available > 0 && in_run) {
+    //     ChecklistSubentry subentry;
+    //     subentry.header = pluralise(clovers_available, "clover", "clovers") + " available";
+        
+        
+    //     if (!__quest_state["Level 9"].state_boolean["bridge complete"])
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building. (3/3)", $location[the smut orc logging camp]));
+    //     if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && my_path().id != PATH_G_LOVER)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues. (2)", $location[a-boo peak]));
+    //     if (__misc_state["wand of nagamar needed"] && $item[wand of nagamar].creatable_amount() == 0)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
+    //     boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
+    //     if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
+   
+    //        if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mob of zeppelin protestors NC", $location[A Mob of Zeppelin Protesters]));         
+    //     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) { //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
+    //     }
+    //     if (!__quest_state["Level 8"].state_boolean["Past mine"]) {
+    //         item ore_needed = __quest_state["Level 8"].state_string["ore needed"].to_item();
+    //         if (ore_needed == $item[none])
+    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mining ore. (1)", $location[itznotyerzitz mine]));
+    //         else
+    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability(ore_needed.capitaliseFirstLetter() + ". (1)", $location[itznotyerzitz mine]));
+    //     }
+    //     if (__misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"]) {
+    //         location l = $location[none];
+    //         if (my_primestat() == $stat[moxie])
+    //             l = $location[the haunted ballroom];
+    //         else if (my_primestat() == $stat[mysticality])
+    //             l = $location[the haunted bathroom];
+    //         else if (my_primestat() == $stat[muscle])
+    //             l = $location[the haunted gallery];
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Powerlevelling (" + l + ")", l));
+    //     }
+    //     //put relevant tower items here
+        
+    //     resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Ten-leaf clover resource"));
+    // }
+    // Turning off because lucky pills are garbage now.
+
+    // if (in_run && $item[lucky pill].have() && availableSpleen() > 0) {
+    //     string [int] description;
+    //     description.listAppend("Chew for clovers.");
+    //     resource_entries.listAppend(ChecklistEntryMake("__item lucky pill", "inventory.php?ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Lucky pill resource"));
+    // }
 }
 
 RegisterTaskGenerationFunction("LuckyGenerateTasks");
@@ -27261,6 +27334,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item anchor bomb", "", ChecklistSubentryMake(pluralise($item[anchor bomb]), "", "Free run, 30-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
 
     if (in_run) {
+        // ... except for these, these guys suck lol
         if ($item[crystal skull].available_amount() > 0)
             resource_entries.listAppend(ChecklistEntryMake("__item crystal skull", "", ChecklistSubentryMake(pluralise($item[crystal skull]), "", "Turn-taking, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Crystal skull banish"));
             
@@ -27323,58 +27397,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice a day on monsters for good-level food."), 6).ChecklistEntrySetIDTag("Pigification wand resource"));
     }
         
-    int clovers_available = $items[11-leaf clover].available_amount() + $item[11-leaf clover].closet_amount();
-    // Removing clover code and swapping to lucky code like TES has.
-    // if (my_path().id == PATH_BEES_HATE_YOU || my_path().id == PATH_G_LOVER)
-    //     clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
-    // if (clovers_available > 0 && in_run) {
-    //     ChecklistSubentry subentry;
-    //     subentry.header = pluralise(clovers_available, "clover", "clovers") + " available";
-        
-        
-    //     if (!__quest_state["Level 9"].state_boolean["bridge complete"])
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building. (3/3)", $location[the smut orc logging camp]));
-    //     if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && my_path().id != PATH_G_LOVER)
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues. (2)", $location[a-boo peak]));
-    //     if (__misc_state["wand of nagamar needed"] && $item[wand of nagamar].creatable_amount() == 0)
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
-    //     boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
-    //     if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
-   
-    //        if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mob of zeppelin protestors NC", $location[A Mob of Zeppelin Protesters]));         
-    //     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) { //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
-    //     }
-    //     if (!__quest_state["Level 8"].state_boolean["Past mine"]) {
-    //         item ore_needed = __quest_state["Level 8"].state_string["ore needed"].to_item();
-    //         if (ore_needed == $item[none])
-    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mining ore. (1)", $location[itznotyerzitz mine]));
-    //         else
-    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability(ore_needed.capitaliseFirstLetter() + ". (1)", $location[itznotyerzitz mine]));
-    //     }
-    //     if (__misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"]) {
-    //         location l = $location[none];
-    //         if (my_primestat() == $stat[moxie])
-    //             l = $location[the haunted ballroom];
-    //         else if (my_primestat() == $stat[mysticality])
-    //             l = $location[the haunted bathroom];
-    //         else if (my_primestat() == $stat[muscle])
-    //             l = $location[the haunted gallery];
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Powerlevelling (" + l + ")", l));
-    //     }
-    //     //put relevant tower items here
-        
-    //     resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Ten-leaf clover resource"));
-    // }
-    // Turning off because lucky pills are garbage now.
-
-    // if (in_run && $item[lucky pill].have() && availableSpleen() > 0) {
-    //     string [int] description;
-    //     description.listAppend("Chew for clovers.");
-    //     resource_entries.listAppend(ChecklistEntryMake("__item lucky pill", "inventory.php?ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Lucky pill resource"));
-    // }
+    
     if (in_run) {
         if ($item[gameinformpowerdailypro magazine].available_amount() > 0) {
             string [int] description;
@@ -27812,11 +27835,12 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item bowl of scorpions", "inventory.php?which=3&ftext=bowl+of+scorpions", ChecklistSubentryMake(pluralise(uses_remaining,$item[bowl of scorpions]), "", "Free fight when brought to Bowling Alley."), 5).ChecklistEntrySetIDTag("daily free fight"));
     }
 	
-	if ($item[glark cable].available_amount() > 0 && get_property_int("_glarkCableUses") < 5 && my_path().id != PATH_G_LOVER)
+	if ($item[glark cable].available_amount() > 0 && get_property_int("_glarkCableUses") < 5 && my_path().id != PATH_G_LOVER && can_adventure($location[The Red Zeppelin]))
     {
         int uses_remaining = MIN($item[glark cable].available_amount(), clampi(5 - get_property_int("_glarkCableUses"), 0, 5));
-        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free fight on the Red Zeppelin."), 5).ChecklistEntrySetIDTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free kill in the Red Zeppelin."), 5).ChecklistEntrySetIDTag("free instakill"));
     } 
+
     if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3 && $item[lynyrd snare].item_is_usable()) { // && in_run && __misc_state["need to level"])
         int uses_remaining = MIN($item[lynyrd snare].available_amount(), clampi(3 - get_property_int("_lynyrdSnareUses"), 0, 3));
         resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
@@ -28162,7 +28186,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
                 url = invSearch("hodgman");
                 description.listAppend("Equip frippery first.");
             }
-            resource_entries.listAppend(ChecklistEntryMake("__skill Summon hobo underling", url, ChecklistSubentryMake(pluralise(underling_summons_remaining, "hobo underling summon", "hobo underling summons"), "", description), -1).ChecklistEntrySetIDTag("Hodgman regal frippery resource"));
+            resource_entries.listAppend(ChecklistEntryMake("__skill Summon hobo underling", url, ChecklistSubentryMake(pluralise(underling_summons_remaining, "hobo underling summon", "hobo underling summons"), "", description), 5).ChecklistEntrySetIDTag("Hodgman regal frippery resource"));
         }
     }
     if (lookupItem("license to chill").available_amount() > 0 && !get_property_boolean("_licenseToChillUsed") && mafiaIsPastRevision(18122)) {
@@ -28174,7 +28198,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
     }
     if ($item[mafia middle finger ring].available_amount() > 0 && !get_property_boolean("_mafiaMiddleFingerRingUsed")) {
-        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("1 cast of 'show them your ring'", "", "Free run, 60-turn banish." + ($item[mafia middle finger ring].equipped_amount() == 0 ? "|"+HTMLGenerateSpanFont("Equip the mafia middle finger ring first", "red") : "")), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));   
+        string [int] description;
+        description.listAppend("Free run, 60-turn banish.");
+        if ($item[mafia middle finger ring].equipped_amount() == 0) 
+            description.listAppend(HTMLGenerateSpanFont("Equip the mafia middle finger ring first", "red") : "");
+        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("1 cast of show them your ring", "", description, 0)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));   
     }
 
     if (get_property_int("_glitchMonsterFights") == 0 && lookupItem("[glitch season reward name]").item_amount() > 0) {
@@ -58120,17 +58148,20 @@ void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	//   - not a tile addition, but add a peridot icon to location bar if you can use peridot in the zone
 
 	if (!__iotms_usable[lookupItem("Peridot of Peril")]) return;
+	boolean peridotEquipped = gemstoneEquipped(lookupItem("peridot of peril"));
 	string url = "inventory.php?ftext=peridot+of+peril";
 	string [int] description;
 	
-	if (lookupItem("peridot of peril").equipped_amount() == 1)
+	if (peridotEquipped)
 	{
 		description.listAppend(HTMLGenerateSpanFont("PERIDOT POWER!", "green"));
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently set in the Eternity Codpiece");
 		string main_title = HTMLGenerateSpanFont("Peridot picking power", "green");
 		task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("peridot task"));
 	}
-	else if (lookupItem("peridot of peril").equipped_amount() == 0 && (__misc_state["in run"]))
+	else if (!peridotEquipped && (__misc_state["in run"]))
 	{
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently set in the Eternity Codpiece");
 		description.listAppend(HTMLGenerateSpanFont("Equip the peridot to map monsters", "red"));
 		optional_task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake("Peridot picking power", description), 10).ChecklistEntrySetIDTag("peridot task"));
 	}
@@ -58177,7 +58208,7 @@ RegisterResourceGenerationFunction("IOTMPeridotGenerateResource");
 void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (!__iotms_usable[lookupItem("Peridot of Peril")]) return;
     
-	boolean peridotEquipped = lookupItem("peridot of peril").equipped_amount() > 0;
+	boolean peridotEquipped = gemstoneEquipped(lookupItem("peridot of peril"));
 	string [int] perilLocations = get_property("_perilLocations").split_string(",");
 
 	string title = "Use your Peridot of Peril";
@@ -58229,6 +58260,7 @@ void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (peridotPicks.count() == 0) return;
 
 	description.listAppend("Select relevant, available monsters!");
+	if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently set in the Eternity Codpiece!");
 	if (!peridotEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Peridot of Peril","red"));
 	description.listAppend("<hr>|*"+pp+peridotPicks.listJoinComponents("<hr>|*"+pp));
 
@@ -58237,28 +58269,29 @@ void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 }
 //prismatic beret
 
+// These are the only modifiers I care to give.
 string [string] modifierMapping;
-
-
-modifierMapping["Item Drop"] = "% item";
 modifierMapping["Meat Drop"] = "% meat";
+modifierMapping["Item Drop"] = "% item";
 modifierMapping["Initiative"] = "% init";
-modifierMapping["Familiar Weight"] = " fam wt";
-modifierMapping["Familiar Experience"] = " fam xp";
+modifierMapping["Familiar Weight"] = " famwt";
+modifierMapping["Familiar Experience"] = " famxp";
 
+// Generate a string description of the buffs by cycling through above modifiers.
 string generateBuffDescription(effect currEffect) {
 	string output = "<b>"+currEffect.name+"</b>";
 	string [int] relevantMods;
 	int modLevel = 0;
-	foreach modifier, shortmod in modifierMapping {
-		modLevel = numeric_modifier(currEffect, modifier).to_int();
-		if (modLevel > 0) relevantMods.listAppend(modLevel+shortmod);
+	foreach mod, shortmod in modifierMapping {
+		modLevel = numeric_modifier(currEffect, mod).to_int();
+		if (modLevel > 0) relevantMods.listAppend("+"+modLevel+shortmod);
 	}
 	if (relevantMods.count() > 0) output += ": "+listJoinComponents(relevantMods,", ");
 
 	return output;
 }
 
+// Cycle through all effects in the currently produced busks 
 string [int] generateBuskDescription(int [effect] currentBusks) {
 	string [int] output;
 
@@ -58269,7 +58302,7 @@ string [int] generateBuskDescription(int [effect] currentBusks) {
 			output.listAppend("|*<b>Dirty Pear</b>: Doubles "+HTMLGenerateSpanFont("sleaze damage", "r_element_sleaze"));
 		} else {
 			string color = have_effect(busk) > 0 ? "gray" : "black";
-			output.listAppend("|*"+generateBuffDescription(busk));
+			output.listAppend(HTMLGenerateSpanFont("|*"+generateBuffDescription(busk),color));
 		}
 
 	}
@@ -58290,8 +58323,9 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 	string title = HTMLGenerateSpanFont(busksLeft + " Prismatic Beret busks!", "purple");
 
 	int [effect] currentBusks = beret_busking_effects();
+    boolean canHatrack = lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted();
 
-	string [int] description = generateBuffDescription(currentBusks);
+	string [int] description = generateBuskDescription(currentBusks);
 	
 	int hatpower;
     int pantspower;
@@ -58318,17 +58352,19 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	if (busksLeft > 0) 
 	{
+        string hatrackText = canHatrack ? "(Can equip on hatrack)" : "";
+        boolean hatrackEquipped = equipped_item($slot[familiar]) == lookupItem("prismatic beret");
+        if (hatrackEquipped) hatrackText = "";
 		if (lookupSkill("tao of the terrapin").have_skill()) total += hatpower*2 + pantspower*2;
         if ($effect[Hammertime].have_effect() > 0) total += pantspower*3;
-		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " Power");
+		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " total hat/shirt/pants power. ");
 		
 		if (lookupItem("prismatic beret").equipped_amount() == 0) {
-			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk!", "red"));
+			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk! ", "red")+hatrackText);
 		}
-		if (lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted()) {
-			description.listAppend(HTMLGenerateSpanFont("|*(You can put it on your hatrack)", "blue"));
-		}
-		
+        if (canHatrack && !hatrackEquipped && lookupItem("prismatic beret").equipped_amount() > 0) {
+            description.listAppend("|*Consider equipping to your hatrack for more options.");
+        }
 		resource_entries.listAppend(ChecklistEntryMake("__item prismatic beret", url, ChecklistSubentryMake(title, "", description)));
 	}
 }
@@ -58599,7 +58635,6 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
     //   - add refract recommendation system
     //   - shorten resource tile by switching the less-useful uses into a hoverover
     //   - small wording tweaks 
-    //   - match pheromone styling to other banishes
 
 
 	if (!__iotms_usable[lookupItem("blood cubic zirconia")]) return;
@@ -58618,7 +58653,7 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 	int bulletCost = bloodCast[min(bczBullets, 15)];
 	int equityCost = bloodCast[min(bczEquitys, 15)];
 	
-	if (lookupItem("blood cubic zirconia").equipped_amount() > 0)
+	if (gemstoneEquipped(lookupItem("blood cubic zirconia")))
 	{
 		if (bczRefracts < 13) {
 			description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost + "", "red") + " mys");
@@ -58645,8 +58680,9 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 		}
 		else if (bczEquitys >= 13) {
 			description.listAppend(HTMLGenerateSpanFont("Next Equity costs " + equityCost + " mox. EXPENSIVE!", "red") + "");
-		}	
-		task_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(HTMLGenerateSpanFont("BCZ: Blood Cubic Zirconia skills", "brown"), description), -11).ChecklistEntrySetIDTag("bcz important skills"));
+		}
+		// This was originally a supernag but I simply will not let this be -always- on my screen.	
+		task_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(HTMLGenerateSpanFont("BCZ: Blood Cubic Zirconia skills", "brown"), description), 11).ChecklistEntrySetIDTag("bcz important skills"));
 	}
 }
 
@@ -58709,8 +58745,8 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 
 	bulletDesc.listAppend("Win a fight without taking a turn.");
 	bulletDesc.listAppend("Next bullet costs "+bulletCost+" moxie substats");
-	if (lookupItem("blood cubic zirconia").equipped_amount() == 0) 
-		bulletDesc.listAppend(HTMLGenerateSpanFont("Equip the Blood Cubic Zirconia first", "red"));;
+	if (!gemstoneEquipped(lookupItem("blood cubic zirconia"))) 
+		bulletDesc.listAppend(HTMLGenerateSpanFont("Equip the Blood Cubic Zirconia first", "red"));
 
 	resource_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(header,subtitle,bulletDesc)).ChecklistEntrySetCombinationTag("free instakill"));
 
@@ -59095,7 +59131,7 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     string hackerToday = "";
 
     // Is the heartstone equipped?
-    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
+    boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
 
     // Generate boolean flags for accessibility of each monster
     // --- T MONSTERS ----------------
@@ -59190,7 +59226,7 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
 { 
 	// the heart must go on
 	if (!__iotms_usable[lookupItem("Heartstone")]) return;
-    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
+    boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
 
     // What are the heartstone's letters?
     string heartLetters = get_property("heartstoneLetters");
@@ -59347,7 +59383,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
 
     ChecklistSubentry [int] subentries;
 
-    boolean baseballEquipped = lookupItem("Baseball Diamond").equipped_amount() > 0;
+    boolean baseballEquipped = gemstoneEquipped(lookupItem("Baseball Diamond"));
     string url = baseballEquipped ? "inventory.php?which=2" : "inventory.php?ftext=baseball+diamond";
     int inningsPlayed = get_property_int("_baseballInnings");
     monster [int] myTeam = baseballBuddies();
