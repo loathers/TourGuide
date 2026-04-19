@@ -5142,6 +5142,13 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Spacegate access badge")] = false;
     }
 
+    // Can show as 0 available amount even if it is equipped in your codpiece.
+    foreach it in $items[Heartstone, Peridot of Peril, Blood Cubic Zirconia, Baseball Diamond] 
+    {
+        if (gemstoneInCodpiece(it)) __iotms_usable[it] = true;
+    }
+
+
     // Remove non-standard. Do this prior to replicaChecks, since replicas allow
     //   usage of non-standard IOTMs. 
     foreach it in __iotms_usable
@@ -28201,7 +28208,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         description.listAppend("Free run, 60-turn banish.");
         if ($item[mafia middle finger ring].equipped_amount() == 0) 
-            description.listAppend(HTMLGenerateSpanFont("Equip the mafia middle finger ring first", "red") : "");
+            description.listAppend(HTMLGenerateSpanFont("Equip the mafia middle finger ring first", "red"));
         resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("1 cast of show them your ring", "", description, 0)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));   
     }
 
@@ -58155,13 +58162,13 @@ void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	if (peridotEquipped)
 	{
 		description.listAppend(HTMLGenerateSpanFont("PERIDOT POWER!", "green"));
-		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently set in the Eternity Codpiece");
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 		string main_title = HTMLGenerateSpanFont("Peridot picking power", "green");
 		task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("peridot task"));
 	}
 	else if (!peridotEquipped && (__misc_state["in run"]))
 	{
-		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently set in the Eternity Codpiece");
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 		description.listAppend(HTMLGenerateSpanFont("Equip the peridot to map monsters", "red"));
 		optional_task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake("Peridot picking power", description), 10).ChecklistEntrySetIDTag("peridot task"));
 	}
@@ -58260,7 +58267,7 @@ void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (peridotPicks.count() == 0) return;
 
 	description.listAppend("Select relevant, available monsters!");
-	if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently set in the Eternity Codpiece!");
+	if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 	if (!peridotEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Peridot of Peril","red"));
 	description.listAppend("<hr>|*"+pp+peridotPicks.listJoinComponents("<hr>|*"+pp));
 
@@ -58653,6 +58660,8 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 	int bulletCost = bloodCast[min(bczBullets, 15)];
 	int equityCost = bloodCast[min(bczEquitys, 15)];
 	
+	if (gemstoneInCodpiece(lookupItem("blood cubic zirconia"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
+	
 	if (gemstoneEquipped(lookupItem("blood cubic zirconia")))
 	{
 		if (bczRefracts < 13) {
@@ -58716,6 +58725,8 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 	int refractCost = bloodCast[min(bczRefracts, 15)];
 	int bulletCost = bloodCast[min(bczBullets, 15)];
 	int equityCost = bloodCast[min(bczEquitys, 15)];
+	
+	if (gemstoneInCodpiece(lookupItem("blood cubic zirconia"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 	
 	description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost + "", "red") + " mys");
 	description.listAppend("Next Bullet costs " + HTMLGenerateSpanFont(bulletCost + "", "red") + " mox");
@@ -59285,6 +59296,8 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
         }
     
     if (!heartstoneEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
+	if (gemstoneInCodpiece(lookupItem("heartstone"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
+    
     resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Heartstone skills"));
             
 
