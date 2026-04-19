@@ -27091,11 +27091,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             //subentry.entries.listAppend(pluralise(banishes_available, "banish", "banishes") + " available.");
             string [int] tasks;
             string subtitle;
-            tasks.listAppend("Turn-taking, 30-turn banish.");
+            tasks.listAppend("Turn-taking kill, 30-turn banish.");
             if ($item[pantsgiving].equipped_amount() == 0)
                  subtitle = "equip pantsgiving";
             // tasks.listAppend("cast talk about politics");
-            resource_entries.listAppend(ChecklistEntryMake("__item pantsgiving", url, ChecklistSubentryMake(pluralise(banishes_available, "cast of Talk About Politics", "casts of Talk About Politics"), "", tasks), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Pantsgiving banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item pantsgiving", url, ChecklistSubentryMake(pluralise(banishes_available, "cast of Talk About Politics", "casts of Talk About Politics"), "does allow item/meat drops", tasks), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Pantsgiving banish"));
             
         }
         
@@ -28174,7 +28174,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
     }
     if ($item[mafia middle finger ring].available_amount() > 0 && !get_property_boolean("_mafiaMiddleFingerRingUsed")) {
-        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("Mafia middle finger ring", "", "Free run, 60-turn banish." + ($item[mafia middle finger ring].equipped_amount() == 0 ? " Equip first." : "")), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));   
+        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("1 cast of 'show them your ring'", "", "Free run, 60-turn banish." + ($item[mafia middle finger ring].equipped_amount() == 0 ? "|"+HTMLGenerateSpanFont("Equip the mafia middle finger ring first", "red") : "")), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));   
     }
 
     if (get_property_int("_glitchMonsterFights") == 0 && lookupItem("[glitch season reward name]").item_amount() > 0) {
@@ -53151,14 +53151,15 @@ void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries
 		else
 		{
 			description.listAppend("Free run, 100-turn banish for 100 scraps.");
+			if (!have_equipped($item[familiar scrapbook]))
+				description.listAppend(HTMLGenerateSpanFont("Equip the familiar scrapbook first", "red"));
+
 		}
 
 		// description.listAppend("Charge up your familiar scrapbook by letting familiars act in combat.");
-		if (!have_equipped($item[familiar scrapbook]))
-			description.listAppend(HTMLGenerateSpanFont("Equip the familiar scrapbook first", "red"));
 		
 		string url = invSearch("familiar scrapbook");
-		resource_entries.listAppend(ChecklistEntryMake("__item familiar scrapbook", url, ChecklistSubentryMake(familiar_scraps / 100 + " scrapbook banishes available", "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Familiar scrapbook boring pictures banish"));
+		resource_entries.listAppend(ChecklistEntryMake("__item familiar scrapbook", url, ChecklistSubentryMake(familiar_scraps / 100 + " scrapbook banishes available", subtitle, description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Familiar scrapbook boring pictures banish"));
 	}
 }
 
@@ -55710,7 +55711,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         string url;
         url = "main.php";
-        description.listAppend("Turn-taking banish, all-day duration.");
+        description.listAppend("Turn-taking kill, all-day banish.");
         if ($item[cursed monkey's paw].equipped_amount() == 0) {
 		    description.listAppend(HTMLGenerateSpanFont("Equip the Monkey's Paw first.", "red"));
             url = "inventory.php?ftext=cursed+monkey";
@@ -58491,13 +58492,22 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
 
 
 	if (!__iotms_usable[lookupItem("monodent of the sea")]) return;
-	
+
+	// it is important to name things properly
+	string [int] dentPrefixes = { 'Mono', 'Bi', 'Tri', 'Qua', 'Penta', 'Hexa', 'Hepta', 'Octo', 'Nona', 'Deca' };
+	int constructs = get_property('seadentConstructKills').to_int();
+	int level = clamp(get_property('seadentLevel').to_int(), 1, 10);
+	string prefix = dentPrefixes[level - 1];
+
+	string monodentName = prefix + "dent of the sea";
+	string monodentShortName = prefix + "dent";
+
     string url = "inventory.php?ftext=dent+of+the+sea";
 	int monodentLightningsLeft = clampi(11 - get_property_int("_seadentLightningUsed"), 0, 11);
     boolean monodentWaveUsed = get_property_boolean("_seadentWaveUsed");
 	string monodentWaveZone = get_property("_seadentWaveZone");
 	string [int] description;
-	string title = "Monodent/Seadent powers";
+	string title = "Seaworthy "+monodentShortName+" powers!";
 	boolean monodentIsEquipped = lookupItem("monodent of the sea").equipped_amount() > 0;
 	
 	if (!monodentWaveUsed) {
@@ -58506,7 +58516,7 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
 	else if (monodentWaveUsed) {
 		description.listAppend(HTMLGenerateSpanFont(monodentWaveZone + " flooded, +30 item/meat", "indigo"));	
 		if ($effect[fishy].have_effect() < 1 && lookupItem("monodent of the sea").equipped_amount() == 0) {
-			description.listAppend(HTMLGenerateSpanFont("Equip Monodent for Fishy?", "red"));		
+			description.listAppend(HTMLGenerateSpanFont("Equip "+monodentShortName+" for Fishy?", "red"));		
 		}		
 	}
 	if (monodentLightningsLeft > 0) {
@@ -58521,21 +58531,21 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
     }
 	if (!monodentIsEquipped)
     {
-		description.listAppend(HTMLGenerateSpanFont("Equip the Seadent first", "red"));		
+		description.listAppend(HTMLGenerateSpanFont("Equip the "+monodentShortName+" first", "red"));		
 	}
 	if (monodentIsEquipped)
 	{
-		description.listAppend(HTMLGenerateSpanFont("Seadent lightning ready!", "blue"));		
+		description.listAppend(HTMLGenerateSpanFont(monodentShortName+" lightning ready!", "blue"));		
 	}
-	resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", url, ChecklistSubentryMake(title, "", description)));
+	resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", url, ChecklistSubentryMake(title, "who lives in a monodent under the sea", description)));
 
 	// Banish combination tile
 	if (monodentLightningsLeft > 0)
     {
         string [int] banishDesc;
-		banishDesc.listAppend("Turn-taking, all-day banish.");
-		if (!monodentIsEquipped) banishDesc.listAppend(HTMLGenerateSpanFont("Equip the Seadent first", "red"));
-		resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", "", ChecklistSubentryMake(pluralise(monodentLightningsLeft, "lightning strike", "lightning strikes"), "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("seadent killbanish"));
+		banishDesc.listAppend("Turn-taking kill, all-day banish.");
+		if (!monodentIsEquipped) banishDesc.listAppend(HTMLGenerateSpanFont("Equip the "+monodentName+" first", "red"));
+		resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", "", ChecklistSubentryMake(pluralise(monodentLightningsLeft, "lightning strike", "lightning strikes"), "kill does allow item/meat drops", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("seadent killbanish"));
     }
 }
 //blood cubic zirconia
@@ -58646,7 +58656,7 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 	if (pheromoneBlasts > 0)
     {
         string [int] description2;
-		description2.listAppend("Turn-taking, all-day banish.");
+		description2.listAppend("Turn-taking kill, all-day banish.");
 		resource_entries.listAppend(ChecklistEntryMake("__skill mark your territory", "", ChecklistSubentryMake(pluralise(pheromoneBlasts, "cast of Mark Your Territory", "casts of Mark Your Territory"), "drink pheromone cocktails for more charges!", description2), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("BCZ pheromone banish"));
     }
 }
@@ -59143,7 +59153,7 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
     // Banish combination tag for GONE.
     if (accessGONE && usesGONE < 5) {
         string [int] banishDesc;
-        banishDesc.listAppend("Turn-taking banish, 50-turn duration.");
+        banishDesc.listAppend("Turn-taking kill, 50-turn banish.");
         if (!heartstoneEquipped) banishDesc.listAppend("Equip your Heartstone.");
         resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
     }
