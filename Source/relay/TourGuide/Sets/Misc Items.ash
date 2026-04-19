@@ -1251,7 +1251,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         description.listAppend("Free run, 60-turn banish.");
         if ($item[mafia middle finger ring].equipped_amount() == 0) 
-            description.listAppend(HTMLGenerateSpanFont("Equip the mafia middle finger ring first", "red") : "");
+            description.listAppend(HTMLGenerateSpanFont("Equip the mafia middle finger ring first", "red"));
         resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("1 cast of show them your ring", "", description, 0)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));   
     }
 

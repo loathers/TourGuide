@@ -14,13 +14,13 @@ void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	if (peridotEquipped)
 	{
 		description.listAppend(HTMLGenerateSpanFont("PERIDOT POWER!", "green"));
-		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently set in the Eternity Codpiece");
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 		string main_title = HTMLGenerateSpanFont("Peridot picking power", "green");
 		task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("peridot task"));
 	}
 	else if (!peridotEquipped && (__misc_state["in run"]))
 	{
-		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently set in the Eternity Codpiece");
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 		description.listAppend(HTMLGenerateSpanFont("Equip the peridot to map monsters", "red"));
 		optional_task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake("Peridot picking power", description), 10).ChecklistEntrySetIDTag("peridot task"));
 	}
@@ -119,7 +119,7 @@ void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (peridotPicks.count() == 0) return;
 
 	description.listAppend("Select relevant, available monsters!");
-	if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently set in the Eternity Codpiece!");
+	if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 	if (!peridotEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Peridot of Peril","red"));
 	description.listAppend("<hr>|*"+pp+peridotPicks.listJoinComponents("<hr>|*"+pp));
 

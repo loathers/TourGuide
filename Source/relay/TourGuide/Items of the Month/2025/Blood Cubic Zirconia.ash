@@ -25,6 +25,8 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 	int bulletCost = bloodCast[min(bczBullets, 15)];
 	int equityCost = bloodCast[min(bczEquitys, 15)];
 	
+	if (gemstoneInCodpiece(lookupItem("blood cubic zirconia"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
+	
 	if (gemstoneEquipped(lookupItem("blood cubic zirconia")))
 	{
 		if (bczRefracts < 13) {
@@ -88,6 +90,8 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 	int refractCost = bloodCast[min(bczRefracts, 15)];
 	int bulletCost = bloodCast[min(bczBullets, 15)];
 	int equityCost = bloodCast[min(bczEquitys, 15)];
+	
+	if (gemstoneInCodpiece(lookupItem("blood cubic zirconia"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 	
 	description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost + "", "red") + " mys");
 	description.listAppend("Next Bullet costs " + HTMLGenerateSpanFont(bulletCost + "", "red") + " mox");

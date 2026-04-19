@@ -257,6 +257,13 @@ void initialiseIOTMsUsable()
         __iotms_usable[lookupItem("Spacegate access badge")] = false;
     }
 
+    // Can show as 0 available amount even if it is equipped in your codpiece.
+    foreach it in $items[Heartstone, Peridot of Peril, Blood Cubic Zirconia, Baseball Diamond] 
+    {
+        if (gemstoneInCodpiece(it)) __iotms_usable[it] = true;
+    }
+
+
     // Remove non-standard. Do this prior to replicaChecks, since replicas allow
     //   usage of non-standard IOTMs. 
     foreach it in __iotms_usable

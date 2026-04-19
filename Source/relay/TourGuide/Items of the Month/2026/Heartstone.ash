@@ -166,6 +166,8 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
         }
     
     if (!heartstoneEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
+	if (gemstoneInCodpiece(lookupItem("heartstone"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
+    
     resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Heartstone skills"));
             
 
