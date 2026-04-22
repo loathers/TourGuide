@@ -390,7 +390,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         string url;
         url = "main.php";
-        description.listAppend("Turn-taking kill, all-day banish.");
+        description.listAppend("Turn-taking item-destroying kill, all-day banish.");
         if ($item[cursed monkey's paw].equipped_amount() == 0) {
 		    description.listAppend(HTMLGenerateSpanFont("Equip the Monkey's Paw first", "red"));
             url = "inventory.php?ftext=cursed+monkey";
