@@ -55746,7 +55746,7 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         string url;
         url = "main.php";
-        description.listAppend("Turn-taking kill, all-day banish.");
+        description.listAppend("Turn-taking item-destroying kill, all-day banish.");
         if ($item[cursed monkey's paw].equipped_amount() == 0) {
 		    description.listAppend(HTMLGenerateSpanFont("Equip the Monkey's Paw first", "red"));
             url = "inventory.php?ftext=cursed+monkey";
@@ -58628,7 +58628,7 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
 	if (monodentLightningsLeft > 0)
     {
         string [int] banishDesc;
-		banishDesc.listAppend("Turn-taking kill, all-day banish.");
+		banishDesc.listAppend("Turn-taking item-destroying kill, all-day banish.");
 		if (!monodentIsEquipped) banishDesc.listAppend(HTMLGenerateSpanFont("Equip the "+monodentName+" first", "red"));
 		resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", "", ChecklistSubentryMake(pluralise(monodentLightningsLeft, "lightning strike", "lightning strikes"), "kill does allow item/meat drops", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("seadent killbanish"));
     }
@@ -58744,7 +58744,7 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 	int pheromoneBlasts = get_property_int("markYourTerritoryCharges");
 	if (pheromoneBlasts > 0)
     {
-		resource_entries.listAppend(ChecklistEntryMake("__skill mark your territory", "", ChecklistSubentryMake(pluralise(pheromoneBlasts, "cast of Mark Your Territory", "casts of Mark Your Territory"), "drink pheromone cocktails for more charges!", "Turn-taking kill, all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("BCZ pheromone banish"));
+		resource_entries.listAppend(ChecklistEntryMake("__skill mark your territory", "", ChecklistSubentryMake(pluralise(pheromoneBlasts, "cast of Mark Your Territory", "casts of Mark Your Territory"), "drink pheromone cocktails for more charges!", "Turn-taking item-destroying kill, all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("BCZ pheromone banish"));
     }
 
 	// Freekill combination tile entry.
@@ -59269,7 +59269,7 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
     // Banish combination tag for GONE.
     if (accessGONE && usesGONE < 5) {
         string [int] banishDesc;
-        banishDesc.listAppend("Turn-taking kill, 50-turn banish.");
+        banishDesc.listAppend("Turn-taking item-destroying kill, 50-turn banish.");
         if (!heartstoneEquipped) banishDesc.listAppend("Equip your Heartstone.");
         resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
     }
