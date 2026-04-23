@@ -58,8 +58,8 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
 	if (monodentLightningsLeft > 0)
     {
         string [int] banishDesc;
-		banishDesc.listAppend("Turn-taking item-destroying kill, all-day banish.");
+		banishDesc.listAppend("Turn-taking kill, all-day banish.");
 		if (!monodentIsEquipped) banishDesc.listAppend(HTMLGenerateSpanFont("Equip the "+monodentName+" first", "red"));
-		resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", "", ChecklistSubentryMake(pluralise(monodentLightningsLeft, "lightning strike", "lightning strikes"), "kill does allow item/meat drops", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("seadent killbanish"));
+		resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", "", ChecklistSubentryMake(pluralise(monodentLightningsLeft, "lightning strike", "lightning strikes"), "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("seadent killbanish"));
     }
 }

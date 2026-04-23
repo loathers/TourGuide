@@ -386,10 +386,10 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     if (in_run) {
         // ... except for these, these guys suck lol
         if ($item[crystal skull].available_amount() > 0)
-            resource_entries.listAppend(ChecklistEntryMake("__item crystal skull", "", ChecklistSubentryMake(pluralise($item[crystal skull]), "", "Turn-taking, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Crystal skull banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item crystal skull", "", ChecklistSubentryMake(pluralise($item[crystal skull]), "", "Turn-taking run, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Crystal skull banish"));
             
         if ($item[harold's bell].available_amount() > 0 && $item[harold's bell].item_is_usable())
-            resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Turn-taking, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Turn-taking run, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
         
         if ($item[lost key].available_amount() > 0 && $item[lost key].item_is_usable()){
             string [int] details;
@@ -620,7 +620,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item vitachoconutriment capsule", "inventory.php?ftext=vitachoconutriment+capsule", ChecklistSubentryMake(pluralise($item[vitachoconutriment capsule]), "", line), importance_level_unimportant_item).ChecklistEntrySetIDTag("Vitachoconutriment capsule"));
     }
     if (lookupItem("tryptophan dart").available_amount() > 0 && lookupItem("tryptophan dart").item_is_usable()) {
-        resource_entries.listAppend(ChecklistEntryMake("__item tryptophan dart", "", ChecklistSubentryMake(pluralise(lookupItem("tryptophan dart")), "", "Turn-taking, all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Tryptophan dart banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item tryptophan dart", "", ChecklistSubentryMake(pluralise(lookupItem("tryptophan dart")), "", "Turn-taking run, all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Tryptophan dart banish"));
     }
     if (__misc_state["free runs usable"] && get_property_int("_humanMuskUses") < 3 && lookupItem("human musk").available_amount() > 0 && lookupItem("human musk") != $item[none]) {
         resource_entries.listAppend(ChecklistEntryMake("__item human musk", "", ChecklistSubentryMake(MIN(lookupItem("human musk").available_amount(), 3 - get_property_int("_humanMuskUses")).pluralise("human musk", "human musks"), "", "Free run, all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Human musk banish"));
@@ -838,7 +838,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     
     if ($item[smoke grenade].available_amount() > 0) {
-        string description = "Turn-taking, 20-turn banish.";
+        string description = "Turn-taking run, 20-turn banish.";
         resource_entries.listAppend(ChecklistEntryMake("__item smoke grenade", "", ChecklistSubentryMake(pluralise($item[Smoke grenade]), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Smoke grenade banish"));
     }
     

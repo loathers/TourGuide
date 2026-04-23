@@ -140,7 +140,7 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
     if (accessGONE && usesGONE < 5) {
         string [int] banishDesc;
         banishDesc.listAppend("Turn-taking item-destroying kill, 50-turn banish.");
-        if (!heartstoneEquipped) banishDesc.listAppend("Equip your Heartstone.");
+        if (!heartstoneEquipped) banishDesc.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
         resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
     }
 

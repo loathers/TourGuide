@@ -301,7 +301,7 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
         if (get_property_int("_nanorhinoCharge") >= 100)
         {
         	tag_with_banish_tag = true;
-            description_banish.listAppend("Turn-taking, all-day banish.");
+            description_banish.listAppend("Turn-taking run, all-day banish.");
             description_banish.listAppend("Cast muscle combat skill" + (my_familiar() == $familiar[nanorhino] ? "" : " with nanorhino as your familiar") + ".");
         }
 		if (__misc_state["have muscle class combat skill"])
