@@ -3266,7 +3266,7 @@ static
     __place_delays[$location[the oasis]] = 5;
     __place_delays[$location[the "fun" house]] = 10;
     __place_delays[$location[the mer-kin outpost]] = 24;
-    __place_delays[$location[the mer-kin library]] = 5;
+    __place_delays[$location[mer-kin library]] = 5;
     __place_delays[$location[the smut orc logging camp]] = 19;
     __place_delays[$location[twin peak]] = 50;
 }
@@ -25338,34 +25338,42 @@ record DelayTracker
 DelayTracker makeDelayRecord(string l, boolean r) {
     DelayTracker final;
 
-    final.location = lookupLocation(l);
-    final.delay = totalDelayForLocation(final.location);
-    final.delayRemaining = delayRemainingInLocation(final.location);
+    final.zone = lookupLocation(l);
+    final.delay = totalDelayForLocation(final.zone);
+    final.delayRemaining = delayRemainingInLocation(final.zone);
     final.relevant = r;
-    final.accessible = can_adventure(final.location);
+    final.accessible = can_adventure(final.zone);
 
     return final;
 }
 
-// Populating all delay zones into a list
-DelayTrack [int] delayZones;
+void listAppend(DelayTracker [int] list, DelayTracker entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
 
-delayZones.listAppend(makeDelayRecord("The Spooky Forest", true));
-delayZones.listAppend(makeDelayRecord("The Boss Bat's Lair", true)); 
-delayZones.listAppend(makeDelayRecord("The Outskirts of Cobb's Knob", true));
-delayZones.listAppend(makeDelayRecord("The Penultimate Fantasy Airship", true)); // bat wing dependent
-delayZones.listAppend(makeDelayRecord("The Castle in the Clouds in the Sky (Ground Floor)", true));
-delayZones.listAppend(makeDelayRecord("The Hidden Park", true));
-delayZones.listAppend(makeDelayRecord("The Hidden Apartment Building", true));
-delayZones.listAppend(makeDelayRecord("The Hidden Office Building", true));
-delayZones.listAppend(makeDelayRecord("The Haunted Gallery", true));
-delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", true));
-delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", true));
-delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", true));
+// Populating all delay zones into a list
+DelayTracker [int] delayZones;
+
+delayZones.listAppend(makeDelayRecord("The Spooky Forest", !__quest_state["Level 2"].finished && !__quest_state["Hidden Temple Unlock"].finished));
+delayZones.listAppend(makeDelayRecord("The Boss Bat's Lair", !__quest_state["Level 4"].finished)); 
+delayZones.listAppend(makeDelayRecord("The Outskirts of Cobb's Knob", !__quest_state["Level 5"].finished));
+delayZones.listAppend(makeDelayRecord("The Penultimate Fantasy Airship", !can_adventure($location[The Castle in the Clouds in the Sky (Basement)]))); // bat wing dependent
+delayZones.listAppend(makeDelayRecord("The Castle in the Clouds in the Sky (Ground Floor)", !can_adventure($location[The Castle in the Clouds in the Sky (Top Floor)])));
+delayZones.listAppend(makeDelayRecord("The Hidden Park", __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"]));
+delayZones.listAppend(makeDelayRecord("The Hidden Apartment Building", get_property_int("hiddenApartmentProgress") < 7));
+delayZones.listAppend(makeDelayRecord("The Hidden Office Building", get_property_int("hiddenOfficeProgress") < 7));
+delayZones.listAppend(makeDelayRecord("The Haunted Gallery", get_property("questM21Dance") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", get_property("questM21Dance") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", get_property("questM21Dance") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", !can_adventure($location[The Haunted Wine Cellar])));
 // delayZones.listAppend(makeDelayRecord(5, "SHEN ZONE", true)); // TODO: needs custom
-delayZones.listAppend(makeDelayRecord("The Copperhead Club", true));
-delayZones.listAppend(makeDelayRecord("The Upper Chamber", true));
-delayZones.listAppend(makeDelayRecord("The Middle Chamber", true));
+delayZones.listAppend(makeDelayRecord("The Copperhead Club", get_property("questL11Shen") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Upper Chamber", !can_adventure($location[The Middle Chamber])));
+delayZones.listAppend(makeDelayRecord("The Middle Chamber", !can_adventure($location[The Lower Chamber])));
 
 void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -25388,11 +25396,11 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
     string color;
 
     foreach key, delayEntry in delayZones {
-        currLoc = delayEntry.location;
-        currDelay = delayEntry.delay;
-        currDelayRemaining = delayEntry.delayRemaining;
-        currRelevant = delayEntry.relevant;
-        currAccessible = delayEntry.accessible;
+        location currLoc = delayEntry.zone;
+        int currDelay = delayEntry.delay;
+        int currDelayRemaining = delayEntry.delayRemaining;
+        boolean currRelevant = delayEntry.relevant;
+        boolean currAccessible = delayEntry.accessible;
 
         // fix airship delay in the event user has bat wings
         if ($item[bat wings].available_amount() > 0 && currLoc == $location[The Penultimate Fantasy Airship]) {
@@ -25408,8 +25416,9 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
         if (currRelevant && currDelayRemaining > 0) {
             // gray out inaccessible entries
             color = currAccessible ? "black" : "gray";
-            delayEntries.listAppend(HTMLGenerateSpanFont("|* <b>" + currDelayRemaining + "</b> @ " + currLoc.name, color));
-            entry.url = currLoc.getClickableURLForLocation();
+            if (color == "black") entry.url = currLoc.getClickableURLForLocation();
+            delayEntries.listAppend(HTMLGenerateSpanFont("|* • <b>" + currDelayRemaining + "</b> @ " + to_string(currLoc), color)+"");
+            
         }
     }
 
@@ -25418,16 +25427,24 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
 
     description.listAppend("Eat up delay in these zones using wanderers, free runs, and free fights to advance your quests!");
 
-    delayTeaser.listAppend(HTMLGenerateSpanOfClass("Mouse over for your delay zones!","r_bold r_element_spooky_desaturated"))
+    delayTeaser.listAppend(HTMLGenerateSpanOfClass("Mouse over for your delay zones!","r_bold r_element_spooky_desaturated"));
 
     string delayTitle = pluralise(totalDelayRemaining, "delay turn remains", "delay turns remain");
 
-    // Store the base description within the mouseover subentries, then the enumerated delay entries
-    entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
-    entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(delayTitle, "", delayEntries));
-    // Store the base description within the non-mouseover version of the tile
+    // For the first run with it I'm just going to have the thing always available IDGAF
+    //   (TODO: also for update, maybe leverage generatePossibleLocationsToBurnDelay() ?)
+
+    
+    // // Store the base description within the mouseover subentries, then the enumerated delay entries
+    // entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
+    // entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(delayTitle, "", delayEntries));
+    // // Store the base description within the non-mouseover version of the tile
+    // entry.subentries.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
+    // entry.subentries.listAppend(ChecklistSubentryMake(delayTitle, "", delayTeaser));
+
     entry.subentries.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
-    entry.subentries.listAppend(ChecklistSubentryMake(delayTitle, "", delayTeaser));
+    entry.subentries.listAppend(ChecklistSubentryMake(delayTitle, "", delayEntries));
+
 
     task_entries.listAppend(entry);
 }
@@ -59510,6 +59527,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
 
     boolean baseballEquipped = gemstoneEquipped(lookupItem("Baseball Diamond"));
     string url = baseballEquipped ? "inventory.php?which=2" : "inventory.php?ftext=baseball+diamond";
+    if (gemstoneInCodpiece(lookupItem("baseball diamond"))) url = baseballEquipped ?  "inventory.php?which=2" : "inventory.php?ftext=eternity+codpiece";
     int inningsPlayed = get_property_int("_baseballInnings");
     monster [int] myTeam = baseballBuddies();
     int monstersNeededToPlayBall = clampi(9-myTeam.count(),0,9);
@@ -59521,6 +59539,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     if (inningsPlayed < 3) {
         string title = "Play "+pluralise(clampi(3-inningsPlayed, 0, 3),"more inning","more innings")+" of Baseball";
         string [int] description;
+        if (gemstoneInCodpiece(lookupItem("Baseball Diamond"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
         if (myTeam.count() < 9) {
             if (baseballEquipped) description.listAppend("Find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
             if (!baseballEquipped) description.listAppend(HTMLGenerateSpanOfClass("Equip your Baseball Diamond","r_element_hot")+" to find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
