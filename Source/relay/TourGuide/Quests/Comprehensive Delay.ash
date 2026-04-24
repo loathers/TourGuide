@@ -106,14 +106,14 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
 
         if (shenDelay.delayRemaining > 0) {
             color = shenDelay.accessible ? "black" : "gray";
-            if (color == "black") entry.url = currLoc.getClickableURLForLocation();
+            if (color == "black") entry.url = shenLocation.getClickableURLForLocation();
             delayEntries.listAppend("|* • "+HTMLGenerateSpanFont("<b>" + shenDelay.delayRemaining + "</b> @ " + to_string(shenLocation), color, "0.9em")+"");
         }
     }
 
     if (remainingShenDelay > 0) {
         string color = can_adventure(shenLocation) ? "black" : "gray";
-        delayEntries.listAppend("|* • "+HTMLGenerateSpanFont("<b>" + remainingShenDelay + "</b> @ remaining Shen assignments", color, "0.9em")+"")
+        delayEntries.listAppend("|* • "+HTMLGenerateSpanFont("<b>" + remainingShenDelay + "</b> @ remaining Shen assignments", color, "0.9em")+"");
     }
 
 
