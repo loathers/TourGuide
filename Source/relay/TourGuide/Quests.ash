@@ -82,6 +82,7 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QMadnessBakeryGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 
 	Q8bitRealmGenerateTasks(task_entries, future_task_entries);
+	QGenerateDelayRemainingTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] resource_entries)
