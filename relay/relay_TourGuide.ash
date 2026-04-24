@@ -25373,7 +25373,7 @@ delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", !can_adventure($lo
 // delayZones.listAppend(makeDelayRecord(5, "SHEN ZONE", true)); // TODO: needs custom
 delayZones.listAppend(makeDelayRecord("The Copperhead Club", get_property("questL11Shen") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Upper Chamber", !can_adventure($location[The Middle Chamber])));
-delayZones.listAppend(makeDelayRecord("The Middle Chamber", !can_adventure($location[The Lower Chamber])));
+delayZones.listAppend(makeDelayRecord("The Middle Chamber", !can_adventure($location[The Lower Chambers])));
 
 void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -25384,7 +25384,7 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
     ChecklistEntry entry;
 
     entry.url = "";
-    entry.image_lookup_name = "__monster running man";
+    entry.image_lookup_name = "__monster rushing bum";
     entry.tags.id = "Total delay remaining task";
     entry.importance_level = 10;
 
@@ -25417,15 +25417,38 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
             // gray out inaccessible entries
             color = currAccessible ? "black" : "gray";
             if (color == "black") entry.url = currLoc.getClickableURLForLocation();
-            delayEntries.listAppend(HTMLGenerateSpanFont("|* • <b>" + currDelayRemaining + "</b> @ " + to_string(currLoc), color)+"");
+            delayEntries.listAppend("|* • "+HTMLGenerateSpanFont("<b>" + currDelayRemaining + "</b> @ " + to_string(currLoc), color, "0.9em")+"");
             
         }
     }
 
+    // Custom handling for active shen snake zone
+    int shenDay = get_property_int("shenInitiationDay");
+    int shenMeetings = __quest_state["Level 11 Shen"].state_int["Shen meetings"];
+    location shenLocation = __shen_items_to_locations[get_property_item("shenQuestItem")];
+    boolean onAnAssignment = __quest_state["Level 11 Shen"].state_boolean["on an assignment"];
+    int remainingShenDelay = max((3-shenMeetings)*5,0); 
+
+    if (onAnAssignment) {
+        DelayTracker shenDelay = makeDelayRecord(to_string(shenLocation), true);
+
+        if (shenDelay.delayRemaining > 0) {
+            color = shenDelay.accessible ? "black" : "gray";
+            if (color == "black") entry.url = currLoc.getClickableURLForLocation();
+            delayEntries.listAppend("|* • "+HTMLGenerateSpanFont("<b>" + shenDelay.delayRemaining + "</b> @ " + to_string(shenLocation), color, "0.9em")+"");
+        }
+    }
+
+    if (remainingShenDelay > 0) {
+        string color = can_adventure(shenLocation) ? "black" : "gray";
+        delayEntries.listAppend("|* • "+HTMLGenerateSpanFont("<b>" + remainingShenDelay + "</b> @ remaining Shen assignments", color, "0.9em")+"")
+    }
+
+
     // no need to generate the tile if no delay is remaining
     if (delayEntries.count() == 0) return;
 
-    description.listAppend("Eat up delay in these zones using wanderers, free runs, and free fights to advance your quests!");
+    description.listAppend("Use free runs and wanderers to avoid spending turns.");
 
     delayTeaser.listAppend(HTMLGenerateSpanOfClass("Mouse over for your delay zones!","r_bold r_element_spooky_desaturated"));
 
