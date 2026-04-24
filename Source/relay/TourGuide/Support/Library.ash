@@ -596,7 +596,7 @@ static
     __place_delays[$location[the oasis]] = 5;
     __place_delays[$location[the "fun" house]] = 10;
     __place_delays[$location[the mer-kin outpost]] = 24;
-    __place_delays[$location[the mer-kin library]] = 5;
+    __place_delays[$location[mer-kin library]] = 5;
     __place_delays[$location[the smut orc logging camp]] = 19;
     __place_delays[$location[twin peak]] = 50;
 }

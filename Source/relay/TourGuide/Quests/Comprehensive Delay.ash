@@ -10,17 +10,25 @@ record DelayTracker
 DelayTracker makeDelayRecord(string l, boolean r) {
     DelayTracker final;
 
-    final.location = lookupLocation(l);
-    final.delay = totalDelayForLocation(final.location);
-    final.delayRemaining = delayRemainingInLocation(final.location);
+    final.zone = lookupLocation(l);
+    final.delay = totalDelayForLocation(final.zone);
+    final.delayRemaining = delayRemainingInLocation(final.zone);
     final.relevant = r;
-    final.accessible = can_adventure(final.location);
+    final.accessible = can_adventure(final.zone);
 
     return final;
 }
 
+void listAppend(DelayTracker [int] list, DelayTracker entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
 // Populating all delay zones into a list
-DelayTrack [int] delayZones;
+DelayTracker [int] delayZones;
 
 delayZones.listAppend(makeDelayRecord("The Spooky Forest", true));
 delayZones.listAppend(makeDelayRecord("The Boss Bat's Lair", true)); 
@@ -60,11 +68,11 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
     string color;
 
     foreach key, delayEntry in delayZones {
-        currLoc = delayEntry.location;
-        currDelay = delayEntry.delay;
-        currDelayRemaining = delayEntry.delayRemaining;
-        currRelevant = delayEntry.relevant;
-        currAccessible = delayEntry.accessible;
+        location currLoc = delayEntry.zone;
+        int currDelay = delayEntry.delay;
+        int currDelayRemaining = delayEntry.delayRemaining;
+        boolean currRelevant = delayEntry.relevant;
+        boolean currAccessible = delayEntry.accessible;
 
         // fix airship delay in the event user has bat wings
         if ($item[bat wings].available_amount() > 0 && currLoc == $location[The Penultimate Fantasy Airship]) {
@@ -80,8 +88,9 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
         if (currRelevant && currDelayRemaining > 0) {
             // gray out inaccessible entries
             color = currAccessible ? "black" : "gray";
-            delayEntries.listAppend(HTMLGenerateSpanFont("|* <b>" + currDelayRemaining + "</b> @ " + currLoc.name, color));
-            entry.url = currLoc.getClickableURLForLocation();
+            if (color == "black") entry.url = currLoc.getClickableURLForLocation();
+            delayEntries.listAppend(HTMLGenerateSpanFont("|* • <b>" + currDelayRemaining + "</b> @ " + to_string(currLoc), color)+"");
+            
         }
     }
 
@@ -90,16 +99,21 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
 
     description.listAppend("Eat up delay in these zones using wanderers, free runs, and free fights to advance your quests!");
 
-    delayTeaser.listAppend(HTMLGenerateSpanOfClass("Mouse over for your delay zones!","r_bold r_element_spooky_desaturated"))
+    delayTeaser.listAppend(HTMLGenerateSpanOfClass("Mouse over for your delay zones!","r_bold r_element_spooky_desaturated"));
 
     string delayTitle = pluralise(totalDelayRemaining, "delay turn remains", "delay turns remain");
 
-    // Store the base description within the mouseover subentries, then the enumerated delay entries
-    entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
-    entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(delayTitle, "", delayEntries));
-    // Store the base description within the non-mouseover version of the tile
+    // For the first run with it I'm just going to have the thing always available IDGAF
+    // // Store the base description within the mouseover subentries, then the enumerated delay entries
+    // entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
+    // entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(delayTitle, "", delayEntries));
+    // // Store the base description within the non-mouseover version of the tile
+    // entry.subentries.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
+    // entry.subentries.listAppend(ChecklistSubentryMake(delayTitle, "", delayTeaser));
+
     entry.subentries.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
-    entry.subentries.listAppend(ChecklistSubentryMake(delayTitle, "", delayTeaser));
+    entry.subentries.listAppend(ChecklistSubentryMake(delayTitle, "", delayEntries));
+
 
     task_entries.listAppend(entry);
 }
