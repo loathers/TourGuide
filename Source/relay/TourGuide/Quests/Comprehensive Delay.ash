@@ -30,22 +30,22 @@ void listAppend(DelayTracker [int] list, DelayTracker entry)
 // Populating all delay zones into a list
 DelayTracker [int] delayZones;
 
-delayZones.listAppend(makeDelayRecord("The Spooky Forest", true));
-delayZones.listAppend(makeDelayRecord("The Boss Bat's Lair", true)); 
-delayZones.listAppend(makeDelayRecord("The Outskirts of Cobb's Knob", true));
-delayZones.listAppend(makeDelayRecord("The Penultimate Fantasy Airship", true)); // bat wing dependent
-delayZones.listAppend(makeDelayRecord("The Castle in the Clouds in the Sky (Ground Floor)", true));
-delayZones.listAppend(makeDelayRecord("The Hidden Park", true));
-delayZones.listAppend(makeDelayRecord("The Hidden Apartment Building", true));
-delayZones.listAppend(makeDelayRecord("The Hidden Office Building", true));
-delayZones.listAppend(makeDelayRecord("The Haunted Gallery", true));
-delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", true));
-delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", true));
-delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", true));
+delayZones.listAppend(makeDelayRecord("The Spooky Forest", !__quest_state["Level 2"].finished && !__quest_state["Hidden Temple Unlock"].finished));
+delayZones.listAppend(makeDelayRecord("The Boss Bat's Lair", !__quest_state["Level 4"].finished)); 
+delayZones.listAppend(makeDelayRecord("The Outskirts of Cobb's Knob", !__quest_state["Level 5"].finished));
+delayZones.listAppend(makeDelayRecord("The Penultimate Fantasy Airship", !can_adventure($location[The Castle in the Clouds in the Sky (Basement)]))); // bat wing dependent
+delayZones.listAppend(makeDelayRecord("The Castle in the Clouds in the Sky (Ground Floor)", !can_adventure($location[The Castle in the Clouds in the Sky (Top Floor)])));
+delayZones.listAppend(makeDelayRecord("The Hidden Park", __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"]));
+delayZones.listAppend(makeDelayRecord("The Hidden Apartment Building", get_property_int("hiddenApartmentProgress") < 7));
+delayZones.listAppend(makeDelayRecord("The Hidden Office Building", get_property_int("hiddenOfficeProgress") < 7));
+delayZones.listAppend(makeDelayRecord("The Haunted Gallery", get_property("questM21Dance") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", get_property("questM21Dance") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", get_property("questM21Dance") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", !can_adventure($location[The Haunted Wine Cellar])));
 // delayZones.listAppend(makeDelayRecord(5, "SHEN ZONE", true)); // TODO: needs custom
-delayZones.listAppend(makeDelayRecord("The Copperhead Club", true));
-delayZones.listAppend(makeDelayRecord("The Upper Chamber", true));
-delayZones.listAppend(makeDelayRecord("The Middle Chamber", true));
+delayZones.listAppend(makeDelayRecord("The Copperhead Club", get_property("questL11Shen") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Upper Chamber", !can_adventure($location[The Middle Chamber])));
+delayZones.listAppend(makeDelayRecord("The Middle Chamber", !can_adventure($location[The Lower Chamber])));
 
 void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -104,6 +104,9 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
     string delayTitle = pluralise(totalDelayRemaining, "delay turn remains", "delay turns remain");
 
     // For the first run with it I'm just going to have the thing always available IDGAF
+    //   (TODO: also for update, maybe leverage generatePossibleLocationsToBurnDelay() ?)
+
+    
     // // Store the base description within the mouseover subentries, then the enumerated delay entries
     // entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
     // entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(delayTitle, "", delayEntries));
