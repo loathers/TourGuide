@@ -34,3 +34,4 @@ import "relay/TourGuide/Sets/Level 13 Door.ash";
 import "relay/TourGuide/Sets/Monorail.ash";
 import "relay/TourGuide/Sets/Sneaks.ash";
 import "relay/TourGuide/Sets/Active Banishes.ash";
+import "relay/TourGuide/Sets/Familiar Drops.ash";

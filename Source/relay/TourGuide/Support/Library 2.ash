@@ -405,8 +405,8 @@ float grabClampedFloat(int i, float[int] array) {
     int maxVal = 999;
 
     foreach key, val in array {
-        if (minVal = 999) minVal = key;
-        if (maxVal = 999) maxVal = key;
+        if (minVal == 999) minVal = key;
+        if (maxVal == 999) maxVal = key;
         if (key < minVal) minVal = key;
         if (key > maxVal) maxVal = key;
     }
@@ -425,8 +425,8 @@ float grabClampedInt(int i, int[int] array) {
     int maxVal = 999;
 
     foreach key, val in array {
-        if (minVal = 999) minVal = key;
-        if (maxVal = 999) maxVal = key;
+        if (minVal == 999) minVal = key;
+        if (maxVal == 999) maxVal = key;
         if (key < minVal) minVal = key;
         if (key > maxVal) maxVal = key;
     }
