@@ -7888,6 +7888,45 @@ KramcoSausageFightInformation KramcoCalculateSausageFightInformation() {
     return information;
 }
 
+// Helper function for FamDrops to grab min/max item in a float[int] if passing int > or < keys in the float[int]
+float grabClampedFloat(int i, float[int] array) {
+    if (array.count() == 0 ) return 0.0;
+
+    int minVal = 999;
+    int maxVal = 999;
+
+    foreach key, val in array {
+        if (minVal = 999) minVal = key;
+        if (maxVal = 999) maxVal = key;
+        if (key < minVal) minVal = key;
+        if (key > maxVal) maxVal = key;
+    }
+
+    if (i > maxVal) return array[maxVal];
+    if (i < minVal) return array[minVal];
+
+    return array[i];
+}
+
+// Helper function for FamDrops to grab min/max item in an int[int] if passing int > or < keys in the int[int]
+float grabClampedInt(int i, int[int] array) {
+    if (array.count() == 0 ) return 0.0;
+
+    int minVal = 999;
+    int maxVal = 999;
+
+    foreach key, val in array {
+        if (minVal = 999) minVal = key;
+        if (maxVal = 999) maxVal = key;
+        if (key < minVal) minVal = key;
+        if (key > maxVal) maxVal = key;
+    }
+
+    if (i > maxVal) return array[maxVal];
+    if (i < minVal) return array[minVal];
+
+    return array[i];
+}
 
 record CSSEntry
 {
@@ -25360,17 +25399,16 @@ DelayTracker [int] delayZones;
 
 delayZones.listAppend(makeDelayRecord("The Spooky Forest", !__quest_state["Level 2"].finished && !__quest_state["Hidden Temple Unlock"].finished));
 delayZones.listAppend(makeDelayRecord("The Boss Bat's Lair", !__quest_state["Level 4"].finished)); 
-delayZones.listAppend(makeDelayRecord("The Outskirts of Cobb's Knob", !__quest_state["Level 5"].finished));
+delayZones.listAppend(makeDelayRecord("The Outskirts of Cobb's Knob", !__quest_state["Level 5"].finished && !can_adventure($location[Cobb's Knob Barracks])));
 delayZones.listAppend(makeDelayRecord("The Penultimate Fantasy Airship", !can_adventure($location[The Castle in the Clouds in the Sky (Basement)]))); // bat wing dependent
 delayZones.listAppend(makeDelayRecord("The Castle in the Clouds in the Sky (Ground Floor)", !can_adventure($location[The Castle in the Clouds in the Sky (Top Floor)])));
-delayZones.listAppend(makeDelayRecord("The Hidden Park", __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"]));
+delayZones.listAppend(makeDelayRecord("The Hidden Park", __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"])); //technically if you autosell antique this sort of doesn't work but idc
 delayZones.listAppend(makeDelayRecord("The Hidden Apartment Building", get_property_int("hiddenApartmentProgress") < 7));
 delayZones.listAppend(makeDelayRecord("The Hidden Office Building", get_property_int("hiddenOfficeProgress") < 7));
 delayZones.listAppend(makeDelayRecord("The Haunted Gallery", get_property("questM21Dance") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", get_property("questM21Dance") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", get_property("questM21Dance") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", !can_adventure($location[The Haunted Wine Cellar])));
-// delayZones.listAppend(makeDelayRecord(5, "SHEN ZONE", true)); // TODO: needs custom
 delayZones.listAppend(makeDelayRecord("The Copperhead Club", get_property("questL11Shen") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Upper Chamber", !can_adventure($location[The Middle Chamber])));
 delayZones.listAppend(makeDelayRecord("The Middle Chamber", !can_adventure($location[The Lower Chambers])));
@@ -25384,7 +25422,7 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
     ChecklistEntry entry;
 
     entry.url = "";
-    entry.image_lookup_name = "__monster rushing bum";
+    entry.image_lookup_name = "__monster rushing bum"; // TODO: pick better image lol
     entry.tags.id = "Total delay remaining task";
     entry.importance_level = 10;
 
@@ -34696,6 +34734,7 @@ void SetsInit()
 void SetsGenerateResources(ChecklistEntry [int] resource_entries)
 {
 	SFamiliarsGenerateResource(resource_entries);
+	SFamiliarDropsGenerateResource(resource_entries);
 	SSkillsGenerateResource(resource_entries);
 	SMiscItemsGenerateResource(resource_entries);
 	SCopiedMonstersGenerateResource(resource_entries);
@@ -45057,7 +45096,7 @@ void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if    ( currentDrops == limit ) { txtclr = "gray"; }
         
-        description.listAppend(HTMLGenerateSpanFont(fam+": "+currentDrops + "/"+limit+" "+dropdesc+".", txtclr));
+        description.listAppend("|*"+HTMLGenerateSpanFont(fam+": "+currentDrops + "/"+limit+" "+dropdesc+".", txtclr));
         return;
     }
     
@@ -45071,26 +45110,6 @@ void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
 	addFamiliarDropsLine("Puck Man", "_yellowPixelDropsCrown", 25, "yellow pixels");
 	addFamiliarDropsLine("Trick-or-Treating Tot", "_hoardedCandyDropsCrown", 3, "hoarded candy wads");
 	
-    description.listAppend(HTMLGenerateSpanFont("General familiar drops", "purple"));
-    addFamiliarDropsLine("Adventurous Spelunker", "_spelunkingTalesDrops", 1, "Tales of Spelunking");
-	addFamiliarDropsLine("Astral Badger", "_astralDrops", 5, "astral mushrooms");
-	addFamiliarDropsLine("Baby Sandworm", "_aguaDrops", 5, "Agua de Vidae");
-	addFamiliarDropsLine("Blavious Kloop", "_kloopDrops", 5, "devlish folios");
-	addFamiliarDropsLine("Bloovian Groose", "_grooseDrops", 5, "groose grease");
-	addFamiliarDropsLine("Cat Burglar", "_catBurglarCharge", 30, "Heist charges");
-	#addFamiliarDropsLine("Cookbookbat", "_turkeyBooze", 5, "Turkey booze");
-	addFamiliarDropsLine("Fist Turkey", "_turkeyBooze", 5, "Turkey booze");
-	addFamiliarDropsLine("Galloping Grill", "_hotAshesDrops", 5, "hot ashes");
-    addFamiliarDropsLine("Golden Monkey", "_powderedGoldDrops", 5, "powdered gold");
-    addFamiliarDropsLine("Green Pixie", "_absintheDrops", 5, "bottles of absinthe");
-	addFamiliarDropsLine("Grim Brother", "_grimFairyTaleDrops", 5, "grim fairy tales");
-	addFamiliarDropsLine("Li'l Xenomorph", "_transponderDrops", 5, "transponders");
-	addFamiliarDropsLine("Llama Lama", "_gongDrops", 5, "Llama gongs");
-	addFamiliarDropsLine("Puck Man", "_powerPillDrops", 11, "power pills");
-    addFamiliarDropsLine("Ms. Puck Man", "_powerPillDrops", 11, "power pills");
-    addFamiliarDropsLine("Rogue Program", "_tokenDrops", 5, "GG tokens");
-    addFamiliarDropsLine("Stomping Boots", "_pasteDrops", 7, "spleen pastes");
-    addFamiliarDropsLine("Unconscious Collective", "_dreamJarDrops", 5, "dream jars");
     item crown_item = $item[crown of thrones];
     if (crown_item.equipped_amount() == 0 && $item[Buddy Bjorn].available_amount() > 0)
         crown_item = $item[Buddy Bjorn];
