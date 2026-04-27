@@ -32,17 +32,16 @@ DelayTracker [int] delayZones;
 
 delayZones.listAppend(makeDelayRecord("The Spooky Forest", !__quest_state["Level 2"].finished && !__quest_state["Hidden Temple Unlock"].finished));
 delayZones.listAppend(makeDelayRecord("The Boss Bat's Lair", !__quest_state["Level 4"].finished)); 
-delayZones.listAppend(makeDelayRecord("The Outskirts of Cobb's Knob", !__quest_state["Level 5"].finished));
+delayZones.listAppend(makeDelayRecord("The Outskirts of Cobb's Knob", !__quest_state["Level 5"].finished && !can_adventure($location[Cobb's Knob Barracks])));
 delayZones.listAppend(makeDelayRecord("The Penultimate Fantasy Airship", !can_adventure($location[The Castle in the Clouds in the Sky (Basement)]))); // bat wing dependent
 delayZones.listAppend(makeDelayRecord("The Castle in the Clouds in the Sky (Ground Floor)", !can_adventure($location[The Castle in the Clouds in the Sky (Top Floor)])));
-delayZones.listAppend(makeDelayRecord("The Hidden Park", __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"]));
+delayZones.listAppend(makeDelayRecord("The Hidden Park", __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"])); //technically if you autosell antique this sort of doesn't work but idc
 delayZones.listAppend(makeDelayRecord("The Hidden Apartment Building", get_property_int("hiddenApartmentProgress") < 7));
 delayZones.listAppend(makeDelayRecord("The Hidden Office Building", get_property_int("hiddenOfficeProgress") < 7));
 delayZones.listAppend(makeDelayRecord("The Haunted Gallery", get_property("questM21Dance") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", get_property("questM21Dance") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", get_property("questM21Dance") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", !can_adventure($location[The Haunted Wine Cellar])));
-// delayZones.listAppend(makeDelayRecord(5, "SHEN ZONE", true)); // TODO: needs custom
 delayZones.listAppend(makeDelayRecord("The Copperhead Club", get_property("questL11Shen") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Upper Chamber", !can_adventure($location[The Middle Chamber])));
 delayZones.listAppend(makeDelayRecord("The Middle Chamber", !can_adventure($location[The Lower Chambers])));
@@ -56,7 +55,7 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
     ChecklistEntry entry;
 
     entry.url = "";
-    entry.image_lookup_name = "__monster rushing bum";
+    entry.image_lookup_name = "__monster rushing bum"; // TODO: pick better image lol
     entry.tags.id = "Total delay remaining task";
     entry.importance_level = 10;
 
