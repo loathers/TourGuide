@@ -396,3 +396,43 @@ KramcoSausageFightInformation KramcoCalculateSausageFightInformation() {
     
     return information;
 }
+
+// Helper function for FamDrops to grab min/max item in a float[int] if passing int > or < keys in the float[int]
+float grabClampedFloat(int i, float[int] array) {
+    if (array.count() == 0 ) return 0.0;
+
+    int minVal = 999;
+    int maxVal = 999;
+
+    foreach key, val in array {
+        if (minVal = 999) minVal = key;
+        if (maxVal = 999) maxVal = key;
+        if (key < minVal) minVal = key;
+        if (key > maxVal) maxVal = key;
+    }
+
+    if (i > maxVal) return array[maxVal];
+    if (i < minVal) return array[minVal];
+
+    return array[i];
+}
+
+// Helper function for FamDrops to grab min/max item in an int[int] if passing int > or < keys in the int[int]
+float grabClampedInt(int i, int[int] array) {
+    if (array.count() == 0 ) return 0.0;
+
+    int minVal = 999;
+    int maxVal = 999;
+
+    foreach key, val in array {
+        if (minVal = 999) minVal = key;
+        if (maxVal = 999) maxVal = key;
+        if (key < minVal) minVal = key;
+        if (key > maxVal) maxVal = key;
+    }
+
+    if (i > maxVal) return array[maxVal];
+    if (i < minVal) return array[minVal];
+
+    return array[i];
+}
