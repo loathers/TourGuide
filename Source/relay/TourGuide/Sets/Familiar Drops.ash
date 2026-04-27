@@ -3,7 +3,7 @@
 //   "normal fam drops" tile. The primary goal is to abstract all familiar drops 
 //   into a combo tile that correctly describes:
 
-//     - progress on how many drops you are from the fam's limit
+//     - progress on how many di'll s you are from the fam's limit
 //     - % chance of next drop, if applicable
 //     - exact turns til next drop, if applicable
 
@@ -16,13 +16,13 @@
 // ===============================================================
 int bootsTurns;
 if (get_property_boolean("bootsCharged")) bootsTurns = 0;
-else if ($familiar[Stomping Boots].fights_today < 3) bootsTurns = clampi(3 - $familiar[Stomping Boots].fights_today,1,3);
-else if ($familiar[Stomping Boots].fights_today < 7) bootsTurns = clampi(7 - $familiar[Stomping Boots].fights_today,1,4);
-else if ($familiar[Stomping Boots].fights_today < 12) bootsTurns = clampi(12 - $familiar[Stomping Boots].fights_today,1,5);
-else if ($familiar[Stomping Boots].fights_today < 18) bootsTurns = clampi(18 - $familiar[Stomping Boots].fights_today,1,6);
-else if ($familiar[Stomping Boots].fights_today < 25) bootsTurns = clampi(25 - $familiar[Stomping Boots].fights_today,1,7);
-else if ($familiar[Stomping Boots].fights_today < 33) bootsTurns = clampi(33 - $familiar[Stomping Boots].fights_today,1,8);
-else if ($familiar[Stomping Boots].fights_today < 42) bootsTurns = clampi(42 - $familiar[Stomping Boots].fights_today,1,9);
+else if ($familiar[Pair of Stomping Boots].fights_today < 3) bootsTurns = clampi(3 - $familiar[Pair of Stomping Boots].fights_today,1,3);
+else if ($familiar[Pair of Stomping Boots].fights_today < 7) bootsTurns = clampi(7 - $familiar[Pair of Stomping Boots].fights_today,1,4);
+else if ($familiar[Pair of Stomping Boots].fights_today < 12) bootsTurns = clampi(12 - $familiar[Pair of Stomping Boots].fights_today,1,5);
+else if ($familiar[Pair of Stomping Boots].fights_today < 18) bootsTurns = clampi(18 - $familiar[Pair of Stomping Boots].fights_today,1,6);
+else if ($familiar[Pair of Stomping Boots].fights_today < 25) bootsTurns = clampi(25 - $familiar[Pair of Stomping Boots].fights_today,1,7);
+else if ($familiar[Pair of Stomping Boots].fights_today < 33) bootsTurns = clampi(33 - $familiar[Pair of Stomping Boots].fights_today,1,8);
+else if ($familiar[Pair of Stomping Boots].fights_today < 42) bootsTurns = clampi(42 - $familiar[Pair of Stomping Boots].fights_today,1,9);
 
 int sheepTurns = $familiar[Hobo in Sheep's Clothing].fights_today;
 if (sheepTurns < 11) sheepTurns = 10 - sheepTurns;
@@ -33,7 +33,7 @@ else if (sheepTurns < 151) sheepTurns = 150 - sheepTurns;
 else if (sheepTurns > 150) sheepTurns = 999; // not technically true but i don't want to enumerate more
 
 int [familiar] dropTurnsLeft;
-dropTurnsLeft[$familiar[Stomping Boots]] = bootsTurns;
+dropTurnsLeft[$familiar[Pair of Stomping Boots]] = bootsTurns;
 dropTurnsLeft[$familiar[Rockin' Robin]] = 30 - get_property_int("rockinRobinProgress"); 
 dropTurnsLeft[$familiar[Optimistic Candle]] = 30 - get_property_int("optimisticCandleProgress");
 dropTurnsLeft[$familiar[Garbage Fire]] = 30 - get_property_int("garbageFireProgress");
@@ -77,7 +77,7 @@ dropPercentArrays[$familiar[Golden Monkey]] = {1:25.0, 2:20.0, 3:15.0, 4:10.0, 5
 dropPercentArrays[$familiar[Adventurous Spelunker]] = {1:15.0, 2:0.0};
 dropPercentArrays[$familiar[Miniature Sword & Martini Guy]] = {1:30.0, 2:25.0, 3:20.0, 4:15.0, 5:10.0, 6:5.0, 7:0.0};
 dropPercentArrays[$familiar[Machine Elf]] = {1:10.0, 2:0.0}; // guess-ish, this looks right
-dropPercentArrays[$familiar[Jill-of-All-Trades]] = {1:35.0, 2:2.0, 3:0.1, 4:0.0} //technically, last is 0.0043% but mehhhh
+dropPercentArrays[$familiar[Jill-of-All-Trades]] = {1:35.0, 2:2.0, 3:0.1, 4:0.0}; //technically, last is 0.0043% but mehhhh
 
 // ===============================================================
 // ---------- PERCENT DROP CALCULATIONS (dropType == "percent calc")
@@ -117,7 +117,15 @@ record FamDrop {
     int dropInt; // valid outputs: turns 
 };
 
-void generateFamDrop(string fam, string drop, string dropsmall, string prop, int limit, string dropType) {
+void listAppend(FamDrop [int] list, FamDrop entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+FamDrop generateFamDrop(string fam, string drop, string dropsmall, string prop, int limit, string dropType) {
     FamDrop out;
 
     // initialize things
@@ -134,17 +142,17 @@ void generateFamDrop(string fam, string drop, string dropsmall, string prop, int
     // if (!out.haveFam) return out; // exit if you don't have fam
     if (drop != "") out.drop = lookupItem(drop);
 
-    out.activeFam = my_familiar() == thisFam;
+    out.activeFam = my_familiar() == out.fam;
 
     if (prop != "") out.currDrops = get_property_int(prop);
     if (prop == "") return out;
 
     // valid values: "percent", "turn", "approx float turn", "precise int turn", "percent calc"
-    if (dropType == "percent") out.dropFloat = grabClampedFloat(currentDrops+1, dropPercentArrays[thisFam]);
-    if (dropType == "approx float turn") out.dropFloat = dropApproxTurnsLeft[thisFam];
-    if (dropType == "turn") out.dropInt = grabClampedInt(currentDrops+1, dropTurnArrays[thisFam]);
-    if (dropType == "precise int turn") out.dropInt = dropTurnsLeft[thisFam];
-    if (dropType == "percent calc") out.dropFloat = dropPercentCalc[thisFam];
+    if (dropType == "percent") out.dropFloat = grabClampedFloat(out.currDrops+1, dropPercentArrays[out.fam]);
+    if (dropType == "approx float turn") out.dropFloat = dropApproxTurnsLeft[out.fam];
+    if (dropType == "turn") out.dropInt = grabClampedInt(out.currDrops+1, dropTurnArrays[out.fam]);
+    if (dropType == "precise int turn") out.dropInt = dropTurnsLeft[out.fam];
+    if (dropType == "percent calc") out.dropFloat = dropPercentCalc[out.fam];
 
     return out;
 }
@@ -168,13 +176,13 @@ __fam_drops.listAppend(generateFamDrop("Fist Turkey", (my_level() < 5 ? "friendl
 __fam_drops.listAppend(generateFamDrop("Golden Monkey","powdered gold","powdered golds","_powderedGoldDrops",5, "percent"));
 __fam_drops.listAppend(generateFamDrop("Adventurous Spelunker","tales of spelunking","tales","_spelunkingTalesDrops",1, "percent"));
 // __fam_drops.listAppend(generateFamDrop("Cotton Candy Carnie", -1, "cotton candy", "_carnieCandyDrops", 10, "percent")); // not including, pretty useless
-__fam_drops.listAppend(generateFamDrop("Stomping Boots","","paste","_bootStomps",7,"precise int turn"));
+__fam_drops.listAppend(generateFamDrop("Pair of Stomping Boots","","paste","_bootStomps",7,"precise int turn"));
 __fam_drops.listAppend(generateFamDrop("Puck Man","power pill","power pills","_powerPillDrops", MIN(11, my_daycount() + 1), "approx float turn"));
 __fam_drops.listAppend(generateFamDrop("Ms. Puck Man","power pill","power pills","_powerPillDrops", MIN(11, my_daycount() + 1), "approx float turn"));
 __fam_drops.listAppend(generateFamDrop("Miniature Sword & Martini Guy","mini-martini","mini-martinis","_miniMartiniDrops",6, "percent"));
 __fam_drops.listAppend(generateFamDrop("Machine Elf","Deep Machine Tunnels snowglobe","snowglobe","_snowglobeDrops",1,"percent"));
 __fam_drops.listAppend(generateFamDrop("Rockin' Robin", "robin's egg", "robin's egg", "_robinEggDrops", -1, "precise int turn"));
-__fam_drops.listAppend(generateFamDrop("Optimistic Candle", "wax glob", "wax glob", "_waxGlobDrops", -1, "precise int turn"));
+__fam_drops.listAppend(generateFamDrop("Optimistic Candle", "glob of melted wax", "wax glob", "_waxGlobDrops", -1, "precise int turn"));
 __fam_drops.listAppend(generateFamDrop("Garbage Fire", "burning newspaper", "burning item", "_garbageFireDrops", -1, "precise int turn"));
 __fam_drops.listAppend(generateFamDrop("Cookbookbat", "yeast of boris", "cookbookbat ingredient", "_cookbookbatRecipeDrops", -1, "precise int turn"));
 __fam_drops.listAppend(generateFamDrop("Hobo in Sheep's Clothing","grubby wool","grubby wools","_grubbyWoolDrops",5, "precise int turn")); // technically unlimited but setting at limit 5 bc nobody should get >5
@@ -190,20 +198,6 @@ __fam_drops.listAppend(generateFamDrop("Skeleton of Crimbo Past","knucklebone","
 //   - space jellyfish (_spaceJellyfishDrops)
 // 
 
-record FamDrop {
-    familiar fam; // familiar that drops a thing
-    item drop; // item dropped by the familiar
-    string dropText; // a shortened string
-    string prop; // prop used to get dropsdropped
-    int limit; // max drops per day
-    string dropType; // valid values: "percent", "turn", "approx float turn", "precise int turn", "percent calc"
-    boolean haveFam; // does user have this fam
-    boolean activeFam; // is this fam equipped
-    int currDrops; // how many drops have dropped
-    float dropFloat; // valid outputs: % chance, approx float turn, % calculated
-    int dropInt; // valid outputs: turns 
-};
-
 string [string] dropFamTile(FamDrop currFamDrop) {
     // Generate empty starting output
     string [string] output;
@@ -214,7 +208,9 @@ string [string] dropFamTile(FamDrop currFamDrop) {
 
     string limitString = "";
     if (currFamDrop.limit > 0) {
-        limitString = "("currFamDrop.currDrops+"/"+currFamDrop.limit+")";
+        limitString = " "+currFamDrop.currDrops+"/"+currFamDrop.limit+" "+currFamDrop.drop.plural;
+        output["subtitle"] = limitString;
+        if (currFamDrop.fam == lookupFamiliar("pair of stomping boots")) output["subtitle"] = limitString+" spleen pastes";
     }
 
 
@@ -224,37 +220,50 @@ string [string] dropFamTile(FamDrop currFamDrop) {
         return output;
     }
 
+    // Fixing a few small language issues
+    string droppedItem = currFamDrop.drop;
+    if (currFamDrop.drop == lookupItem("yeast of boris")) droppedItem="3x cookbat food";
+    if (currFamDrop.fam == lookupFamiliar("pair of stomping boots")) droppedItem="spleen paste";
+
     string famText = to_string(currFamDrop.fam);
-    if (currFamDrop.activeFam) famText = HTMLGenerateSpanFont(to_string(currFamDrop.fam),"blue");
+    if (currFamDrop.activeFam) famText = HTMLGenerateSpanFont(famText,"blue");
+
+    string secondaryColor = "gray";
+    string alertColor = "green";
 
 
     string textNumber = "";
-    if (dropType == "percent") {
-        textNumber = to_string(roundFloat(currFamDrop.dropFloat,1))+"%";
-        output["title"] = famText+": "+textNumber+"chance of "+currFamDrop.dropText+limitString;
+    if (currFamDrop.dropType == "percent") {
+        textNumber = to_string(round(currFamDrop.dropFloat,0).to_int())+"%";
+        output["title"] = famText+": "+HTMLGenerateSpanFont(textNumber+" for "+currFamDrop.dropText, secondaryColor);
     }
-    if (dropType == "approx float turn") {
-        textNumber = "~"+to_string(roundFloat(currFamDrop.dropFloat,1));
-        output["title"] = famText+": "+to_string(currFamDrop.drop)+" in "+pluralise(textNumber,"turn ","turns ")+limitString;
+    if (currFamDrop.dropType == "approx float turn") {
+        textNumber = "~"+to_string(round(currFamDrop.dropFloat,1));
+        output["title"] = famText+": "+HTMLGenerateSpanFont(droppedItem+" in ~"+currFamDrop.dropFloat+" turns", secondaryColor);
     }
-    if (dropType == "turn") {
+    if (currFamDrop.dropType == "turn") {
         int turnsSpentWithFam = currFamDrop.fam.fights_today;
-        textNumber = to_string(clampi(currFamDrop.dropInt - turnsSpentWithFam,0,50));
-        output["title"] = famText+": "+to_string(currFamDrop.drop)+" in "+pluralise(textNumber,"turn ","turns ")+limitString;
+        int turnCalc = clampi(currFamDrop.dropInt - turnsSpentWithFam,0,50);
+        output["title"] = famText+": "+HTMLGenerateSpanFont(droppedItem+" in "+pluralise(turnCalc,"turn","turns"), secondaryColor);
     }
-    if (dropType == "precise int turn") {
-        textNumber = to_string(currFamDrop.dropInt);
-        output["title"] = famText+": "+to_string(currFamDrop.drop)+" in "+pluralise(textNumber,"turn ","turns ")+limitString;
+    if (currFamDrop.dropType == "precise int turn") {
+        output["title"] = famText+": "+HTMLGenerateSpanFont(droppedItem+" in "+pluralise(currFamDrop.dropInt,"turn","turns"), secondaryColor);
+        if (currFamDrop.dropInt == 0) output["title"] = famText+": "+HTMLGenerateSpanFont(droppedItem+" in "+pluralise(currFamDrop.dropInt,"turn","turns"), alertColor);
     }
-    if (dropType == "percent calc") = {
-        textNumber = "~"+to_string(roundFloat(currFamDrop.dropFloat,1))+"%";
-        output["title"] = famText+": "+textNumber+"chance of "+currFamDrop.dropText+limitString;
+    if (currFamDrop.dropType == "percent calc") {
+        textNumber = "~"+to_string(round(currFamDrop.dropFloat,1))+"%";
+        output["title"] = famText+": "+HTMLGenerateSpanFont(textNumber+" chance of "+currFamDrop.dropText, secondaryColor);
+    }
+
+    if (currFamDrop.dropFloat < 0.0) {
+        output["title"] = famText+": "+HTMLGenerateSpanFont("Knucklebones! ("+currFamDrop.currDrops+"/"+currFamDrop.limit+")", secondaryColor);
+        output["subtitle"] = "";
     }
 
     // Adding special desclines for special fam drop conditions & extras
-    if (thisFam == lookupFamiliar("Golden Monkey")) output["desc"] = "Also, 100 meat autosell vs. meatless monsters";
-    if (thisFam == lookupFamiliar("Peace Turkey")) {
-        string [int] peaceMap = {0:"whirled peas",1:"olive",2:"hp/mp restore",3:"weap% buff",4:"whirled peas",5:"piece of cake",6:"booze",7:"peace shooter"}
+    if (currFamDrop.fam == lookupFamiliar("Golden Monkey")) output["desc"] = "Also, 100 meat autosell vs. meatless monsters";
+    if (currFamDrop.fam == lookupFamiliar("Peace Turkey")) {
+        string [int] peaceMap = {0:"whirled peas",1:"olive",2:"hp/mp restore",3:"weap% buff",4:"whirled peas",5:"piece of cake",6:"booze",7:"peace shooter"};
         output["desc"] = "Next pea boon: "+peaceMap[get_property_int("peaceTurkeyIndex")];
     }
 
@@ -273,10 +282,12 @@ void SFamiliarDropsGenerateResource(ChecklistEntry [int] resource_entries)
     // New 2026 tile enumerating the TES Crown of Thrones thing into a general famdrop helper
     ChecklistEntry entry;
 
-    entry.url = "";
+    entry.url = "familiars.php";
     entry.image_lookup_name = "__familiar Floating Eye"; // TODO: pick better image lol
     entry.tags.id = "Familiar Drops Megatile";
     entry.importance_level = 8;
+
+    // entry.title = HTMLGenerateSpanFont("Collected Familiar Drops");
 
     string [int] description;
     string [int] completedDrops;
@@ -290,14 +301,13 @@ void SFamiliarDropsGenerateResource(ChecklistEntry [int] resource_entries)
                 completedDrops.listAppend(tileComponents["limitLine"]);
             }
             if (tileComponents["title"] != "") {
-                description.listAppend(tileComponents["title"]);
+                // entry.image_lookup_name = "__ familiar "+famDropRecord.fam.to_string();
+                entry.subentries.listAppend(ChecklistSubentryMake(tileComponents["title"], tileComponents["subtitle"], tileComponents["desc"]));
             }
         }
     }
 
-    string title = "testing famdrops";
-    string subtitle = "testing <b>famdrops</b>?????????"
-
-    return ChecklistEntryMake("__familiar floating eye", "", ChecklistSubentryMake(title, subtitle, description), 8).ChecklistEntrySetCombinationTag("familiar drops").ChecklistEntrySetIDTag(fam+" drops combo");
+    if (entry.subentries.count() > 1)
+        resource_entries.listAppend(entry);
 
 }
