@@ -34915,6 +34915,9 @@ __fam_drops.listAppend(generateFamDrop("Mini Kiwi", "mini kiwi", "mini kiwi", "_
 __fam_drops.listAppend(generateFamDrop("Peace Turkey","whirled peas","pea boon","_knuckleboneDrops", -1, "percent calc"));
 __fam_drops.listAppend(generateFamDrop("Skeleton of Crimbo Past","knucklebone","knucklebone","_knuckleboneDrops",100, "percent calc"));
 
+// Reverse the sort, so you get newest IOTM fams on top
+sort __fam_drops by -index;
+
 // TODO: this includes almost all drop familiars. it's missing a small handful: 
 //   - xo skeleton (xs & os; xoSkeleltonOProgress & xoSkeleltonXProgress)
 //   - mechanical songbird (mechanicalSongbirdProgress)
@@ -34937,9 +34940,14 @@ string [string] dropFamTile(FamDrop currFamDrop) {
         if (currFamDrop.fam == lookupFamiliar("pair of stomping boots")) output["subtitle"] = limitString+" spleen pastes";
     }
 
+    // Setting some custom subtitles
+    if (currFamDrop.limit < 0) {
+        output["subtitle"] = "currently have "+pluralise(currFamDrop.drop);
+    }
+
 
     // Generate a limited line and return
-    if (currFamDrop.dropFloat == 0.0 && currFamDrop.dropInt == 0 && currFamDrop.limit > 0) {
+    if (currFamDrop.dropFloat == 0.0 && currFamDrop.dropInt == 0 && currFamDrop.limit - currFamDrop.currDrops == 0) {
         output["limitLine"] = to_string(currFamDrop.fam)+": "+currFamDrop.limit+"/"+currFamDrop.limit+" "+currFamDrop.dropText;
         return output;
     }
@@ -34950,10 +34958,10 @@ string [string] dropFamTile(FamDrop currFamDrop) {
     if (currFamDrop.fam == lookupFamiliar("pair of stomping boots")) droppedItem="spleen paste";
 
     string famText = to_string(currFamDrop.fam);
-    if (currFamDrop.activeFam) famText = HTMLGenerateSpanFont(famText,"blue");
+    if (currFamDrop.activeFam) famText = HTMLGenerateSpanFont(famText,"#0bb1a3");
 
-    string secondaryColor = "gray";
-    string alertColor = "green";
+    string secondaryColor = "#444444";
+    string alertColor = "#088841";
 
 
     string textNumber = "";
@@ -34981,14 +34989,26 @@ string [string] dropFamTile(FamDrop currFamDrop) {
 
     if (currFamDrop.dropFloat < 0.0) {
         output["title"] = famText+": "+HTMLGenerateSpanFont("Knucklebones! ("+currFamDrop.currDrops+"/"+currFamDrop.limit+")", secondaryColor);
-        output["subtitle"] = "";
+        output["subtitle"] = "currently have "+pluralise(currFamDrop.drop);
     }
 
     // Adding special desclines for special fam drop conditions & extras
     if (currFamDrop.fam == lookupFamiliar("Golden Monkey")) output["desc"] = "Also, 100 meat autosell vs. meatless monsters";
     if (currFamDrop.fam == lookupFamiliar("Peace Turkey")) {
         string [int] peaceMap = {0:"whirled peas",1:"olive",2:"hp/mp restore",3:"weap% buff",4:"whirled peas",5:"piece of cake",6:"booze",7:"peace shooter"};
-        output["desc"] = "Next pea boon: "+peaceMap[get_property_int("peaceTurkeyIndex")];
+        string [int] peaceCycle;
+        foreach idx, peaBoon in peaceMap {
+            if (idx == get_property_int("peaceTurkeyIndex")) peaceCycle.listAppend("<b>"+peaBoon+"</b>");
+            else peaceCycle.listAppend(HTMLGenerateSpanFont(peaBoon,"gray"));
+        }
+        output["desc"] = "Pea cycle: "+listJoinComponents(peaceCycle," ➔ ");
+    }
+    if (currFamDrop.fam == lookupFamiliar("Pair of Stomping Boots")) {
+        int runsUsed = get_property_int("_banderRunaways");
+        int runsPossible = (familiar_weight(currFamDrop.fam) + weight_adjustment())/5;
+        string limitBreak = runsUsed > runsPossible ? ". Limit break!" : "";
+        if (__misc_state["free runs usable"])
+            output["desc"] = "Also, you've used "+runsUsed+"/"+runsPossible+" of available freeruns"+limitBreak;
     }
 
     return output;
@@ -35006,10 +35026,12 @@ void SFamiliarDropsGenerateResource(ChecklistEntry [int] resource_entries)
     // New 2026 tile enumerating the TES Crown of Thrones thing into a general famdrop helper
     ChecklistEntry entry;
 
-    entry.url = "familiars.php";
-    entry.image_lookup_name = "__familiar Floating Eye"; // TODO: pick better image lol
+    entry.url = "familiar.php";
+    entry.image_lookup_name = "__item Familiar-Gro&trade; Terrarium"; // TODO: pick better image lol
     entry.tags.id = "Familiar Drops Megatile";
     entry.importance_level = 8;
+	entry.should_indent_after_first_subentry = true;
+	entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("★ Familiar Drops Available ★","#165e61"),"","Consider these familiars for useful drops!<br>"));
 
     // entry.title = HTMLGenerateSpanFont("Collected Familiar Drops");
 
