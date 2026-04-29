@@ -2,10 +2,11 @@
 
 since r28660; // fix: lots and lots of sea stuff
 //These settings are for development. Don't worry about editing them.
-string __version = "2.3.2"; 
+string __version = "2.3.3"; 
 // pushed to 2.2.1 on jill/leaves tiles
 //           2.3.1 on sea path upgrades
 //           2.3.2 on the lucky refactor ++ in spring 2026
+//           2.3.3 on the delay tile + famcombo tile in spring 2026
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -35040,8 +35041,8 @@ void SFamiliarDropsGenerateResource(ChecklistEntry [int] resource_entries)
     string [string] tileComponents;
 
     foreach i, famDropRecord in __fam_drops {
-        if (true) { // used to test tile display
-        // if (famDropRecord.haveFam) {
+        // if (true) { // used to test tile display
+        if (famDropRecord.haveFam) {
             tileComponents = dropFamTile(famDropRecord);
             if (tileComponents["title"] == "" && tileComponents["limitLine"] != "") {
                 completedDrops.listAppend(tileComponents["limitLine"]);
