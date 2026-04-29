@@ -316,8 +316,8 @@ void SFamiliarDropsGenerateResource(ChecklistEntry [int] resource_entries)
     string [string] tileComponents;
 
     foreach i, famDropRecord in __fam_drops {
-        if (true) { // used to test tile display
-        // if (famDropRecord.haveFam) {
+        // if (true) { // used to test tile display
+        if (famDropRecord.haveFam) {
             tileComponents = dropFamTile(famDropRecord);
             if (tileComponents["title"] == "" && tileComponents["limitLine"] != "") {
                 completedDrops.listAppend(tileComponents["limitLine"]);
