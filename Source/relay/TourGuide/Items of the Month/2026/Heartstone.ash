@@ -20,7 +20,7 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     string eightBitColor = get_property("8BitColor"); // and A/E
     boolean fratGearDone = have_outfit_components("Frat Warrior Fatigues");
     int shenDay = get_property_int("shenInitiationDay");
-    boolean hospitalDone = get_property("questL11Doctor") == "finished";
+    boolean hospitalDone = get_property("questL11Doctor") == "finished" && get_property("questL11Doctor") != "unstarted";
     if ($item[server room key].available_amount() > 0 && get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) hackerToday = get_property("_cyberZone1Hacker");
     // --- A MONSTERS ----------------
     boolean forestDone = get_property_ascension("lastTempleUnlock") && get_property("questL02Larva") == "finished";
