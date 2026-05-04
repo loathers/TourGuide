@@ -225,30 +225,33 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8).ChecklistEntrySetIDTag("Spaghetti breakfast resource"));
     }
     
-    if (my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && my_path().id != PATH_NUCLEAR_AUTUMN)
-    {
-        item upgraded_dwelling = $item[none];
-        if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 && (__campground[$item[big rock]] > 0 || __campground[$item[Newbiesport&trade; tent]] > 0 || __campground[$item[cottage]] > 0) && my_path().id != PATH_G_LOVER && my_path().id != PATH_BEES_HATE_YOU)
-        {
-            upgraded_dwelling = $item[Frobozz Real-Estate Company Instant House (TM)];
-        }
-        else if ($item[Newbiesport&trade; tent].available_amount() > 0 && __campground[$item[big rock]] > 0 && my_path().id != PATH_G_LOVER)
-        {
-            upgraded_dwelling = $item[Newbiesport&trade; tent];
-        }
-        if (upgraded_dwelling != $item[none])
-        {
-            string [int] reasons;
-            reasons.listAppend("rollover");
+    // In Feb 2026 they made dwellings static. That means an "upgrade your dwelling" tile 
+    //   is actively unhelpful, since your starter campground rules.
+
+    // if (my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && my_path().id != PATH_NUCLEAR_AUTUMN)
+    // {
+    //     item upgraded_dwelling = $item[none];
+    //     if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 && (__campground[$item[big rock]] > 0 || __campground[$item[Newbiesport&trade; tent]] > 0 || __campground[$item[cottage]] > 0) && my_path().id != PATH_G_LOVER && my_path().id != PATH_BEES_HATE_YOU)
+    //     {
+    //         upgraded_dwelling = $item[Frobozz Real-Estate Company Instant House (TM)];
+    //     }
+    //     else if ($item[Newbiesport&trade; tent].available_amount() > 0 && __campground[$item[big rock]] > 0 && my_path().id != PATH_G_LOVER)
+    //     {
+    //         upgraded_dwelling = $item[Newbiesport&trade; tent];
+    //     }
+    //     if (upgraded_dwelling != $item[none])
+    //     {
+    //         string [int] reasons;
+    //         reasons.listAppend("rollover");
             
-            if (__misc_state_int["total free rests possible"] > 0)
-                reasons.listAppend("free rests");
+    //         if (__misc_state_int["total free rests possible"] > 0)
+    //             reasons.listAppend("free rests");
             
-            string description = "Better HP/MP restoration via " + reasons.listJoinComponents(", ", "and") + ".";
-            optional_task_entries.listAppend(ChecklistEntryMake("__item " + upgraded_dwelling, upgraded_dwelling.invSearch(), ChecklistSubentryMake("Use " + upgraded_dwelling, "", description), 8).ChecklistEntrySetIDTag("Campground dwelling uprgade"));
+    //         string description = "Better HP/MP restoration via " + reasons.listJoinComponents(", ", "and") + ".";
+    //         optional_task_entries.listAppend(ChecklistEntryMake("__item " + upgraded_dwelling, upgraded_dwelling.invSearch(), ChecklistSubentryMake("Use " + upgraded_dwelling, "", description), 8).ChecklistEntrySetIDTag("Campground dwelling uprgade"));
             
-        }
-    }
+    //     }
+    // }
     
     if (__misc_state["in run"] && $item[dry cleaning receipt].available_amount() > 0)
     {

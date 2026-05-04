@@ -25,9 +25,24 @@ void IOTMChestMimicGenerateResource(ChecklistEntry [int] resource_entries)
 	description.listAppend(`Can lay {HTMLGenerateSpanOfClass(mimicEggsLeft, "r_bold")} more eggs today.`);
 
 	resource_entries.listAppend(ChecklistEntryMake("__familiar chest mimic", url, ChecklistSubentryMake("Chest mimic fxp", "", description), -2));
+
+	// Nice little tile to show what you've got in your mimic eggs
 	if ($item[mimic egg].available_amount() > 0) {
-		string header = $item[mimic egg].pluralise().capitaliseFirstLetter();
-		string url = `inv_use.php?pwd={my_hash()}&whichitem=11542`;
-		resource_entries.listAppend(ChecklistEntryMake("__item mimic egg", url, ChecklistSubentryMake(header, "", "Fight some copies"), -1).ChecklistEntrySetCombinationTag("fax and copies"));
+		// Make sure the property is actually enumerated, might have an old mafia?
+		if (get_property("mimicEggMonsters") != "") {
+			string [int] eggEntries;
+			foreach key,entry in get_property("mimicEggMonsters").split_string(",") {
+				monster currMon = entry.split_string(":")[0].to_monster();
+				int currAmt = entry.split_string(":")[1].to_int();
+				string freeText = currMon.attributes.contains_text("FREE") ? " (free fight)" : "";
+				eggEntries.listAppend(pluralise(currAmt, currMon+" egg", currMon+" eggs")+freeText);
+			}
+
+			string header = $item[mimic egg].pluralise().capitaliseFirstLetter();
+			string url = `inv_use.php?pwd={my_hash()}&whichitem=11542`;
+			string [int] description;
+			description.listAppend("Fight some copies. Currently have: |*"+eggEntries.listJoinComponents("|*"));
+			resource_entries.listAppend(ChecklistEntryMake("__item mimic egg", url, ChecklistSubentryMake(header, "", description), -1).ChecklistEntrySetCombinationTag("fax and copies"));
+		}
 	}
 }

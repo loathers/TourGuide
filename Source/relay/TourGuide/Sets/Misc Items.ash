@@ -89,6 +89,7 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
         // IOTM Workshed Descriptions
         string [item] shedDesc = {
+            $item[portable Mayo Clinic]:"wacky stomach stuff",
             $item[Asdon Martin keyfob (on ring)]:"banishes & buffs",
             $item[diabolic pizza cube]:"3-fullness pizza boons",
             $item[cold medicine cabinet]:"25 freekills in exchange for your sanity",
@@ -98,6 +99,7 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
         // FIXME: Add new worksheds as time goes on.
         item [int] iotmWorksheds; 
+        iotmWorksheds.listAppend($item[portable Mayo Clinic]);
         iotmWorksheds.listAppend($item[Asdon Martin keyfob (on ring)]);
         iotmWorksheds.listAppend($item[diabolic pizza cube]);
         iotmWorksheds.listAppend($item[cold medicine cabinet]);
@@ -116,10 +118,17 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
 
         // return if user has no other options, no need to generate the tile
-        if (shed_options.length() == 0) return;
+        if (shed_options.count() == 0) return;
 
         // do not generate if user has just one workshed and has installed it.
-        if (shed_options.length() == 1 && workshedInCampground != $item[none]) return;
+        if (shed_options.count() == 1 && workshedInCampground != $item[none]) return;
+
+        // do not generate if the path does not allow worksheds.
+        if (my_path().id == PATH_ACTUALLY_ED_THE_UNDYING) return;
+        if (my_path().id == PATH_NUCLEAR_AUTUMN) return;
+        if (my_path().id == PATH_YOU_ROBOT) return;
+        if (my_path().id == PATH_WEREPROFESSOR) return;
+        if (my_path().id == PATH_MEAT) return;
 
         if (workshedInCampground == $item[none]) {
             description.listAppend(HTMLGenerateSpanFont("No workshed currently installed!", "red"));
@@ -127,10 +136,8 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
 
         description.listAppend("Potential IOTM worksheds:|*" + shed_options.listJoinComponents("|*"));
-
+    
         optional_task_entries.listAppend(ChecklistEntryMake("__item tiny house", url, ChecklistSubentryMake(main_title, "", description), 2).ChecklistEntrySetIDTag("Workshed installation reminder"));
-        
-        
     }
 }
 
@@ -1272,5 +1279,42 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Uncloset " + (glitch_in_closet > 1 ? "some" : "one") + " to " + (glitch_amount > 1 ? "increase" : "multiply") + " its power and reward.");
 
         resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "inventory.php?ftext=%5Bglitch+season+reward+name%5D", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
+    }
+
+    // Due to Heartstone re-entering these into standard, this is outside of the 2002 tile. 
+    if ($item[spooky vhs tape].available_amount() > 0) {
+        // Generate useful VHS copy list
+		string [int] optionsVHS;
+        string [int] description;
+        boolean canVHS = get_property("spookyVHSTapeMonster") == "";
+        string VHSDescription = canVHS ? "Use a VHS tape in combat to free-copy into delay & get forced item drops." : "Cannot use a VHS tape until you encounter your active monster!";
+        int availableVHS = $item[spooky vhs tape].available_amount();
+
+		if (__quest_state["Level 12"].state_int["hippies left on battlefield"] > 5) optionsVHS.listAppend("War monsters; especially GROPs");
+		if (!__quest_state["Level 7"].state_boolean["cranny finished"]) optionsVHS.listAppend("Giant swarm of ghuol whelps");
+		if ($item[amulet of extreme plot significance].available_amount() == 0) optionsVHS.listAppend("Quiet Healer");
+		if ($item[mohawk wig].available_amount() == 0) optionsVHS.listAppend("Burly Sidekick");
+        if (get_property_int("_shadowBricksUsed") < 13) optionsVHS.listAppend("Shadow Slab");
+
+        if (optionsVHS.count() > 0 && canVHS) {
+				VHSDescription += " Recommended monsters:|*"+optionsVHS.listJoinComponents("|*");
+			}
+			description.listAppend(VHSDescription);
+
+		resource_entries.listAppend(ChecklistEntryMake("__item spooky vhs tape", "", ChecklistSubentryMake(pluralise(availableVHS,"spooky VHS tape","spooky VHS tapes"),"",description), 1).ChecklistEntrySetIDTag("spooky VHS tape tile"));
+    }
+
+    // Due to out-of-standard combat items being usable, this is outside of the payphone tile.
+    int shadowBricks = available_amount($item[shadow brick]);
+    int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
+    if ($item[shadow brick].available_amount() > 0) {
+        string header = $item[shadow brick].pluralise().capitaliseFirstLetter();
+        if (shadowBrickUsesLeft < shadowBricks) {
+            if (shadowBrickUsesLeft == 0)
+                header += " (not usable today)";
+            else
+                header += " (" + shadowBrickUsesLeft + " usable today)";
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__item shadow brick", "", ChecklistSubentryMake(header, "", "Win a fight without taking a turn.")).ChecklistEntrySetCombinationTag("free instakill"));
     }
 }

@@ -33,7 +33,7 @@ string [int] generateBuskDescription(int [effect] currentBusks) {
 			output.listAppend("|*<b>Dirty Pear</b>: Doubles "+HTMLGenerateSpanFont("sleaze damage", "r_element_sleaze"));
 		} else {
 			string color = have_effect(busk) > 0 ? "gray" : "black";
-			output.listAppend(HTMLGenerateSpanFont("|*"+generateBuffDescription(busk),color));
+			output.listAppend(""+HTMLGenerateSpanFont("|*"+generateBuffDescription(busk),color)+"");
 		}
 
 	}
@@ -86,6 +86,7 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
         string hatrackText = canHatrack ? "(Can equip on hatrack)" : "";
         boolean hatrackEquipped = equipped_item($slot[familiar]) == lookupItem("prismatic beret");
         if (hatrackEquipped) hatrackText = "";
+		total = hatpower + pantspower;
 		if (lookupSkill("tao of the terrapin").have_skill()) total += hatpower*2 + pantspower*2;
         if ($effect[Hammertime].have_effect() > 0) total += pantspower*3;
 		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " total hat/shirt/pants power. ");

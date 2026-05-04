@@ -24,7 +24,7 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	if (skiAvalanchesLeft > 0)
 	{
-		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " avalanches", "r_bold") + " left. Sneak!");
+		description.listAppend(HTMLGenerateSpanOfClass(skiAvalanchesLeft + " avalanches", "r_bold") + " left. Sneak!");
     //fixme: currently not supported by sneako tile
 		if (lookupItem("McHugeLarge left ski").equipped_amount() == 1)
 		{

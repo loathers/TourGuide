@@ -25,6 +25,9 @@ void IOTMCoolerYetiGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (!lookupFamiliar("Cooler Yeti").familiar_is_usable()) return;
 
+	// Hide if you can't drink, since none of this is useful without the ability to booze it up.
+	if (!__misc_state["can drink just about anything"]) return;
+
 	// Title
 	int famExperienceGain = numeric_modifier("familiar experience") + 1;
 	int yetiExperience = ($familiar[cooler yeti].experience);

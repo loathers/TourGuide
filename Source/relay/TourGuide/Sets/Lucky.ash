@@ -168,13 +168,13 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 	LuckySource getSaxophones() {
         LuckySource final;
 
-        final.sourceName = 'apriling tuba';
-        final.url = "inventory.php?ftext=apriling+band+tuba";
-        final.imageLookupName = "__item Apriling band tuba";
+        final.sourceName = 'apriling sax';
+        final.url = "inventory.php?ftext=apriling+band+saxophone";
+        final.imageLookupName = "__item Apriling band saxophone";
 
         int aprilingBandSaxUsesLeft = clampi(3 - get_property_int("_aprilBandSaxUses"), 0, 3);
         
-        final.luckyCondition = (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0);
+        final.luckyCondition = (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band saxophone]) > 0);
         final.luckyCount = aprilingBandSaxUsesLeft;
         final.tileDescription = `<b>{aprilingBandSaxUsesLeft}x apriling sax solos</b> left`;
         return final;

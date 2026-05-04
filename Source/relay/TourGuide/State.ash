@@ -146,13 +146,13 @@ void setUpState()
     }
 	
 	__misc_state["can eat just about anything"] = true;
-	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_ZOMBIE_SLAYER || fullness_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_GELATINOUS_NOOB)
+	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_ZOMBIE_SLAYER || fullness_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_GELATINOUS_NOOB || my_path().id == PATH_MEAT)
 	{
 		__misc_state["can eat just about anything"] = false;
 	}
 	
 	__misc_state["can drink just about anything"] = true;
-	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_KOLHS || my_path().id == PATH_LICENSE_TO_ADVENTURE || inebriety_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT)
+	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_KOLHS || my_path().id == PATH_LICENSE_TO_ADVENTURE || inebriety_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_MEAT)
 	{
 		__misc_state["can drink just about anything"] = false;
 	}

@@ -1,5 +1,4 @@
 // heartstone 
-
 RegisterTaskGenerationFunction("IOTMHeartstoneGenerateTasks");
 void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) 
 {
@@ -14,6 +13,9 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     // Is the heartstone equipped?
     boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
 
+    // TODO:
+    //   The availability conditions are a little messed up here. 
+
     // Generate boolean flags for accessibility of each monster
     // --- T MONSTERS ----------------
     boolean nightstandsDone = $item[Lady Spookyraven's finest gown].available_amount() > 0 || get_property("questM21Dance") == "finished";
@@ -21,6 +23,7 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     boolean fratGearDone = have_outfit_components("Frat Warrior Fatigues");
     int shenDay = get_property_int("shenInitiationDay");
     boolean hospitalDone = get_property("questL11Doctor") == "finished" && get_property("questL11Doctor") != "unstarted";
+    boolean frattlesnakePossible = (shenDay == 0 || shenDay == 2) && __quest_state["Level 11 Shen"].mafia_internal_step < 3;
     if ($item[server room key].available_amount() > 0 && get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) hackerToday = get_property("_cyberZone1Hacker");
     // --- A MONSTERS ----------------
     boolean forestDone = get_property_ascension("lastTempleUnlock") && get_property("questL02Larva") == "finished";
@@ -52,7 +55,7 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("elegant animated nightstand", !nightstandsDone));
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("tektite", eightBitColor == "green"));
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("War Frat 151st Infantryman", !fratGearDone));
-        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("The Frattlesnake", shenDay == 2));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("The Frattlesnake", frattlesnakePossible));
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("Pygmy Witch Nurse", !hospitalDone));
         if (hackerToday.contains_text("blue")) monsterList.listAppend("Bluehat Hacker (zone 1!)");
         if (hackerToday.contains_text("grey")) monsterList.listAppend("Greyhat Hacker (zone 1!)");
