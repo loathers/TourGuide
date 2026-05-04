@@ -27250,10 +27250,12 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
             $item[cold medicine cabinet]:"25 freekills in exchange for your sanity",
             $item[model train set]:"bridge parts, stats, and meat",
             $item[TakerSpace letter of Marque]:"island access",
+            $item[Little Geneticist DNA-Splicing Lab]:"buffs",
         };
 
         // FIXME: Add new worksheds as time goes on.
         item [int] iotmWorksheds; 
+        iotmWorksheds.listAppend($item[Little Geneticist DNA-Splicing Lab]);
         iotmWorksheds.listAppend($item[portable Mayo Clinic]);
         iotmWorksheds.listAppend($item[Asdon Martin keyfob (on ring)]);
         iotmWorksheds.listAppend($item[diabolic pizza cube]);
@@ -34509,7 +34511,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     boolean [string] slopes_known_ncs = $strings[2 eXXtreme 4 U,3 eXXXtreme 4ever 6pack];
     int slopeNCsLeft = min(2-countFriarNCs(slopes_known_ncs,$location[The eXtreme Slope]), 2);
 
-    if (slopeNCsLeft && canSneakSlopes) {
+    if (slopeNCsLeft > 0 && canSneakSlopes) {
         sneak95.listAppend(`{slopeNCsLeft} eXtreme Slope`);
         totalNCsRemaining += slopeNCsLeft-1;
     }
