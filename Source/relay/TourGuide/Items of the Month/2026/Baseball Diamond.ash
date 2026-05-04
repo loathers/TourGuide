@@ -86,7 +86,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     monster curveballMonster = to_monster(get_property("_curveballMonster"));
     int curveballFightsLeft = get_property_int("_curveballFightsLeft");
 
-    if (curveballMonster != $monster[none]) {
+    if (curveballMonster != $monster[none] && curveballFightsLeft > 0) {
         subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!",""));
     }
 

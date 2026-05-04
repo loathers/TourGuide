@@ -581,7 +581,7 @@ static
     __place_delays[$location[the spooky forest]] = 5;
     __place_delays[$location[the boss bat's lair]] = 5;
     __place_delays[$location[the outskirts of cobb's knob]] = 10;
-    __place_delays[$location[the penultimate fantasy airship]] = 25;
+    __place_delays[$location[the penultimate fantasy airship]] = $item[bat wings].available_amount() > 0 ? 20 : 25;
     __place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 10;
     __place_delays[$location[the hidden park]] = 6; //6? does turkey blaster give four turns sometimes...?
     __place_delays[$location[the hidden apartment building]] = 8;
