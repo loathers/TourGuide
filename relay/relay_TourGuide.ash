@@ -3252,7 +3252,7 @@ static
     __place_delays[$location[the spooky forest]] = 5;
     __place_delays[$location[the boss bat's lair]] = 5;
     __place_delays[$location[the outskirts of cobb's knob]] = 10;
-    __place_delays[$location[the penultimate fantasy airship]] = 25;
+    __place_delays[$location[the penultimate fantasy airship]] = $item[bat wings].available_amount() > 0 ? 20 : 25;
     __place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 10;
     __place_delays[$location[the hidden park]] = 6; //6? does turkey blaster give four turns sometimes...?
     __place_delays[$location[the hidden apartment building]] = 8;
@@ -12759,34 +12759,50 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             int turns_spent = $location[the penultimate fantasy airship].turns_spent;
             int turns_delay = -1;
+
+            // bat wings change the between-NC available to be 1 less than the 5/5/5 etc
+            boolean haveBatWings = $item[bat wings].available_amount() > 0;
+            int [int] airshipTurnRef;
+            airshipTurnRef.listAppend(5);
+            airshipTurnRef.listAppend(10);
+            airshipTurnRef.listAppend(15);
+            airshipTurnRef.listAppend(20);
+            airshipTurnRef.listAppend(25);
+
+            // this ensures those with bat wings will show proper delay
+            if (haveBatWings) {
+                foreach i, val in airshipTurnRef {
+                    airshipTurnRef[i] = airshipTurnRef - (1+i);
+                }
+            }
             
             boolean need_minus_combat = true;
             if (turns_spent == -1)
                 need_minus_combat = true;
-            else if (turns_spent < 5)
+            else if (turns_spent < airshipTurnRef[0])
             {
                 need_minus_combat = false;
-                turns_delay = 5 - turns_spent;
+                turns_delay = airshipTurnRef[0] - turns_spent;
             }
-            else if (turns_spent < 10 && $item[Tissue Paper Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[1] && $item[Tissue Paper Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 10 - turns_spent;
+                turns_delay = airshipTurnRef[1] - turns_spent;
             }
-            else if (turns_spent < 15 && $item[Tin Foil Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[2] && $item[Tin Foil Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 15 - turns_spent;
+                turns_delay = airshipTurnRef[2] - turns_spent;
             }
-            else if (turns_spent < 20 && $item[Gauze Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[3] && $item[Gauze Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 20 - turns_spent;
+                turns_delay = airshipTurnRef[3] - turns_spent;
             }
-            else if (turns_spent < 25 && $item[Plastic Wrap Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[4] && $item[Plastic Wrap Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 25 - turns_spent;
+                turns_delay = airshipTurnRef[4] - turns_spent;
             }
             
             //boolean need_minus_combat_only_for_model_airship = false;
@@ -36827,7 +36843,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_FALL_OF_THE_DINOSAURS || my_path().id == PATH_AVATAR_OF_SHADOWS_OVER_LOATHING || my_path().id == PATH_WEREPROFESSOR)
+	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_FALL_OF_THE_DINOSAURS || my_path().id == PATH_AVATAR_OF_SHADOWS_OVER_LOATHING || my_path().id == PATH_WEREPROFESSOR || my_path().id == PATH_SEA || my_path().id == PATH_MEAT)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -58744,6 +58760,7 @@ void IOTMAprilShowerThoughtsGenerateTasks(ChecklistEntry [int] task_entries, Che
 	{
 		string main_title = HTMLGenerateSpanFont("April Shower Powers", "black");
 		boolean showerNEYR = get_property_boolean("_aprilShowerNorthernExplosion"); 
+		if (!lookupSkill("Northern Explosion").have_skill()) showerNEYR = true;
 		if (showerNEYR == false) {
 			description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
 			task_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("april shower thoughts calendar tasks"));
@@ -58760,6 +58777,7 @@ void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entri
 	
 	string main_title = HTMLGenerateSpanFont("April Shower Powers", "black");
 	boolean showerNEYR = get_property_boolean("_aprilShowerNorthernExplosion"); 
+		if (!lookupSkill("Northern Explosion").have_skill()) showerNEYR = true;
 	if (showerNEYR == false) {
 		description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
 	}
@@ -58767,7 +58785,8 @@ void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entri
 	{
 		description.listAppend("Craft your shower thoughts, with your "+pluralise(globCount,"glob","globs")+"!");
 	}
-	resource_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", url, ChecklistSubentryMake(main_title, description), 10).ChecklistEntrySetIDTag("april shower thoughts calendar resource"));
+	if (description.count() > 0)
+		resource_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", url, ChecklistSubentryMake(main_title, description), 10).ChecklistEntrySetIDTag("april shower thoughts calendar resource"));
 }
 //peridot of peril
 RegisterTaskGenerationFunction("IOTMPeridotGenerateTasks");
@@ -60073,7 +60092,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     monster curveballMonster = to_monster(get_property("_curveballMonster"));
     int curveballFightsLeft = get_property_int("_curveballFightsLeft");
 
-    if (curveballMonster != $monster[none]) {
+    if (curveballMonster != $monster[none] && curveballFightsLeft > 0) {
         subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!",""));
     }
 
