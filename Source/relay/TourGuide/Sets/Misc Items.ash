@@ -1284,13 +1284,13 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
 
     // Due to Heartstone re-entering these into standard, this is outside of the 2002 tile. 
-    if ($item[spooky vhs tape].available_amount() > 0) {
+    if ($item[spooky vhs tape].item_amount() > 0) {
         // Generate useful VHS copy list
 		string [int] optionsVHS;
         string [int] description;
         boolean canVHS = get_property("spookyVHSTapeMonster") == "";
         string VHSDescription = canVHS ? "Use a VHS tape in combat to free-copy into delay & get forced item drops." : "Cannot use a VHS tape until you encounter your active monster!";
-        int availableVHS = $item[spooky vhs tape].available_amount();
+        int availableVHS = $item[spooky vhs tape].item_amount();
 
 		if (__quest_state["Level 12"].state_int["hippies left on battlefield"] > 5) optionsVHS.listAppend("War monsters; especially GROPs");
 		if (!__quest_state["Level 7"].state_boolean["cranny finished"]) optionsVHS.listAppend("Giant swarm of ghuol whelps");
@@ -1307,9 +1307,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
 
     // Due to out-of-standard combat items being usable, this is outside of the payphone tile.
-    int shadowBricks = available_amount($item[shadow brick]);
+    int shadowBricks = $item[shadow brick].item_amount();
     int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
-    if ($item[shadow brick].available_amount() > 0) {
+    if ($item[shadow brick].item_amount() > 0) {
         string header = $item[shadow brick].pluralise().capitaliseFirstLetter();
         if (shadowBrickUsesLeft < shadowBricks) {
             if (shadowBrickUsesLeft == 0)

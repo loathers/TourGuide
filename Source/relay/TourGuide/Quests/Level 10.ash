@@ -84,7 +84,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             // this ensures those with bat wings will show proper delay
             if (haveBatWings) {
                 foreach i, val in airshipTurnRef {
-                    airshipTurnRef[i] = airshipTurnRef - (1+i);
+                    airshipTurnRef[i] = airshipTurnRef[i] - (1+i);
                 }
             }
             
@@ -181,9 +181,9 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             //FIXME it would be nice to track this
             if (turns_spent == -1)
-                subentry.entries.listAppend("25 total turns of delay.");
-            else if (turns_spent < 25)
-                subentry.entries.listAppend(pluralise(25 - turns_spent, "turn", "turns") + " total delay remaining.");
+                subentry.entries.listAppend(airshipTurnRef[4]+" total turns of delay.");
+            else if (turns_spent < airshipTurnRef[4])
+                subentry.entries.listAppend(pluralise(airshipTurnRef[4] - turns_spent, "turn", "turns") + " total delay remaining.");
             if ($skill[Transcendent Olfaction].skill_is_usable() && !(get_property("olfactedMonster") == "Quiet Healer") && !have_more_than_enough_sgeeas)
                 subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
             
