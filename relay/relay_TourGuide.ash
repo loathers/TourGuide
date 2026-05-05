@@ -12772,7 +12772,7 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             // this ensures those with bat wings will show proper delay
             if (haveBatWings) {
                 foreach i, val in airshipTurnRef {
-                    airshipTurnRef[i] = airshipTurnRef - (1+i);
+                    airshipTurnRef[i] = airshipTurnRef[i] - (1+i);
                 }
             }
             
@@ -12869,9 +12869,9 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             //FIXME it would be nice to track this
             if (turns_spent == -1)
-                subentry.entries.listAppend("25 total turns of delay.");
-            else if (turns_spent < 25)
-                subentry.entries.listAppend(pluralise(25 - turns_spent, "turn", "turns") + " total delay remaining.");
+                subentry.entries.listAppend(airshipTurnRef[4]+" total turns of delay.");
+            else if (turns_spent < airshipTurnRef[4])
+                subentry.entries.listAppend(pluralise(airshipTurnRef[4] - turns_spent, "turn", "turns") + " total delay remaining.");
             if ($skill[Transcendent Olfaction].skill_is_usable() && !(get_property("olfactedMonster") == "Quiet Healer") && !have_more_than_enough_sgeeas)
                 subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
             
@@ -25784,7 +25784,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
         final.url = 'skillz.php';
         final.imageLookupName = "__item heartstone";
     	boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
-    	int usesLUCK = get_property_int("heartstoneLuckUsed");
+    	int usesLUCK = get_property_int("_heartstoneLuckUsed");
 
         final.luckyCondition = accessLUCK && usesLUCK == 0 && __iotms_usable[lookupItem("heartstone")];
         final.luckyCount = usesLUCK == 1 ? 0 : 1; 
@@ -28455,13 +28455,13 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
 
     // Due to Heartstone re-entering these into standard, this is outside of the 2002 tile. 
-    if ($item[spooky vhs tape].available_amount() > 0) {
+    if ($item[spooky vhs tape].item_amount() > 0) {
         // Generate useful VHS copy list
 		string [int] optionsVHS;
         string [int] description;
         boolean canVHS = get_property("spookyVHSTapeMonster") == "";
         string VHSDescription = canVHS ? "Use a VHS tape in combat to free-copy into delay & get forced item drops." : "Cannot use a VHS tape until you encounter your active monster!";
-        int availableVHS = $item[spooky vhs tape].available_amount();
+        int availableVHS = $item[spooky vhs tape].item_amount();
 
 		if (__quest_state["Level 12"].state_int["hippies left on battlefield"] > 5) optionsVHS.listAppend("War monsters; especially GROPs");
 		if (!__quest_state["Level 7"].state_boolean["cranny finished"]) optionsVHS.listAppend("Giant swarm of ghuol whelps");
@@ -28478,9 +28478,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
 
     // Due to out-of-standard combat items being usable, this is outside of the payphone tile.
-    int shadowBricks = available_amount($item[shadow brick]);
+    int shadowBricks = $item[shadow brick].item_amount();
     int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
-    if ($item[shadow brick].available_amount() > 0) {
+    if ($item[shadow brick].item_amount() > 0) {
         string header = $item[shadow brick].pluralise().capitaliseFirstLetter();
         if (shadowBrickUsesLeft < shadowBricks) {
             if (shadowBrickUsesLeft == 0)
