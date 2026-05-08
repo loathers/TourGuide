@@ -3,7 +3,7 @@
 //   "normal fam drops" tile. The primary goal is to abstract all familiar drops 
 //   into a combo tile that correctly describes:
 
-//     - progress on how many di'll s you are from the fam's limit
+//     - progress on how many drops you are from the fam's limit
 //     - % chance of next drop, if applicable
 //     - exact turns til next drop, if applicable
 
@@ -83,15 +83,16 @@ dropPercentArrays[$familiar[Jill-of-All-Trades]] = {1:35.0, 2:2.0, 3:0.1, 4:0.0}
 // ---------- PERCENT DROP CALCULATIONS (dropType == "percent calc")
 // ===============================================================
 
-float kiwiWeight = effective_familiar_weight($familiar[Mini Kiwi]) + weight_adjustment();
+float kiwiWeight = max(0.0, effective_familiar_weight($familiar[Mini Kiwi]) + weight_adjustment());
 float kiwiModifier = $item[aviator goggles].available_amount() > 0 ? 0.75 : 0.50;
 float kiwiChance = min(kiwiWeight * kiwiModifier,100.0);
+float turkeyWeight = max(0.0, effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
 
 // These are familiars where you are just exporting a conditional probability.
 float [familiar] dropPercentCalc;
 dropPercentCalc[$familiar[mini kiwi]] = kiwiChance;
 dropPercentCalc[$familiar[Skeleton of Crimbo Past]] = -100.0; //no good way to do this so just overriding in tile builder
-dropPercentCalc[$familiar[Peace Turkey]] = clampf(24.0 + square_root(effective_familiar_weight($familiar[peace turkey]) + weight_adjustment()), 0.0, 100.0);
+dropPercentCalc[$familiar[Peace Turkey]] = clampf(24.0 + square_root(turkeyWeight), 0.0, 100.0);
 
 // ===============================================================
 // ---------- TURNS TO DROP ARRAYS (dropType == "turn")

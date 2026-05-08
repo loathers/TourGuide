@@ -5,7 +5,8 @@ void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries)
 
 	// Purkey Title
     int turkeyProc = 24;
-	turkeyProc = 24 + square_root(effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
+	float turkeyWeight = max(0.0, effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
+	turkeyProc = 24 + square_root(turkeyWeight);
 	
 	int PeasCount = available_amount($item[whirled peas]);
 	int PeaSoupCount = available_amount($item[handful of split pea soup]);
