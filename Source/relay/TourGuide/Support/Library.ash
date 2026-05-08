@@ -1423,7 +1423,10 @@ int effective_familiar_weight(familiar f)
     }
     if (is_moved)
         weight += 10;
-    return weight;
+
+    // due to drunkula's wineglass you can sometimes get negative weights. 
+    //   this messes up any sqrt calcs. do not return negative weights.
+    return max(weight,0);
 }
 
 boolean year_is_leap_year(int year)
