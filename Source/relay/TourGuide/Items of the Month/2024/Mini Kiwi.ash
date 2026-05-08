@@ -21,7 +21,7 @@ void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
 
 	description.listAppend(`At {to_int(kiwiWeight)} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
 
-    if (!kiwiSpiritsBought) {
+    if (!kiwiSpiritsBought && __misc_state["can drink just about anything"]) {
         description.listAppend('|*Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
     }
 

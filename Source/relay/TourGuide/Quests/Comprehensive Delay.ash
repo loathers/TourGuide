@@ -38,9 +38,9 @@ delayZones.listAppend(makeDelayRecord("The Castle in the Clouds in the Sky (Grou
 delayZones.listAppend(makeDelayRecord("The Hidden Park", __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"])); //technically if you autosell antique this sort of doesn't work but idc
 delayZones.listAppend(makeDelayRecord("The Hidden Apartment Building", get_property_int("hiddenApartmentProgress") < 7));
 delayZones.listAppend(makeDelayRecord("The Hidden Office Building", get_property_int("hiddenOfficeProgress") < 7));
-delayZones.listAppend(makeDelayRecord("The Haunted Gallery", get_property("questM21Dance") == "finished"));
-delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", get_property("questM21Dance") == "finished"));
-delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", get_property("questM21Dance") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Haunted Gallery", !can_adventure($location[The Haunted Ballroom])));
+delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", !can_adventure($location[The Haunted Ballroom])));
+delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", !can_adventure($location[The Haunted Ballroom])));
 delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", !can_adventure($location[The Haunted Wine Cellar])));
 delayZones.listAppend(makeDelayRecord("The Copperhead Club", get_property("questL11Shen") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Upper Chamber", !can_adventure($location[The Middle Chamber])));
@@ -96,6 +96,7 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
     // Custom handling for active shen snake zone
     int shenDay = get_property_int("shenInitiationDay");
     int shenMeetings = __quest_state["Level 11 Shen"].state_int["Shen meetings"];
+    if (__quest_state["Level 11 Shen"].finished) shenMeetings=3;
     location shenLocation = __shen_items_to_locations[get_property_item("shenQuestItem")];
     boolean onAnAssignment = __quest_state["Level 11 Shen"].state_boolean["on an assignment"];
     int remainingShenDelay = max((3-shenMeetings)*5,0); 

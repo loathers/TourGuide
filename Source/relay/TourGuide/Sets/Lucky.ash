@@ -155,7 +155,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
         final.url = 'skillz.php';
         final.imageLookupName = "__item heartstone";
     	boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
-    	int usesLUCK = get_property_int("_heartstoneLuckUsed");
+    	int usesLUCK = get_property_boolean("_heartstoneLuckUsed").to_int();
 
         final.luckyCondition = accessLUCK && usesLUCK == 0 && __iotms_usable[lookupItem("heartstone")];
         final.luckyCount = usesLUCK == 1 ? 0 : 1; 

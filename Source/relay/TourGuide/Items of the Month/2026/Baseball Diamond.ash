@@ -87,7 +87,9 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     int curveballFightsLeft = get_property_int("_curveballFightsLeft");
 
     if (curveballMonster != $monster[none] && curveballFightsLeft > 0) {
+        // Add to subentries & to freefight combo tile
         subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!",""));
+        resource_entries.listAppend(ChecklistEntryMake("__item baseball diamond",url,ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!","")).ChecklistEntrySetIDTag("Baseball Diamond free fights").ChecklistEntrySetCombinationTag("daily free fight"));
     }
 
     // Some Cheddar sub-tile; annoying because I've never abstracted tracked monsters...
