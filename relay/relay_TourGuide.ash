@@ -25429,9 +25429,9 @@ delayZones.listAppend(makeDelayRecord("The Castle in the Clouds in the Sky (Grou
 delayZones.listAppend(makeDelayRecord("The Hidden Park", __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"])); //technically if you autosell antique this sort of doesn't work but idc
 delayZones.listAppend(makeDelayRecord("The Hidden Apartment Building", get_property_int("hiddenApartmentProgress") < 7));
 delayZones.listAppend(makeDelayRecord("The Hidden Office Building", get_property_int("hiddenOfficeProgress") < 7));
-delayZones.listAppend(makeDelayRecord("The Haunted Gallery", get_property("questM21Dance") == "finished"));
-delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", get_property("questM21Dance") == "finished"));
-delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", get_property("questM21Dance") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Haunted Gallery", !can_adventure($location[The Haunted Ballroom])));
+delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", !can_adventure($location[The Haunted Ballroom])));
+delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", !can_adventure($location[The Haunted Ballroom])));
 delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", !can_adventure($location[The Haunted Wine Cellar])));
 delayZones.listAppend(makeDelayRecord("The Copperhead Club", get_property("questL11Shen") == "finished"));
 delayZones.listAppend(makeDelayRecord("The Upper Chamber", !can_adventure($location[The Middle Chamber])));
@@ -25487,6 +25487,7 @@ void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEn
     // Custom handling for active shen snake zone
     int shenDay = get_property_int("shenInitiationDay");
     int shenMeetings = __quest_state["Level 11 Shen"].state_int["Shen meetings"];
+    if (__quest_state["Level 11 Shen"].finished) shenMeetings=3;
     location shenLocation = __shen_items_to_locations[get_property_item("shenQuestItem")];
     boolean onAnAssignment = __quest_state["Level 11 Shen"].state_boolean["on an assignment"];
     int remainingShenDelay = max((3-shenMeetings)*5,0); 
@@ -25784,7 +25785,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
         final.url = 'skillz.php';
         final.imageLookupName = "__item heartstone";
     	boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
-    	int usesLUCK = get_property_int("_heartstoneLuckUsed");
+    	int usesLUCK = get_property_boolean("_heartstoneLuckUsed").to_int();
 
         final.luckyCondition = accessLUCK && usesLUCK == 0 && __iotms_usable[lookupItem("heartstone")];
         final.luckyCount = usesLUCK == 1 ? 0 : 1; 
@@ -28479,16 +28480,20 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
 
     // Due to out-of-standard combat items being usable, this is outside of the payphone tile.
     int shadowBricks = $item[shadow brick].item_amount();
+    int shadowBricksUsed = get_property_int("_shadowBricksUsed");
     int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
+
+    string subtitle = shadowBricksUsed > 0 ? "have used "+pluralise(shadowBricksUsed, "brick", "bricks") : "";
+    
     if ($item[shadow brick].item_amount() > 0) {
-        string header = $item[shadow brick].pluralise().capitaliseFirstLetter();
+        string header = pluralise(shadowBricks, "shadow brick", "shadow bricks");
         if (shadowBrickUsesLeft < shadowBricks) {
             if (shadowBrickUsesLeft == 0)
                 header += " (not usable today)";
             else
                 header += " (" + shadowBrickUsesLeft + " usable today)";
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item shadow brick", "", ChecklistSubentryMake(header, "", "Win a fight without taking a turn.")).ChecklistEntrySetCombinationTag("free instakill"));
+        resource_entries.listAppend(ChecklistEntryMake("__item shadow brick", "", ChecklistSubentryMake(header, subtitle, "Win a fight without taking a turn.")).ChecklistEntrySetCombinationTag("free instakill"));
     }
 }
 
@@ -34814,7 +34819,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
 //   "normal fam drops" tile. The primary goal is to abstract all familiar drops 
 //   into a combo tile that correctly describes:
 
-//     - progress on how many di'll s you are from the fam's limit
+//     - progress on how many drops you are from the fam's limit
 //     - % chance of next drop, if applicable
 //     - exact turns til next drop, if applicable
 
@@ -34894,15 +34899,16 @@ dropPercentArrays[$familiar[Jill-of-All-Trades]] = {1:35.0, 2:2.0, 3:0.1, 4:0.0}
 // ---------- PERCENT DROP CALCULATIONS (dropType == "percent calc")
 // ===============================================================
 
-float kiwiWeight = effective_familiar_weight($familiar[Mini Kiwi]) + weight_adjustment();
+float kiwiWeight = max(0.0, effective_familiar_weight($familiar[Mini Kiwi]) + weight_adjustment());
 float kiwiModifier = $item[aviator goggles].available_amount() > 0 ? 0.75 : 0.50;
 float kiwiChance = min(kiwiWeight * kiwiModifier,100.0);
+float turkeyWeight = max(0.0, effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
 
 // These are familiars where you are just exporting a conditional probability.
 float [familiar] dropPercentCalc;
 dropPercentCalc[$familiar[mini kiwi]] = kiwiChance;
 dropPercentCalc[$familiar[Skeleton of Crimbo Past]] = -100.0; //no good way to do this so just overriding in tile builder
-dropPercentCalc[$familiar[Peace Turkey]] = clampf(24.0 + square_root(effective_familiar_weight($familiar[peace turkey]) + weight_adjustment()), 0.0, 100.0);
+dropPercentCalc[$familiar[Peace Turkey]] = clampf(24.0 + square_root(turkeyWeight), 0.0, 100.0);
 
 // ===============================================================
 // ---------- TURNS TO DROP ARRAYS (dropType == "turn")
@@ -58149,7 +58155,7 @@ void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
 
 	description.listAppend(`At {to_int(kiwiWeight)} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
 
-    if (!kiwiSpiritsBought) {
+    if (!kiwiSpiritsBought && __misc_state["can drink just about anything"]) {
         description.listAppend('|*Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
     }
 
@@ -58449,7 +58455,8 @@ void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries)
 
 	// Purkey Title
     int turkeyProc = 24;
-	turkeyProc = 24 + square_root(effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
+	float turkeyWeight = max(0.0, effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
+	turkeyProc = 24 + square_root(turkeyWeight);
 	
 	int PeasCount = available_amount($item[whirled peas]);
 	int PeaSoupCount = available_amount($item[handful of split pea soup]);
@@ -60093,7 +60100,9 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     int curveballFightsLeft = get_property_int("_curveballFightsLeft");
 
     if (curveballMonster != $monster[none] && curveballFightsLeft > 0) {
+        // Add to subentries & to freefight combo tile
         subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!",""));
+        resource_entries.listAppend(ChecklistEntryMake("__item baseball diamond",url,ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!","")).ChecklistEntrySetIDTag("Baseball Diamond free fights").ChecklistEntrySetCombinationTag("daily free fight"));
     }
 
     // Some Cheddar sub-tile; annoying because I've never abstracted tracked monsters...
