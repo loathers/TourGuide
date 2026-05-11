@@ -2,10 +2,11 @@
 
 since r28660; // fix: lots and lots of sea stuff
 //These settings are for development. Don't worry about editing them.
-string __version = "2.3.2"; 
+string __version = "2.3.3"; 
 // pushed to 2.2.1 on jill/leaves tiles
 //           2.3.1 on sea path upgrades
 //           2.3.2 on the lucky refactor ++ in spring 2026
+//           2.3.3 on the delay tile + famcombo tile in spring 2026
 
 //Path and name of the .js file. In case you change either.
 string __javascript = "TourGuide/TourGuide.js";
@@ -2324,7 +2325,13 @@ static {
     int PATH_SMOL = 49; // easier to type
     int PATH_A_SHRUNKEN_ADVENTURER_AM_I = 49;
     int PATH_WEREPROFESSOR = 50;
+    int PATH_11_THINGS = 51;
+    int PATH_BODYGUARD = 52;
+    int PATH_ZOOT = 53;
+    int PATH_ZOOTOMIST = 53;
+    int PATH_HAT_TRICK = 54;
     int PATH_SEA = 55;
+    int PATH_MEAT = 56;
 }
 
 float numeric_modifier_replacement(item it, string modifier_string) {
@@ -3240,23 +3247,29 @@ string lastCombatInLocation(location place)
 
 static
 {
+    // Corrected these and added a few unrestricted/seapath ones
     int [location] __place_delays;
     __place_delays[$location[the spooky forest]] = 5;
-    __place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
-    __place_delays[$location[the boss bat's lair]] = 4;
-    __place_delays[$location[the oasis]] = 5;
-    __place_delays[$location[the hidden park]] = 6; //6? does turkey blaster give four turns sometimes...?
-    __place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
-    __place_delays[$location[the haunted bathroom]] = 5;
-    __place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
-    __place_delays[$location[the penultimate fantasy airship]] = 25;
-    __place_delays[$location[the "fun" house]] = 10;
-    __place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 10;
+    __place_delays[$location[the boss bat's lair]] = 5;
     __place_delays[$location[the outskirts of cobb's knob]] = 10;
+    __place_delays[$location[the penultimate fantasy airship]] = $item[bat wings].available_amount() > 0 ? 20 : 25;
+    __place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 10;
+    __place_delays[$location[the hidden park]] = 6; //6? does turkey blaster give four turns sometimes...?
     __place_delays[$location[the hidden apartment building]] = 8;
     __place_delays[$location[the hidden office building]] = 10;
-    __place_delays[$location[the copperhead club]] = 14;
+    __place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
+    __place_delays[$location[the haunted bathroom]] = 5;
+    __place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
+    __place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
+    __place_delays[$location[the copperhead club]] = 13;
     __place_delays[$location[the upper chamber]] = 5;
+    __place_delays[$location[the middle chamber]] = 5;
+    __place_delays[$location[the oasis]] = 5;
+    __place_delays[$location[the "fun" house]] = 10;
+    __place_delays[$location[the mer-kin outpost]] = 24;
+    __place_delays[$location[mer-kin library]] = 5;
+    __place_delays[$location[the smut orc logging camp]] = 19;
+    __place_delays[$location[twin peak]] = 50;
 }
 
 int totalDelayForLocation(location place)
@@ -4081,7 +4094,10 @@ int effective_familiar_weight(familiar f)
     }
     if (is_moved)
         weight += 10;
-    return weight;
+
+    // due to drunkula's wineglass you can sometimes get negative weights. 
+    //   this messes up any sqrt calcs. do not return negative weights.
+    return max(weight,0);
 }
 
 boolean year_is_leap_year(int year)
@@ -4382,6 +4398,24 @@ location hippyCampInDisguise() {
 
 boolean isAprilFools() {
     return (now_to_string("MMdd") == "0401");
+}
+
+// For gems that can appear in the Eternity Codpiece, helper function
+//   that checks both general equip status + 
+boolean gemstoneInCodpiece(item gem) {
+    if ($slot[codpiece1].equipped_item() == gem) return true;
+    if ($slot[codpiece2].equipped_item() == gem) return true;
+    if ($slot[codpiece3].equipped_item() == gem) return true;
+    if ($slot[codpiece4].equipped_item() == gem) return true;
+    if ($slot[codpiece5].equipped_item() == gem) return true;
+    return false;
+}
+
+// For gems that can appear in Eternity Codpiece, check both gem + cod equip status
+boolean gemstoneEquipped(item gem) {
+    if (gemstoneInCodpiece(gem)) return $item[The Eternity Codpiece].equipped_amount() > 0;
+    if (gem.equipped_amount() > 0) return true;
+    return false;
 }
 
 
@@ -5117,6 +5151,13 @@ void initialiseIOTMsUsable()
     {
         __iotms_usable[lookupItem("Spacegate access badge")] = false;
     }
+
+    // Can show as 0 available amount even if it is equipped in your codpiece.
+    foreach it in $items[Heartstone, Peridot of Peril, Blood Cubic Zirconia, Baseball Diamond] 
+    {
+        if (gemstoneInCodpiece(it)) __iotms_usable[it] = true;
+    }
+
 
     // Remove non-standard. Do this prior to replicaChecks, since replicas allow
     //   usage of non-standard IOTMs. 
@@ -7851,6 +7892,45 @@ KramcoSausageFightInformation KramcoCalculateSausageFightInformation() {
     return information;
 }
 
+// Helper function for FamDrops to grab min/max item in a float[int] if passing int > or < keys in the float[int]
+float grabClampedFloat(int i, float[int] array) {
+    if (array.count() == 0 ) return 0.0;
+
+    int minVal = 999;
+    int maxVal = 999;
+
+    foreach key, val in array {
+        if (minVal == 999) minVal = key;
+        if (maxVal == 999) maxVal = key;
+        if (key < minVal) minVal = key;
+        if (key > maxVal) maxVal = key;
+    }
+
+    if (i > maxVal) return array[maxVal];
+    if (i < minVal) return array[minVal];
+
+    return array[i];
+}
+
+// Helper function for FamDrops to grab min/max item in an int[int] if passing int > or < keys in the int[int]
+float grabClampedInt(int i, int[int] array) {
+    if (array.count() == 0 ) return 0.0;
+
+    int minVal = 999;
+    int maxVal = 999;
+
+    foreach key, val in array {
+        if (minVal == 999) minVal = key;
+        if (maxVal == 999) maxVal = key;
+        if (key < minVal) minVal = key;
+        if (key > maxVal) maxVal = key;
+    }
+
+    if (i > maxVal) return array[maxVal];
+    if (i < minVal) return array[minVal];
+
+    return array[i];
+}
 
 record CSSEntry
 {
@@ -8554,6 +8634,7 @@ static
         building_images["Avatar of Boris"] = KOLImageMake("images/otherimages/boris_avatar_f.gif", Vec2iMake(60,100), RectMake(0,4,59,93));
         building_images["Zombie Master"] = KOLImageMake("images/otherimages/zombavatar_f.gif", Vec2iMake(60,100), RectMake(10,3,55,99));
         building_images["WereProfessor"] = KOLImageMake("images/otherimages/wereprofavatar_f.gif", Vec2iMake(60,100), RectMake(9,7,50,98));
+        building_images["Meat Class"] = KOLImageMake("images/otherimages/meatvatar.gif", Vec2iMake(60,100), RectMake(9,7,50,98));
         building_images["Hourglass"] = KOLImageMake("images/itemimages/hourglass.gif", Vec2iMake(30,30));
 
         building_images["Nemesis Disco Bandit"] = KOLImageMake("images/adventureimages/newwave.gif", Vec2iMake(100,100));
@@ -11948,9 +12029,13 @@ void QLevel9Init()
             fasteners_have += 15;
             lumber_have += 15;
         }
+
+        // If user has bat wings, they can cross @ 25 
+        int totalNeeded = 30;
+        if (available_amount($item[bat wings]) > 0) totalNeeded = 25;
 		
-		int fasteners_needed = MAX(0, 30 - fasteners_have);
-		int lumber_needed = MAX(0, 30 - lumber_have);
+		int fasteners_needed = MAX(0, totalNeeded - fasteners_have);
+		int lumber_needed = MAX(0, totalNeeded - lumber_have);
 		
 		state.state_int["bridge fasteners needed"] = fasteners_needed;
 		state.state_int["bridge lumber needed"] = lumber_needed;
@@ -12563,10 +12648,12 @@ void QLevel9GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int
             
         if (lumber_needed + fasteners_needed == 0)
         {
-            //finished
+            //finished; adding bat wing reminder
+            string extraDesc = "";
+            if (available_amount($item[bat wings]) > 0) extraDesc = " (Or, hop across with your <b>bat wings</b> & talk to Black Angus.)";
             subentry.modifiers.listClear();
             subentry.entries.listClear();
-            subentry.entries.listAppend("Build a bridge!");
+            subentry.entries.listAppend("Build a bridge!"+extraDesc);
         }
 		if ($item[smut orc keepsake box].available_amount() > 0)
 			subentry.entries.listAppend("Open " + pluralise($item[smut orc keepsake box]) + ".");
@@ -12675,34 +12762,50 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             int turns_spent = $location[the penultimate fantasy airship].turns_spent;
             int turns_delay = -1;
+
+            // bat wings change the between-NC available to be 1 less than the 5/5/5 etc
+            boolean haveBatWings = $item[bat wings].available_amount() > 0;
+            int [int] airshipTurnRef;
+            airshipTurnRef.listAppend(5);
+            airshipTurnRef.listAppend(10);
+            airshipTurnRef.listAppend(15);
+            airshipTurnRef.listAppend(20);
+            airshipTurnRef.listAppend(25);
+
+            // this ensures those with bat wings will show proper delay
+            if (haveBatWings) {
+                foreach i, val in airshipTurnRef {
+                    airshipTurnRef[i] = airshipTurnRef[i] - (1+i);
+                }
+            }
             
             boolean need_minus_combat = true;
             if (turns_spent == -1)
                 need_minus_combat = true;
-            else if (turns_spent < 5)
+            else if (turns_spent < airshipTurnRef[0])
             {
                 need_minus_combat = false;
-                turns_delay = 5 - turns_spent;
+                turns_delay = airshipTurnRef[0] - turns_spent;
             }
-            else if (turns_spent < 10 && $item[Tissue Paper Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[1] && $item[Tissue Paper Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 10 - turns_spent;
+                turns_delay = airshipTurnRef[1] - turns_spent;
             }
-            else if (turns_spent < 15 && $item[Tin Foil Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[2] && $item[Tin Foil Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 15 - turns_spent;
+                turns_delay = airshipTurnRef[2] - turns_spent;
             }
-            else if (turns_spent < 20 && $item[Gauze Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[3] && $item[Gauze Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 20 - turns_spent;
+                turns_delay = airshipTurnRef[3] - turns_spent;
             }
-            else if (turns_spent < 25 && $item[Plastic Wrap Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[4] && $item[Plastic Wrap Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 25 - turns_spent;
+                turns_delay = airshipTurnRef[4] - turns_spent;
             }
             
             //boolean need_minus_combat_only_for_model_airship = false;
@@ -12769,9 +12872,9 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             //FIXME it would be nice to track this
             if (turns_spent == -1)
-                subentry.entries.listAppend("25 total turns of delay.");
-            else if (turns_spent < 25)
-                subentry.entries.listAppend(pluralise(25 - turns_spent, "turn", "turns") + " total delay remaining.");
+                subentry.entries.listAppend(airshipTurnRef[4]+" total turns of delay.");
+            else if (turns_spent < airshipTurnRef[4])
+                subentry.entries.listAppend(pluralise(airshipTurnRef[4] - turns_spent, "turn", "turns") + " total delay remaining.");
             if ($skill[Transcendent Olfaction].skill_is_usable() && !(get_property("olfactedMonster") == "Quiet Healer") && !have_more_than_enough_sgeeas)
                 subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
             
@@ -25289,6 +25392,151 @@ void Q8bitRealmGenerateMissingItems(ChecklistEntry [int] items_needed_entries)
     }
 }
 
+record DelayTracker
+{
+    location zone;      // zone containing delay
+    int delay;          // total amt of delay
+    int delayRemaining; // amt of delay turns left
+    boolean relevant;   // if currently relevant
+    boolean accessible; // if zone accessible
+};
+
+DelayTracker makeDelayRecord(string l, boolean r) {
+    DelayTracker final;
+
+    final.zone = lookupLocation(l);
+    final.delay = totalDelayForLocation(final.zone);
+    final.delayRemaining = delayRemainingInLocation(final.zone);
+    final.relevant = r;
+    final.accessible = can_adventure(final.zone);
+
+    return final;
+}
+
+void listAppend(DelayTracker [int] list, DelayTracker entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+// Populating all delay zones into a list
+DelayTracker [int] delayZones;
+
+delayZones.listAppend(makeDelayRecord("The Spooky Forest", !__quest_state["Level 2"].finished && !__quest_state["Hidden Temple Unlock"].finished));
+delayZones.listAppend(makeDelayRecord("The Boss Bat's Lair", !__quest_state["Level 4"].finished)); 
+delayZones.listAppend(makeDelayRecord("The Outskirts of Cobb's Knob", !__quest_state["Level 5"].finished && !can_adventure($location[Cobb's Knob Barracks])));
+delayZones.listAppend(makeDelayRecord("The Penultimate Fantasy Airship", !can_adventure($location[The Castle in the Clouds in the Sky (Basement)]))); // bat wing dependent
+delayZones.listAppend(makeDelayRecord("The Castle in the Clouds in the Sky (Ground Floor)", !can_adventure($location[The Castle in the Clouds in the Sky (Top Floor)])));
+delayZones.listAppend(makeDelayRecord("The Hidden Park", __quest_state["Level 11 Hidden City"].state_boolean["need machete for liana"])); //technically if you autosell antique this sort of doesn't work but idc
+delayZones.listAppend(makeDelayRecord("The Hidden Apartment Building", get_property_int("hiddenApartmentProgress") < 7));
+delayZones.listAppend(makeDelayRecord("The Hidden Office Building", get_property_int("hiddenOfficeProgress") < 7));
+delayZones.listAppend(makeDelayRecord("The Haunted Gallery", !can_adventure($location[The Haunted Ballroom])));
+delayZones.listAppend(makeDelayRecord("The Haunted Bathroom", !can_adventure($location[The Haunted Ballroom])));
+delayZones.listAppend(makeDelayRecord("The Haunted Bedroom", !can_adventure($location[The Haunted Ballroom])));
+delayZones.listAppend(makeDelayRecord("The Haunted Ballroom", !can_adventure($location[The Haunted Wine Cellar])));
+delayZones.listAppend(makeDelayRecord("The Copperhead Club", get_property("questL11Shen") == "finished"));
+delayZones.listAppend(makeDelayRecord("The Upper Chamber", !can_adventure($location[The Middle Chamber])));
+delayZones.listAppend(makeDelayRecord("The Middle Chamber", !can_adventure($location[The Lower Chambers])));
+
+void QGenerateDelayRemainingTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    // This is a new brick as of mid-2026 that assesses remaining delay. I'm putting 
+    //   this in as an unfinished brick that compiles all delay and puts it in a thing 
+    //   for your speedrunning fun.
+
+    ChecklistEntry entry;
+
+    entry.url = "";
+    entry.image_lookup_name = "__monster rushing bum"; // TODO: pick better image lol
+    entry.tags.id = "Total delay remaining task";
+    entry.importance_level = 10;
+
+    int totalDelay = 0;
+    int totalDelayRemaining = 0;
+    string [int] description;
+    string [int] delayTeaser;
+    string [int] delayEntries;
+    string color;
+
+    foreach key, delayEntry in delayZones {
+        location currLoc = delayEntry.zone;
+        int currDelay = delayEntry.delay;
+        int currDelayRemaining = delayEntry.delayRemaining;
+        boolean currRelevant = delayEntry.relevant;
+        boolean currAccessible = delayEntry.accessible;
+
+        // fix airship delay in the event user has bat wings
+        if ($item[bat wings].available_amount() > 0 && currLoc == $location[The Penultimate Fantasy Airship]) {
+            currDelay = currDelay - 5;
+            currDelayRemaining = max(currDelayRemaining - 5, 0);
+        }
+
+        // add totalDelay & totalDelayRemaining
+        totalDelay += currDelay;
+        totalDelayRemaining += currDelayRemaining;
+
+        // only make an entry if there's delay left & it's still relevant
+        if (currRelevant && currDelayRemaining > 0) {
+            // gray out inaccessible entries
+            color = currAccessible ? "black" : "gray";
+            if (color == "black") entry.url = currLoc.getClickableURLForLocation();
+            delayEntries.listAppend("|* • "+HTMLGenerateSpanFont("<b>" + currDelayRemaining + "</b> @ " + to_string(currLoc), color, "0.9em")+"");
+            
+        }
+    }
+
+    // Custom handling for active shen snake zone
+    int shenDay = get_property_int("shenInitiationDay");
+    int shenMeetings = __quest_state["Level 11 Shen"].state_int["Shen meetings"];
+    if (__quest_state["Level 11 Shen"].finished) shenMeetings=3;
+    location shenLocation = __shen_items_to_locations[get_property_item("shenQuestItem")];
+    boolean onAnAssignment = __quest_state["Level 11 Shen"].state_boolean["on an assignment"];
+    int remainingShenDelay = max((3-shenMeetings)*5,0); 
+
+    if (onAnAssignment) {
+        DelayTracker shenDelay = makeDelayRecord(to_string(shenLocation), true);
+
+        if (shenDelay.delayRemaining > 0) {
+            color = shenDelay.accessible ? "black" : "gray";
+            if (color == "black") entry.url = shenLocation.getClickableURLForLocation();
+            delayEntries.listAppend("|* • "+HTMLGenerateSpanFont("<b>" + shenDelay.delayRemaining + "</b> @ " + to_string(shenLocation), color, "0.9em")+"");
+        }
+    }
+
+    if (remainingShenDelay > 0) {
+        string color = can_adventure(shenLocation) ? "black" : "gray";
+        delayEntries.listAppend("|* • "+HTMLGenerateSpanFont("<b>" + remainingShenDelay + "</b> @ remaining Shen assignments", color, "0.9em")+"");
+    }
+
+
+    // no need to generate the tile if no delay is remaining
+    if (delayEntries.count() == 0) return;
+
+    description.listAppend("Use free runs and wanderers to avoid spending turns.");
+
+    delayTeaser.listAppend(HTMLGenerateSpanOfClass("Mouse over for your delay zones!","r_bold r_element_spooky_desaturated"));
+
+    string delayTitle = pluralise(totalDelayRemaining, "delay turn remains", "delay turns remain");
+
+    // For the first run with it I'm just going to have the thing always available IDGAF
+    //   (TODO: also for update, maybe leverage generatePossibleLocationsToBurnDelay() ?)
+
+    
+    // // Store the base description within the mouseover subentries, then the enumerated delay entries
+    // entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
+    // entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(delayTitle, "", delayEntries));
+    // // Store the base description within the non-mouseover version of the tile
+    // entry.subentries.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
+    // entry.subentries.listAppend(ChecklistSubentryMake(delayTitle, "", delayTeaser));
+
+    entry.subentries.listAppend(ChecklistSubentryMake("Burn away your delay!", "", description));
+    entry.subentries.listAppend(ChecklistSubentryMake(delayTitle, "", delayEntries));
+
+
+    task_entries.listAppend(entry);
+}
 
 
 
@@ -25372,6 +25620,7 @@ void QuestsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int]
     QMadnessBakeryGenerateTasks(task_entries, optional_task_entries, future_task_entries);
 
 	Q8bitRealmGenerateTasks(task_entries, future_task_entries);
+	QGenerateDelayRemainingTasks(task_entries, optional_task_entries, future_task_entries);
 }
 
 void QuestsGenerateResources(ChecklistEntry [int] resource_entries)
@@ -25439,7 +25688,7 @@ string [int] luckyOptions(int cloversAvailable) {
 	if (protestorsRemaining > 10 && protestorsPerClover > 15)
 		allTheLuckyStuff.listAppend("Zeppelin Mob (x"+projectedZeppClovers+")");
 		cloversAdjusted = MAX(cloversAdjusted - projectedZeppClovers, 3);
-	if (my_path().id == 56) //adventurer meats world
+	if (my_path().id == PATH_MEAT) //adventurer meats world
 		allTheLuckyStuff.listAppend("Knob Goblin Embezzler");
 	if (__misc_state["wand of nagamar needed"] && lettersStillNeeded > 0)
 		allTheLuckyStuff.listAppend("Wand of Nagamar");
@@ -25535,14 +25784,14 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 	LuckySource getHeartstone() {
         LuckySource final;
 
-        final.sourceName = `august scepter`;
+        final.sourceName = `heartstone`;
         final.url = 'skillz.php';
         final.imageLookupName = "__item heartstone";
     	boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
-    	int usesLUCK = get_property_int("heartstoneLuckUsed");
+    	int usesLUCK = get_property_boolean("_heartstoneLuckUsed").to_int();
 
         final.luckyCondition = accessLUCK && usesLUCK == 0 && __iotms_usable[lookupItem("heartstone")];
-        final.luckyCount = usesLUCK == 0 ? 0 : 1; 
+        final.luckyCount = usesLUCK == 1 ? 0 : 1; 
         final.tileDescription = `<b>{final.luckyCount}x Heartstone: LUCK</b> cast left`;
 
         return final;
@@ -25552,13 +25801,13 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 	LuckySource getSaxophones() {
         LuckySource final;
 
-        final.sourceName = 'apriling tuba';
-        final.url = "inventory.php?ftext=apriling+band+tuba";
-        final.imageLookupName = "__item Apriling band tuba";
+        final.sourceName = 'apriling sax';
+        final.url = "inventory.php?ftext=apriling+band+saxophone";
+        final.imageLookupName = "__item Apriling band saxophone";
 
         int aprilingBandSaxUsesLeft = clampi(3 - get_property_int("_aprilBandSaxUses"), 0, 3);
         
-        final.luckyCondition = (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0);
+        final.luckyCondition = (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band saxophone]) > 0);
         final.luckyCount = aprilingBandSaxUsesLeft;
         final.tileDescription = `<b>{aprilingBandSaxUsesLeft}x apriling sax solos</b> left`;
         return final;
@@ -25589,7 +25838,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
         final.luckyCondition = __iotms_usable[$item[August Scepter]];
         final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
-        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug. 2)`;
+        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug 2)`;
 
         return final;
     }
@@ -25613,7 +25862,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
         // never noticed I didn't explicitly say this was pillkeeper in the tile lol
         final.luckyCount = freeLuckLeft + spleenLucks;
-        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x PillKeeper</b> free lucky, `;
+        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x Pillkeeper</b> free lucky, `;
         if (spleenLucks > 0) final.tileDescription = final.tileDescription + `and <b>{spleenLucks}x</b> more for 3 spleen each`;
         return final;
     }
@@ -25645,7 +25894,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] description;
     int totalLuckyCharges = 0;
 	string line = HTMLGenerateSpanOfClass("Get a Lucky! adventure", "r_bold r_element_stench_desaturated");
-	string ll = HTMLGenerateSpanOfClass("✾", "r_element_stench");
+	string ll = HTMLGenerateSpanOfClass("✾ ", "r_element_stench");
 	string luckyText = HTMLGenerateSpanOfClass("Lucky!", "r_element_stench_desaturated");
 
 	foreach it, luckyType in luckyOrder
@@ -25685,6 +25934,61 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake("__item 11-leaf clover", url, ChecklistSubentryMake(title, hermitDescription), -11).ChecklistEntrySetIDTag("Clover resource"));    
         }
 	}
+
+	// int clovers_available = $items[11-leaf clover].available_amount() + $item[11-leaf clover].closet_amount();
+    
+	// TODO: This was the old clover recommender code. Might be usable for recs?
+
+    // if (my_path().id == PATH_BEES_HATE_YOU || my_path().id == PATH_G_LOVER)
+    //     clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
+    // if (clovers_available > 0 && in_run) {
+    //     ChecklistSubentry subentry;
+    //     subentry.header = pluralise(clovers_available, "clover", "clovers") + " available";
+        
+        
+    //     if (!__quest_state["Level 9"].state_boolean["bridge complete"])
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building. (3/3)", $location[the smut orc logging camp]));
+    //     if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && my_path().id != PATH_G_LOVER)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues. (2)", $location[a-boo peak]));
+    //     if (__misc_state["wand of nagamar needed"] && $item[wand of nagamar].creatable_amount() == 0)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
+    //     boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
+    //     if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
+   
+    //        if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mob of zeppelin protestors NC", $location[A Mob of Zeppelin Protesters]));         
+    //     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) { //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
+    //     }
+    //     if (!__quest_state["Level 8"].state_boolean["Past mine"]) {
+    //         item ore_needed = __quest_state["Level 8"].state_string["ore needed"].to_item();
+    //         if (ore_needed == $item[none])
+    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mining ore. (1)", $location[itznotyerzitz mine]));
+    //         else
+    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability(ore_needed.capitaliseFirstLetter() + ". (1)", $location[itznotyerzitz mine]));
+    //     }
+    //     if (__misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"]) {
+    //         location l = $location[none];
+    //         if (my_primestat() == $stat[moxie])
+    //             l = $location[the haunted ballroom];
+    //         else if (my_primestat() == $stat[mysticality])
+    //             l = $location[the haunted bathroom];
+    //         else if (my_primestat() == $stat[muscle])
+    //             l = $location[the haunted gallery];
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Powerlevelling (" + l + ")", l));
+    //     }
+    //     //put relevant tower items here
+        
+    //     resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Ten-leaf clover resource"));
+    // }
+    // Turning off because lucky pills are garbage now.
+
+    // if (in_run && $item[lucky pill].have() && availableSpleen() > 0) {
+    //     string [int] description;
+    //     description.listAppend("Chew for clovers.");
+    //     resource_entries.listAppend(ChecklistEntryMake("__item lucky pill", "inventory.php?ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Lucky pill resource"));
+    // }
 }
 
 RegisterTaskGenerationFunction("LuckyGenerateTasks");
@@ -25698,7 +26002,7 @@ void LuckyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 		int cloversAvailable = clampi(3 - get_property_int("_cloversPurchased"), 0, 3);
 		int cloversPossible = $item[11-leaf clover].available_amount() + cloversAvailable;
 		
-		if (__misc_state["in run"] && my_path().id == 44) { // path is grey you lol
+		if (__misc_state["in run"] && my_path().id == PATH_GREY_YOU) { // path is grey you lol
 			description.listAppend("1x ore, 1x freezerburned ice cube, 1x full-length mirror.");
 		}
 		else if (__misc_state["in run"]) {
@@ -26317,7 +26621,8 @@ void SFamiliarsGenerateResource(ChecklistEntry [int] resource_entries)
         if (get_property_int("_nanorhinoCharge") >= 100)
         {
         	tag_with_banish_tag = true;
-            description_banish.listAppend("All day. Cast muscle combat skill" + (my_familiar() == $familiar[nanorhino] ? "" : " with nanorhino as your familiar") + ".");
+            description_banish.listAppend("Turn-taking run, all-day banish.");
+            description_banish.listAppend("Cast muscle combat skill" + (my_familiar() == $familiar[nanorhino] ? "" : " with nanorhino as your familiar") + ".");
         }
 		if (__misc_state["have muscle class combat skill"])
         {
@@ -26959,15 +27264,19 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
 
         // IOTM Workshed Descriptions
         string [item] shedDesc = {
+            $item[portable Mayo Clinic]:"wacky stomach stuff",
             $item[Asdon Martin keyfob (on ring)]:"banishes & buffs",
             $item[diabolic pizza cube]:"3-fullness pizza boons",
             $item[cold medicine cabinet]:"25 freekills in exchange for your sanity",
             $item[model train set]:"bridge parts, stats, and meat",
             $item[TakerSpace letter of Marque]:"island access",
+            $item[Little Geneticist DNA-Splicing Lab]:"buffs",
         };
 
         // FIXME: Add new worksheds as time goes on.
         item [int] iotmWorksheds; 
+        iotmWorksheds.listAppend($item[Little Geneticist DNA-Splicing Lab]);
+        iotmWorksheds.listAppend($item[portable Mayo Clinic]);
         iotmWorksheds.listAppend($item[Asdon Martin keyfob (on ring)]);
         iotmWorksheds.listAppend($item[diabolic pizza cube]);
         iotmWorksheds.listAppend($item[cold medicine cabinet]);
@@ -26986,10 +27295,17 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
 
         // return if user has no other options, no need to generate the tile
-        if (shed_options.length() == 0) return;
+        if (shed_options.count() == 0) return;
 
         // do not generate if user has just one workshed and has installed it.
-        if (shed_options.length() == 1 && workshedInCampground != $item[none]) return;
+        if (shed_options.count() == 1 && workshedInCampground != $item[none]) return;
+
+        // do not generate if the path does not allow worksheds.
+        if (my_path().id == PATH_ACTUALLY_ED_THE_UNDYING) return;
+        if (my_path().id == PATH_NUCLEAR_AUTUMN) return;
+        if (my_path().id == PATH_YOU_ROBOT) return;
+        if (my_path().id == PATH_WEREPROFESSOR) return;
+        if (my_path().id == PATH_MEAT) return;
 
         if (workshedInCampground == $item[none]) {
             description.listAppend(HTMLGenerateSpanFont("No workshed currently installed!", "red"));
@@ -26997,10 +27313,8 @@ void SMiscItemsGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         }
 
         description.listAppend("Potential IOTM worksheds:|*" + shed_options.listJoinComponents("|*"));
-
+    
         optional_task_entries.listAppend(ChecklistEntryMake("__item tiny house", url, ChecklistSubentryMake(main_title, "", description), 2).ChecklistEntrySetIDTag("Workshed installation reminder"));
-        
-        
     }
 }
 
@@ -27083,10 +27397,12 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         if (banishes_available > 0 && $skill[Talk About Politics].skill_is_usable()) {
             //subentry.entries.listAppend(pluralise(banishes_available, "banish", "banishes") + " available.");
             string [int] tasks;
+            string subtitle;
+            tasks.listAppend("Turn-taking kill, 30-turn banish.");
             if ($item[pantsgiving].equipped_amount() == 0)
-                tasks.listAppend("equip pantsgiving");
-            tasks.listAppend("cast talk about politics");
-            resource_entries.listAppend(ChecklistEntryMake("__item pantsgiving", url, ChecklistSubentryMake(pluralise(banishes_available, "Pantsgiving banish", "Pantsgiving banishes"), "", tasks.listJoinComponents(", ").capitaliseFirstLetter() + "."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Pantsgiving banish"));
+                 subtitle = "equip pantsgiving";
+            // tasks.listAppend("cast talk about politics");
+            resource_entries.listAppend(ChecklistEntryMake("__item pantsgiving", url, ChecklistSubentryMake(pluralise(banishes_available, "cast of Talk About Politics", "casts of Talk About Politics"), "does allow item/meat drops", tasks), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Pantsgiving banish"));
             
         }
         
@@ -27245,18 +27561,20 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
     
     
-    
+    // Even if not in-run, want to have banishes enumerated.
+    if (7014.to_item().available_amount() > 0) //Louder than bomb
+        resource_entries.listAppend(ChecklistEntryMake("__item " + 7014.to_item().to_string(), "", ChecklistSubentryMake(pluralise(7014.to_item()), "", "Free run, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Louder than bomb banish"));
+	if ($item[anchor bomb].available_amount() > 0 )
+        resource_entries.listAppend(ChecklistEntryMake("__item anchor bomb", "", ChecklistSubentryMake(pluralise($item[anchor bomb]), "", "Free run, 30-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
+
     if (in_run) {
-        if (7014.to_item().available_amount() > 0) //Louder than bomb
-            resource_entries.listAppend(ChecklistEntryMake("__item " + 7014.to_item().to_string(), "", ChecklistSubentryMake(pluralise(7014.to_item()), "", "Free run, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Louder than bomb banish"));
+        // ... except for these, these guys suck lol
         if ($item[crystal skull].available_amount() > 0)
-            resource_entries.listAppend(ChecklistEntryMake("__item crystal skull", "", ChecklistSubentryMake(pluralise($item[crystal skull]), "", "Takes a turn, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Crystal skull banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item crystal skull", "", ChecklistSubentryMake(pluralise($item[crystal skull]), "", "Turn-taking run, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Crystal skull banish"));
             
         if ($item[harold's bell].available_amount() > 0 && $item[harold's bell].item_is_usable())
-            resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Takes a turn, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item harold's bell", "", ChecklistSubentryMake(pluralise($item[harold's bell]), "", "Turn-taking run, 20-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Harold's bell banish"));
         
-	    if ($item[anchor bomb].available_amount() > 0 )
-            resource_entries.listAppend(ChecklistEntryMake("__item anchor bomb", "", ChecklistSubentryMake(pluralise($item[anchor bomb]), "", "Free run/banish. (30 turns)"), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
         if ($item[lost key].available_amount() > 0 && $item[lost key].item_is_usable()){
             string [int] details;
             details.listAppend("Lost pill bottle is mini-fridge, take a nap, open the pill bottle.");
@@ -27313,58 +27631,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item wand of pigification", "", ChecklistSubentryMake("Wand of pigification", "", "Use twice a day on monsters for good-level food."), 6).ChecklistEntrySetIDTag("Pigification wand resource"));
     }
         
-    int clovers_available = $items[11-leaf clover].available_amount() + $item[11-leaf clover].closet_amount();
-    // Removing clover code and swapping to lucky code like TES has.
-    // if (my_path().id == PATH_BEES_HATE_YOU || my_path().id == PATH_G_LOVER)
-    //     clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
-    // if (clovers_available > 0 && in_run) {
-    //     ChecklistSubentry subentry;
-    //     subentry.header = pluralise(clovers_available, "clover", "clovers") + " available";
-        
-        
-    //     if (!__quest_state["Level 9"].state_boolean["bridge complete"])
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building. (3/3)", $location[the smut orc logging camp]));
-    //     if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && my_path().id != PATH_G_LOVER)
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues. (2)", $location[a-boo peak]));
-    //     if (__misc_state["wand of nagamar needed"] && $item[wand of nagamar].creatable_amount() == 0)
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
-    //     boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
-    //     if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
-   
-    //        if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mob of zeppelin protestors NC", $location[A Mob of Zeppelin Protesters]));         
-    //     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) { //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
-    //     }
-    //     if (!__quest_state["Level 8"].state_boolean["Past mine"]) {
-    //         item ore_needed = __quest_state["Level 8"].state_string["ore needed"].to_item();
-    //         if (ore_needed == $item[none])
-    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mining ore. (1)", $location[itznotyerzitz mine]));
-    //         else
-    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability(ore_needed.capitaliseFirstLetter() + ". (1)", $location[itznotyerzitz mine]));
-    //     }
-    //     if (__misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"]) {
-    //         location l = $location[none];
-    //         if (my_primestat() == $stat[moxie])
-    //             l = $location[the haunted ballroom];
-    //         else if (my_primestat() == $stat[mysticality])
-    //             l = $location[the haunted bathroom];
-    //         else if (my_primestat() == $stat[muscle])
-    //             l = $location[the haunted gallery];
-    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Powerlevelling (" + l + ")", l));
-    //     }
-    //     //put relevant tower items here
-        
-    //     resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Ten-leaf clover resource"));
-    // }
-    // Turning off because lucky pills are garbage now.
-
-    // if (in_run && $item[lucky pill].have() && availableSpleen() > 0) {
-    //     string [int] description;
-    //     description.listAppend("Chew for clovers.");
-    //     resource_entries.listAppend(ChecklistEntryMake("__item lucky pill", "inventory.php?ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Lucky pill resource"));
-    // }
+    
     if (in_run) {
         if ($item[gameinformpowerdailypro magazine].available_amount() > 0) {
             string [int] description;
@@ -27372,7 +27639,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake("__item gameinformpowerdailypro magazine", "inventory.php?ftext=gameinformpowerdailypro+magazine", ChecklistSubentryMake(pluralise($item[gameinformpowerdailypro magazine]), "", description), importance_level_unimportant_item).ChecklistEntrySetIDTag("Gameinformpowerdailypro magazine"));
         }
     }
-    if ($item[divine champagne popper].available_amount() > 0 && in_run) {
+    if ($item[divine champagne popper].available_amount() > 0) {
         resource_entries.listAppend(ChecklistEntryMake("__item divine champagne popper", "", ChecklistSubentryMake(pluralise($item[divine champagne popper]), "", "Free run, 5-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Champagne popper banish"));
     }
     if (__misc_state["need to level"]) {
@@ -27536,11 +27803,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         line += ".";
         resource_entries.listAppend(ChecklistEntryMake("__item vitachoconutriment capsule", "inventory.php?ftext=vitachoconutriment+capsule", ChecklistSubentryMake(pluralise($item[vitachoconutriment capsule]), "", line), importance_level_unimportant_item).ChecklistEntrySetIDTag("Vitachoconutriment capsule"));
     }
-    if (in_run && lookupItem("tryptophan dart").available_amount() > 0 && in_ronin() && lookupItem("tryptophan dart").item_is_usable()) {
-        resource_entries.listAppend(ChecklistEntryMake("__item tryptophan dart", "", ChecklistSubentryMake(pluralise(lookupItem("tryptophan dart")), "", "Non-free all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Tryptophan dart banish"));
+    if (lookupItem("tryptophan dart").available_amount() > 0 && lookupItem("tryptophan dart").item_is_usable()) {
+        resource_entries.listAppend(ChecklistEntryMake("__item tryptophan dart", "", ChecklistSubentryMake(pluralise(lookupItem("tryptophan dart")), "", "Turn-taking run, all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Tryptophan dart banish"));
     }
-    if (in_run && __misc_state["free runs usable"] && get_property_int("_humanMuskUses") < 3 && lookupItem("human musk").available_amount() > 0 && lookupItem("human musk") != $item[none]) {
-        resource_entries.listAppend(ChecklistEntryMake("__item human musk", "", ChecklistSubentryMake(MIN(lookupItem("human musk").available_amount(), 3 - get_property_int("_humanMuskUses")).pluralise("human musk", "human musks"), "", "Free run/banish. Consumes item."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Human musk banish"));
+    if (__misc_state["free runs usable"] && get_property_int("_humanMuskUses") < 3 && lookupItem("human musk").available_amount() > 0 && lookupItem("human musk") != $item[none]) {
+        resource_entries.listAppend(ChecklistEntryMake("__item human musk", "", ChecklistSubentryMake(MIN(lookupItem("human musk").available_amount(), 3 - get_property_int("_humanMuskUses")).pluralise("human musk", "human musks"), "", "Free run, all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Human musk banish"));
     }
     
     if ($item[drum machine].available_amount() > 0 && in_run && (my_adventures() <= 1 || (availableDrunkenness() < 0 && availableDrunkenness() > -4 && my_adventures() >= 1)) && __quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && $item[drum machine].item_is_usable()) {
@@ -27554,7 +27821,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     
     if ($items[stinky cheese sword,stinky cheese diaper,stinky cheese wheel,stinky cheese eye,Staff of Queso Escusado].available_amount() > 0) {
         if (!get_property_boolean("_stinkyCheeseBanisherUsed"))
-            resource_entries.listAppend(ChecklistEntryMake("__item stinky cheese eye", "", ChecklistSubentryMake("Stinky cheese eye banish", "", "Free run."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Stinky cheese banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item stinky cheese eye", "", ChecklistSubentryMake("1 stinky cheese eye banish", "", "Free run, 10-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Stinky cheese banish"));
         
         int stinky_cheese_charge = min(100, get_property_int("_stinkyCheeseCount"));
         string title;
@@ -27754,8 +28021,8 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item chest of the Bonerdagon", "inventory.php?ftext=chest+of+the+Bonerdagon", ChecklistSubentryMake("chest of the Bonerdagon", "", description), importance_level_unimportant_item).ChecklistEntrySetIDTag("Bonerdagon chest resource"));
     }
     
-    if ($item[smoke grenade].available_amount() > 0 && in_run) {
-        string description = "Turn-costing banish. (lasts 20 turns, no stats, no items, no meat)";
+    if ($item[smoke grenade].available_amount() > 0) {
+        string description = "Turn-taking run, 20-turn banish.";
         resource_entries.listAppend(ChecklistEntryMake("__item smoke grenade", "", ChecklistSubentryMake(pluralise($item[Smoke grenade]), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Smoke grenade banish"));
     }
     
@@ -27802,11 +28069,12 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item bowl of scorpions", "inventory.php?which=3&ftext=bowl+of+scorpions", ChecklistSubentryMake(pluralise(uses_remaining,$item[bowl of scorpions]), "", "Free fight when brought to Bowling Alley."), 5).ChecklistEntrySetIDTag("daily free fight"));
     }
 	
-	if ($item[glark cable].available_amount() > 0 && get_property_int("_glarkCableUses") < 5 && my_path().id != PATH_G_LOVER)
+	if ($item[glark cable].available_amount() > 0 && get_property_int("_glarkCableUses") < 5 && my_path().id != PATH_G_LOVER && can_adventure($location[The Red Zeppelin]))
     {
         int uses_remaining = MIN($item[glark cable].available_amount(), clampi(5 - get_property_int("_glarkCableUses"), 0, 5));
-        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free fight on the Red Zeppelin."), 5).ChecklistEntrySetIDTag("daily free fight"));
+        resource_entries.listAppend(ChecklistEntryMake("__item glark cable", "inventory.php?which=3&ftext=glark+cable", ChecklistSubentryMake(pluralise(uses_remaining,$item[glark cable]), "", "Free kill in the Red Zeppelin."), 5).ChecklistEntrySetIDTag("free instakill"));
     } 
+
     if ($item[lynyrd snare].available_amount() > 0 && get_property_int("_lynyrdSnareUses") < 3 && $item[lynyrd snare].item_is_usable()) { // && in_run && __misc_state["need to level"])
         int uses_remaining = MIN($item[lynyrd snare].available_amount(), clampi(3 - get_property_int("_lynyrdSnareUses"), 0, 3));
         resource_entries.listAppend(ChecklistEntryMake("__item lynyrd snare", "inventory.php?ftext=lynyrd+snare", ChecklistSubentryMake(pluralise(uses_remaining,$item[lynyrd snare]), "", "Free fight when used."), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Lynyrd snare free fight"));
@@ -27972,9 +28240,9 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             string url;
             string [int] description;
             if (__misc_state["free runs usable"])
-                description.listAppend("Once/day free run/banisher. (combat skill)");
+                description.listAppend("Free run, 10-turn banish.");
             else
-                description.listAppend("Once/day banisher. (combat skill)");
+                description.listAppend("10-turn banish.");
 
             if ($item[V for Vivala mask].equipped_amount() == 0) {
                 if ($item[replica V for Vivala mask].equipped_amount() == 0) {
@@ -27982,12 +28250,13 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
                     url = "inventory.php?ftext=v+for+vivala";
                 }
             }
-            string line = "Costs ";
-            if (my_mp() < 30)
-                line += HTMLGenerateSpanFont("30 MP", "red");
-            else
-                line += "30 MP";
-            description.listAppend(line + ".");
+            // I do not think we need this.
+            // string line = "Costs ";
+            // if (my_mp() < 30)
+            //     line += HTMLGenerateSpanFont("30 MP", "red");
+            // else
+            //     line += "30 MP";
+            // description.listAppend(line + ".");
             resource_entries.listAppend(ChecklistEntryMake("__item V for Vivala mask", url, ChecklistSubentryMake("Creepy Grin usable", "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Vivala mask banish"));
         }
         if (get_property_int("_vmaskAdv") < 10) {
@@ -28151,7 +28420,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
                 url = invSearch("hodgman");
                 description.listAppend("Equip frippery first.");
             }
-            resource_entries.listAppend(ChecklistEntryMake("__skill Summon hobo underling", url, ChecklistSubentryMake(pluralise(underling_summons_remaining, "hobo underling summon", "hobo underling summons"), "", description), -1).ChecklistEntrySetIDTag("Hodgman regal frippery resource"));
+            resource_entries.listAppend(ChecklistEntryMake("__skill Summon hobo underling", url, ChecklistSubentryMake(pluralise(underling_summons_remaining, "hobo underling summon", "hobo underling summons"), "", description), 5).ChecklistEntrySetIDTag("Hodgman regal frippery resource"));
         }
     }
     if (lookupItem("license to chill").available_amount() > 0 && !get_property_boolean("_licenseToChillUsed") && mafiaIsPastRevision(18122)) {
@@ -28163,8 +28432,11 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         
     }
     if ($item[mafia middle finger ring].available_amount() > 0 && !get_property_boolean("_mafiaMiddleFingerRingUsed")) {
-        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("Mafia middle finger ring banish/free run", "", "Once/day, 60 turn duration." + ($item[mafia middle finger ring].equipped_amount() == 0 ? " Equip first." : "")), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));
-        
+        string [int] description;
+        description.listAppend("Free run, 60-turn banish.");
+        if ($item[mafia middle finger ring].equipped_amount() == 0) 
+            description.listAppend(HTMLGenerateSpanFont("Equip the mafia middle finger ring first", "red"));
+        resource_entries.listAppend(ChecklistEntryMake("__item mafia middle finger ring", ($item[mafia middle finger ring].equipped_amount() == 0 ? $item[mafia middle finger ring].invSearch() : ""), ChecklistSubentryMake("1 cast of show them your ring", "", description),0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mafia middle finger ring banish"));   
     }
 
     if (get_property_int("_glitchMonsterFights") == 0 && lookupItem("[glitch season reward name]").item_amount() > 0) {
@@ -28184,6 +28456,47 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
             description.listAppend("Uncloset " + (glitch_in_closet > 1 ? "some" : "one") + " to " + (glitch_amount > 1 ? "increase" : "multiply") + " its power and reward.");
 
         resource_entries.listAppend(ChecklistEntryMake("__item [glitch season reward name]", "inventory.php?ftext=%5Bglitch+season+reward+name%5D", ChecklistSubentryMake("[glitch season reward name] free fight", "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Glitch reward free fight"));
+    }
+
+    // Due to Heartstone re-entering these into standard, this is outside of the 2002 tile. 
+    if ($item[spooky vhs tape].item_amount() > 0) {
+        // Generate useful VHS copy list
+		string [int] optionsVHS;
+        string [int] description;
+        boolean canVHS = get_property("spookyVHSTapeMonster") == "";
+        string VHSDescription = canVHS ? "Use a VHS tape in combat to free-copy into delay & get forced item drops." : "Cannot use a VHS tape until you encounter your active monster!";
+        int availableVHS = $item[spooky vhs tape].item_amount();
+
+		if (__quest_state["Level 12"].state_int["hippies left on battlefield"] > 5) optionsVHS.listAppend("War monsters; especially GROPs");
+		if (!__quest_state["Level 7"].state_boolean["cranny finished"]) optionsVHS.listAppend("Giant swarm of ghuol whelps");
+		if ($item[amulet of extreme plot significance].available_amount() == 0) optionsVHS.listAppend("Quiet Healer");
+		if ($item[mohawk wig].available_amount() == 0) optionsVHS.listAppend("Burly Sidekick");
+        if (get_property_int("_shadowBricksUsed") < 13) optionsVHS.listAppend("Shadow Slab");
+
+        if (optionsVHS.count() > 0 && canVHS) {
+				VHSDescription += " Recommended monsters:|*"+optionsVHS.listJoinComponents("|*");
+			}
+			description.listAppend(VHSDescription);
+
+		resource_entries.listAppend(ChecklistEntryMake("__item spooky vhs tape", "", ChecklistSubentryMake(pluralise(availableVHS,"spooky VHS tape","spooky VHS tapes"),"",description), 1).ChecklistEntrySetIDTag("spooky VHS tape tile"));
+    }
+
+    // Due to out-of-standard combat items being usable, this is outside of the payphone tile.
+    int shadowBricks = $item[shadow brick].item_amount();
+    int shadowBricksUsed = get_property_int("_shadowBricksUsed");
+    int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
+
+    string subtitle = shadowBricksUsed > 0 ? "have used "+pluralise(shadowBricksUsed, "brick", "bricks") : "";
+    
+    if ($item[shadow brick].item_amount() > 0) {
+        string header = pluralise(shadowBricks, "shadow brick", "shadow bricks");
+        if (shadowBrickUsesLeft < shadowBricks) {
+            if (shadowBrickUsesLeft == 0)
+                header += " (not usable today)";
+            else
+                header += " (" + shadowBrickUsesLeft + " usable today)";
+        }
+        resource_entries.listAppend(ChecklistEntryMake("__item shadow brick", "", ChecklistSubentryMake(header, subtitle, "Win a fight without taking a turn.")).ChecklistEntrySetCombinationTag("free instakill"));
     }
 }
 
@@ -28986,8 +29299,7 @@ void SDailyDungeonGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntr
             if (avoid_using_skeleton_key && $item[skeleton key].available_amount() > 0)
                 description.listAppend(HTMLGenerateSpanOfClass("Avoid using your skeleton key, you don't have many left.", "r_bold"));
 			
-			if (rooms_left == 14) {
-                description.listAppend(pluraliseWordy(rooms_left, "room", "rooms").capitaliseFirstLetter() + " left.");
+			if (rooms_left == 1) {
 				description.listAppend(HTMLGenerateSpanOfClass("Last room; claim your loot token!","r_element_hot"));
 				task_entries.listAppend(ChecklistEntryMake("daily dungeon", url, ChecklistSubentryMake("Daily Dungeon", "", description), -11).ChecklistEntrySetIDTag("Daily dungeon last-room supernag"));
 			} else {
@@ -32629,6 +32941,8 @@ void SPowerlevelGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
         
         
         string image_name = "player character";
+
+        if (my_path().id == PATH_MEAT) image_name = "Meat Class";
         
         if (false)
         {
@@ -33333,30 +33647,33 @@ void SMiscTasksGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [
         optional_task_entries.listAppend(ChecklistEntryMake("__item spaghetti breakfast", url, ChecklistSubentryMake("Eat " + $item[spaghetti breakfast] + " first", "", description), 8).ChecklistEntrySetIDTag("Spaghetti breakfast resource"));
     }
     
-    if (my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && my_path().id != PATH_NUCLEAR_AUTUMN)
-    {
-        item upgraded_dwelling = $item[none];
-        if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 && (__campground[$item[big rock]] > 0 || __campground[$item[Newbiesport&trade; tent]] > 0 || __campground[$item[cottage]] > 0) && my_path().id != PATH_G_LOVER && my_path().id != PATH_BEES_HATE_YOU)
-        {
-            upgraded_dwelling = $item[Frobozz Real-Estate Company Instant House (TM)];
-        }
-        else if ($item[Newbiesport&trade; tent].available_amount() > 0 && __campground[$item[big rock]] > 0 && my_path().id != PATH_G_LOVER)
-        {
-            upgraded_dwelling = $item[Newbiesport&trade; tent];
-        }
-        if (upgraded_dwelling != $item[none])
-        {
-            string [int] reasons;
-            reasons.listAppend("rollover");
+    // In Feb 2026 they made dwellings static. That means an "upgrade your dwelling" tile 
+    //   is actively unhelpful, since your starter campground rules.
+
+    // if (my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && my_path().id != PATH_NUCLEAR_AUTUMN)
+    // {
+    //     item upgraded_dwelling = $item[none];
+    //     if ($item[Frobozz Real-Estate Company Instant House (TM)].available_amount() > 0 && (__campground[$item[big rock]] > 0 || __campground[$item[Newbiesport&trade; tent]] > 0 || __campground[$item[cottage]] > 0) && my_path().id != PATH_G_LOVER && my_path().id != PATH_BEES_HATE_YOU)
+    //     {
+    //         upgraded_dwelling = $item[Frobozz Real-Estate Company Instant House (TM)];
+    //     }
+    //     else if ($item[Newbiesport&trade; tent].available_amount() > 0 && __campground[$item[big rock]] > 0 && my_path().id != PATH_G_LOVER)
+    //     {
+    //         upgraded_dwelling = $item[Newbiesport&trade; tent];
+    //     }
+    //     if (upgraded_dwelling != $item[none])
+    //     {
+    //         string [int] reasons;
+    //         reasons.listAppend("rollover");
             
-            if (__misc_state_int["total free rests possible"] > 0)
-                reasons.listAppend("free rests");
+    //         if (__misc_state_int["total free rests possible"] > 0)
+    //             reasons.listAppend("free rests");
             
-            string description = "Better HP/MP restoration via " + reasons.listJoinComponents(", ", "and") + ".";
-            optional_task_entries.listAppend(ChecklistEntryMake("__item " + upgraded_dwelling, upgraded_dwelling.invSearch(), ChecklistSubentryMake("Use " + upgraded_dwelling, "", description), 8).ChecklistEntrySetIDTag("Campground dwelling uprgade"));
+    //         string description = "Better HP/MP restoration via " + reasons.listJoinComponents(", ", "and") + ".";
+    //         optional_task_entries.listAppend(ChecklistEntryMake("__item " + upgraded_dwelling, upgraded_dwelling.invSearch(), ChecklistSubentryMake("Use " + upgraded_dwelling, "", description), 8).ChecklistEntrySetIDTag("Campground dwelling uprgade"));
             
-        }
-    }
+    //     }
+    // }
     
     if (__misc_state["in run"] && $item[dry cleaning receipt].available_amount() > 0)
     {
@@ -34147,6 +34464,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     //   12x friars NCs (-1 w/ carto)
     //    1x castle basement
     //    1x castle top
+    //    2x eXtreme slopes
 
     string [int] sneak95;
 
@@ -34209,6 +34527,18 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     // If the quest is unfinished, you can sneak the top floor.
     if (get_property("questL10Garbage")!= "finished") sneak95.listAppend("1 castle top floor");
+
+    // If the pref is any of these, you may still need eXtremities
+    boolean canSneakSlopes = $strings[unstarted,started,step1,step2] contains get_property("questL08Trapper");
+    
+    // Ripping some code from the friars tile to count NCs encountered.
+    boolean [string] slopes_known_ncs = $strings[2 eXXtreme 4 U,3 eXXXtreme 4ever 6pack];
+    int slopeNCsLeft = min(2-countFriarNCs(slopes_known_ncs,$location[The eXtreme Slope]), 2);
+
+    if (slopeNCsLeft > 0 && canSneakSlopes) {
+        sneak95.listAppend(`{slopeNCsLeft} eXtreme Slope`);
+        totalNCsRemaining += slopeNCsLeft-1;
+    }
 
     tableLines[2] = populateSneakTable("95% Combat", sneak95);
 
@@ -34487,6 +34817,342 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(entry);
 	}
 }
+// ===============================================================
+// This is a big ol' megatile meant to replace & expand on the crown of thrones 
+//   "normal fam drops" tile. The primary goal is to abstract all familiar drops 
+//   into a combo tile that correctly describes:
+
+//     - progress on how many drops you are from the fam's limit
+//     - % chance of next drop, if applicable
+//     - exact turns til next drop, if applicable
+
+// Eventually I will probably remove many of the tinier fam tiles in favor of 
+//   this combo tile (like peace turkey)
+// ===============================================================
+
+// ===============================================================
+// ---------- EXACT DROP TURN CALCULATIONS (dropType == "precise int turn")
+// ===============================================================
+int bootsTurns;
+if (get_property_boolean("bootsCharged")) bootsTurns = 0;
+else if ($familiar[Pair of Stomping Boots].fights_today < 3) bootsTurns = clampi(3 - $familiar[Pair of Stomping Boots].fights_today,1,3);
+else if ($familiar[Pair of Stomping Boots].fights_today < 7) bootsTurns = clampi(7 - $familiar[Pair of Stomping Boots].fights_today,1,4);
+else if ($familiar[Pair of Stomping Boots].fights_today < 12) bootsTurns = clampi(12 - $familiar[Pair of Stomping Boots].fights_today,1,5);
+else if ($familiar[Pair of Stomping Boots].fights_today < 18) bootsTurns = clampi(18 - $familiar[Pair of Stomping Boots].fights_today,1,6);
+else if ($familiar[Pair of Stomping Boots].fights_today < 25) bootsTurns = clampi(25 - $familiar[Pair of Stomping Boots].fights_today,1,7);
+else if ($familiar[Pair of Stomping Boots].fights_today < 33) bootsTurns = clampi(33 - $familiar[Pair of Stomping Boots].fights_today,1,8);
+else if ($familiar[Pair of Stomping Boots].fights_today < 42) bootsTurns = clampi(42 - $familiar[Pair of Stomping Boots].fights_today,1,9);
+
+int sheepTurns = $familiar[Hobo in Sheep's Clothing].fights_today;
+if (sheepTurns < 11) sheepTurns = 10 - sheepTurns;
+else if (sheepTurns < 31) sheepTurns = 30 - sheepTurns;
+else if (sheepTurns < 61) sheepTurns = 60 - sheepTurns;
+else if (sheepTurns < 101) sheepTurns = 100 - sheepTurns;
+else if (sheepTurns < 151) sheepTurns = 150 - sheepTurns;
+else if (sheepTurns > 150) sheepTurns = 999; // not technically true but i don't want to enumerate more
+
+int [familiar] dropTurnsLeft;
+dropTurnsLeft[$familiar[Pair of Stomping Boots]] = bootsTurns;
+dropTurnsLeft[$familiar[Rockin' Robin]] = 30 - get_property_int("rockinRobinProgress"); 
+dropTurnsLeft[$familiar[Optimistic Candle]] = 30 - get_property_int("optimisticCandleProgress");
+dropTurnsLeft[$familiar[Garbage Fire]] = 30 - get_property_int("garbageFireProgress");
+dropTurnsLeft[$familiar[Cookbookbat]] = 11 - get_property_int("cookbookbatIngredientsCharge");
+dropTurnsLeft[$familiar[Hobo in Sheep's Clothing]] = sheepTurns;
+
+// ===============================================================
+// ---------- FLOAT DROP TURN CALCULATION (dropType == "approx float turn")
+// ===============================================================
+
+float[int] puckTurnLookup = {10:3.9,11:3.3,12:2.8,13:2.3,14:1.9,15:1.6,16:1.4,17:1.2,18:1,19:1};
+
+float pucksTurns;
+if (get_property_int("powerPillProgress") < 10) pucksTurns = to_float(10 - get_property_int("powerPillProgress"))+3.9;
+if (get_property_int("powerPillProgress") > 9) pucksTurns = puckTurnLookup[get_property_int("powerPillProgress")];
+
+float [familiar] dropApproxTurnsLeft;
+dropApproxTurnsLeft[$familiar[puck man]] = pucksTurns;
+dropApproxTurnsLeft[$familiar[ms. puck man]] = pucksTurns;
+
+// ===============================================================
+// ---------- PERCENT DROP ARRAYS (dropType == "percent")
+// ===============================================================
+// Important note: these don't include the "5% per turn without a drop" increase for the oldies.
+//   That isn't currently trackable via mafia, though. These are referenced for dropType == "percent"
+
+float [familiar][int] dropPercentArrays;
+dropPercentArrays[$familiar[Green Pixie]] = {1:20.0, 2:15.0, 3:10.0, 4:5.0, 5:5.0, 6:0.0};
+dropPercentArrays[$familiar[Baby Sandworm]] = {1:20.0, 2:15.0, 3:10.0, 4:5.0, 5:5.0, 6:0.0};
+dropPercentArrays[$familiar[Astral Badger]] = {1:25.0, 2:20.0, 3:15.0, 4:10.0, 5:5.0, 6:0.0};
+dropPercentArrays[$familiar[Blavious Kloop]] = {1:25.0, 2:20.0, 3:15.0, 4:10.0, 5:5.0, 6:0.0};
+dropPercentArrays[$familiar[Llama lama]] = {1:20.0, 2:15.0, 3:10.0, 4:5.0, 5:5.0, 6:0.0};
+dropPercentArrays[$familiar[Bloovian Groose]] = {1:25.0, 2:20.0, 3:15.0, 4:10.0, 5:5.0, 6:0.0};
+dropPercentArrays[$familiar[Rogue Program]] = {1:25.0, 2:20.0, 3:15.0, 4:10.0, 5:5.0, 6:0.0};
+dropPercentArrays[$familiar[Li'l Xenomorph]] = {1:25.0, 2:20.0, 3:15.0, 4:10.0, 5:5.0, 6:0.0};
+dropPercentArrays[$familiar[Unconscious Collective]] = {1:25.0, 2:20.0, 3:15.0, 4:10.0, 5:5.0, 6:0.0};
+dropPercentArrays[$familiar[Grim Brother]] = {1:25.0, 2:20.0, 3:15.0, 4:10.0, 5:5.0, 6:0.0}; // guess, not on wiki & i don't have one
+dropPercentArrays[$familiar[Galloping Grill]] = {1:8.0, 2:8.0, 3:8.0, 4:8.0, 5:8.0, 6:0.0}; // guess, not on wiki & i don't have one
+dropPercentArrays[$familiar[Fist Turkey]] = {1:8.0, 2:8.0, 3:8.0, 4:8.0, 5:8.0, 6:0.0}; // guess, not on wiki & i don't have one
+dropPercentArrays[$familiar[Golden Monkey]] = {1:25.0, 2:20.0, 3:15.0, 4:10.0, 5:5.0, 6:0.0}; // guess, not on wiki & i don't have one
+dropPercentArrays[$familiar[Adventurous Spelunker]] = {1:15.0, 2:0.0};
+dropPercentArrays[$familiar[Miniature Sword & Martini Guy]] = {1:30.0, 2:25.0, 3:20.0, 4:15.0, 5:10.0, 6:5.0, 7:0.0};
+dropPercentArrays[$familiar[Machine Elf]] = {1:10.0, 2:0.0}; // guess-ish, this looks right
+dropPercentArrays[$familiar[Jill-of-All-Trades]] = {1:35.0, 2:2.0, 3:0.1, 4:0.0}; //technically, last is 0.0043% but mehhhh
+
+// ===============================================================
+// ---------- PERCENT DROP CALCULATIONS (dropType == "percent calc")
+// ===============================================================
+
+float kiwiWeight = max(0.0, effective_familiar_weight($familiar[Mini Kiwi]) + weight_adjustment());
+float kiwiModifier = $item[aviator goggles].available_amount() > 0 ? 0.75 : 0.50;
+float kiwiChance = min(kiwiWeight * kiwiModifier,100.0);
+float turkeyWeight = max(0.0, effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
+
+// These are familiars where you are just exporting a conditional probability.
+float [familiar] dropPercentCalc;
+dropPercentCalc[$familiar[mini kiwi]] = kiwiChance;
+dropPercentCalc[$familiar[Skeleton of Crimbo Past]] = -100.0; //no good way to do this so just overriding in tile builder
+dropPercentCalc[$familiar[Peace Turkey]] = clampf(24.0 + square_root(turkeyWeight), 0.0, 100.0);
+
+// ===============================================================
+// ---------- TURNS TO DROP ARRAYS (dropType == "turn")
+// ===============================================================
+
+// These familiars drop their goodies after a certain amount of turns spent with the fam
+int [familiar][int] dropTurnArrays;
+dropTurnArrays[$familiar[Angry Jung Man]] = {1:30, 2:0};
+dropTurnArrays[$familiar[Grimstone Golem]] = {1:45, 2:0};
+
+
+record FamDrop {
+    familiar fam; // familiar that drops a thing
+    item drop; // item dropped by the familiar
+    string dropText; // a shortened string
+    string prop; // prop used to get dropsdropped
+    int limit; // max drops per day
+    string dropType; // valid values: "percent", "turn", "approx float turn", "precise int turn", "percent calc"
+    boolean haveFam; // does user have this fam
+    boolean activeFam; // is this fam equipped
+    int currDrops; // how many drops have dropped
+    float dropFloat; // valid outputs: % chance, approx float turn, % calculated
+    int dropInt; // valid outputs: turns 
+};
+
+void listAppend(FamDrop [int] list, FamDrop entry)
+{
+	int position = list.count();
+	while (list contains position)
+		position += 1;
+	list[position] = entry;
+}
+
+FamDrop generateFamDrop(string fam, string drop, string dropsmall, string prop, int limit, string dropType) {
+    FamDrop out;
+
+    // initialize things
+    out.fam = lookupFamiliar(fam);
+    out.drop = $item[none];
+    out.dropText = dropsmall;
+    out.prop = prop;
+    out.limit = limit;
+    out.dropType = dropType;
+    out.dropFloat = 0.0;
+    out.dropInt = 0;
+
+    out.haveFam = out.fam.have_familiar();
+    // if (!out.haveFam) return out; // exit if you don't have fam
+    if (drop != "") out.drop = lookupItem(drop);
+
+    out.activeFam = my_familiar() == out.fam;
+
+    if (prop != "") out.currDrops = get_property_int(prop);
+    if (prop == "") return out;
+
+    // valid values: "percent", "turn", "approx float turn", "precise int turn", "percent calc"
+    if (dropType == "percent") out.dropFloat = grabClampedFloat(out.currDrops+1, dropPercentArrays[out.fam]);
+    if (dropType == "approx float turn") out.dropFloat = dropApproxTurnsLeft[out.fam];
+    if (dropType == "turn") out.dropInt = grabClampedInt(out.currDrops+1, dropTurnArrays[out.fam]);
+    if (dropType == "precise int turn") out.dropInt = dropTurnsLeft[out.fam];
+    if (dropType == "percent calc") out.dropFloat = dropPercentCalc[out.fam];
+
+    return out;
+}
+
+FamDrop [int] __fam_drops;
+// format ===========> generateFamDrop(string fam, string drop, string dropsmall, string prop, int limit, string dropType)
+__fam_drops.listAppend(generateFamDrop("Green Pixie", "tiny bottle of absinthe", "absinthe bottles", "_absintheDrops", 5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Baby Sandworm", "agua de vida", "agua bottles", "_aguaDrops", 5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Astral Badger", "astral mushroom", "astral shrooms", "_astralDrops", 5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Blavious Kloop", "devilish folio", "folios", "_kloopDrops", 5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Llama Lama", "llama lama gong", "gongs", "_gongDrops", 5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Bloovian Groose", "groose grease", "greases", "_grooseDrops", 5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Rogue Program", "game grid token", "tokens", "_tokenDrops", 5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Li'l Xenomorph","transporter transponder","transponders","_transponderDrops",5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Unconscious Collective","Unconscious Collective dream jar","dream jars","_dreamJarDrops",5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Angry Jung Man","psychoanalytic jar","psycho jar","_jungDrops",1, "turn"));
+__fam_drops.listAppend(generateFamDrop("Grim Brother","grim fairy tale","fairy tales","_grimFairyTaleDrops",5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Grimstone Golem","grimstone mask","grim mask","_grimstoneMaskDrops",1, "turn"));
+__fam_drops.listAppend(generateFamDrop("Galloping Grill", "hot ashes", "hot ashes", "_hotAshesDrops", 5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Fist Turkey", (my_level() < 5 ? "friendly turkey" : (my_level() < 7 ? "agitated turkey" : "ambitious turkey")), "turkey boozes", "_turkeyBooze", 5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Golden Monkey","powdered gold","powdered golds","_powderedGoldDrops",5, "percent"));
+__fam_drops.listAppend(generateFamDrop("Adventurous Spelunker","tales of spelunking","tales","_spelunkingTalesDrops",1, "percent"));
+// __fam_drops.listAppend(generateFamDrop("Cotton Candy Carnie", -1, "cotton candy", "_carnieCandyDrops", 10, "percent")); // not including, pretty useless
+__fam_drops.listAppend(generateFamDrop("Pair of Stomping Boots","","paste","_bootStomps",7,"precise int turn"));
+__fam_drops.listAppend(generateFamDrop("Puck Man","power pill","power pills","_powerPillDrops", MIN(11, my_daycount() + 1), "approx float turn"));
+__fam_drops.listAppend(generateFamDrop("Ms. Puck Man","power pill","power pills","_powerPillDrops", MIN(11, my_daycount() + 1), "approx float turn"));
+__fam_drops.listAppend(generateFamDrop("Miniature Sword & Martini Guy","mini-martini","mini-martinis","_miniMartiniDrops",6, "percent"));
+__fam_drops.listAppend(generateFamDrop("Machine Elf","Deep Machine Tunnels snowglobe","snowglobe","_snowglobeDrops",1,"percent"));
+__fam_drops.listAppend(generateFamDrop("Rockin' Robin", "robin's egg", "robin's egg", "_robinEggDrops", -1, "precise int turn"));
+__fam_drops.listAppend(generateFamDrop("Optimistic Candle", "glob of melted wax", "wax glob", "_waxGlobDrops", -1, "precise int turn"));
+__fam_drops.listAppend(generateFamDrop("Garbage Fire", "burning newspaper", "burning item", "_garbageFireDrops", -1, "precise int turn"));
+__fam_drops.listAppend(generateFamDrop("Cookbookbat", "yeast of boris", "cookbookbat ingredient", "_cookbookbatRecipeDrops", -1, "precise int turn"));
+__fam_drops.listAppend(generateFamDrop("Hobo in Sheep's Clothing","grubby wool","grubby wools","_grubbyWoolDrops",5, "precise int turn")); // technically unlimited but setting at limit 5 bc nobody should get >5
+__fam_drops.listAppend(generateFamDrop("Jill-of-All-Trades","map to a candy-rich block","candy block map","_mapToACandyRichBlockDrops",-1,"percent"));
+__fam_drops.listAppend(generateFamDrop("Mini Kiwi", "mini kiwi", "mini kiwi", "_miniKiwiDrops", -1, "percent calc"));
+__fam_drops.listAppend(generateFamDrop("Peace Turkey","whirled peas","pea boon","_knuckleboneDrops", -1, "percent calc"));
+__fam_drops.listAppend(generateFamDrop("Skeleton of Crimbo Past","knucklebone","knucklebone","_knuckleboneDrops",100, "percent calc"));
+
+// Reverse the sort, so you get newest IOTM fams on top
+sort __fam_drops by -index;
+
+// TODO: this includes almost all drop familiars. it's missing a small handful: 
+//   - xo skeleton (xs & os; xoSkeleltonOProgress & xoSkeleltonXProgress)
+//   - mechanical songbird (mechanicalSongbirdProgress)
+//   - cubeling (cubelingProgress)
+//   - space jellyfish (_spaceJellyfishDrops)
+// 
+
+string [string] dropFamTile(FamDrop currFamDrop) {
+    // Generate empty starting output
+    string [string] output;
+    output["title"] = "";
+    output["subtitle"] = "";
+    output["desc"] = "";
+    output["limitLine"] = "";
+
+    string limitString = "";
+    if (currFamDrop.limit > 0) {
+        limitString = " "+currFamDrop.currDrops+"/"+currFamDrop.limit+" "+currFamDrop.drop.plural;
+        output["subtitle"] = limitString;
+        if (currFamDrop.fam == lookupFamiliar("pair of stomping boots")) output["subtitle"] = limitString+" spleen pastes";
+    }
+
+    // Setting some custom subtitles
+    if (currFamDrop.limit < 0) {
+        output["subtitle"] = "currently have "+pluralise(currFamDrop.drop);
+    }
+
+
+    // Generate a limited line and return
+    if (currFamDrop.dropFloat == 0.0 && currFamDrop.dropInt == 0 && currFamDrop.limit - currFamDrop.currDrops == 0) {
+        output["limitLine"] = to_string(currFamDrop.fam)+": "+currFamDrop.limit+"/"+currFamDrop.limit+" "+currFamDrop.dropText;
+        return output;
+    }
+
+    // Fixing a few small language issues
+    string droppedItem = currFamDrop.drop;
+    if (currFamDrop.drop == lookupItem("yeast of boris")) droppedItem="3x cookbat food";
+    if (currFamDrop.fam == lookupFamiliar("pair of stomping boots")) droppedItem="spleen paste";
+
+    string famText = to_string(currFamDrop.fam);
+    if (currFamDrop.activeFam) famText = HTMLGenerateSpanFont(famText,"#0bb1a3");
+
+    string secondaryColor = "#444444";
+    string alertColor = "#088841";
+
+
+    string textNumber = "";
+    if (currFamDrop.dropType == "percent") {
+        textNumber = to_string(round(currFamDrop.dropFloat,0).to_int())+"%";
+        output["title"] = famText+": "+HTMLGenerateSpanFont(textNumber+" for "+currFamDrop.dropText, secondaryColor);
+    }
+    if (currFamDrop.dropType == "approx float turn") {
+        textNumber = "~"+to_string(round(currFamDrop.dropFloat,1));
+        output["title"] = famText+": "+HTMLGenerateSpanFont(droppedItem+" in ~"+currFamDrop.dropFloat+" turns", secondaryColor);
+    }
+    if (currFamDrop.dropType == "turn") {
+        int turnsSpentWithFam = currFamDrop.fam.fights_today;
+        int turnCalc = clampi(currFamDrop.dropInt - turnsSpentWithFam,0,50);
+        output["title"] = famText+": "+HTMLGenerateSpanFont(droppedItem+" in "+pluralise(turnCalc,"turn","turns"), secondaryColor);
+    }
+    if (currFamDrop.dropType == "precise int turn") {
+        output["title"] = famText+": "+HTMLGenerateSpanFont(droppedItem+" in "+pluralise(currFamDrop.dropInt,"turn","turns"), secondaryColor);
+        if (currFamDrop.dropInt == 0) output["title"] = famText+": "+HTMLGenerateSpanFont(droppedItem+" in "+pluralise(currFamDrop.dropInt,"turn","turns"), alertColor);
+    }
+    if (currFamDrop.dropType == "percent calc") {
+        textNumber = "~"+to_string(round(currFamDrop.dropFloat,1))+"%";
+        output["title"] = famText+": "+HTMLGenerateSpanFont(textNumber+" chance of "+currFamDrop.dropText, secondaryColor);
+    }
+
+    if (currFamDrop.dropFloat < 0.0) {
+        output["title"] = famText+": "+HTMLGenerateSpanFont("Knucklebones! ("+currFamDrop.currDrops+"/"+currFamDrop.limit+")", secondaryColor);
+        output["subtitle"] = "currently have "+pluralise(currFamDrop.drop);
+    }
+
+    // Adding special desclines for special fam drop conditions & extras
+    if (currFamDrop.fam == lookupFamiliar("Golden Monkey")) output["desc"] = "Also, 100 meat autosell vs. meatless monsters";
+    if (currFamDrop.fam == lookupFamiliar("Peace Turkey")) {
+        string [int] peaceMap = {0:"whirled peas",1:"olive",2:"hp/mp restore",3:"weap% buff",4:"whirled peas",5:"piece of cake",6:"booze",7:"peace shooter"};
+        string [int] peaceCycle;
+        foreach idx, peaBoon in peaceMap {
+            if (idx == get_property_int("peaceTurkeyIndex")) peaceCycle.listAppend("<b>"+peaBoon+"</b>");
+            else peaceCycle.listAppend(HTMLGenerateSpanFont(peaBoon,"gray"));
+        }
+        output["desc"] = "Pea cycle: "+listJoinComponents(peaceCycle," ➔ ");
+    }
+    if (currFamDrop.fam == lookupFamiliar("Pair of Stomping Boots")) {
+        int runsUsed = get_property_int("_banderRunaways");
+        int runsPossible = (familiar_weight(currFamDrop.fam) + weight_adjustment())/5;
+        string limitBreak = runsUsed > runsPossible ? ". Limit break!" : "";
+        if (__misc_state["free runs usable"])
+            output["desc"] = "Also, you've used "+runsUsed+"/"+runsPossible+" of available freeruns"+limitBreak;
+    }
+
+    return output;
+
+    // string txtclr = "";
+    // // if    ( fam.index_of("Stomping") > -1 ) {
+    // //     txtclr = (get_property_boolean("bootsCharged"))?"blue":"black";
+    // // }
+    // if    ( currentDrops == limit ) { txtclr = "gray"; }
+
+}
+
+void SFamiliarDropsGenerateResource(ChecklistEntry [int] resource_entries)
+{
+    // New 2026 tile enumerating the TES Crown of Thrones thing into a general famdrop helper
+    ChecklistEntry entry;
+
+    entry.url = "familiar.php";
+    entry.image_lookup_name = "__item Familiar-Gro&trade; Terrarium"; // TODO: pick better image lol
+    entry.tags.id = "Familiar Drops Megatile";
+    entry.importance_level = 8;
+	entry.should_indent_after_first_subentry = true;
+	entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("★ Familiar Drops Available ★","#165e61"),"","Consider these familiars for useful drops!<br>"));
+
+    // entry.title = HTMLGenerateSpanFont("Collected Familiar Drops");
+
+    string [int] description;
+    string [int] completedDrops;
+    string [string] tileComponents;
+
+    foreach i, famDropRecord in __fam_drops {
+        // if (true) { // used to test tile display
+        if (famDropRecord.haveFam) {
+            tileComponents = dropFamTile(famDropRecord);
+            if (tileComponents["title"] == "" && tileComponents["limitLine"] != "") {
+                completedDrops.listAppend(tileComponents["limitLine"]);
+            }
+            if (tileComponents["title"] != "") {
+                // entry.image_lookup_name = "__ familiar "+famDropRecord.fam.to_string();
+                entry.subentries.listAppend(ChecklistSubentryMake(tileComponents["title"], tileComponents["subtitle"], tileComponents["desc"]));
+            }
+        }
+    }
+
+    if (entry.subentries.count() > 1)
+        resource_entries.listAppend(entry);
+
+}
 
 
 void SetsInit()
@@ -34499,6 +35165,7 @@ void SetsInit()
 void SetsGenerateResources(ChecklistEntry [int] resource_entries)
 {
 	SFamiliarsGenerateResource(resource_entries);
+	SFamiliarDropsGenerateResource(resource_entries);
 	SSkillsGenerateResource(resource_entries);
 	SMiscItemsGenerateResource(resource_entries);
 	SCopiedMonstersGenerateResource(resource_entries);
@@ -35806,13 +36473,13 @@ void setUpState()
     }
 	
 	__misc_state["can eat just about anything"] = true;
-	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_ZOMBIE_SLAYER || fullness_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_GELATINOUS_NOOB)
+	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_ZOMBIE_SLAYER || fullness_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_GELATINOUS_NOOB || my_path().id == PATH_MEAT)
 	{
 		__misc_state["can eat just about anything"] = false;
 	}
 	
 	__misc_state["can drink just about anything"] = true;
-	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_KOLHS || my_path().id == PATH_LICENSE_TO_ADVENTURE || inebriety_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT)
+	if (my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_KOLHS || my_path().id == PATH_LICENSE_TO_ADVENTURE || inebriety_limit() == 0 || my_path().id == PATH_VAMPIRE || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_MEAT)
 	{
 		__misc_state["can drink just about anything"] = false;
 	}
@@ -36185,7 +36852,7 @@ void setUpState()
 	//wand
 	
 	boolean wand_of_nagamar_needed = true;
-	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_FALL_OF_THE_DINOSAURS || my_path().id == PATH_AVATAR_OF_SHADOWS_OVER_LOATHING || my_path().id == PATH_WEREPROFESSOR)
+	if (my_path().id == PATH_AVATAR_OF_BORIS || my_path().id == PATH_AVATAR_OF_JARLSBERG || my_path().id == PATH_AVATAR_OF_SNEAKY_PETE || my_path().id == PATH_BUGBEAR_INVASION || my_path().id == PATH_ZOMBIE_SLAYER || my_path().id == PATH_KOLHS || my_path().id == PATH_HEAVY_RAINS || my_path().id == PATH_ACTUALLY_ED_THE_UNDYING || my_path().id == PATH_COMMUNITY_SERVICE || my_path().id == PATH_THE_SOURCE || my_path().id == PATH_LICENSE_TO_ADVENTURE || my_path().id == PATH_POCKET_FAMILIARS || my_path().id == PATH_VAMPIRE || my_path().id == PATH_GREY_GOO || my_path().id == PATH_YOU_ROBOT || my_path().id == PATH_FALL_OF_THE_DINOSAURS || my_path().id == PATH_AVATAR_OF_SHADOWS_OVER_LOATHING || my_path().id == PATH_WEREPROFESSOR || my_path().id == PATH_SEA || my_path().id == PATH_MEAT)
 		wand_of_nagamar_needed = false;
 		
 	int ruby_w_needed = 1;
@@ -38181,7 +38848,7 @@ void generateDailyResources(Checklist [int] checklists)
     }
 
     //Not sure how I feel about this. It's kind of extraneous?
-    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_G_LOVER && my_path().id != PATH_WEREPROFESSOR) {
+    if (get_property_int("telescopeUpgrades") > 0 && !get_property_boolean("telescopeLookedHigh") && __misc_state["in run"] && my_path().id != PATH_ACTUALLY_ED_THE_UNDYING && !in_bad_moon() && my_path().id != PATH_NUCLEAR_AUTUMN && my_path().id != PATH_G_LOVER && my_path().id != PATH_WEREPROFESSOR && my_path().id != PATH_MEAT) {
         string [int] description;
         int percentage = 5 * get_property_int("telescopeUpgrades");
         description.listAppend("+" + (percentage == 25 ? "35% or +25" : percentage) + "% to all attributes. (10 turns)");
@@ -38997,7 +39664,7 @@ string generateRandomMessage()
             random_messages.listAppend("a single perfect day");
             break;
         case PATH_POCKET_FAMILIARS:
-        	random_messages.listAppend("adorable slaves");
+        	random_messages.listAppend("adorable servants");
             break;
         case PATH_G_LOVER:
             random_messages.listAppend("get going, guuuurl");
@@ -39010,6 +39677,41 @@ string generateRandomMessage()
             random_messages.listAppend("what happened to my inventory?"); break;
         case PATH_EXPLOSIONS:
             random_messages.listAppend("kaboooooom"); break;
+        case PATH_OF_THE_PLUMBER:
+            random_messages.listAppend("it'sa me, tourguido"); break;
+        case PATH_LOW_KEY_SUMMER:
+            random_messages.listAppend("the key is that you find keys"); break;
+        case PATH_GREY_GOO:
+            random_messages.listAppend("gooooooooo"); break;
+        case PATH_YOU_ROBOT:
+            random_messages.listAppend("beep boop beep boop"); break;
+        case PATH_QUANTUM_TERRARIUM:
+            random_messages.listAppend("go watch quantum leap"); break;
+        case PATH_WILDFIRE:
+            random_messages.listAppend("aaaaa!! everything's on "+HTMLGenerateSpanFont("fire", "red")+"!!"); break;
+        case PATH_GREY_YOU:
+            random_messages.listAppend("are you manual, or straight gloopin'?"); break;
+        case PATH_JOURNEYMAN:
+            random_messages.listAppend("it's all part of the journey, man"); break;
+        case PATH_FALL_OF_THE_DINOSAURS:
+            random_messages.listAppend("autumn of the chickens just didn't have the same zip"); break;
+        case PATH_AVATAR_OF_SHADOWS_OVER_LOATHING:
+            random_messages.listAppend("enter the shadow realm"); break;
+        case PATH_LEGACY_OF_LOATHING:
+            random_messages.listAppend("100% jill ascension when"); break;
+        case PATH_WEREPROFESSOR:
+            random_messages.listAppend("what to were, what to were"); break;
+        case PATH_11_THINGS:
+            random_messages.listAppend("ridiculous path. not even funny."); break;
+        case PATH_BODYGUARD:
+            random_messages.listAppend("wanna fight?!??!?"); break;
+        case PATH_HAT_TRICK:
+            random_messages.listAppend("hat got your tongue?"); break;
+        case PATH_SEA:
+            random_messages.listAppend("gurgle gurgle gurgle"); break;
+        case PATH_MEAT:
+            random_messages.listAppend("to quote Doc Rivers, don't play with your meat"); break;
+        
         /*case PATH_CLASS_ACT_3:
             random_messages.listAppend("buttons for the people"); break;
         case PATH_AVATAR_OF_THE_NAUGHTY_SORCERESS:
@@ -39018,6 +39720,26 @@ string generateRandomMessage()
     
     if (in_ronin() && my_adventures() <= 3)
     	random_messages.listAppend("always tomorrow");
+
+    if (my_path().id == PATH_SMOL) {
+        // just adding all the quotes i remember from the mcelroy amelie sketch
+        random_messages.listAppend("cook an egg with a spoon, it's amelie!"); 
+        random_messages.listAppend("fall in love again with me, amelie!");
+        random_messages.listAppend("too small to fit on the blu-ray, they lose me");
+        random_messages.listAppend("this laserdisc is gigantique"); 
+        random_messages.listAppend("a plate for my egg dinner"); 
+        random_messages.listAppend("spin around inside a VHS tape"); 
+        random_messages.listAppend("amelie?"); 
+    }
+
+    if (my_path().id == PATH_ZOOT) {
+        // just adding godric the grafted quotes nbd
+        random_messages.listAppend("lend me thy strength, o kindred"); 
+        random_messages.listAppend("a lowly tarnished..."); 
+        random_messages.listAppend("turns himself into a pickle, he's called pickle godrick"); 
+        random_messages.listAppend("playing as a Lorde, specifically on Royals"); 
+        random_messages.listAppend("deliver me unto greater heights"); 
+    }
     
     random_messages.listAppend("I don't know either, sorry");
     
@@ -39413,8 +40135,10 @@ string generateRandomMessage()
                 random_messages.listAppend(lowercase_player_name + "! now is not the time to use that!"); break;
             case PATH_G_LOVER:
                 random_messages.listAppend("the Gs will continue until morale improves"); break;
-            case 46: // Fall of the Dinosaurs
+            case PATH_FALL_OF_THE_DINOSAURS: // Fall of the Dinosaurs
                 random_messages.listAppend("watch out for velociraptors"); break;
+            case PATH_ZOOT:
+                random_messages.listAppend("thou'rt unfit even to graft..."); break;
             default:
                 random_messages.listAppend("ow"); break;
         }
@@ -39451,7 +40175,7 @@ string generateRandomMessage()
     
     // Adding a few Legacy of Loathing replica messages
 
-    if (my_path() == $path[Legacy of Loathing])
+    if (my_path().id == PATH_LEGACY_OF_LOATHING)
     {
         random_messages.listAppend("make sure you get your hand turkey");
         random_messages.listAppend("hot legacy summer");
@@ -44803,7 +45527,7 @@ void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
         }
         if    ( currentDrops == limit ) { txtclr = "gray"; }
         
-        description.listAppend(HTMLGenerateSpanFont(fam+": "+currentDrops + "/"+limit+" "+dropdesc+".", txtclr));
+        description.listAppend("|*"+HTMLGenerateSpanFont(fam+": "+currentDrops + "/"+limit+" "+dropdesc+".", txtclr));
         return;
     }
     
@@ -44817,26 +45541,6 @@ void IOTMCOTGenerateResource(ChecklistEntry [int] resource_entries)
 	addFamiliarDropsLine("Puck Man", "_yellowPixelDropsCrown", 25, "yellow pixels");
 	addFamiliarDropsLine("Trick-or-Treating Tot", "_hoardedCandyDropsCrown", 3, "hoarded candy wads");
 	
-    description.listAppend(HTMLGenerateSpanFont("General familiar drops", "purple"));
-    addFamiliarDropsLine("Adventurous Spelunker", "_spelunkingTalesDrops", 1, "Tales of Spelunking");
-	addFamiliarDropsLine("Astral Badger", "_astralDrops", 5, "astral mushrooms");
-	addFamiliarDropsLine("Baby Sandworm", "_aguaDrops", 5, "Agua de Vidae");
-	addFamiliarDropsLine("Blavious Kloop", "_kloopDrops", 5, "devlish folios");
-	addFamiliarDropsLine("Bloovian Groose", "_grooseDrops", 5, "groose grease");
-	addFamiliarDropsLine("Cat Burglar", "_catBurglarCharge", 30, "Heist charges");
-	#addFamiliarDropsLine("Cookbookbat", "_turkeyBooze", 5, "Turkey booze");
-	addFamiliarDropsLine("Fist Turkey", "_turkeyBooze", 5, "Turkey booze");
-	addFamiliarDropsLine("Galloping Grill", "_hotAshesDrops", 5, "hot ashes");
-    addFamiliarDropsLine("Golden Monkey", "_powderedGoldDrops", 5, "powdered gold");
-    addFamiliarDropsLine("Green Pixie", "_absintheDrops", 5, "bottles of absinthe");
-	addFamiliarDropsLine("Grim Brother", "_grimFairyTaleDrops", 5, "grim fairy tales");
-	addFamiliarDropsLine("Li'l Xenomorph", "_transponderDrops", 5, "transponders");
-	addFamiliarDropsLine("Llama Lama", "_gongDrops", 5, "Llama gongs");
-	addFamiliarDropsLine("Puck Man", "_powerPillDrops", 11, "power pills");
-    addFamiliarDropsLine("Ms. Puck Man", "_powerPillDrops", 11, "power pills");
-    addFamiliarDropsLine("Rogue Program", "_tokenDrops", 5, "GG tokens");
-    addFamiliarDropsLine("Stomping Boots", "_pasteDrops", 7, "spleen pastes");
-    addFamiliarDropsLine("Unconscious Collective", "_dreamJarDrops", 5, "dream jars");
     item crown_item = $item[crown of thrones];
     if (crown_item.equipped_amount() == 0 && $item[Buddy Bjorn].available_amount() > 0)
         crown_item = $item[Buddy Bjorn];
@@ -46972,13 +47676,15 @@ void IOTMDeckOfEveryCardGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterResourceGenerationFunction("IOTMHauntedDoghouseGenerateResource");
 void IOTMHauntedDoghouseGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if (!__misc_state["in run"])
-        return;
-    if ($item[tennis ball].available_amount() > 0 && in_ronin() && $item[tennis ball].item_is_usable())
+    // No need for an in-run quash on this one.
+    // if (!__misc_state["in run"])
+    //     return;
+    if ($item[tennis ball].available_amount() > 0 && $item[tennis ball].item_is_usable())
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item tennis ball", "", ChecklistSubentryMake(pluralise($item[tennis ball]), "", "Free run/banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Haunted doghouse banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item tennis ball", "", ChecklistSubentryMake(pluralise($item[tennis ball]), "", "Free run, 30-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Haunted doghouse banish"));
     }
     //I, um, hmm. I guess there's not much to say. Poor lonely file, nearly empty.
+    //... right??? Smallest file! 
 }
 
 
@@ -49272,13 +49978,13 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
     if (get_property_int("_kgbTranquilizerDartUses") < 3 && my_path().id != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
-        description.listAppend("Free run, 20-turn banish.|Use the KGB tranquilizer dart skill in-combat.");
+        description.listAppend("Free run, 20-turn banish.");
         if (lookupItem("kremlin's greatest briefcase").equipped_amount() == 0)
         {
-		    description.listAppend(HTMLGenerateSpanFont("Equip the briefcase first!", "red"));
+		    description.listAppend(HTMLGenerateSpanFont("Equip the briefcase first", "red"));
             entry.url = "inventory.php?ftext=kremlin";
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item Kremlin's Greatest Briefcase", entry.url, ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "briefcase dart", "briefcase darts"), "", description),0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Kremlin Briefcase tranq dart banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Kremlin's Greatest Briefcase", entry.url, ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "KGB tranquilizer dart", "KGB tranquilizer darts"), "", description),0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Kremlin Briefcase tranq dart banish"));
     }
     int clicks_remaining = clampi(22 - get_property_int("_kgbClicksUsed"), 0, 22);
     if (!mafiaIsPastRevision(18110))
@@ -49578,9 +50284,10 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
         13:5,
         14:5,
     };
-    //FIXME spade rest
-    
-    if (__misc_state["in run"] && spleen_limit() > 0)
+    // FIXME spade rest
+    // Removed the "in run" flag
+
+    if (spleen_limit() > 0)
     {
         /*
         hot - free run/banish
@@ -49589,10 +50296,6 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
         
         The other two aren't too useful in-run.
         */
-        if (get_property_int("_hotJellyUses") > 0)
-        {
-            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise(get_property_int("_hotJellyUses"), "breathe out", "breathe outs"), "", "Cast Breathe Out. Free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Space jellyfish breathe out banish"));
-        }
         
         string [item] jelly_descriptions;
         //jelly_descriptions[$item[hot jelly]] = "Free run/banish.";
@@ -49606,11 +50309,15 @@ void IOTMSpaceJellyfishGenerateResource(ChecklistEntry [int] resource_entries)
             }
         }
         
+        // Call out that they can eat it IIF they have toast available.
+        string toastString = $item[toast].available_amount() > 0 ? "/eat" : "";
+        
+        if (get_property_int("_hotJellyUses") > 0)
+            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise(get_property_int("_hotJellyUses"), "breathe out", "breathe outs"), "", "Free run, 20-turn banish."),0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Space jellyfish breathe out banish"));
+        
         if ($item[hot jelly].available_amount() > 0 && in_ronin())
-            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise($item[hot jelly]), "", "Chew for free run/banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Space jellyfish hot jelly banish"));
-        
-        
-        
+            resource_entries.listAppend(ChecklistEntryMake("__item hot jelly", "", ChecklistSubentryMake(pluralise($item[hot jelly]), "", "Free run, 20-turn banish (if you chew"+toastString+" it)."),0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Space jellyfish hot jelly banish"));
+
         int extractions = get_property_int("_spaceJellyfishDrops");
         string [int] description;
         string line = "Extract jelly against elemental monsters.";
@@ -49747,7 +50454,7 @@ RegisterResourceGenerationFunction("IOTMTunnelOfLoveGenerateResource");
 void IOTMTunnelOfLoveGenerateResource(ChecklistEntry [int] resource_entries)
 {
     
-    if (!get_property_boolean("_loveTunnelUsed")) {
+    if (!get_property_boolean("_loveTunnelUsed") && __iotms_usable[lookupItem("heart-shaped crate")]) {
         resource_entries.listAppend(ChecklistEntryMake("__item pink candy heart", "place.php?whichplace=town_wrong", ChecklistSubentryMake("3 free L.O.V. dudes", "", "Free fights and useful items/buffs."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Love tunnel free fights"));
     }
 
@@ -50529,12 +51236,12 @@ void IOTMLatteGenerateResource(ChecklistEntry [int] resource_entries)
 
         if (banish_used) {
             banish_url = "main.php?latte=1";
-            description.listAppend(HTMLGenerateSpanFont("Must refill latte first.", "red"));
+            description.listAppend(HTMLGenerateSpanFont("Refill latte first!.", "red"));
         } else if (latte_needs_equipping) {
             banish_url = "inventory.php?which=3";
-            description.listAppend(HTMLGenerateSpanFont("Equip the latte first", "red"));
+            description.listAppend(HTMLGenerateSpanFont("Equip latte first!", "red"));
         } else {
-            description.listAppend("Free run/banish");
+            description.listAppend("Free run, 30-turn banish.");
         }
 
         resource_entries.listAppend(ChecklistEntryMake("__item latte lovers member's mug", banish_url, ChecklistSubentryMake(pluralise(banishes_available, "latte banish", "latte banishes"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Latte lovers mug throw banish"));
@@ -50910,12 +51617,13 @@ void IOTMLilDoctorBagGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string url;
         string [int] description;
+        description.listAppend("Free run, 30-turn banish.");
+        
         if (lookupItem("Lil' Doctor&trade; bag").equipped_amount() == 0) {
             description.listAppend(HTMLGenerateSpanFont("Equip the Lil' Doctor™ bag first", "red"));
             url = "inventory.php?ftext=lil'+doctor";
-        } else {
-            description.listAppend("Free run, 30-turn banish.");
-        }
+        } 
+        
         resource_entries.listAppend(ChecklistEntryMake("__item Lil' Doctor&trade; bag", url, ChecklistSubentryMake(pluralise(banishes_left, "reflex hammer", "reflex hammers"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Lil doctor bag reflex hammer banish"));
     }
 }
@@ -51011,9 +51719,9 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
             if (sabersEquipped == 0)
                 description.listAppend(HTMLGenerateSpanFont("Equip the Fourth of May saber first", "red"));
             else
-                description.listAppend("Rollover runaway-like/banish");
+                description.listAppend("Free runaway, 30-turn banish. (Does <b>not</b> burn delay.)");
 
-            resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", "inventory.php?which=2", ChecklistSubentryMake("(up to) " + uses_remaining.pluralise("force banish", "forces banishes"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Fourth may saber force banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", "inventory.php?which=2", ChecklistSubentryMake("(up to) " + uses_remaining.pluralise("force banish", "force banishes"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Fourth may saber force banish"));
         }
     }
 }
@@ -52939,6 +53647,7 @@ void IOTMEmotionChipGenerateResource(ChecklistEntry [int] resource_entries)
 	ChecklistEntry entry;
     entry.image_lookup_name = "__item emotion chip";
     entry.tags.id = "emotion chip resource";
+    entry.importance_level = 5;
 
     ChecklistSubentry emotions = getEmotions();
     if (emotions.entries.count() > 0) {
@@ -53065,6 +53774,7 @@ void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries
 {
 	// Title
 	string main_title = "Familiar scraps";
+	string subtitle;
 	string [int] description;
 
 	// Entries
@@ -53073,19 +53783,20 @@ void IOTMFamiliarScrapbookGenerateResource(ChecklistEntry [int] resource_entries
 	
 	if (available_amount($item[familiar scrapbook]) > 0) {
 		if (familiar_scraps < 100) {
-			description.listAppend(familiar_scraps + " /100 scraps until a banish is available.");
+			subtitle = familiar_scraps + " /100 scraps until next banish";
 		}
 		else
 		{
-			description.listAppend("Free run, 100-turn banish for 100 scraps.|"+familiar_scraps + " scraps collected.");
+			description.listAppend("Free run, 100-turn banish for 100 scraps.");
+			if (!have_equipped($item[familiar scrapbook]))
+				description.listAppend(HTMLGenerateSpanFont("Equip the familiar scrapbook first", "red"));
+
 		}
 
-		description.listAppend("Charge up your familiar scrapbook by letting familiars act in combat.");
-		if (!have_equipped($item[familiar scrapbook]))
-			description.listAppend(HTMLGenerateSpanFont("Equip the familiar scrapbook first", "red"));
+		// description.listAppend("Charge up your familiar scrapbook by letting familiars act in combat.");
 		
 		string url = invSearch("familiar scrapbook");
-		resource_entries.listAppend(ChecklistEntryMake("__item familiar scrapbook", url, ChecklistSubentryMake(familiar_scraps / 100 + " scrapbook banishes available", "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Familiar scrapbook boring pictures banish"));
+		resource_entries.listAppend(ChecklistEntryMake("__item familiar scrapbook", url, ChecklistSubentryMake(familiar_scraps / 100 + " scrapbook banishes available", subtitle, description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Familiar scrapbook boring pictures banish"));
 	}
 }
 
@@ -53169,7 +53880,7 @@ void IOTMFireExtinguisherGenerateResource(ChecklistEntry [int] resource_entries)
 	// Entries
 	int extinguisher_charge = get_property_int("_fireExtinguisherCharge");
 	boolean extinguisher_refill = get_property_boolean("_fireExtinguisherRefilled");
-	boolean is_on_fire = my_path().id == 43; // Path 43 is Wildfire.
+	boolean is_on_fire = my_path().id == PATH_WILDFIRE; // Path 43 is Wildfire.
 
 	string url = "inventory.php?ftext=industrial+fire+extinguisher";
 	description.listAppend("Extinguish the fires in your life!");
@@ -53731,7 +54442,7 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 		description.listAppend("Hit a strike! Knock the competition down a pin with your hole-y ball.");
 		description.listAppend("Give yourself an item/meat buff, gain stats in a zone, or banish for the next " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " combats.");
 		
-		resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", "", ChecklistSubentryMake("Bowl a Curveball with your Cosmic Bowling Ball", "", "Has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration and cooldown."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball banish"));
+		resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", "", ChecklistSubentryMake("1 Cosmic Bowling Ball banish", "cast Bowl a Curveball", "Free run, " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + "-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball banish"));
 		resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball use available", "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 	}
 	if (bowlingCooldown > -1)
@@ -53740,21 +54451,21 @@ void IOTMCosmicBowlingBallGenerateResource(ChecklistEntry [int] resource_entries
 		string [int] description;
 		Banish banish_entry = BanishByName("Bowl a Curveball");
 		int turns_left_of_banish = banish_entry.BanishTurnsLeft();
-		if (turns_left_of_banish > 0)
-		{
-			description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
-		}
+		// if (turns_left_of_banish > 0)
+		// {
+		// 	description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
+		// }
 		if (bowlingCooldown == 1)
 		{
 			description.listAppend(HTMLGenerateSpanFont("You can bowl again next turn!", "blue"));
-			description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");
-			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), -11).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
+			description.listAppend("Free run, " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + "-turn banish.");
+			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake("Cosmic bowling ball returns next combat", "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 		}
 		else
 		{	
-			description.listAppend("Bowling ball in the sky with your diamonds.");
-			description.listAppend("Next use has " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + " duration.");  
+			// description.listAppend("Bowling ball in the sky with your diamonds.");
+			description.listAppend("Free run, " + HTMLGenerateSpanOfClass(bowlingCooldown2, "r_bold") + "-turn banish.");  
 			resource_entries.listAppend(ChecklistEntryMake("__item cosmic bowling ball", url, ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 			resource_entries.listAppend(ChecklistEntryMake("__effect trash-wrapped", url, ChecklistSubentryMake(main_title, "", description)).ChecklistEntrySetCombinationTag("special").ChecklistEntrySetIDTag("Cosmic bowling ball skills"));
 		}
@@ -55202,25 +55913,25 @@ void IOTMClosedCircuitPayPhoneGenerateTasks(ChecklistEntry [int] task_entries, C
     }
 }
 
-void showShadowBrickFreeKills(ChecklistEntry [int] resource_entries) {
-    int shadowBricks = available_amount($item[shadow brick]);
-    int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
-    if ($item[shadow brick].available_amount() > 0) {
-        string header = $item[shadow brick].pluralise().capitaliseFirstLetter();
-        if (shadowBrickUsesLeft < shadowBricks) {
-            if (shadowBrickUsesLeft == 0)
-                header += " (not usable today)";
-            else
-                header += " (" + shadowBrickUsesLeft + " usable today)";
-        }
-        resource_entries.listAppend(ChecklistEntryMake("__item shadow brick", "", ChecklistSubentryMake(header, "", "Win a fight without taking a turn.")).ChecklistEntrySetCombinationTag("free instakill"));
-    }
-}
+// void showShadowBrickFreeKills(ChecklistEntry [int] resource_entries) {
+//     int shadowBricks = available_amount($item[shadow brick]);
+//     int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
+//     if ($item[shadow brick].available_amount() > 0) {
+//         string header = $item[shadow brick].pluralise().capitaliseFirstLetter();
+//         if (shadowBrickUsesLeft < shadowBricks) {
+//             if (shadowBrickUsesLeft == 0)
+//                 header += " (not usable today)";
+//             else
+//                 header += " (" + shadowBrickUsesLeft + " usable today)";
+//         }
+//         resource_entries.listAppend(ChecklistEntryMake("__item shadow brick", "", ChecklistSubentryMake(header, "", "Win a fight without taking a turn.")).ChecklistEntrySetCombinationTag("free instakill"));
+//     }
+// }
 
 RegisterResourceGenerationFunction("IOTMClosedCircuitPayPhoneGenerateResource");
 void IOTMClosedCircuitPayPhoneGenerateResource(ChecklistEntry [int] resource_entries) {
     // Shadow bricks don't depend on having the IOTM
-    showShadowBrickFreeKills(resource_entries);
+    // showShadowBrickFreeKills(resource_entries);
 
     if (!lookupItem("closed-circuit pay phone").have())
         return;
@@ -55637,11 +56348,12 @@ void IOTMCursedMonkeysPawGenerateResource(ChecklistEntry [int] resource_entries)
         string [int] description;
         string url;
         url = "main.php";
-        description.listAppend("Turn-taking repeat-use banish. Lasts until you use it again!");
+        description.listAppend("Turn-taking item-destroying kill, all-day banish.");
         if ($item[cursed monkey's paw].equipped_amount() == 0) {
-            description.listAppend("Equip your cursed monkey paw first.");
+		    description.listAppend(HTMLGenerateSpanFont("Equip the Monkey's Paw first", "red"));
             url = "inventory.php?ftext=cursed+monkey";
         }
+
         resource_entries.listAppend(ChecklistEntryMake("__skill monkey slap", "", ChecklistSubentryMake("Monkey Slap usable", "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Cursed monkey paw banish"));
     }
 }
@@ -55798,7 +56510,7 @@ void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
     description.listAppend("Spend credits on prehistoric IotMs!");
 		
 		string [int] options;
-		if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE)
+		if (my_path().id != PATH_COMMUNITY_SERVICE)
 		{
         	if ($item[Flash Liquidizer Ultra Dousing Accessory].available_amount() == 0)
             {
@@ -57073,10 +57785,25 @@ void IOTMChestMimicGenerateResource(ChecklistEntry [int] resource_entries)
 	description.listAppend(`Can lay {HTMLGenerateSpanOfClass(mimicEggsLeft, "r_bold")} more eggs today.`);
 
 	resource_entries.listAppend(ChecklistEntryMake("__familiar chest mimic", url, ChecklistSubentryMake("Chest mimic fxp", "", description), -2));
+
+	// Nice little tile to show what you've got in your mimic eggs
 	if ($item[mimic egg].available_amount() > 0) {
-		string header = $item[mimic egg].pluralise().capitaliseFirstLetter();
-		string url = `inv_use.php?pwd={my_hash()}&whichitem=11542`;
-		resource_entries.listAppend(ChecklistEntryMake("__item mimic egg", url, ChecklistSubentryMake(header, "", "Fight some copies"), -1).ChecklistEntrySetCombinationTag("fax and copies"));
+		// Make sure the property is actually enumerated, might have an old mafia?
+		if (get_property("mimicEggMonsters") != "") {
+			string [int] eggEntries;
+			foreach key,entry in get_property("mimicEggMonsters").split_string(",") {
+				monster currMon = entry.split_string(":")[0].to_monster();
+				int currAmt = entry.split_string(":")[1].to_int();
+				string freeText = currMon.attributes.contains_text("FREE") ? " (free fight)" : "";
+				eggEntries.listAppend(pluralise(currAmt, currMon+" egg", currMon+" eggs")+freeText);
+			}
+
+			string header = $item[mimic egg].pluralise().capitaliseFirstLetter();
+			string url = `inv_use.php?pwd={my_hash()}&whichitem=11542`;
+			string [int] description;
+			description.listAppend("Fight some copies. Currently have: |*"+eggEntries.listJoinComponents("|*"));
+			resource_entries.listAppend(ChecklistEntryMake("__item mimic egg", url, ChecklistSubentryMake(header, "", description), -1).ChecklistEntrySetCombinationTag("fax and copies"));
+		}
 	}
 }
 
@@ -57120,12 +57847,12 @@ void IOTMSpringShoesGenerateResource(ChecklistEntry [int] resource_entries)
 	if (!__iotms_usable[lookupItem("spring shoes")]) return;
 
 	string [int] banishDescription;
-	banishDescription.listAppend("All day banish, doesn't end combat");
+	banishDescription.listAppend("Mid-combat, all-day banish.");
 	if (lookupItem("spring shoes").equipped_amount() == 0)
 	{
-		banishDescription.listAppend(HTMLGenerateSpanFont("Equip the spring shoes first.", "red"));
+		banishDescription.listAppend(HTMLGenerateSpanFont("Equip the spring shoes first", "red"));
 	}
-	resource_entries.listAppend(ChecklistEntryMake("__skill spring shoes", "", ChecklistSubentryMake("Spring Kick", "", banishDescription), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Spring shoes spring kick banish"));
+	resource_entries.listAppend(ChecklistEntryMake("__skill spring shoes", "still gotta kill the monster!", ChecklistSubentryMake("Spring Kick", "", banishDescription), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Spring shoes spring kick banish"));
 }
 //Everfull Dart Holster via TES
 RegisterTaskGenerationFunction("IOTMEverfullDartsGenerateTasks");
@@ -57134,7 +57861,7 @@ void IOTMEverfullDartsGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     if (!__iotms_usable[$item[everfull dart holster]]) return;
 
     string [int] description;
-    string url = "inventory.php?ftext=everfull+dart_holster";
+    string url = "inventory.php?ftext=everfull+dart+holster";
 
     if ($effect[everything looks red].have_effect() == 0)  {
         int dartCooldown = 50;
@@ -57275,7 +58002,7 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
     // Adding this prior to the check if the user has stinkbombs.
     if ($item[stuffed yam stinkbomb].available_amount() > 0 )
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item stuffed yam stinkbomb", "", ChecklistSubentryMake(pluralise($item[stuffed yam stinkbomb]), "", "Free run/banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Haunted doghouse banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item stuffed yam stinkbomb", "", ChecklistSubentryMake(pluralise($item[stuffed yam stinkbomb]), "", "Free run, 15-turn banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Mayam stinkbomb banish"));
     }
 
     if (available_amount($item[mayam calendar]) < 1)
@@ -57431,7 +58158,7 @@ void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
 
 	description.listAppend(`At {to_int(kiwiWeight)} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
 
-    if (!kiwiSpiritsBought) {
+    if (!kiwiSpiritsBought && __misc_state["can drink just about anything"]) {
         description.listAppend('|*Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
     }
 
@@ -57498,6 +58225,11 @@ void IOTMSeptemberCenserGenerateResource(ChecklistEntry [int] resource_entries)
     int hunkCount = $item[embering hunk].available_amount();
     boolean hulkFought = get_property_boolean("_emberingHulkFought");
     boolean structureUsed = get_property_boolean("_structuralEmberUsed");
+    boolean canUseMouthwash = true;
+
+    if (my_path().id == PATH_GREY_YOU) canUseMouthwash = false;
+    if (my_path().id == PATH_ZOOTOMIST) canUseMouthwash = false;
+    if (my_path().id == PATH_MEAT) canUseMouthwash = false;
 
     if (septEmbers > 0)
     {
@@ -57505,7 +58237,8 @@ void IOTMSeptemberCenserGenerateResource(ChecklistEntry [int] resource_entries)
     }
 
     description.listAppend(`|*1 embers: +5 cold res accessory (You have {HTMLGenerateSpanFont(bembershootCount, "red")})`);
-    description.listAppend(`|*2 embers: mmm-brr! mouthwash for {HTMLGenerateSpanFont(mainstatGain, "blue")} mainstat. (You have {HTMLGenerateSpanFont(mouthwashCount, "red")})`);
+    if (canUseMouthwash)
+        description.listAppend(`|*2 embers: mmm-brr! mouthwash for {HTMLGenerateSpanFont(mainstatGain, "blue")} mainstat. (You have {HTMLGenerateSpanFont(mouthwashCount, "red")})`);
 
     if (structureUsed) {
         description.listAppend((HTMLGenerateSpanFont("|*Already used structural ember today", "blue")));
@@ -57536,6 +58269,10 @@ void MmmBrrMouthwashGenerateTask(ChecklistEntry [int] task_entries, ChecklistEnt
     // Check a few things. Don't need this tile over level 11.
     int mouthwashCount = $item[Mmm-brr! brand mouthwash].available_amount();
     boolean doNotNeedToLevel = my_level() > 11;
+
+    if (my_path().id == PATH_GREY_YOU) return;
+    if (my_path().id == PATH_ZOOTOMIST) return;
+    if (my_path().id == PATH_MEAT) return;
 
     if (mouthwashCount == 0 || doNotNeedToLevel) return;
 
@@ -57657,6 +58394,19 @@ void IOTMBatWingsGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 
 	resource_entries.listAppend(ChecklistEntryMake("__item bat wings", url, ChecklistSubentryMake("Bat Wings functions", "", description), 8));
+
+	// Adding a free fight combo tile.
+    if (batWingFreeFlapsLeft > 0) {
+        string header = pluralise(batWingFreeFlapsLeft, "free Bat Wing flap","free Bat Wing flaps");
+		string [int] description;
+		float procRate = 100/(2+get_property_int("_batWingsFreeFights"));
+		description.listAppend("Will (unpredictably!) turn fights free. Currently "+to_string(round(procRate,1))+"% chance for a flap.");
+		if (lookupItem("bat wings").equipped_amount() == 0) {
+			description.listAppend(HTMLGenerateSpanFont("Equip your Bat Wings to flap","red"));
+		}
+        resource_entries.listAppend(ChecklistEntryMake("__item bat wings", "", ChecklistSubentryMake(header, "", description)).ChecklistEntrySetCombinationTag("free instakill"));
+    }
+
 }
 
 // Clan VIP Photo booth
@@ -57708,7 +58458,8 @@ void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries)
 
 	// Purkey Title
     int turkeyProc = 24;
-	turkeyProc = 24 + square_root(effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
+	float turkeyWeight = max(0.0, effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
+	turkeyProc = 24 + square_root(turkeyWeight);
 	
 	int PeasCount = available_amount($item[whirled peas]);
 	int PeaSoupCount = available_amount($item[handful of split pea soup]);
@@ -57721,7 +58472,7 @@ void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 	if ($item[handful of split pea soup].available_amount() > 0 )
     {
-        resource_entries.listAppend(ChecklistEntryMake("__item handful of split pea soup", "", ChecklistSubentryMake(pluralise($item[handful of split pea soup]), "", "Free run/banish. Also have " + PeasCount + " peas."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item handful of split pea soup", "", ChecklistSubentryMake(pluralise($item[handful of split pea soup]), "also, have " + PeasCount + " peas", "Free run, 30-turn banish. "), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
     }
 }
 
@@ -57771,7 +58522,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 {
 	if ($item[server room key].available_amount() < 1) return;
 	
-	int CyberFree = get_property_int("_cyberFreeFights");
+	int CyberFree = lookupSkill("OVERCLOCK(10)").have_skill() ? clampi(10 - get_property_int("_cyberFreeFights"), 0, 10) : 0;
 	int zone1Turns = get_property_int("_cyberZone1Turns");
 	int zone2Turns = get_property_int("_cyberZone2Turns");
 	int zone3Turns = get_property_int("_cyberZone3Turns");
@@ -57862,18 +58613,26 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 				
 		if (($locations[Cyberzone 1,Cyberzone 2,Cyberzone 3] contains __last_adventure_location))
 		{
-			description.listAppend(HTMLGenerateSpanFont("Have " + (10 - CyberFree) + " free fights left!", "green"));
+			description.listAppend(HTMLGenerateSpanFont("Have " + CyberFree + " free fights left!", "green"));
 			task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), -11));
 		}
 		else
 		{
-			if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
-				description.listAppend(HTMLGenerateSpanFont("Have " + (10 - CyberFree) + " free fights left!", "green"));
+			if (CyberFree > 0) {
+				description.listAppend(HTMLGenerateSpanFont("Have " + CyberFree + " free fights left!", "green"));
+				optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
+
 			}
 			else	{
+				// In the event the user doesn't have free fights remaining, you don't need to enumerate the whole tile in-run.
 				description.listAppend(HTMLGenerateSpanFont("No free fights left", "red"));
+				if (__misc_state["in run"]) {
+					optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", HTMLGenerateSpanFont("No free fights left!", "red")), 10));
+				}
+				else {
+					optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
+				}
 			}
-			optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
 		}
 }
 
@@ -57919,7 +58678,7 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	if (skiAvalanchesLeft > 0)
 	{
-		description.listAppend(HTMLGenerateSpanOfClass(skiSlashesLeft + " avalanches", "r_bold") + " left. Sneak!");
+		description.listAppend(HTMLGenerateSpanOfClass(skiAvalanchesLeft + " avalanches", "r_bold") + " left. Sneak!");
     //fixme: currently not supported by sneako tile
 		if (lookupItem("McHugeLarge left ski").equipped_amount() == 1)
 		{
@@ -57989,7 +58748,7 @@ void IOTMLeprecondoGenerateResource(ChecklistEntry [int] resource_entries)
 	int punchOutChanges = (get_property_int("preworkoutPowderUses"));
 	if (punchOutChanges > 0)
 	{
-		resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "", ChecklistSubentryMake(pluralise(get_property_int("preworkoutPowderUses"), "Condo Punch", "Condo Punches"), "", "Free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("condo punch banish"));
+		resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "", ChecklistSubentryMake("Punch Out your Foe "+pluralise(get_property_int("preworkoutPowderUses"), "time", "times"), "", "Free run, 20-turn banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("condo punch banish"));
 	}
 		
 	resource_entries.listAppend(ChecklistEntryMake("__item leprecondo", url, ChecklistSubentryMake("Leprecondo stuff", description), 11));
@@ -58011,6 +58770,7 @@ void IOTMAprilShowerThoughtsGenerateTasks(ChecklistEntry [int] task_entries, Che
 	{
 		string main_title = HTMLGenerateSpanFont("April Shower Powers", "black");
 		boolean showerNEYR = get_property_boolean("_aprilShowerNorthernExplosion"); 
+		if (!lookupSkill("Northern Explosion").have_skill()) showerNEYR = true;
 		if (showerNEYR == false) {
 			description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
 			task_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("april shower thoughts calendar tasks"));
@@ -58027,6 +58787,7 @@ void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entri
 	
 	string main_title = HTMLGenerateSpanFont("April Shower Powers", "black");
 	boolean showerNEYR = get_property_boolean("_aprilShowerNorthernExplosion"); 
+		if (!lookupSkill("Northern Explosion").have_skill()) showerNEYR = true;
 	if (showerNEYR == false) {
 		description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
 	}
@@ -58034,7 +58795,8 @@ void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entri
 	{
 		description.listAppend("Craft your shower thoughts, with your "+pluralise(globCount,"glob","globs")+"!");
 	}
-	resource_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", url, ChecklistSubentryMake(main_title, description), 10).ChecklistEntrySetIDTag("april shower thoughts calendar resource"));
+	if (description.count() > 0)
+		resource_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", url, ChecklistSubentryMake(main_title, description), 10).ChecklistEntrySetIDTag("april shower thoughts calendar resource"));
 }
 //peridot of peril
 RegisterTaskGenerationFunction("IOTMPeridotGenerateTasks");
@@ -58045,17 +58807,20 @@ void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	//   - not a tile addition, but add a peridot icon to location bar if you can use peridot in the zone
 
 	if (!__iotms_usable[lookupItem("Peridot of Peril")]) return;
+	boolean peridotEquipped = gemstoneEquipped(lookupItem("peridot of peril"));
 	string url = "inventory.php?ftext=peridot+of+peril";
 	string [int] description;
 	
-	if (lookupItem("peridot of peril").equipped_amount() == 1)
+	if (peridotEquipped)
 	{
 		description.listAppend(HTMLGenerateSpanFont("PERIDOT POWER!", "green"));
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 		string main_title = HTMLGenerateSpanFont("Peridot picking power", "green");
 		task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("peridot task"));
 	}
-	else if (lookupItem("peridot of peril").equipped_amount() == 0 && (__misc_state["in run"]))
+	else if (!peridotEquipped && (__misc_state["in run"]))
 	{
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 		description.listAppend(HTMLGenerateSpanFont("Equip the peridot to map monsters", "red"));
 		optional_task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake("Peridot picking power", description), 10).ChecklistEntrySetIDTag("peridot task"));
 	}
@@ -58102,7 +58867,7 @@ RegisterResourceGenerationFunction("IOTMPeridotGenerateResource");
 void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (!__iotms_usable[lookupItem("Peridot of Peril")]) return;
     
-	boolean peridotEquipped = lookupItem("peridot of peril").equipped_amount() > 0;
+	boolean peridotEquipped = gemstoneEquipped(lookupItem("peridot of peril"));
 	string [int] perilLocations = get_property("_perilLocations").split_string(",");
 
 	string title = "Use your Peridot of Peril";
@@ -58154,6 +58919,7 @@ void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (peridotPicks.count() == 0) return;
 
 	description.listAppend("Select relevant, available monsters!");
+	if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 	if (!peridotEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Peridot of Peril","red"));
 	description.listAppend("<hr>|*"+pp+peridotPicks.listJoinComponents("<hr>|*"+pp));
 
@@ -58161,19 +58927,64 @@ void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 
 }
 //prismatic beret
+
+// These are the only modifiers I care to give.
+string [string] modifierMapping;
+modifierMapping["Meat Drop"] = "% meat";
+modifierMapping["Item Drop"] = "% item";
+modifierMapping["Initiative"] = "% init";
+modifierMapping["Familiar Weight"] = " famwt";
+modifierMapping["Familiar Experience"] = " famxp";
+
+// Generate a string description of the buffs by cycling through above modifiers.
+string generateBuffDescription(effect currEffect) {
+	string output = "<b>"+currEffect.name+"</b>";
+	string [int] relevantMods;
+	int modLevel = 0;
+	foreach mod, shortmod in modifierMapping {
+		modLevel = numeric_modifier(currEffect, mod).to_int();
+		if (modLevel > 0) relevantMods.listAppend("+"+modLevel+shortmod);
+	}
+	if (relevantMods.count() > 0) output += ": "+listJoinComponents(relevantMods,", ");
+
+	return output;
+}
+
+// Cycle through all effects in the currently produced busks 
+string [int] generateBuskDescription(int [effect] currentBusks) {
+	string [int] output;
+
+	foreach busk,turns in currentBusks {
+		if (busk == $effect[none]) {
+			output.listAppend("Busk now for "+turns+" meat, and these effects:");
+		} else if (busk == $effect[dirty pear]) {
+			output.listAppend("|*<b>Dirty Pear</b>: Doubles "+HTMLGenerateSpanFont("sleaze damage", "r_element_sleaze"));
+		} else {
+			string color = have_effect(busk) > 0 ? "gray" : "black";
+			output.listAppend(""+HTMLGenerateSpanFont("|*"+generateBuffDescription(busk),color)+"");
+		}
+
+	}
+
+	return output;
+}
+
 RegisterResourceGenerationFunction("IOTMPrismaticBeretGenerateResource");
 void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	// TODO: tile additions 
-	//   - add beret busk you will get here
 	//   - maybe add easily accessible hats/pants too
 
 	if (!__iotms_usable[lookupItem("prismatic beret")]) return;
 	
     string url = "inventory.php?ftext=prismatic+beret";
 	int busksLeft = clampi(5 - get_property_int("_beretBuskingUses"), 0, 5);
-	string [int] description;
-	string title = HTMLGenerateSpanFont(busksLeft + " Prismatic Beret Busks", "purple");
+	string title = HTMLGenerateSpanFont(busksLeft + " Prismatic Beret busks!", "purple");
+
+	int [effect] currentBusks = beret_busking_effects();
+    boolean canHatrack = lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted();
+
+	string [int] description = generateBuskDescription(currentBusks);
 	
 	int hatpower;
     int pantspower;
@@ -58200,18 +59011,20 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	if (busksLeft > 0) 
 	{
+        string hatrackText = canHatrack ? "(Can equip on hatrack)" : "";
+        boolean hatrackEquipped = equipped_item($slot[familiar]) == lookupItem("prismatic beret");
+        if (hatrackEquipped) hatrackText = "";
+		total = hatpower + pantspower;
 		if (lookupSkill("tao of the terrapin").have_skill()) total += hatpower*2 + pantspower*2;
         if ($effect[Hammertime].have_effect() > 0) total += pantspower*3;
-		description.listAppend("Gain buffs based on current equipment Power");
-		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " Power");
+		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " total hat/shirt/pants power. ");
 		
 		if (lookupItem("prismatic beret").equipped_amount() == 0) {
-			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk!", "red"));
+			description.listAppend(HTMLGenerateSpanFont("Equip the beret to busk! ", "red")+hatrackText);
 		}
-		if (lookupFamiliar("mad hatrack").familiar_is_usable() && $item[sane hatrack].is_unrestricted()) {
-			description.listAppend(HTMLGenerateSpanFont("(You can put it on your hatrack)", "blue"));
-		}
-		
+        if (canHatrack && !hatrackEquipped && lookupItem("prismatic beret").equipped_amount() > 0) {
+            description.listAppend("|*Consider equipping to your hatrack for more options.");
+        }
 		resource_entries.listAppend(ChecklistEntryMake("__item prismatic beret", url, ChecklistSubentryMake(title, "", description)));
 	}
 }
@@ -58241,6 +59054,9 @@ RegisterResourceGenerationFunction("IOTMCoolerYetiGenerateResource");
 void IOTMCoolerYetiGenerateResource(ChecklistEntry [int] resource_entries)
 {
 	if (!lookupFamiliar("Cooler Yeti").familiar_is_usable()) return;
+
+	// Hide if you can't drink, since none of this is useful without the ability to booze it up.
+	if (!__misc_state["can drink just about anything"]) return;
 
 	// Title
 	int famExperienceGain = numeric_modifier("familiar experience") + 1;
@@ -58277,7 +59093,7 @@ void IOTMCoolerYetiGenerateResource(ChecklistEntry [int] resource_entries)
 RegisterResourceGenerationFunction("IOTTAlliedRadioBackpackGenerateResource");
 void IOTTAlliedRadioBackpackGenerateResource(ChecklistEntry [int] resource_entries)
 {
-	if (__iotms_usable[lookupItem("allied radio backpack")]) return;
+	if (!__iotms_usable[lookupItem("allied radio backpack")]) return;
 	
     string url = "inventory.php?action=requestdrop&pwd=" + my_hash();
 	int radioDropsLeft = clampi(3 - get_property_int("_alliedRadioDropsUsed"), 0, 3);
@@ -58417,13 +59233,23 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
 
 
 	if (!__iotms_usable[lookupItem("monodent of the sea")]) return;
-	
+
+	// it is important to name things properly
+	string [int] dentPrefixes = { 'Mono', 'Bi', 'Tri', 'Qua', 'Penta', 'Hexa', 'Hepta', 'Octo', 'Nona', 'Deca' };
+	int constructs = get_property('seadentConstructKills').to_int();
+	int level = clampi(get_property('seadentLevel').to_int(), 1, 10);
+	string prefix = dentPrefixes[level - 1];
+
+	string monodentName = prefix + "dent of the sea";
+	string monodentShortName = prefix + "dent";
+
     string url = "inventory.php?ftext=dent+of+the+sea";
 	int monodentLightningsLeft = clampi(11 - get_property_int("_seadentLightningUsed"), 0, 11);
     boolean monodentWaveUsed = get_property_boolean("_seadentWaveUsed");
 	string monodentWaveZone = get_property("_seadentWaveZone");
 	string [int] description;
-	string title = "Monodent/Seadent powers";
+	string title = "Seaworthy "+monodentShortName+" powers!";
+	boolean monodentIsEquipped = lookupItem("monodent of the sea").equipped_amount() > 0;
 	
 	if (!monodentWaveUsed) {
 		description.listAppend(HTMLGenerateSpanFont("Flood a zone for +30% item/meat", "blue"));		
@@ -58431,7 +59257,7 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
 	else if (monodentWaveUsed) {
 		description.listAppend(HTMLGenerateSpanFont(monodentWaveZone + " flooded, +30 item/meat", "indigo"));	
 		if ($effect[fishy].have_effect() < 1 && lookupItem("monodent of the sea").equipped_amount() == 0) {
-			description.listAppend(HTMLGenerateSpanFont("Equip Monodent for Fishy?", "red"));		
+			description.listAppend(HTMLGenerateSpanFont("Equip "+monodentShortName+" for Fishy?", "red"));		
 		}		
 	}
 	if (monodentLightningsLeft > 0) {
@@ -58444,15 +59270,24 @@ void IOTMMonodentGenerateResource(ChecklistEntry [int] resource_entries)
         description.listAppend("Current upgrades: " + monodentUpgrades + "/100");
         description.listAppend((HTMLGenerateSpanFont(constructsNeededForNextPerk, "blue")) + " constructs needed for upgrade");
     }
-	if (lookupItem("monodent of the sea").equipped_amount() == 0)
+	if (!monodentIsEquipped)
     {
-		description.listAppend(HTMLGenerateSpanFont("Equip the Seadent first", "red"));		
+		description.listAppend(HTMLGenerateSpanFont("Equip the "+monodentShortName+" first", "red"));		
 	}
-	if (lookupItem("monodent of the sea").equipped_amount() > 0)
+	if (monodentIsEquipped)
 	{
-		description.listAppend(HTMLGenerateSpanFont("Seadent lightning ready!", "blue"));		
+		description.listAppend(HTMLGenerateSpanFont(monodentShortName+" lightning ready!", "blue"));		
 	}
-	resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", url, ChecklistSubentryMake(title, "", description)));
+	resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", url, ChecklistSubentryMake(title, "who lives in a monodent under the sea", description)));
+
+	// Banish combination tile
+	if (monodentLightningsLeft > 0)
+    {
+        string [int] banishDesc;
+		banishDesc.listAppend("Turn-taking kill, all-day banish.");
+		if (!monodentIsEquipped) banishDesc.listAppend(HTMLGenerateSpanFont("Equip the "+monodentName+" first", "red"));
+		resource_entries.listAppend(ChecklistEntryMake("__item monodent of the sea", "", ChecklistSubentryMake(pluralise(monodentLightningsLeft, "lightning strike", "lightning strikes"), "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("seadent killbanish"));
+    }
 }
 //blood cubic zirconia
 RegisterTaskGenerationFunction("IOTMBloodCubicZirconiaGenerateTasks");
@@ -58463,10 +59298,9 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
     //   - add refract recommendation system
     //   - shorten resource tile by switching the less-useful uses into a hoverover
     //   - small wording tweaks 
-    //   - match pheromone styling to other banishes
 
 
-	if (__iotms_usable[lookupItem("blood cubic zirconia")]) return;
+	if (!__iotms_usable[lookupItem("blood cubic zirconia")]) return;
 	string url = "inventory.php?ftext=blood+cubic+zirconia";
 	string [int] description;
 	int bczRefracts = get_property_int("_bczRefractedGazeCasts");
@@ -58482,7 +59316,9 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 	int bulletCost = bloodCast[min(bczBullets, 15)];
 	int equityCost = bloodCast[min(bczEquitys, 15)];
 	
-	if (lookupItem("blood cubic zirconia").equipped_amount() > 0)
+	if (gemstoneInCodpiece(lookupItem("blood cubic zirconia"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
+	
+	if (gemstoneEquipped(lookupItem("blood cubic zirconia")))
 	{
 		if (bczRefracts < 13) {
 			description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost + "", "red") + " mys");
@@ -58509,15 +59345,16 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 		}
 		else if (bczEquitys >= 13) {
 			description.listAppend(HTMLGenerateSpanFont("Next Equity costs " + equityCost + " mox. EXPENSIVE!", "red") + "");
-		}	
-		task_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(HTMLGenerateSpanFont("BCZ: Blood Cubic Zirconia skills", "brown"), description), -11).ChecklistEntrySetIDTag("bcz important skills"));
+		}
+		// This was originally a supernag but I simply will not let this be -always- on my screen.	
+		task_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(HTMLGenerateSpanFont("BCZ: Blood Cubic Zirconia skills", "brown"), description), 11).ChecklistEntrySetIDTag("bcz important skills"));
 	}
 }
 
 RegisterResourceGenerationFunction("IOTMBloodCubicZirconiaGenerateResource");
 void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entries)
 {
-    if ($item[blood cubic zirconia].available_amount() == 0) return;
+    if (!__iotms_usable[lookupItem("blood cubic zirconia")]) return;
 	string url = "inventory.php?ftext=blood+cubic+zirconia";
 	string [int] description;
 	int bczBaths = get_property_int("_bczBloodBathCasts");
@@ -58545,6 +59382,8 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 	int bulletCost = bloodCast[min(bczBullets, 15)];
 	int equityCost = bloodCast[min(bczEquitys, 15)];
 	
+	if (gemstoneInCodpiece(lookupItem("blood cubic zirconia"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
+	
 	description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost + "", "red") + " mys");
 	description.listAppend("Next Bullet costs " + HTMLGenerateSpanFont(bulletCost + "", "red") + " mox");
 	description.listAppend("Next Equity costs " + HTMLGenerateSpanFont(equityCost + "", "red") + " mox");
@@ -58561,10 +59400,37 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 	int pheromoneBlasts = get_property_int("markYourTerritoryCharges");
 	if (pheromoneBlasts > 0)
     {
-        string [int] description2;
-		description2.listAppend("Instakill no items/meat");
-		resource_entries.listAppend(ChecklistEntryMake("__skill mark your territory", "", ChecklistSubentryMake(pluralise(pheromoneBlasts, "BCZ pheromone", "BCZ pheromones"), "", description2), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("BCZ pheromone banish"));
+		resource_entries.listAppend(ChecklistEntryMake("__skill mark your territory", "", ChecklistSubentryMake(pluralise(pheromoneBlasts, "cast of Mark Your Territory", "casts of Mark Your Territory"), "drink pheromone cocktails for more charges!", "Turn-taking item-destroying kill, all-day banish."), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("BCZ pheromone banish"));
     }
+
+	// Freekill combination tile entry.
+	string header = "BCZ: Sweat Bullets";
+	string subtitle;
+	string [int] bulletDesc;
+
+	if (bczBullets > 0) subtitle= "have used "+pluralise(bczBullets,"bullet","bullets")+" today";
+
+	bulletDesc.listAppend("Win a fight without taking a turn.");
+	bulletDesc.listAppend("Next bullet costs "+bulletCost+" moxie substats");
+	if (!gemstoneEquipped(lookupItem("blood cubic zirconia"))) 
+		bulletDesc.listAppend(HTMLGenerateSpanFont("Equip the Blood Cubic Zirconia first", "red"));
+
+	resource_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(header,subtitle,bulletDesc)).ChecklistEntrySetCombinationTag("free instakill"));
+
+	// void showShadowBrickFreeKills(ChecklistEntry [int] resource_entries) {
+	// 	int shadowBricks = available_amount($item[shadow brick]);
+	// 	int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
+	// 	if ($item[shadow brick].available_amount() > 0) {
+	// 		string header = $item[shadow brick].pluralise().capitaliseFirstLetter();
+	// 		if (shadowBrickUsesLeft < shadowBricks) {
+	// 			if (shadowBrickUsesLeft == 0)
+	// 				header += " (not usable today)";
+	// 			else
+	// 				header += " (" + shadowBrickUsesLeft + " usable today)";
+	// 		}
+	// 	resource_entries.listAppend(ChecklistEntryMake("__item shadow brick", "", ChecklistSubentryMake(header, "", "Win a fight without taking a turn.")).ChecklistEntrySetCombinationTag("free instakill"));
+    // 	}
+	// }
 }
 //shrunken head
 RegisterTaskGenerationFunction("IOTMShrunkenHeadGenerateTasks");
@@ -58917,9 +59783,14 @@ void IOTMLegendaryClubGenerateResource(ChecklistEntry [int] resource_entries)
 		}
 	
 	resource_entries.listAppend(ChecklistEntryMake("__item legendary seal-clubbing club", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Legendary seal-clubbing club skills", "orange"), description), 1).ChecklistEntrySetIDTag("LSSC skills"));
+
+	// Adding a free fight combo tile.
+    if (clubBackwardsLeft > 0) {
+        string header = pluralise(clubBackwardsLeft, "club 'em back in time","club 'em back in times");
+        resource_entries.listAppend(ChecklistEntryMake("__item legendary seal-clubbing club", "", ChecklistSubentryMake(header, "", "Free kill, no items. Can make bosses free!")).ChecklistEntrySetCombinationTag("free instakill"));
+    }
 }
 // heartstone 
-
 RegisterTaskGenerationFunction("IOTMHeartstoneGenerateTasks");
 void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) 
 {
@@ -58932,7 +59803,10 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     string hackerToday = "";
 
     // Is the heartstone equipped?
-    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
+    boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
+
+    // TODO:
+    //   The availability conditions are a little messed up here. 
 
     // Generate boolean flags for accessibility of each monster
     // --- T MONSTERS ----------------
@@ -58940,7 +59814,8 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     string eightBitColor = get_property("8BitColor"); // and A/E
     boolean fratGearDone = have_outfit_components("Frat Warrior Fatigues");
     int shenDay = get_property_int("shenInitiationDay");
-    boolean hospitalDone = get_property("questL11Doctor") == "finished";
+    boolean hospitalDone = get_property("questL11Doctor") == "finished" && get_property("questL11Doctor") != "unstarted";
+    boolean frattlesnakePossible = (shenDay == 0 || shenDay == 2) && __quest_state["Level 11 Shen"].mafia_internal_step < 3;
     if ($item[server room key].available_amount() > 0 && get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) hackerToday = get_property("_cyberZone1Hacker");
     // --- A MONSTERS ----------------
     boolean forestDone = get_property_ascension("lastTempleUnlock") && get_property("questL02Larva") == "finished";
@@ -58972,7 +59847,7 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("elegant animated nightstand", !nightstandsDone));
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("tektite", eightBitColor == "green"));
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("War Frat 151st Infantryman", !fratGearDone));
-        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("The Frattlesnake", shenDay == 2));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("The Frattlesnake", frattlesnakePossible));
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("Pygmy Witch Nurse", !hospitalDone));
         if (hackerToday.contains_text("blue")) monsterList.listAppend("Bluehat Hacker (zone 1!)");
         if (hackerToday.contains_text("grey")) monsterList.listAppend("Greyhat Hacker (zone 1!)");
@@ -59027,7 +59902,7 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
 { 
 	// the heart must go on
 	if (!__iotms_usable[lookupItem("Heartstone")]) return;
-    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
+    boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
 
     // What are the heartstone's letters?
     string heartLetters = get_property("heartstoneLetters");
@@ -59049,19 +59924,19 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
     boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
 
     // How many times has the user used the skills?
-    int usesBOOM = get_property_int("heartstoneKillUsed");
-    int usesGONE = get_property_int("heartstoneBanishUsed");
-    int usesSTUN = get_property_int("heartstoneStunUsed");
-    int usesBUDS = get_property_int("heartstonePalsUsed");
-    int usesBUFF = get_property_int("heartstoneBuffUsed");
-    int usesLUCK = get_property_int("heartstoneLuckUsed");
+    int usesBOOM = get_property_int("_heartstoneKillUsed");
+    int usesGONE = get_property_int("_heartstoneBanishUsed");
+    int usesSTUN = get_property_int("_heartstoneStunUsed");
+    int usesBUDS = get_property_int("_heartstonePalsUsed");
+    int usesBUFF = get_property_int("_heartstoneBuffUsed");
+    int usesLUCK = get_property_boolean("_heartstoneLuckUsed").to_int();
 
     // Banish combination tag for GONE.
     if (accessGONE && usesGONE < 5) {
         string [int] banishDesc;
-        banishDesc.listAppend("Turn-taking banish, 50-turn duration.");
-        if (!heartstoneEquipped) banishDesc.listAppend("Equip your Heartstone.");
-        resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", "", ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", url, banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
+        banishDesc.listAppend("Turn-taking item-destroying kill, 50-turn banish.");
+        if (!heartstoneEquipped) banishDesc.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
     }
 
     description.listAppend("Steal Monster Hearts for useful items.");
@@ -59086,6 +59961,8 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
         }
     
     if (!heartstoneEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
+	if (gemstoneInCodpiece(lookupItem("heartstone"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
+    
     resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Heartstone skills"));
             
 
@@ -59184,11 +60061,13 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
 
     ChecklistSubentry [int] subentries;
 
-    boolean baseballEquipped = lookupItem("Baseball Diamond").equipped_amount() > 0;
+    boolean baseballEquipped = gemstoneEquipped(lookupItem("Baseball Diamond"));
     string url = baseballEquipped ? "inventory.php?which=2" : "inventory.php?ftext=baseball+diamond";
+    if (gemstoneInCodpiece(lookupItem("baseball diamond"))) url = baseballEquipped ?  "inventory.php?which=2" : "inventory.php?ftext=eternity+codpiece";
     int inningsPlayed = get_property_int("_baseballInnings");
     monster [int] myTeam = baseballBuddies();
     int monstersNeededToPlayBall = clampi(9-myTeam.count(),0,9);
+    if (get_property("baseballTeam") == "") monstersNeededToPlayBall = 9;
 
     // For this tile, we'll start with an overall "what should you use your remaining ballgames on" and transition into "what -have- you used these things on, currently"
 
@@ -59196,6 +60075,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     if (inningsPlayed < 3) {
         string title = "Play "+pluralise(clampi(3-inningsPlayed, 0, 3),"more inning","more innings")+" of Baseball";
         string [int] description;
+        if (gemstoneInCodpiece(lookupItem("Baseball Diamond"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
         if (myTeam.count() < 9) {
             if (baseballEquipped) description.listAppend("Find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
             if (!baseballEquipped) description.listAppend(HTMLGenerateSpanOfClass("Equip your Baseball Diamond","r_element_hot")+" to find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
@@ -59222,8 +60102,10 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     monster curveballMonster = to_monster(get_property("_curveballMonster"));
     int curveballFightsLeft = get_property_int("_curveballFightsLeft");
 
-    if (curveballMonster != $monster[none]) {
+    if (curveballMonster != $monster[none] && curveballFightsLeft > 0) {
+        // Add to subentries & to freefight combo tile
         subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!",""));
+        resource_entries.listAppend(ChecklistEntryMake("__item baseball diamond",url,ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!","")).ChecklistEntrySetIDTag("Baseball Diamond free fights").ChecklistEntrySetCombinationTag("daily free fight"));
     }
 
     // Some Cheddar sub-tile; annoying because I've never abstracted tracked monsters...
@@ -60141,6 +61023,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
         {
             string [int] description;
             if (banish_sources.count() > 0)
+                description.listAppend("Turn-taking run, all-day banish.");
                 description.listAppend("From " + banish_sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
             string url = "";
             if (equipped_amount == 0)
@@ -62331,15 +63214,16 @@ void PathDarkGiftGenerateResource(ChecklistEntry [int] resource_entries)
     {
         string url;
         string [int] description;
-        description.listAppend("Free run/banish.");
-        description.listAppend("There's a lot of them, so you might just want to use them as a free run?");
-        Banish banish_entry = BanishByName("Baleful Howl");
-        int turns_left_of_banish = banish_entry.BanishTurnsLeft();
-        if (turns_left_of_banish > 0)
-        {
-            //is this relevant? we don't describe this for pantsgiving
-            description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
-        }
+        description.listAppend("Free run, all-day banish.");
+        // description.listAppend("There's a lot of them, so you might just want to use them as a free run?");
+        // Banish banish_entry = BanishByName("Baleful Howl");
+        // int turns_left_of_banish = banish_entry.BanishTurnsLeft();
+        // Removing since we have the banis combo tile now.
+        // if (turns_left_of_banish > 0)
+        // {
+        //     //is this relevant? we don't describe this for pantsgiving
+        //     description.listAppend("Currently used on " + banish_entry.banished_monster + " for " + pluralise(turns_left_of_banish, "more turn", "more turns") + ".");
+        // }
         resource_entries.listAppend(ChecklistEntryMake("__skill Baleful Howl", url, ChecklistSubentryMake(pluralise(banishes_left, "baleful howl", "baleful howls"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Dark gyffte path baleful howl banish"));
     }
 }
@@ -62784,6 +63668,95 @@ void PathWereProfessorGenerateTasks(ChecklistEntry [int] task_entries, Checklist
         if (professor_tips.count() > 0) {
             tips_location.listAppend(ChecklistEntryMake("WereProfessor", "", ChecklistSubentryMake("You are a Professor", professor_tips), priority));
         }
+    }
+}
+RegisterTaskGenerationFunction("PathBodyguardGenerateTasks");
+void PathBodyguardGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    if (my_path().id != PATH_BODYGUARD)
+        return;
+    
+    int bodychat = (get_property_int("bodyguardCharge"));
+	string [int] description;
+	
+	description.listAppend("Lots of options.");
+		
+	string [int][int] tooltip_table2;
+	tooltip_table2.listAppend(listMake("astronomer / skinflute", "star key"));
+	tooltip_table2.listAppend(listMake("white lion / whitesnake", "wet stew"));
+	tooltip_table2.listAppend(listMake("topiary animals", "level 9"));
+	tooltip_table2.listAppend(listMake("wine rack / cabinet", "wine bomb"));
+	tooltip_table2.listAppend(listMake("dairy goat", "goat cheese"));
+	tooltip_table2.listAppend(listMake("harem girl", "outfit"));
+	tooltip_table2.listAppend(listMake("pygmy bowler / accountant / surgeon", "hidden city"));
+	tooltip_table2.listAppend(listMake("blur", "drum machine"));
+	tooltip_table2.listAppend(listMake("tool gremlins", "gremlin tools"));
+	tooltip_table2.listAppend(listMake("war hippies", "WAR!"));
+		
+	buffer tooltip_text2;
+	tooltip_text2.append(HTMLGenerateTagWrap("div", "Stillsuit buff target", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+	tooltip_text2.append(HTMLGenerateSimpleTableLines(tooltip_table2));
+		
+	string stillSweatTypeTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Suggested Stillsuit Familiars", "r_tooltip_outer_class");
+	
+	
+    if (bodychat == 50)
+    {
+        string main_title = HTMLGenerateSpanFont("Force a bodyguard", "blue");
+		string url = "main.php?talktobg=1";
+        task_entries.listAppend(ChecklistEntryMake("__familiar burly bodyguard", url, ChecklistSubentryMake(main_title, "", description), -11));
+    }
+	else if (bodychat < 50)
+    {
+        string main_title = HTMLGenerateSpanFont((50 - bodychat) + " combats until next bodyguard chat", "black");
+        optional_task_entries.listAppend(ChecklistEntryMake("__item adventurer clone egg", "", ChecklistSubentryMake(main_title, "", description), 11));
+    }
+}
+RegisterTaskGenerationFunction("PathZootomistGenerateTasks");
+void PathZootomistGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
+{
+    string [int] description;
+	string [int] ydescription;
+	string [int] bdescription;
+	if (my_path().id != PATH_ZOOTOMIST) return;
+	{
+        if ($effect[Everything Looks Yellow].have_effect() == 0) {
+			string ymain_title = HTMLGenerateSpanFont("Quantum Left Kick castable", "orange");
+			ydescription.listAppend("Free YR (31 adv cooldown)");
+			task_entries.listAppend(ChecklistEntryMake("__familiar quantum entangler", "", ChecklistSubentryMake(ymain_title, "", ydescription), -11));
+		}
+        if ($effect[Everything Looks Blue].have_effect() == 0) {
+			string bmain_title = HTMLGenerateSpanFont("Phantom Right Kick castable", "blue");
+			bdescription.listAppend("Banish (31 adv cooldown)");
+			task_entries.listAppend(ChecklistEntryMake("__skill toss", "", ChecklistSubentryMake(bmain_title, "", bdescription), -11));
+		}
+    	
+		string url = 'place.php?whichplace=graftinglab&action=graftinglab_chamber';
+		int famWeight = floor(sqrt(my_familiar().experience));
+		int famExperienceGain = numeric_modifier("familiar experience") +1;
+		int benchPrepsLeft = (1 + get_property_int("zootomistPoints") - get_property_int("zootSpecimensPrepared"));
+		int graftFXP = (my_level() +2) ** 2;
+		int famExpNeeded = graftFXP - my_familiar().experience;
+		int fxpCalc = 1 + (famExpNeeded/famExperienceGain);
+		if (benchPrepsLeft > 0) {
+			description.listAppend("+20 fxp usable " + benchPrepsLeft + " more times.");
+		}
+		description.listAppend("" + (my_level() -1) + "/11 grafted.");
+		if (famExpNeeded < 1) {
+			description.listAppend(HTMLGenerateSpanFont("You can graft this fam! (" + my_familiar().experience + ") fxp", "green"));
+		}
+		else {
+			description.listAppend("Currently gain " + famExperienceGain + " fxp/fight");
+			description.listAppend("" + famExpNeeded + " more fxp to graft current fam. (" + fxpCalc + " fights)");
+		}
+		if (my_level() < 12)
+		{
+			task_entries.listAppend(ChecklistEntryMake("__monster stephen spookyraven", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Familiar grafting time", "blue"), "", description), -11));
+		}
+	/*	else if (famWeight +2 < my_level() && my_level() < 12)
+		{
+			optional_task_entries.listAppend(ChecklistEntryMake("__monster stephen spookyraven", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Not fat enough to graft", "red"), "", description), 11));
+		} */
     }
 }
 
