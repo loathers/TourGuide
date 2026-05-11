@@ -45,11 +45,13 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
 
     ChecklistSubentry [int] subentries;
 
-    boolean baseballEquipped = lookupItem("Baseball Diamond").equipped_amount() > 0;
+    boolean baseballEquipped = gemstoneEquipped(lookupItem("Baseball Diamond"));
     string url = baseballEquipped ? "inventory.php?which=2" : "inventory.php?ftext=baseball+diamond";
+    if (gemstoneInCodpiece(lookupItem("baseball diamond"))) url = baseballEquipped ?  "inventory.php?which=2" : "inventory.php?ftext=eternity+codpiece";
     int inningsPlayed = get_property_int("_baseballInnings");
     monster [int] myTeam = baseballBuddies();
     int monstersNeededToPlayBall = clampi(9-myTeam.count(),0,9);
+    if (get_property("baseballTeam") == "") monstersNeededToPlayBall = 9;
 
     // For this tile, we'll start with an overall "what should you use your remaining ballgames on" and transition into "what -have- you used these things on, currently"
 
@@ -57,6 +59,7 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     if (inningsPlayed < 3) {
         string title = "Play "+pluralise(clampi(3-inningsPlayed, 0, 3),"more inning","more innings")+" of Baseball";
         string [int] description;
+        if (gemstoneInCodpiece(lookupItem("Baseball Diamond"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
         if (myTeam.count() < 9) {
             if (baseballEquipped) description.listAppend("Find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
             if (!baseballEquipped) description.listAppend(HTMLGenerateSpanOfClass("Equip your Baseball Diamond","r_element_hot")+" to find "+pluralise(monstersNeededToPlayBall,"more monster","more monsters")+" to play ball!");
@@ -83,8 +86,10 @@ void IOTMBaseballDiamondGenerateResource(ChecklistEntry [int] resource_entries)
     monster curveballMonster = to_monster(get_property("_curveballMonster"));
     int curveballFightsLeft = get_property_int("_curveballFightsLeft");
 
-    if (curveballMonster != $monster[none]) {
+    if (curveballMonster != $monster[none] && curveballFightsLeft > 0) {
+        // Add to subentries & to freefight combo tile
         subentries.listAppend(ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!",""));
+        resource_entries.listAppend(ChecklistEntryMake("__item baseball diamond",url,ChecklistSubentryMake(pluralise(curveballFightsLeft, "free copy of", "free copies of") + " "+HTMLGenerateSpanOfClass(curveballMonster.name, "r_element_epic")+" remaining", "naturally free fights!","")).ChecklistEntrySetIDTag("Baseball Diamond free fights").ChecklistEntrySetCombinationTag("daily free fight"));
     }
 
     // Some Cheddar sub-tile; annoying because I've never abstracted tracked monsters...

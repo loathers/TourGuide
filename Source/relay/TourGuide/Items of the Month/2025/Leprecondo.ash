@@ -43,7 +43,7 @@ void IOTMLeprecondoGenerateResource(ChecklistEntry [int] resource_entries)
 	int punchOutChanges = (get_property_int("preworkoutPowderUses"));
 	if (punchOutChanges > 0)
 	{
-		resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "", ChecklistSubentryMake(pluralise(get_property_int("preworkoutPowderUses"), "Condo Punch", "Condo Punches"), "", "Free run/banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("condo punch banish"));
+		resource_entries.listAppend(ChecklistEntryMake("__item orange boxing gloves", "", ChecklistSubentryMake("Punch Out your Foe "+pluralise(get_property_int("preworkoutPowderUses"), "time", "times"), "", "Free run, 20-turn banish.")).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("condo punch banish"));
 	}
 		
 	resource_entries.listAppend(ChecklistEntryMake("__item leprecondo", url, ChecklistSubentryMake("Leprecondo stuff", description), 11));

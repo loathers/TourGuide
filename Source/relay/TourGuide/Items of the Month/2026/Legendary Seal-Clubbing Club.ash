@@ -102,4 +102,10 @@ void IOTMLegendaryClubGenerateResource(ChecklistEntry [int] resource_entries)
 		}
 	
 	resource_entries.listAppend(ChecklistEntryMake("__item legendary seal-clubbing club", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Legendary seal-clubbing club skills", "orange"), description), 1).ChecklistEntrySetIDTag("LSSC skills"));
+
+	// Adding a free fight combo tile.
+    if (clubBackwardsLeft > 0) {
+        string header = pluralise(clubBackwardsLeft, "club 'em back in time","club 'em back in times");
+        resource_entries.listAppend(ChecklistEntryMake("__item legendary seal-clubbing club", "", ChecklistSubentryMake(header, "", "Free kill, no items. Can make bosses free!")).ChecklistEntrySetCombinationTag("free instakill"));
+    }
 }

@@ -103,6 +103,7 @@ void PathAvatarOfWestOfLoathingGenerateResource(ChecklistEntry [int] resource_en
         {
             string [int] description;
             if (banish_sources.count() > 0)
+                description.listAppend("Turn-taking run, all-day banish.");
                 description.listAppend("From " + banish_sources.listJoinComponents(", ", "and").capitaliseFirstLetter() + ".");
             string url = "";
             if (equipped_amount == 0)

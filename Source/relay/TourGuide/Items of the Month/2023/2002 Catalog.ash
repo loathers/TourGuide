@@ -62,7 +62,7 @@ void IOTM2002MrStoreGenerateResource(ChecklistEntry [int] resource_entries)
     description.listAppend("Spend credits on prehistoric IotMs!");
 		
 		string [int] options;
-		if (__misc_state["in run"] && my_path().id != PATH_COMMUNITY_SERVICE)
+		if (my_path().id != PATH_COMMUNITY_SERVICE)
 		{
         	if ($item[Flash Liquidizer Ultra Dousing Accessory].available_amount() == 0)
             {

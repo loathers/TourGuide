@@ -90,4 +90,17 @@ void IOTMBatWingsGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 
 	resource_entries.listAppend(ChecklistEntryMake("__item bat wings", url, ChecklistSubentryMake("Bat Wings functions", "", description), 8));
+
+	// Adding a free fight combo tile.
+    if (batWingFreeFlapsLeft > 0) {
+        string header = pluralise(batWingFreeFlapsLeft, "free Bat Wing flap","free Bat Wing flaps");
+		string [int] description;
+		float procRate = 100/(2+get_property_int("_batWingsFreeFights"));
+		description.listAppend("Will (unpredictably!) turn fights free. Currently "+to_string(round(procRate,1))+"% chance for a flap.");
+		if (lookupItem("bat wings").equipped_amount() == 0) {
+			description.listAppend(HTMLGenerateSpanFont("Equip your Bat Wings to flap","red"));
+		}
+        resource_entries.listAppend(ChecklistEntryMake("__item bat wings", "", ChecklistSubentryMake(header, "", description)).ChecklistEntrySetCombinationTag("free instakill"));
+    }
+
 }

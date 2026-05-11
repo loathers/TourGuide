@@ -50,7 +50,7 @@ RegisterResourceGenerationFunction("IOTMTunnelOfLoveGenerateResource");
 void IOTMTunnelOfLoveGenerateResource(ChecklistEntry [int] resource_entries)
 {
     
-    if (!get_property_boolean("_loveTunnelUsed")) {
+    if (!get_property_boolean("_loveTunnelUsed") && __iotms_usable[lookupItem("heart-shaped crate")]) {
         resource_entries.listAppend(ChecklistEntryMake("__item pink candy heart", "place.php?whichplace=town_wrong", ChecklistSubentryMake("3 free L.O.V. dudes", "", "Free fights and useful items/buffs."), 5).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("Love tunnel free fights"));
     }
 

@@ -55,7 +55,7 @@ string [int] luckyOptions(int cloversAvailable) {
 	if (protestorsRemaining > 10 && protestorsPerClover > 15)
 		allTheLuckyStuff.listAppend("Zeppelin Mob (x"+projectedZeppClovers+")");
 		cloversAdjusted = MAX(cloversAdjusted - projectedZeppClovers, 3);
-	if (my_path().id == 56) //adventurer meats world
+	if (my_path().id == PATH_MEAT) //adventurer meats world
 		allTheLuckyStuff.listAppend("Knob Goblin Embezzler");
 	if (__misc_state["wand of nagamar needed"] && lettersStillNeeded > 0)
 		allTheLuckyStuff.listAppend("Wand of Nagamar");
@@ -151,14 +151,14 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 	LuckySource getHeartstone() {
         LuckySource final;
 
-        final.sourceName = `august scepter`;
+        final.sourceName = `heartstone`;
         final.url = 'skillz.php';
         final.imageLookupName = "__item heartstone";
     	boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
-    	int usesLUCK = get_property_int("heartstoneLuckUsed");
+    	int usesLUCK = get_property_boolean("_heartstoneLuckUsed").to_int();
 
         final.luckyCondition = accessLUCK && usesLUCK == 0 && __iotms_usable[lookupItem("heartstone")];
-        final.luckyCount = usesLUCK == 0 ? 0 : 1; 
+        final.luckyCount = usesLUCK == 1 ? 0 : 1; 
         final.tileDescription = `<b>{final.luckyCount}x Heartstone: LUCK</b> cast left`;
 
         return final;
@@ -168,13 +168,13 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 	LuckySource getSaxophones() {
         LuckySource final;
 
-        final.sourceName = 'apriling tuba';
-        final.url = "inventory.php?ftext=apriling+band+tuba";
-        final.imageLookupName = "__item Apriling band tuba";
+        final.sourceName = 'apriling sax';
+        final.url = "inventory.php?ftext=apriling+band+saxophone";
+        final.imageLookupName = "__item Apriling band saxophone";
 
         int aprilingBandSaxUsesLeft = clampi(3 - get_property_int("_aprilBandSaxUses"), 0, 3);
         
-        final.luckyCondition = (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band tuba]) > 0);
+        final.luckyCondition = (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band saxophone]) > 0);
         final.luckyCount = aprilingBandSaxUsesLeft;
         final.tileDescription = `<b>{aprilingBandSaxUsesLeft}x apriling sax solos</b> left`;
         return final;
@@ -205,7 +205,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
         final.luckyCondition = __iotms_usable[$item[August Scepter]];
         final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
-        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug. 2)`;
+        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug 2)`;
 
         return final;
     }
@@ -229,7 +229,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
         // never noticed I didn't explicitly say this was pillkeeper in the tile lol
         final.luckyCount = freeLuckLeft + spleenLucks;
-        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x PillKeeper</b> free lucky, `;
+        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x Pillkeeper</b> free lucky, `;
         if (spleenLucks > 0) final.tileDescription = final.tileDescription + `and <b>{spleenLucks}x</b> more for 3 spleen each`;
         return final;
     }
@@ -261,7 +261,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
     string [int] description;
     int totalLuckyCharges = 0;
 	string line = HTMLGenerateSpanOfClass("Get a Lucky! adventure", "r_bold r_element_stench_desaturated");
-	string ll = HTMLGenerateSpanOfClass("✾", "r_element_stench");
+	string ll = HTMLGenerateSpanOfClass("✾ ", "r_element_stench");
 	string luckyText = HTMLGenerateSpanOfClass("Lucky!", "r_element_stench_desaturated");
 
 	foreach it, luckyType in luckyOrder
@@ -301,6 +301,61 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
             resource_entries.listAppend(ChecklistEntryMake("__item 11-leaf clover", url, ChecklistSubentryMake(title, hermitDescription), -11).ChecklistEntrySetIDTag("Clover resource"));    
         }
 	}
+
+	// int clovers_available = $items[11-leaf clover].available_amount() + $item[11-leaf clover].closet_amount();
+    
+	// TODO: This was the old clover recommender code. Might be usable for recs?
+
+    // if (my_path().id == PATH_BEES_HATE_YOU || my_path().id == PATH_G_LOVER)
+    //     clovers_available = $item[ten-leaf clover].item_amount() + $item[ten-leaf clover].closet_amount();
+    // if (clovers_available > 0 && in_run) {
+    //     ChecklistSubentry subentry;
+    //     subentry.header = pluralise(clovers_available, "clover", "clovers") + " available";
+        
+        
+    //     if (!__quest_state["Level 9"].state_boolean["bridge complete"])
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Orc logging camp, for bridge building. (3/3)", $location[the smut orc logging camp]));
+    //     if ($item[a-boo clue].available_amount() < 4 && (__quest_state["Level 9"].state_int["a-boo peak hauntedness"] > 0 || !__quest_state["Level 9"].state_boolean["bridge complete"]) && my_path().id != PATH_G_LOVER)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("A-Boo clues. (2)", $location[a-boo peak]));
+    //     if (__misc_state["wand of nagamar needed"] && $item[wand of nagamar].creatable_amount() == 0)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Wand of nagamar components (castle basement)", $location[the castle in the clouds in the sky (basement)]));
+    //     boolean have_all_gum = $item[pack of chewing gum].available_amount() > 0 || ($item[jaba&ntilde;ero-flavored chewing gum].available_amount() > 0 && $item[lime-and-chile-flavored chewing gum].available_amount() > 0 && $item[pickle-flavored chewing gum].available_amount() > 0 && $item[tamarind-flavored chewing gum].available_amount() > 0);
+    //     if (__quest_state["Level 4"].state_int["areas unlocked"] + $item[sonar-in-a-biscuit].available_amount() < 2)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("2 sonar-in-a-biscuit (Guano Junction)", $location[guano junction]));
+   
+    //        if (__quest_state["Level 11 Ron"].mafia_internal_step <= 2 && __quest_state["Level 11 Ron"].state_int["protestors remaining"] > 1)
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mob of zeppelin protestors NC", $location[A Mob of Zeppelin Protesters]));         
+    //     if (!__quest_state["Level 11 Desert"].state_boolean["Desert Explored"] && !(get_property_boolean("lovebugsUnlocked") && $item[bottle of lovebug pheromones].is_unrestricted())) { //taking a gamble here - I'm assuming you'd never clover for ultrahydrated if you have lovebugs. even if you run out of ultrahydrated, you'll likely get it again in a hurry
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Ultrahydrated (Oasis)", $location[the oasis]));
+    //     }
+    //     if (!__quest_state["Level 8"].state_boolean["Past mine"]) {
+    //         item ore_needed = __quest_state["Level 8"].state_string["ore needed"].to_item();
+    //         if (ore_needed == $item[none])
+    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Mining ore. (1)", $location[itznotyerzitz mine]));
+    //         else
+    //             subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability(ore_needed.capitaliseFirstLetter() + ". (1)", $location[itznotyerzitz mine]));
+    //     }
+    //     if (__misc_state["need to level"] && !__misc_state["Stat gain from NCs reduced"]) {
+    //         location l = $location[none];
+    //         if (my_primestat() == $stat[moxie])
+    //             l = $location[the haunted ballroom];
+    //         else if (my_primestat() == $stat[mysticality])
+    //             l = $location[the haunted bathroom];
+    //         else if (my_primestat() == $stat[muscle])
+    //             l = $location[the haunted gallery];
+    //         subentry.entries.listAppend(HTMLGenerateFutureTextByLocationAvailability("Powerlevelling (" + l + ")", l));
+    //     }
+    //     //put relevant tower items here
+        
+    //     resource_entries.listAppend(ChecklistEntryMake("clover", "", subentry, 7).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Ten-leaf clover resource"));
+    // }
+    // Turning off because lucky pills are garbage now.
+
+    // if (in_run && $item[lucky pill].have() && availableSpleen() > 0) {
+    //     string [int] description;
+    //     description.listAppend("Chew for clovers.");
+    //     resource_entries.listAppend(ChecklistEntryMake("__item lucky pill", "inventory.php?ftext=lucky+pill", ChecklistSubentryMake(pluralise($item[lucky pill]), "", description), importance_level_unimportant_item).ChecklistEntrySetCombinationTag("clovers").ChecklistEntrySetIDTag("Lucky pill resource"));
+    // }
 }
 
 RegisterTaskGenerationFunction("LuckyGenerateTasks");
@@ -314,7 +369,7 @@ void LuckyGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] 
 		int cloversAvailable = clampi(3 - get_property_int("_cloversPurchased"), 0, 3);
 		int cloversPossible = $item[11-leaf clover].available_amount() + cloversAvailable;
 		
-		if (__misc_state["in run"] && my_path().id == 44) { // path is grey you lol
+		if (__misc_state["in run"] && my_path().id == PATH_GREY_YOU) { // path is grey you lol
 			description.listAppend("1x ore, 1x freezerburned ice cube, 1x full-length mirror.");
 		}
 		else if (__misc_state["in run"]) {

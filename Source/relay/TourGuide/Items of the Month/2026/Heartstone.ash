@@ -1,5 +1,4 @@
 // heartstone 
-
 RegisterTaskGenerationFunction("IOTMHeartstoneGenerateTasks");
 void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) 
 {
@@ -12,7 +11,10 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     string hackerToday = "";
 
     // Is the heartstone equipped?
-    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
+    boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
+
+    // TODO:
+    //   The availability conditions are a little messed up here. 
 
     // Generate boolean flags for accessibility of each monster
     // --- T MONSTERS ----------------
@@ -20,7 +22,8 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     string eightBitColor = get_property("8BitColor"); // and A/E
     boolean fratGearDone = have_outfit_components("Frat Warrior Fatigues");
     int shenDay = get_property_int("shenInitiationDay");
-    boolean hospitalDone = get_property("questL11Doctor") == "finished";
+    boolean hospitalDone = get_property("questL11Doctor") == "finished" && get_property("questL11Doctor") != "unstarted";
+    boolean frattlesnakePossible = (shenDay == 0 || shenDay == 2) && __quest_state["Level 11 Shen"].mafia_internal_step < 3;
     if ($item[server room key].available_amount() > 0 && get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) hackerToday = get_property("_cyberZone1Hacker");
     // --- A MONSTERS ----------------
     boolean forestDone = get_property_ascension("lastTempleUnlock") && get_property("questL02Larva") == "finished";
@@ -52,7 +55,7 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("elegant animated nightstand", !nightstandsDone));
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("tektite", eightBitColor == "green"));
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("War Frat 151st Infantryman", !fratGearDone));
-        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("The Frattlesnake", shenDay == 2));
+        monsterList.listAppend(HTMLGreyOutTextUnlessTrue("The Frattlesnake", frattlesnakePossible));
         monsterList.listAppend(HTMLGreyOutTextUnlessTrue("Pygmy Witch Nurse", !hospitalDone));
         if (hackerToday.contains_text("blue")) monsterList.listAppend("Bluehat Hacker (zone 1!)");
         if (hackerToday.contains_text("grey")) monsterList.listAppend("Greyhat Hacker (zone 1!)");
@@ -107,7 +110,7 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
 { 
 	// the heart must go on
 	if (!__iotms_usable[lookupItem("Heartstone")]) return;
-    boolean heartstoneEquipped = lookupItem("Heartstone").equipped_amount() > 0;
+    boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
 
     // What are the heartstone's letters?
     string heartLetters = get_property("heartstoneLetters");
@@ -129,19 +132,19 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
     boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
 
     // How many times has the user used the skills?
-    int usesBOOM = get_property_int("heartstoneKillUsed");
-    int usesGONE = get_property_int("heartstoneBanishUsed");
-    int usesSTUN = get_property_int("heartstoneStunUsed");
-    int usesBUDS = get_property_int("heartstonePalsUsed");
-    int usesBUFF = get_property_int("heartstoneBuffUsed");
-    int usesLUCK = get_property_int("heartstoneLuckUsed");
+    int usesBOOM = get_property_int("_heartstoneKillUsed");
+    int usesGONE = get_property_int("_heartstoneBanishUsed");
+    int usesSTUN = get_property_int("_heartstoneStunUsed");
+    int usesBUDS = get_property_int("_heartstonePalsUsed");
+    int usesBUFF = get_property_int("_heartstoneBuffUsed");
+    int usesLUCK = get_property_boolean("_heartstoneLuckUsed").to_int();
 
     // Banish combination tag for GONE.
     if (accessGONE && usesGONE < 5) {
         string [int] banishDesc;
-        banishDesc.listAppend("Turn-taking banish, 50-turn duration.");
-        if (!heartstoneEquipped) banishDesc.listAppend("Equip your Heartstone.");
-        resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", "", ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", url, banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
+        banishDesc.listAppend("Turn-taking item-destroying kill, 50-turn banish.");
+        if (!heartstoneEquipped) banishDesc.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(pluralise(5-usesGONE,"cast","casts")+" of Heartstone: GONE", "", banishDesc), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Heartstone banish"));
     }
 
     description.listAppend("Steal Monster Hearts for useful items.");
@@ -166,6 +169,8 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
         }
     
     if (!heartstoneEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
+	if (gemstoneInCodpiece(lookupItem("heartstone"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
+    
     resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Heartstone skills"));
             
 

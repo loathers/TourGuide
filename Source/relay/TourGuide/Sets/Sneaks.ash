@@ -312,6 +312,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     //   12x friars NCs (-1 w/ carto)
     //    1x castle basement
     //    1x castle top
+    //    2x eXtreme slopes
 
     string [int] sneak95;
 
@@ -374,6 +375,18 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
     // If the quest is unfinished, you can sneak the top floor.
     if (get_property("questL10Garbage")!= "finished") sneak95.listAppend("1 castle top floor");
+
+    // If the pref is any of these, you may still need eXtremities
+    boolean canSneakSlopes = $strings[unstarted,started,step1,step2] contains get_property("questL08Trapper");
+    
+    // Ripping some code from the friars tile to count NCs encountered.
+    boolean [string] slopes_known_ncs = $strings[2 eXXtreme 4 U,3 eXXXtreme 4ever 6pack];
+    int slopeNCsLeft = min(2-countFriarNCs(slopes_known_ncs,$location[The eXtreme Slope]), 2);
+
+    if (slopeNCsLeft > 0 && canSneakSlopes) {
+        sneak95.listAppend(`{slopeNCsLeft} eXtreme Slope`);
+        totalNCsRemaining += slopeNCsLeft-1;
+    }
 
     tableLines[2] = populateSneakTable("95% Combat", sneak95);
 

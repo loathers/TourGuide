@@ -10,13 +10,13 @@ void IOTMKGBriefcaseGenerateResource(ChecklistEntry [int] resource_entries)
     if (get_property_int("_kgbTranquilizerDartUses") < 3 && my_path().id != PATH_POCKET_FAMILIARS)
     {
         string [int] description;
-        description.listAppend("Free run, 20-turn banish.|Use the KGB tranquilizer dart skill in-combat.");
+        description.listAppend("Free run, 20-turn banish.");
         if (lookupItem("kremlin's greatest briefcase").equipped_amount() == 0)
         {
-		    description.listAppend(HTMLGenerateSpanFont("Equip the briefcase first!", "red"));
+		    description.listAppend(HTMLGenerateSpanFont("Equip the briefcase first", "red"));
             entry.url = "inventory.php?ftext=kremlin";
         }
-        resource_entries.listAppend(ChecklistEntryMake("__item Kremlin's Greatest Briefcase", entry.url, ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "briefcase dart", "briefcase darts"), "", description),0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Kremlin Briefcase tranq dart banish"));
+        resource_entries.listAppend(ChecklistEntryMake("__item Kremlin's Greatest Briefcase", entry.url, ChecklistSubentryMake(pluralise(3 - get_property_int("_kgbTranquilizerDartUses"), "KGB tranquilizer dart", "KGB tranquilizer darts"), "", description),0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Kremlin Briefcase tranq dart banish"));
     }
     int clicks_remaining = clampi(22 - get_property_int("_kgbClicksUsed"), 0, 22);
     if (!mafiaIsPastRevision(18110))

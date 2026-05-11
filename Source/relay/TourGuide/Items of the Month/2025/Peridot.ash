@@ -7,17 +7,20 @@ void IOTMPeridotGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry 
 	//   - not a tile addition, but add a peridot icon to location bar if you can use peridot in the zone
 
 	if (!__iotms_usable[lookupItem("Peridot of Peril")]) return;
+	boolean peridotEquipped = gemstoneEquipped(lookupItem("peridot of peril"));
 	string url = "inventory.php?ftext=peridot+of+peril";
 	string [int] description;
 	
-	if (lookupItem("peridot of peril").equipped_amount() == 1)
+	if (peridotEquipped)
 	{
 		description.listAppend(HTMLGenerateSpanFont("PERIDOT POWER!", "green"));
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 		string main_title = HTMLGenerateSpanFont("Peridot picking power", "green");
 		task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("peridot task"));
 	}
-	else if (lookupItem("peridot of peril").equipped_amount() == 0 && (__misc_state["in run"]))
+	else if (!peridotEquipped && (__misc_state["in run"]))
 	{
+		if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 		description.listAppend(HTMLGenerateSpanFont("Equip the peridot to map monsters", "red"));
 		optional_task_entries.listAppend(ChecklistEntryMake("__item peridot of peril", "", ChecklistSubentryMake("Peridot picking power", description), 10).ChecklistEntrySetIDTag("peridot task"));
 	}
@@ -64,7 +67,7 @@ RegisterResourceGenerationFunction("IOTMPeridotGenerateResource");
 void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (!__iotms_usable[lookupItem("Peridot of Peril")]) return;
     
-	boolean peridotEquipped = lookupItem("peridot of peril").equipped_amount() > 0;
+	boolean peridotEquipped = gemstoneEquipped(lookupItem("peridot of peril"));
 	string [int] perilLocations = get_property("_perilLocations").split_string(",");
 
 	string title = "Use your Peridot of Peril";
@@ -116,6 +119,7 @@ void IOTMPeridotGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (peridotPicks.count() == 0) return;
 
 	description.listAppend("Select relevant, available monsters!");
+	if (gemstoneInCodpiece(lookupItem("peridot of peril"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 	if (!peridotEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Peridot of Peril","red"));
 	description.listAppend("<hr>|*"+pp+peridotPicks.listJoinComponents("<hr>|*"+pp));
 

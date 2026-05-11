@@ -5,7 +5,7 @@ void IOTMEverfullDartsGenerateTasks(ChecklistEntry [int] task_entries, Checklist
     if (!__iotms_usable[$item[everfull dart holster]]) return;
 
     string [int] description;
-    string url = "inventory.php?ftext=everfull+dart_holster";
+    string url = "inventory.php?ftext=everfull+dart+holster";
 
     if ($effect[everything looks red].have_effect() == 0)  {
         int dartCooldown = 50;

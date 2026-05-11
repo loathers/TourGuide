@@ -576,23 +576,29 @@ string lastCombatInLocation(location place)
 
 static
 {
+    // Corrected these and added a few unrestricted/seapath ones
     int [location] __place_delays;
     __place_delays[$location[the spooky forest]] = 5;
-    __place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
-    __place_delays[$location[the boss bat's lair]] = 4;
-    __place_delays[$location[the oasis]] = 5;
-    __place_delays[$location[the hidden park]] = 6; //6? does turkey blaster give four turns sometimes...?
-    __place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
-    __place_delays[$location[the haunted bathroom]] = 5;
-    __place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
-    __place_delays[$location[the penultimate fantasy airship]] = 25;
-    __place_delays[$location[the "fun" house]] = 10;
-    __place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 10;
+    __place_delays[$location[the boss bat's lair]] = 5;
     __place_delays[$location[the outskirts of cobb's knob]] = 10;
+    __place_delays[$location[the penultimate fantasy airship]] = $item[bat wings].available_amount() > 0 ? 20 : 25;
+    __place_delays[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = 10;
+    __place_delays[$location[the hidden park]] = 6; //6? does turkey blaster give four turns sometimes...?
     __place_delays[$location[the hidden apartment building]] = 8;
     __place_delays[$location[the hidden office building]] = 10;
-    __place_delays[$location[the copperhead club]] = 14;
+    __place_delays[$location[the haunted gallery]] = 5; //FIXME this is a guess, spade
+    __place_delays[$location[the haunted bathroom]] = 5;
+    __place_delays[$location[the haunted bedroom]] = 6; //a guess from spading
+    __place_delays[$location[the haunted ballroom]] = 5; //FIXME rumored
+    __place_delays[$location[the copperhead club]] = 13;
     __place_delays[$location[the upper chamber]] = 5;
+    __place_delays[$location[the middle chamber]] = 5;
+    __place_delays[$location[the oasis]] = 5;
+    __place_delays[$location[the "fun" house]] = 10;
+    __place_delays[$location[the mer-kin outpost]] = 24;
+    __place_delays[$location[mer-kin library]] = 5;
+    __place_delays[$location[the smut orc logging camp]] = 19;
+    __place_delays[$location[twin peak]] = 50;
 }
 
 int totalDelayForLocation(location place)
@@ -1417,7 +1423,10 @@ int effective_familiar_weight(familiar f)
     }
     if (is_moved)
         weight += 10;
-    return weight;
+
+    // due to drunkula's wineglass you can sometimes get negative weights. 
+    //   this messes up any sqrt calcs. do not return negative weights.
+    return max(weight,0);
 }
 
 boolean year_is_leap_year(int year)
@@ -1718,4 +1727,22 @@ location hippyCampInDisguise() {
 
 boolean isAprilFools() {
     return (now_to_string("MMdd") == "0401");
+}
+
+// For gems that can appear in the Eternity Codpiece, helper function
+//   that checks both general equip status + 
+boolean gemstoneInCodpiece(item gem) {
+    if ($slot[codpiece1].equipped_item() == gem) return true;
+    if ($slot[codpiece2].equipped_item() == gem) return true;
+    if ($slot[codpiece3].equipped_item() == gem) return true;
+    if ($slot[codpiece4].equipped_item() == gem) return true;
+    if ($slot[codpiece5].equipped_item() == gem) return true;
+    return false;
+}
+
+// For gems that can appear in Eternity Codpiece, check both gem + cod equip status
+boolean gemstoneEquipped(item gem) {
+    if (gemstoneInCodpiece(gem)) return $item[The Eternity Codpiece].equipped_amount() > 0;
+    if (gem.equipped_amount() > 0) return true;
+    return false;
 }

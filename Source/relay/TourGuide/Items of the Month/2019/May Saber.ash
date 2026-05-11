@@ -68,9 +68,9 @@ void IOTMMaySaberGenerateResource(ChecklistEntry [int] resource_entries)
             if (sabersEquipped == 0)
                 description.listAppend(HTMLGenerateSpanFont("Equip the Fourth of May saber first", "red"));
             else
-                description.listAppend("Rollover runaway-like/banish");
+                description.listAppend("Free runaway, 30-turn banish. (Does <b>not</b> burn delay.)");
 
-            resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", "inventory.php?which=2", ChecklistSubentryMake("(up to) " + uses_remaining.pluralise("force banish", "forces banishes"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Fourth may saber force banish"));
+            resource_entries.listAppend(ChecklistEntryMake("__item Fourth of May Cosplay Saber", "inventory.php?which=2", ChecklistSubentryMake("(up to) " + uses_remaining.pluralise("force banish", "force banishes"), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Fourth may saber force banish"));
         }
     }
 }

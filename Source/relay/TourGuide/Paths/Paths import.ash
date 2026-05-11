@@ -23,3 +23,5 @@ import "relay/TourGuide/Paths/Fall of the Dinosaurs.ash";
 import "relay/TourGuide/Paths/Avatar of Shadows over Loathing.ash";
 import "relay/TourGuide/Paths/Legacy of Loathing.ash";
 import "relay/TourGuide/Paths/WereProfessor.ash";
+import "relay/TourGuide/Paths/Bodyguard.ash";
+import "relay/TourGuide/Paths/Zootomist.ash";

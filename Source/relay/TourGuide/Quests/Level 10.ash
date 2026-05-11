@@ -71,34 +71,50 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
         {
             int turns_spent = $location[the penultimate fantasy airship].turns_spent;
             int turns_delay = -1;
+
+            // bat wings change the between-NC available to be 1 less than the 5/5/5 etc
+            boolean haveBatWings = $item[bat wings].available_amount() > 0;
+            int [int] airshipTurnRef;
+            airshipTurnRef.listAppend(5);
+            airshipTurnRef.listAppend(10);
+            airshipTurnRef.listAppend(15);
+            airshipTurnRef.listAppend(20);
+            airshipTurnRef.listAppend(25);
+
+            // this ensures those with bat wings will show proper delay
+            if (haveBatWings) {
+                foreach i, val in airshipTurnRef {
+                    airshipTurnRef[i] = airshipTurnRef[i] - (1+i);
+                }
+            }
             
             boolean need_minus_combat = true;
             if (turns_spent == -1)
                 need_minus_combat = true;
-            else if (turns_spent < 5)
+            else if (turns_spent < airshipTurnRef[0])
             {
                 need_minus_combat = false;
-                turns_delay = 5 - turns_spent;
+                turns_delay = airshipTurnRef[0] - turns_spent;
             }
-            else if (turns_spent < 10 && $item[Tissue Paper Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[1] && $item[Tissue Paper Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 10 - turns_spent;
+                turns_delay = airshipTurnRef[1] - turns_spent;
             }
-            else if (turns_spent < 15 && $item[Tin Foil Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[2] && $item[Tin Foil Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 15 - turns_spent;
+                turns_delay = airshipTurnRef[2] - turns_spent;
             }
-            else if (turns_spent < 20 && $item[Gauze Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[3] && $item[Gauze Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 20 - turns_spent;
+                turns_delay = airshipTurnRef[3] - turns_spent;
             }
-            else if (turns_spent < 25 && $item[Plastic Wrap Immateria].available_amount() > 0)
+            else if (turns_spent < airshipTurnRef[4] && $item[Plastic Wrap Immateria].available_amount() > 0)
             {
                 need_minus_combat = false;
-                turns_delay = 25 - turns_spent;
+                turns_delay = airshipTurnRef[4] - turns_spent;
             }
             
             //boolean need_minus_combat_only_for_model_airship = false;
@@ -165,9 +181,9 @@ void QLevel10GenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
             
             //FIXME it would be nice to track this
             if (turns_spent == -1)
-                subentry.entries.listAppend("25 total turns of delay.");
-            else if (turns_spent < 25)
-                subentry.entries.listAppend(pluralise(25 - turns_spent, "turn", "turns") + " total delay remaining.");
+                subentry.entries.listAppend(airshipTurnRef[4]+" total turns of delay.");
+            else if (turns_spent < airshipTurnRef[4])
+                subentry.entries.listAppend(pluralise(airshipTurnRef[4] - turns_spent, "turn", "turns") + " total delay remaining.");
             if ($skill[Transcendent Olfaction].skill_is_usable() && !(get_property("olfactedMonster") == "Quiet Healer") && !have_more_than_enough_sgeeas)
                 subentry.entries.listAppend("Potentially olfact quiet healer for SGEEAs");
             

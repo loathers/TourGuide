@@ -15,6 +15,7 @@ void IOTMAprilShowerThoughtsGenerateTasks(ChecklistEntry [int] task_entries, Che
 	{
 		string main_title = HTMLGenerateSpanFont("April Shower Powers", "black");
 		boolean showerNEYR = get_property_boolean("_aprilShowerNorthernExplosion"); 
+		if (!lookupSkill("Northern Explosion").have_skill()) showerNEYR = true;
 		if (showerNEYR == false) {
 			description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
 			task_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", "", ChecklistSubentryMake(main_title, description), -11).ChecklistEntrySetIDTag("april shower thoughts calendar tasks"));
@@ -31,6 +32,7 @@ void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entri
 	
 	string main_title = HTMLGenerateSpanFont("April Shower Powers", "black");
 	boolean showerNEYR = get_property_boolean("_aprilShowerNorthernExplosion"); 
+		if (!lookupSkill("Northern Explosion").have_skill()) showerNEYR = true;
 	if (showerNEYR == false) {
 		description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
 	}
@@ -38,5 +40,6 @@ void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entri
 	{
 		description.listAppend("Craft your shower thoughts, with your "+pluralise(globCount,"glob","globs")+"!");
 	}
-	resource_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", url, ChecklistSubentryMake(main_title, description), 10).ChecklistEntrySetIDTag("april shower thoughts calendar resource"));
+	if (description.count() > 0)
+		resource_entries.listAppend(ChecklistEntryMake("__item april shower thoughts shield", url, ChecklistSubentryMake(main_title, description), 10).ChecklistEntrySetIDTag("april shower thoughts calendar resource"));
 }
