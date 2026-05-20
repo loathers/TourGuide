@@ -121,11 +121,22 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 RegisterResourceGenerationFunction("IOTYCyberRealmGenerateResource");
 void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries)
 {
+	string url;
+	string [int] description;
+	
+	// Adding a tiny bad moon reminder for the hack market
+	if (can_adventure($location[cyberzone 1]) && in_bad_moon() && availableSpleen() >= 1) {
+		url = "shop.php?whichshop=cyber_hackmarket";
+		string img = "__item datastick";
+		string needMeatString = my_meat() > 500 ? "(500 meat)" : HTMLGenerateSpanFont("(500 meat; get more!)","red");
+		description.listAppend("Purchase a <b>Synapse Blaster<b> "+needMeatString);
+		description.listAppend("|*+5 prismatic resistance; great for kitchen!");
+		resource_entries.listAppend(ChecklistEntryMake(img,url,ChecklistSubentryMake("Visit the Hack Market!","",description),8).ChecklistEntrySetIDTag("cyberrealm hack shop"));
+	}
+
     if ($item[server room key].available_amount() < 1) return;
     
     int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
-	string url;
-	string [int] description;
 
     if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
         string url = "place.php?whichplace=CyberRealm";

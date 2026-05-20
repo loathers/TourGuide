@@ -5,6 +5,9 @@ void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries)
     if (available_amount($item[Clan VIP Lounge key]) < 1)
         return;
 
+    // not usable in bad moon
+    if (in_bad_moon()) return;
+
     string [int] description;
 	string url = "clan_viplounge.php?action=photobooth";
 	

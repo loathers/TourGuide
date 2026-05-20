@@ -96,6 +96,7 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
 
         string [int] resonances;
 
+        
         // adding some filtering to remove from resonance list if cannot make
         if (!mayamSymbolsUsed.contains_text("vessel") && !mayamSymbolsUsed.contains_text("yam2") && !mayamSymbolsUsed.contains_text("cheese") && !mayamSymbolsUsed.contains_text("explosion"))
             resonances.listAppend(HTMLGenerateSpanOfClass("15-turn banisher", "r_bold") + ": Vessel + Yam + Cheese + Explosion");
@@ -108,6 +109,14 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (length(resonances) > 0)
             addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+
+        // if no available mayam combos, only show temple reset
+        if (mayamSymbolsUsed.contains_text("yam4") &&
+        mayamSymbolsUsed.contains_text("clock") &&
+        mayamSymbolsUsed.contains_text("explosion")) {
+            description.listClear();
+            hoverDescription.listClear();
+        }
 
         if (my_ascensions() > templeResetAscension && my_path().id != PATH_SEA) {
             addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanFont("Temple reset available!", "r_bold") + "");

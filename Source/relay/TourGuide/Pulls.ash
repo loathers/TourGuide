@@ -526,7 +526,7 @@ void generatePullList(Checklist [int] checklists)
 	    pullable_item_list.listAppend(GPItemMake($item[pocket wish], "Save turns with meat/item wishes, monster summons, and more", 20));  
 
     // If nuns is still needed, recommend pulling an inhaler.
-    if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && my_path().id != PATH_2CRS) {
+    if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && my_path().id != PATH_2CRS && $effect[sinuses for miles].have_effect() < 7) {
         pullable_item_list.listAppend(GPItemMake($item[Mick's IcyVapoHotness Inhaler], "10 turns of +200% meat|Worth anywhere from 1-3 turns on the nuns war sidequest"));
     }
         
@@ -703,7 +703,7 @@ void generatePullList(Checklist [int] checklists)
 
             if (__iotms_usable[$item[emotion chip]] && clampi(3 - get_property_int("_feelPrideUsed"), 0, 3) > 0) glitchDesc += "|Consider using Feel Pride to get 3x that total of stats.";
 
-            pullable_item_list.listAppend(GPItemMake(lookupItem("[glitch season reward name]"), glitchDesc));
+            if (my_path().id != PATH_MEAT) pullable_item_list.listAppend(GPItemMake(lookupItem("[glitch season reward name]"), glitchDesc));
         }
 
         if (my_primestat() == $stat[muscle])

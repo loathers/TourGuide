@@ -37,7 +37,7 @@ void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entri
 		description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
 	}
 	int globCount = available_amount($item[glob of wet paper]);
-	{
+    if (globCount > 0) {
 		description.listAppend("Craft your shower thoughts, with your "+pluralise(globCount,"glob","globs")+"!");
 	}
 	if (description.count() > 0)
