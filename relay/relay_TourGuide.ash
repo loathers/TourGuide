@@ -35727,7 +35727,7 @@ void generatePullList(Checklist [int] checklists)
 	    pullable_item_list.listAppend(GPItemMake($item[pocket wish], "Save turns with meat/item wishes, monster summons, and more", 20));  
 
     // If nuns is still needed, recommend pulling an inhaler.
-    if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && my_path().id != PATH_2CRS) {
+    if (!__quest_state["Level 12"].state_boolean["Nuns Finished"] && my_path().id != PATH_2CRS && $effect[sinuses for miles].have_effect() < 7) {
         pullable_item_list.listAppend(GPItemMake($item[Mick's IcyVapoHotness Inhaler], "10 turns of +200% meat|Worth anywhere from 1-3 turns on the nuns war sidequest"));
     }
         
@@ -35904,7 +35904,7 @@ void generatePullList(Checklist [int] checklists)
 
             if (__iotms_usable[$item[emotion chip]] && clampi(3 - get_property_int("_feelPrideUsed"), 0, 3) > 0) glitchDesc += "|Consider using Feel Pride to get 3x that total of stats.";
 
-            pullable_item_list.listAppend(GPItemMake(lookupItem("[glitch season reward name]"), glitchDesc));
+            if (my_path().id != PATH_MEAT) pullable_item_list.listAppend(GPItemMake(lookupItem("[glitch season reward name]"), glitchDesc));
         }
 
         if (my_primestat() == $stat[muscle])
@@ -58074,6 +58074,7 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
 
         string [int] resonances;
 
+        
         // adding some filtering to remove from resonance list if cannot make
         if (!mayamSymbolsUsed.contains_text("vessel") && !mayamSymbolsUsed.contains_text("yam2") && !mayamSymbolsUsed.contains_text("cheese") && !mayamSymbolsUsed.contains_text("explosion"))
             resonances.listAppend(HTMLGenerateSpanOfClass("15-turn banisher", "r_bold") + ": Vessel + Yam + Cheese + Explosion");
@@ -58086,6 +58087,14 @@ void IOTMMayamCalendarGenerateResource(ChecklistEntry [int] resource_entries)
         
         if (length(resonances) > 0)
             addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanOfClass("Cool Mayam combos!", "r_bold") + resonances.listJoinComponents("<hr>").HTMLGenerateIndentedText());
+
+        // if no available mayam combos, only show temple reset
+        if (mayamSymbolsUsed.contains_text("yam4") &&
+        mayamSymbolsUsed.contains_text("clock") &&
+        mayamSymbolsUsed.contains_text("explosion")) {
+            description.listClear();
+            hoverDescription.listClear();
+        }
 
         if (my_ascensions() > templeResetAscension && my_path().id != PATH_SEA) {
             addToBothDescriptions(description, hoverDescription, HTMLGenerateSpanFont("Temple reset available!", "r_bold") + "");
@@ -58416,6 +58425,9 @@ void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries)
     if (available_amount($item[Clan VIP Lounge key]) < 1)
         return;
 
+    // not usable in bad moon
+    if (in_bad_moon()) return;
+
     string [int] description;
 	string url = "clan_viplounge.php?action=photobooth";
 	
@@ -58639,11 +58651,22 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 RegisterResourceGenerationFunction("IOTYCyberRealmGenerateResource");
 void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries)
 {
+	string url;
+	string [int] description;
+	
+	// Adding a tiny bad moon reminder for the hack market
+	if (can_adventure($location[cyberzone 1]) && in_bad_moon() && availableSpleen() >= 1) {
+		url = "shop.php?whichshop=cyber_hackmarket";
+		string img = "__item datastick";
+		string needMeatString = my_meat() > 500 ? "(500 meat)" : HTMLGenerateSpanFont("(500 meat; get more!)","red");
+		description.listAppend("Purchase a <b>Synapse Blaster<b> "+needMeatString);
+		description.listAppend("|*+5 prismatic resistance; great for kitchen!");
+		resource_entries.listAppend(ChecklistEntryMake(img,url,ChecklistSubentryMake("Visit the Hack Market!","",description),8).ChecklistEntrySetIDTag("cyberrealm hack shop"));
+	}
+
     if ($item[server room key].available_amount() < 1) return;
     
     int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
-	string url;
-	string [int] description;
 
     if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
         string url = "place.php?whichplace=CyberRealm";
@@ -58792,7 +58815,7 @@ void IOTMAprilShowerThoughtsGenerateResource(ChecklistEntry [int] resource_entri
 		description.listAppend(HTMLGenerateSpanFont("Northern Explosion YR available", "blue"));		
 	}
 	int globCount = available_amount($item[glob of wet paper]);
-	{
+    if (globCount > 0) {
 		description.listAppend("Craft your shower thoughts, with your "+pluralise(globCount,"glob","globs")+"!");
 	}
 	if (description.count() > 0)
