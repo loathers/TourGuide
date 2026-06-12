@@ -35,7 +35,7 @@ void IOTMChestMimicGenerateResource(ChecklistEntry [int] resource_entries)
 				monster currMon = entry.split_string(":")[0].to_monster();
 				int currAmt = entry.split_string(":")[1].to_int();
 				string freeText = currMon.attributes.contains_text("FREE") ? " (free fight)" : "";
-				eggEntries.listAppend(pluralise(currAmt, currMon+" egg", currMon+" eggs")+freeText);
+				eggEntries.listAppend(pluralise(currAmt, currMon+"", currMon+"")+freeText);
 			}
 
 			string header = $item[mimic egg].pluralise().capitaliseFirstLetter();
