@@ -7,10 +7,12 @@ void IOTMSwordofSWordsGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 	string [int] description;
 	
 	int swordKills = get_property_int("_swordOfSWordsKills");
-	int swordChanges = get_property_int("_swordOfSWordsMonsterChanged");
+	int swordChangesLeft = clampi(3 - get_property_int("_swordOfSWordsMonsterChanged"), 0, 3);
 	monster swordTarget = to_monster(get_property("swordOfSWordsMonster"));
 	
 	if (swordKills == 100 && my_familiar() == lookupFamiliar("sword of s words")) {
+		description.listAppend("Target: " + HTMLGenerateSpanFont(swordTarget, "blue") + "");
+		description.listAppend(swordChangesLeft + " S-Sword re-targets left.");
 		task_entries.listAppend(ChecklistEntryMake("__familiar sword of s words", url, ChecklistSubentryMake(HTMLGenerateSpanFont("No more S-Sword drops", "red"), description), -11).ChecklistEntrySetIDTag("sword kills"));
 	}
 	else if (swordKills < 100 && my_familiar() == lookupFamiliar("sword of s words")) {
@@ -33,6 +35,7 @@ void IOTMSwordofSWordsGenerateResource(ChecklistEntry [int] resource_entries)
 	
 	if (swordKills == 100) {
 		title = (HTMLGenerateSpanFont("No more S-Sword drops", "red"));
+		description.listAppend("Target: " + HTMLGenerateSpanFont(swordTarget, "blue") + "");
 	}
 	else if (swordKills < 100) {
 		title = (HTMLGenerateSpanFont((100 - swordKills) + " S-Sword drops left", "black"));
