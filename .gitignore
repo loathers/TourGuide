@@ -1,7 +1,0 @@
-# some general ignores
-
-node_modules
-build
-.yarn/*
-.DS_Store
-.claude*
