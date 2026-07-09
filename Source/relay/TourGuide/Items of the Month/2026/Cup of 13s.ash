@@ -1,3 +1,4 @@
+//cup of 13s
 RegisterResourceGenerationFunction("IOTMCupof13sGenerateResource");
 void IOTMCupof13sGenerateResource(ChecklistEntry [int] resource_entries)
 {
@@ -10,7 +11,8 @@ void IOTMCupof13sGenerateResource(ChecklistEntry [int] resource_entries)
 		
 		if (Cupof13GemsLeft > 0) {
 			description.listAppend("Drink 1 liver for 13 advs " + HTMLGenerateSpanFont("", "blue") + "");
+			description.listAppend("2x snow cleats + gingerbread cigarette?");
+			resource_entries.listAppend(ChecklistEntryMake("__item cup of 13s", url, ChecklistSubentryMake(title, description), -11));
 		}
-		resource_entries.listAppend(ChecklistEntryMake("__item cup of 13s", url, ChecklistSubentryMake(title, description), -11));
 	}
 }
