@@ -15,9 +15,10 @@ void IOTTPortableLaughingStockGenerateResource(ChecklistEntry [int] resource_ent
 		else if (LaughingStockFruit > 11) {
 			description.listAppend("" + HTMLGenerateSpanFont("Not so easy now, buckaroo", "purple") + "");
 		}
+		
 		description.listAppend(HTMLGenerateSpanFont(available_amount($item[antique watermelon]) + " Antique watermelon", "red"));
-		description.listAppend(HTMLGenerateSpanFont(available_amount($item[classic banana]) + " Classic banana", "blue"));
-		description.listAppend(HTMLGenerateSpanFont(available_amount($item[quince]) + " Quince", "green"));
-		resource_entries.listAppend(ChecklistEntryMake("__item portable laughing stock", url, ChecklistSubentryMake(title, description), 10));
+		description.listAppend(HTMLGenerateSpanFont(available_amount($item[quince]) + " Quince", "blue"));
+		description.listAppend(HTMLGenerateSpanFont(available_amount($item[classic banana]) + " Classic banana", "green"));
+		resource_entries.listAppend(ChecklistEntryMake("__item portable laughing stock", url, ChecklistSubentryMake(title, description), 11));
 	}
 }
