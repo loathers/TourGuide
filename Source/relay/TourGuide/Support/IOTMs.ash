@@ -64,7 +64,7 @@ void initialiseIOTMsUsable()
                 __iotms_usable[garden] = true;
         }
     }
-    if (florist_available() && $item[hand turkey outline].is_unrestricted()) //May 2013
+    if (get_property("floristFriarAvailable").to_boolean() && $item[hand turkey outline].is_unrestricted()) //May 2013
         //Order of the Green Thumb Order Form is not marked as out of standard.
         __iotms_usable[$item[Order of the Green Thumb Order Form]] = true; 
     if (get_property_boolean("sleazeAirportAlways") || get_property_boolean("_sleazeAirportToday")) //May 2014
