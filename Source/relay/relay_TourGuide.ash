@@ -1,6 +1,6 @@
 //This script and its support scripts are in the public domain.
 
-since r28660; // fix: lots and lots of sea stuff
+since r29200; // Rollover adventures & pvp fights included in modtrace
 import "relay/TourGuide/Main.ash"
 
 void main()

@@ -57,7 +57,7 @@ void generateMisc(Checklist [int] checklists)
             description.listAppend("Or equip your wineglass.");
         }
         
-        int pvp_fights_gained = numeric_modifier("pvp fights").to_int() + 10;
+        int pvp_fights_gained = numeric_modifier("pvp fights").to_int();
         int pvp_fights_after_rollover_before_caps = pvp_attacks_left() + pvp_fights_gained;
         int pvp_fights_after_rollover = MIN(pvp_fights_after_rollover_before_caps, 100);
         if (today_is_pvp_season_end())
