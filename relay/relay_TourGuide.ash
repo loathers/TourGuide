@@ -1,6 +1,6 @@
 //This script and its support scripts are in the public domain.
 
-since r28660; // fix: lots and lots of sea stuff
+since r29200; // Rollover adventures & pvp fights included in modtrace
 //These settings are for development. Don't worry about editing them.
 string __version = "2.3.3"; 
 // pushed to 2.2.1 on jill/leaves tiles
@@ -36429,7 +36429,7 @@ void setUpState()
     __misc_state["in CS aftercore"] = __misc_state["in aftercore"] && get_property("csServicesPerformed").split_string(",").count() == 11;
     
     
-    int adventures_after_rollover = my_adventures() + 40;
+    int adventures_after_rollover = my_adventures();
     if (my_path().id != PATH_SLOW_AND_STEADY) {
         adventures_after_rollover += numeric_modifier("adventures");
         adventures_after_rollover += get_property_int("extraRolloverAdventures");
@@ -41103,7 +41103,7 @@ void generateMisc(Checklist [int] checklists)
             description.listAppend("Or equip your wineglass.");
         }
         
-        int pvp_fights_gained = numeric_modifier("pvp fights").to_int() + 10;
+        int pvp_fights_gained = numeric_modifier("pvp fights").to_int();
         int pvp_fights_after_rollover_before_caps = pvp_attacks_left() + pvp_fights_gained;
         int pvp_fights_after_rollover = MIN(pvp_fights_after_rollover_before_caps, 100);
         if (today_is_pvp_season_end())
