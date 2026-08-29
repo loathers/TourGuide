@@ -102,7 +102,7 @@ void setUpState()
     __misc_state["in CS aftercore"] = __misc_state["in aftercore"] && get_property("csServicesPerformed").split_string(",").count() == 11;
     
     
-    int adventures_after_rollover = my_adventures() + 40;
+    int adventures_after_rollover = my_adventures();
     if (my_path().id != PATH_SLOW_AND_STEADY) {
         adventures_after_rollover += numeric_modifier("adventures");
         adventures_after_rollover += get_property_int("extraRolloverAdventures");
