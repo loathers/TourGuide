@@ -61,16 +61,13 @@ jobs:
 
     steps:
       - name: setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v7
         with:
-          python-version: 3.8
-      
-      - name: Get branch name
-        uses: nelonoel/branch-name@v1.0.1
+          python-version: '3.12'
       
       # Checkout referrer (source) under ./source_branch/
       - name: checkout current branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           path: ./source_branch
       
@@ -80,7 +77,9 @@ jobs:
         id: set-target
         shell: python
         run: |
-          source = '${{ env.BRANCH_NAME }}'
+          import os
+          
+          source = '${{ github.ref_name }}'
           target = '${{ env.TARGET_NAME }}'
           
           if target == source:
@@ -90,11 +89,12 @@ jobs:
           elif '{0}' in target:
             target = target.format( source )
           
-          print(f'::set-output name=target-branch::{target}')
+          with open( os.environ['GITHUB_OUTPUT'], mode='a', encoding='UTF-8' ) as gh_output:
+            gh_output.write( f'target-branch={target}\n' )
       
       - name: checkout target branch
         id: target_get
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         continue-on-error: true
         with:
           ref: ${{ steps.set-target.outputs.target-branch }}
@@ -106,7 +106,7 @@ jobs:
       - name: create target branch
         id: target_create
         if: ${{ steps.target_get.outcome == 'failure' }}
-        uses: peterjgrainger/action-create-branch@v3.0.0
+        uses: peterjgrainger/action-create-branch@v4.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -116,7 +116,7 @@ jobs:
       - name: checkout created target branch
         id: target_get_created
         if: ${{ steps.target_create.outcome == 'success' }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           ref: ${{ steps.set-target.outputs.target-branch }}
           path: ./target_branch
@@ -138,7 +138,7 @@ jobs:
             if ( $workflow.path -eq "${{ github.workflow }}" -or $workflow.name -eq "${{ github.workflow }}" )
             {
               $workflow_path = $workflow.path
-              echo "::set-output name=workflow-path::$workflow_path"
+              Add-Content -Path $env:GITHUB_OUTPUT -Value "workflow-path=$workflow_path" -Encoding utf8
               break
             }
           }
@@ -309,7 +309,7 @@ jobs:
         
         
       - name: checkout bundler
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
         with:
           repository: fredg1/ASH-bundler
           path: bundler_branch
@@ -350,8 +350,9 @@ jobs:
             imported_files.extend( imports )
             bundled_files.append( source_script )
           
-          print(f'::set-output name=imported_files::{imported_files}')
-          print(f'::set-output name=bundled_files::{bundled_files}')
+          with open( os.environ['GITHUB_OUTPUT'], mode='a', encoding='UTF-8' ) as gh_output:
+            gh_output.write( f'imported_files={imported_files}\n' )
+            gh_output.write( f'bundled_files={bundled_files}\n' )
       
       # copy any non-ASH file in target_branch
       - name: Add non-ash in Source
@@ -408,7 +409,7 @@ jobs:
                 f.write( message + '\n' )
       
       - name: upload unused files message as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unused files found
           path: ./artifact.txt
@@ -419,6 +420,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add --all -v *
+          git add --all -v
           git commit -m "Import changes from ${{ github.ref }}" -a
           git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ steps.set-target.outputs.target-branch }} --follow-tags --tags
