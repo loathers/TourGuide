@@ -11,6 +11,7 @@ int PDS_SOURCE_TYPE_EQUIPMENT = 3;
 int PDS_SOURCE_TYPE_COMBAT_SKILL = 4;
 int PDS_SOURCE_TYPE_FAMILIAR = 5;
 int PDS_SOURCE_TYPE_BJORN_FAMILIAR = 6; //also crown
+int PDS_SOURCE_TYPE_PASTA_THRALL = 7;
 
 record PassiveDamageSource
 {
@@ -29,6 +30,7 @@ record PassiveDamageSource
     item source_combat_item; //if combat item
     skill source_combat_skill; //if combat skill
     familiar source_familiar; //familiar or bjorn familiar
+    thrall source_thrall; //pasta thrall
 };
 
 PassiveDamageSource PassiveDamageSourceMake(int damage_type, int source_type)
@@ -99,7 +101,7 @@ static
             __known_sources.listExactLastObject().PassiveDamageSourceAddDamage(1);
             __known_sources.listExactLastObject().source_equipment = it;
         }
-        foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce,spiky shell,Boner Battalion]
+        foreach e in $effects[Skeletal Warrior,Skeletal Cleric,Skeletal Wizard,Bone Homie,Burning\, Man,Biologically Shocked,EVISCERATE!,Fangs and Pangs,Permanent Halloween,Curse of the Black Pearl Onion,Long Live GORF,Apoplectic with Rage,Dizzy with Rage,Quivering with Rage,Jaba&ntilde;ero Saucesphere,Psalm of Pointiness,Drenched With Filth,Stuck-Up Hair,It's Electric!,Smokin',Jalape&ntilde;o Saucesphere,Scarysauce,Scariersauce,spiky shell,Boner Battalion]
         {
             __known_sources.listAppend(PassiveDamageSourceMake(PDS_DAMAGE_TYPE_ACTIVE, PDS_SOURCE_TYPE_EFFECT));
             __known_sources.listExactLastObject().PassiveDamageSourceAddDamage(1);
@@ -114,6 +116,15 @@ static
             __known_sources.listExactLastObject().chance_of_acting = 0.333; //most
             __known_sources.listExactLastObject().PassiveDamageSourceAddDamage(1);
             __known_sources.listExactLastObject().source_familiar = f;
+        }
+
+        foreach t in $thralls[Vampieroghi,Vermincelli,Lasagmbie]
+        {
+            if (my_class() != $class[Pastamancer] || (t.id == 2 || t.id == 6) && t.level < 5)
+                continue;
+            __known_sources.listAppend(PassiveDamageSourceMake(PDS_DAMAGE_TYPE_ACTIVE, PDS_SOURCE_TYPE_PASTA_THRALL));
+            __known_sources.listExactLastObject().PassiveDamageSourceAddDamage(1);
+            __known_sources.listExactLastObject().source_thrall = t;
         }
     }
     
@@ -156,6 +167,11 @@ PassiveDamageSource [int] PDSGetActiveDamageSources()
             if (my_bjorned_familiar() == pds.source_familiar && $item[buddy bjorn].equipped_amount() > 0)
                 should_add = true;
             if (my_enthroned_familiar() == pds.source_familiar && $item[crown of thrones].equipped_amount() > 0)
+                should_add = true;
+        }
+        else if (pds.source_type == PDS_SOURCE_TYPE_PASTA_THRALL)
+        {
+            if (my_thrall() == pds.source_thrall)
                 should_add = true;
         }
         if (should_add)
@@ -208,6 +224,11 @@ PassiveDamageSource [int] PDSGetPotentialDamageSources()
         {
             //FIXME add
         }
+        else if (pds.source_type == PDS_SOURCE_TYPE_PASTA_THRALL)
+        {
+            if (my_class() == $class[Pastamancer] && my_thrall() != pds.source_thrall && pds.source_thrall.skill.have_skill())
+                should_add = true;
+        }
         if (should_add)
             result.listAppend(pds);
     }
@@ -222,6 +243,7 @@ string [int] PDSGenerateDescriptionToUneffectPassives()
     string [int] equipment_types;
     string [int] familiar_types; //you know, because we often bring two or more familiars... with us... avatar of susie?
     string [int] bjorn_familiar_types;
+    string [int] thrall_types;
     foreach key, pds in PDSGetActiveDamageSources()
     {
         if (pds.source_type == PDS_SOURCE_TYPE_EFFECT)
@@ -240,6 +262,10 @@ string [int] PDSGenerateDescriptionToUneffectPassives()
         {
             bjorn_familiar_types.listAppend(pds.source_familiar);
         }
+        else if (pds.source_type == PDS_SOURCE_TYPE_PASTA_THRALL)
+        {
+            thrall_types.listAppend(pds.source_thrall);
+        }
     }
     string [int] result;
     if (effect_types.count() > 0)
@@ -250,6 +276,8 @@ string [int] PDSGenerateDescriptionToUneffectPassives()
         result.listAppend("Change familiar from " + familiar_types.listJoinComponents(", ", "and") + ".");
     if (bjorn_familiar_types.count() > 0)
         result.listAppend("Change bjorn/crown familiar from " + bjorn_familiar_types.listJoinComponents(", ", "and") + ".");
+    if (thrall_types.count() > 0)
+        result.listAppend("Dismiss pasta thrall " + thrall_types.listJoinComponents(", ", "and") + ".");
     if (get_property("_horsery") == "pale horse") //FIXME make generic
     	result.listAppend("Change to a different horse.");
         
