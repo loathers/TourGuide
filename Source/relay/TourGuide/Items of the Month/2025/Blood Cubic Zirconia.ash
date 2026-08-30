@@ -1,4 +1,30 @@
 //blood cubic zirconia
+Record StatCost {
+	int stats;
+	stat type;
+};
+
+string bczStatChange(StatCost cost) {
+	int substats = my_basestat(cost.type);
+	int mainstats = floor(square_root(substats));
+	int newMainstats = floor(square_root(substats - cost.stats));
+	int newLevel = floor(square_root(newMainstats - 4) + 1);
+
+	buffer statChange;
+	if (newMainstats < mainstats){
+		statChange.append(HTMLGenerateSpanFont("<i>" + newMainstats + "</i>", "crimson"));
+	}
+	if ((my_primesubstat() == cost.type) && (newLevel < my_level())) {
+		statChange.append(", L" + HTMLGenerateSpanFont("<b>" + newLevel + "</b>", "crimson"));
+	}
+
+	if (statChange.length() > 0) {
+		return(", (to " + statChange + ")");
+	} else {
+		return "";
+	}
+}
+
 RegisterTaskGenerationFunction("IOTMBloodCubicZirconiaGenerateTasks");
 void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
@@ -21,19 +47,19 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
         5:370, 6:1100, 7:2300, 8:3700, 9:11000, 
         10:23000, 11:37000, 12:420000, 13:1100000, 14:2300000,
         15:3700000};
-    int refractCost = bloodCast[min(bczRefracts, 15)];
-	int bulletCost = bloodCast[min(bczBullets, 15)];
-	int equityCost = bloodCast[min(bczEquitys, 15)];
+    StatCost refractCost = new StatCost(bloodCast[min(bczRefracts, 15)], $stat[submysticality]);
+	StatCost bulletCost = new StatCost(bloodCast[min(bczBullets, 15)], $stat[submoxie]);
+	StatCost equityCost = new StatCost(bloodCast[min(bczEquitys, 15)], $stat[submoxie]);
 	
 	if (gemstoneInCodpiece(lookupItem("blood cubic zirconia"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 	
 	if (gemstoneEquipped(lookupItem("blood cubic zirconia")))
 	{
 		if (bczRefracts < 13) {
-			description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost + "", "red") + " mys");
+			description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost.stats + "", "red") + " mys" + bczStatChange(refractCost));
 		}
 		else if (bczRefracts >= 13) {
-			description.listAppend(HTMLGenerateSpanFont("Next Refract costs " + refractCost + " mys. EXPENSIVE!", "red") + "");
+			description.listAppend(HTMLGenerateSpanFont("Next Refract costs " + refractCost.stats + " mys. EXPENSIVE!", "red") + bczStatChange(refractCost));
 		}
 			if (lookupItem("monodent of the sea").equipped_amount() == 0)
 			{
@@ -44,16 +70,16 @@ void IOTMBloodCubicZirconiaGenerateTasks(ChecklistEntry [int] task_entries, Chec
 				description.listAppend(HTMLGenerateSpanFont("Seadent FLEESH ok!", "blue"));		
 			}
 		if (bczBullets < 13) {
-			description.listAppend("Next Bullet costs " + HTMLGenerateSpanFont(bulletCost + "", "red") + " mox");
+			description.listAppend("Next Bullet costs " + HTMLGenerateSpanFont(bulletCost.stats + "", "red") + " mox" + bczStatChange(bulletCost));
 		}
 		else if (bczBullets >= 13) {
-			description.listAppend(HTMLGenerateSpanFont("Next Bullet costs " + bulletCost + " mox. EXPENSIVE!", "red") + "");
+			description.listAppend(HTMLGenerateSpanFont("Next Bullet costs " + bulletCost.stats + " mox. EXPENSIVE!", "red") + bczStatChange(bulletCost));
 		}
 		if (bczEquitys < 13) {
-			description.listAppend("Next Equity costs " + HTMLGenerateSpanFont(equityCost + "", "red") + " mox");
+			description.listAppend("Next Equity costs " + HTMLGenerateSpanFont(equityCost.stats + "", "red") + " mox" + bczStatChange(equityCost));
 		}
 		else if (bczEquitys >= 13) {
-			description.listAppend(HTMLGenerateSpanFont("Next Equity costs " + equityCost + " mox. EXPENSIVE!", "red") + "");
+			description.listAppend(HTMLGenerateSpanFont("Next Equity costs " + equityCost.stats + " mox. EXPENSIVE!", "red") + bczStatChange(equityCost));
 		}
 		// This was originally a supernag but I simply will not let this be -always- on my screen.	
 		task_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(HTMLGenerateSpanFont("BCZ: Blood Cubic Zirconia skills", "brown"), description), 11).ChecklistEntrySetIDTag("bcz important skills"));
@@ -81,28 +107,28 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
         5:370, 6:1100, 7:2300, 8:3700, 9:11000, 
         10:23000, 11:37000, 12:420000, 13:1100000, 14:2300000,
         15:3700000};
-    int bathCost = bloodCast[min(bczBaths, 15)];
-	int thinnerCost = bloodCast[min(bczThinners, 15)];
-	int dialCost = bloodCast[min(bczDials, 15)];
-	int pheromoneCost = bloodCast[min(bczPheromones, 15)];
-	int tapasCost = bloodCast[min(bczSpinalTapas, 15)];
-	int geyserCost = bloodCast[min(bczGeysers, 15)];
-	int refractCost = bloodCast[min(bczRefracts, 15)];
-	int bulletCost = bloodCast[min(bczBullets, 15)];
-	int equityCost = bloodCast[min(bczEquitys, 15)];
+    StatCost bathCost = new StatCost(bloodCast[min(bczBaths, 15)], $stat[submuscle]);
+	StatCost thinnerCost = new StatCost(bloodCast[min(bczThinners, 15)], $stat[submuscle]);
+	StatCost dialCost = new StatCost(bloodCast[min(bczDials, 15)], $stat[submysticality]);
+	StatCost pheromoneCost = new StatCost(bloodCast[min(bczPheromones, 15)], $stat[submoxie]);
+	StatCost tapasCost = new StatCost(bloodCast[min(bczSpinalTapas, 15)], $stat[submysticality]);
+	StatCost geyserCost = new StatCost(bloodCast[min(bczGeysers, 15)], $stat[submuscle]);
+	StatCost refractCost = new StatCost(bloodCast[min(bczRefracts, 15)], $stat[submysticality]);
+	StatCost bulletCost = new StatCost(bloodCast[min(bczBullets, 15)], $stat[submoxie]);
+	StatCost equityCost = new StatCost(bloodCast[min(bczEquitys, 15)], $stat[submoxie]);
 	
 	if (gemstoneInCodpiece(lookupItem("blood cubic zirconia"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
 	
-	description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost + "", "red") + " mys");
-	description.listAppend("Next Bullet costs " + HTMLGenerateSpanFont(bulletCost + "", "red") + " mox");
-	description.listAppend("Next Equity costs " + HTMLGenerateSpanFont(equityCost + "", "red") + " mox");
+	description.listAppend("Next Refract costs " + HTMLGenerateSpanFont(refractCost.stats + "", "red") + " mys" + bczStatChange(refractCost));
+	description.listAppend("Next Bullet costs " + HTMLGenerateSpanFont(bulletCost.stats + "", "red") + " mox" + bczStatChange(bulletCost));
+	description.listAppend("Next Equity costs " + HTMLGenerateSpanFont(equityCost.stats + "", "red") + " mox" + bczStatChange(equityCost));
 	
-	description.listAppend("Next Geyser costs " + HTMLGenerateSpanFont(geyserCost + "", "brown") + " mus");
-	description.listAppend("Next Bath costs " + HTMLGenerateSpanFont(bathCost + "", "brown") + " mus");
-	description.listAppend("Next Dial costs " + HTMLGenerateSpanFont(dialCost + "", "brown") + " mys");
-	description.listAppend("Next Thinner costs " + HTMLGenerateSpanFont(thinnerCost + "", "brown") + " mus");
-	description.listAppend("Next Tapas costs " + HTMLGenerateSpanFont(tapasCost + "", "brown") + " mys");
-	description.listAppend("Next Pheromone costs " + HTMLGenerateSpanFont(pheromoneCost + "", "brown") + " mox");
+	description.listAppend("Next Geyser costs " + HTMLGenerateSpanFont(geyserCost.stats + "", "brown") + " mus" + bczStatChange(geyserCost));
+	description.listAppend("Next Bath costs " + HTMLGenerateSpanFont(bathCost.stats + "", "brown") + " mus" + bczStatChange(bathCost));
+	description.listAppend("Next Dial costs " + HTMLGenerateSpanFont(dialCost.stats + "", "brown") + " mys" + bczStatChange(dialCost));
+	description.listAppend("Next Thinner costs " + HTMLGenerateSpanFont(thinnerCost.stats + "", "brown") + " mus" + bczStatChange(thinnerCost));
+	description.listAppend("Next Tapas costs " + HTMLGenerateSpanFont(tapasCost.stats + "", "brown") + " mys" + bczStatChange(tapasCost));
+	description.listAppend("Next Pheromone costs " + HTMLGenerateSpanFont(pheromoneCost.stats + "", "brown") + " mox" + bczStatChange(pheromoneCost));
 		
 	resource_entries.listAppend(ChecklistEntryMake("__item blood cubic zirconia", url, ChecklistSubentryMake(HTMLGenerateSpanFont("BCZ: Blood Cubic Zirconia skills", "brown"), description), 11).ChecklistEntrySetIDTag("bcz important skills"));
 	
@@ -120,7 +146,7 @@ void IOTMBloodCubicZirconiaGenerateResource(ChecklistEntry [int] resource_entrie
 	if (bczBullets > 0) subtitle= "have used "+pluralise(bczBullets,"bullet","bullets")+" today";
 
 	bulletDesc.listAppend("Win a fight without taking a turn.");
-	bulletDesc.listAppend("Next bullet costs "+bulletCost+" moxie substats");
+	bulletDesc.listAppend("Next bullet costs "+bulletCost.stats+" moxie substats");
 	if (!gemstoneEquipped(lookupItem("blood cubic zirconia"))) 
 		bulletDesc.listAppend(HTMLGenerateSpanFont("Equip the Blood Cubic Zirconia first", "red"));
 
