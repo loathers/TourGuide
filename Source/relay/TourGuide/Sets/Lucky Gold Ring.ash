@@ -33,7 +33,7 @@ void LuckyGoldRingGenerateResource(ChecklistEntry [int] resource_entries)
 				description.listAppend(HTMLGenerateSpanFont(lgrBeachBuck + "/25 Beach Bucks", "black"));
 			}
 		}
-		if (locationAvailable($location[cyberzone 1])) {
+		if (get_property_boolean("_cyberTrashCollected")) {
 			if (lgrCyberBit == 10) {
 				description.listAppend(HTMLGenerateSpanFont(lgrCyberBit + "/10 Cyberrealm Bits", "grey"));
 			} else {
