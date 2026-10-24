@@ -432,7 +432,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     // Having done this, you now append the NCs remaining subentry to the end of the core entry, with an on_mouse_over bit as well.
 
     // However, I am going to be lazy, and not append either of these in the event the user is in CS/GG.
-    if (my_path().id != PATH_COMMUNITY_SERVICE && my_path().id != PATH_GREY_GOO && my_path().id != PATH_SEA) {
+    if (my_path().id != PATH_COMMUNITY_SERVICE && my_path().id != PATH_GREY_GOO && my_path().id != PATH_SEA && __misc_state["in run"]) {
         entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", HTMLGenerateSpanOfClass("Mouse over for the best sneaks!", "r_bold r_element_spooky_desaturated")));
         entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalNCsRemaining, "NC remaining","NCs remaining"), "", table.HTMLGenerateSimpleTableLines(false)));
     }
