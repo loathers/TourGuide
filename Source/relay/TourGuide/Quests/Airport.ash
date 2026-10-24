@@ -1263,30 +1263,6 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
     task_entries.listAppend(ChecklistEntryMake("__item " + missing_lamps[0], url, ChecklistSubentryMake("Make a " + colours_missing.listJoinComponents(", ", "and") + " LavaCo Lamp&trade;", modifiers, description), $locations[LavaCo&trade; Lamp Factory]).ChecklistEntrySetIDTag("Airport hot lavaco_lamp"));
 }
 
-void QHotAirportSuperduperheatedMetalGenerateTasks(ChecklistEntry [int] task_entries)
-{
-    int metal_sheets = lookupItem("Heat-resistant sheet metal").item_amount();
-    string image;
-    string header;
-    string [int] description;
-
-    if (!get_property_boolean("_volcanoSuperduperheatedMetal") && (__last_adventure_location == $location[The Bubblin\' Caldera] || !__misc_state["in run"])) {
-        image = "__item superduperheated metal";
-        header = "Get superduperheated metal";
-            if (metal_sheets > 0)
-                description.listAppend("Adventure in the Bubblin' Caldera. ~1/20 chance of superduperheated metal.");
-            else
-                description.listAppend("Get some (scraps of) heat-resistant sheet metal in your inventory.");
-    } else if (__last_adventure_location == $location[The Bubblin\' Caldera] && metal_sheets > 0) {
-        image = "__item superheated metal";
-        header = "Don't waste more Heat-resistant sheet metal";
-        description.listAppend("Already got Superduperheated metal today. Closet your Heat-resistant sheet metal (unless you want Superheated metal for the SMOOCH uniform).");
-    }
-
-    if (description.count() > 0)
-        task_entries.listAppend(ChecklistEntryMake(image, "place.php?whichplace=airport_hot", ChecklistSubentryMake(header, "", description), $locations[The Bubblin\' Caldera]).ChecklistEntrySetIDTag("Airport hot superduperheated"));
-}
-
 void QHotAirportWLFBunkerGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (get_property_boolean("_volcanoItemRedeemed"))

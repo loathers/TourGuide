@@ -152,6 +152,7 @@ void initialiseIOTMsUsable()
     	//FIXME all
         __iotms_usable[lookupItem("Clan Carnival Game")] = true;
         __iotms_usable[$item[clan floundry]] = true;
+        __iotms_usable[lookupItem("photo booth sized crate")] = true;
     }
 
     if (lookupItem("candy cane sword cane").available_amount() > 0) //Dec 2023
@@ -174,7 +175,7 @@ void initialiseIOTMsUsable()
         
     if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
         __iotms_usable[lookupItem("tearaway pants")] = true;
-        
+	        
     if (lookupItem("sept-ember censer").available_amount() > 0) //Sep 2024
         __iotms_usable[lookupItem("sept-ember censer")] = true;
         
@@ -184,6 +185,9 @@ void initialiseIOTMsUsable()
     // Nov 2024 -- peace turkey, unneedded
     // Dec 2024 -- takerspace, in campground above 
     
+    if (get_property_boolean("crAlways") || get_property_boolean("_crToday")) // 2025 IotY
+        __iotms_usable[lookupItem("CyberRealm keycode")] = true;
+
     if (lookupItem("McHugeLarge duffel bag").available_amount() > 0) //Jan 2025
         __iotms_usable[lookupItem("McHugeLarge duffel bag")] = true;
         
