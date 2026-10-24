@@ -91,7 +91,7 @@ void setUpState()
 		__misc_state["Example mode"] = true;
 	}
     
-	__misc_state["in aftercore"] = get_property_boolean("kingLiberated");
+	__misc_state["in aftercore"] = (get_property_boolean("kingLiberated") || (QuestState("questL13Final").mafia_internal_step > 13 && !in_ronin()));
     //if (get_property_ascension("lastKingLiberation") && my_ascensions() != 0)
         //__misc_state["in aftercore"] = true;
 	__misc_state["in run"] = !__misc_state["in aftercore"];
