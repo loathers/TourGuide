@@ -3,7 +3,7 @@ RegisterTaskGenerationFunction("IOTMHeartstoneGenerateTasks");
 void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) 
 {
 	// This is a TAPE-helper optional task tile.
-	if (!__iotms_usable[lookupItem("Heartstone")]) return;
+	if (!__iotms_usable[lookupItem("Heartstone")] || !__misc_state["in run"]) return;
 
     // What are the heartstone's letters?
     string heartLetters = get_property("heartstoneLetters");
