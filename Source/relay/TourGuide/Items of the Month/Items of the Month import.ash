@@ -152,12 +152,10 @@ import "relay/TourGuide/Items of the Month/2024/Everfull Dart Holster.ash";
 import "relay/TourGuide/Items of the Month/2024/Apriling Band Helmet.ash";
 import "relay/TourGuide/Items of the Month/2024/Mayam Calendar.ash";
 import "relay/TourGuide/Items of the Month/2024/Roman Candelabra.ash";
-import "relay/TourGuide/Items of the Month/2024/Mini Kiwi.ash";
 import "relay/TourGuide/Items of the Month/2024/Tearaway Pants.ash";
 import "relay/TourGuide/Items of the Month/2024/Sept-Ember Censer.ash";
 import "relay/TourGuide/Items of the Month/2024/bat wings.ash";
 import "relay/TourGuide/Items of the Month/2024/VIP Photobooth.ash";
-import "relay/TourGuide/Items of the Month/2024/Peace Turkey.ash";
 import "relay/TourGuide/Items of the Month/2024/TakerSpace.ash";
 
 // 2025
@@ -173,7 +171,6 @@ import "relay/TourGuide/Items of the Month/2025/Mobius Ring.ash";
 import "relay/TourGuide/Items of the Month/2025/Seadent.ash";
 import "relay/TourGuide/Items of the Month/2025/Blood Cubic Zirconia.ash";
 import "relay/TourGuide/Items of the Month/2025/Shrunken Head.ash";
-import "relay/TourGuide/Items of the Month/2025/Skeleton of Crimbo Past.ash";
 
 // 2026
 import "relay/TourGuide/Items of the Month/2026/Eternity Codpiece.ash";
