@@ -16,11 +16,11 @@ void IOTMBoomBoxGenerateResource(ChecklistEntry [int] resource_entries) {
 		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), 8));
 	}
 	if (boomboxProgress == 9) {
-		task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop in 2 fights", "", description), -11));
+		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop in 2 fights", "", description), -11));
 	}
 	
 	if (boomboxProgress == 10) {
-		task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop this fight", "", description), -11));
+		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop this fight", "", description), -11));
 	}
 	
 	if (song == "" && changes_left > 0) {
