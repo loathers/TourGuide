@@ -58119,41 +58119,6 @@ void IOTMRomanCandelabraGenerateTasks(ChecklistEntry [int] task_entries, Checkli
     }
 }
 
-// Mini-Kiwi
-RegisterResourceGenerationFunction("IOTMMiniKiwiGenerateResource");
-void IOTMMiniKiwiGenerateResource(ChecklistEntry [int] resource_entries)
-{
-	if (!lookupFamiliar("Mini Kiwi").familiar_is_usable()) return;
-
-    // This familiar sucks. It's really bad. Still, fine to have a tile, I guess.
-    int miniKiwiCount = $item[mini kiwi].available_amount();
-    float kiwiWeight = effective_familiar_weight($familiar[Mini Kiwi]) + weight_adjustment();
-    float kiwiModifier = $item[aviator goggles].available_amount() > 0 ? 0.75 : 0.50;
-
-    // Calculating the chance of a kiwi per fight; weight * your modifier
-    int kiwiChance = to_int(min(kiwiWeight * kiwiModifier,100.0));
-    boolean kiwiSpiritsBought = get_property_boolean("_miniKiwiIntoxicatingSpiritsBought"); 
-    int miniKiwiBikiniCount = $item[mini kiwi bikini].available_amount();
-
-    // Tile setup stuff
-	string [int] description;
-	string url = "familiar.php"; // Could send to the kwiki mart, but don't care enough.
-	string header = pluralise(miniKiwiCount, "mini kiwi available", "mini kiwis available");
-
-	description.listAppend(`At {to_int(kiwiWeight)} weight, you have a {kiwiChance}% chance of a mini kiwi each fight.`);
-
-    if (!kiwiSpiritsBought && __misc_state["can drink just about anything"]) {
-        description.listAppend('|*Consider purchasing mini kiwi intoxicating spirits, for 3 kiwis.');
-    }
-
-    if (miniKiwiBikiniCount < 1 && get_property_int("zeppelinProtestors") < 80) {
-        description.listAppend('|*Consider purchasing mini kiwi bikinis, for the Zeppelin sleaze test.');
-    } 
-
-	resource_entries.listAppend(ChecklistEntryMake("__familiar mini kiwi", url, ChecklistSubentryMake(header, "", description), 10));
-
-}
-
 // Tearaway Pants
 RegisterTaskGenerationFunction("IOTMTearawayPantsGenerateTask");
 void IOTMTearawayPantsGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -58435,31 +58400,6 @@ void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries)
         
     }
 }
-RegisterResourceGenerationFunction("IOTMPeaceTurkeyGenerateResource");
-void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries)
-{
-	if (!lookupFamiliar("Peace Turkey").familiar_is_usable()) return;
-
-	// Purkey Title
-    int turkeyProc = 24;
-	float turkeyWeight = max(0.0, effective_familiar_weight($familiar[peace turkey]) + weight_adjustment());
-	turkeyProc = 24 + square_root(turkeyWeight);
-	
-	int PeasCount = available_amount($item[whirled peas]);
-	int PeaSoupCount = available_amount($item[handful of split pea soup]);
-	string [int] description;
-	string url = "familiar.php";
-	{
-		description.listAppend("" + PeasCount + " peas available (need to paste them)");
-		description.listAppend("" + PeaSoupCount + " peabanishers available");
-		resource_entries.listAppend(ChecklistEntryMake("__familiar peace turkey", url, ChecklistSubentryMake(HTMLGenerateSpanFont(turkeyProc +"% Peace Turkey proc", "black"), "", description), 2));
-	}
-	if ($item[handful of split pea soup].available_amount() > 0 )
-    {
-        resource_entries.listAppend(ChecklistEntryMake("__item handful of split pea soup", "", ChecklistSubentryMake(pluralise($item[handful of split pea soup]), "also, have " + PeasCount + " peas", "Free run, 30-turn banish. "), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
-    }
-}
-
 //Takerspace
 RegisterResourceGenerationFunction("IOTMTakerspaceGenerateResource");
 void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
@@ -59546,56 +59486,6 @@ void IOTMShrunkenHeadGenerateResource(ChecklistEntry [int] resource_entries)
     description.listAppend("|*Any ol' Smut Orc"+HTMLGenerateSpanFont(" (10%)", "gray", "0.8em"));
     
     resource_entries.listAppend(ChecklistEntryMake("__item shrunken head", url, ChecklistSubentryMake(title, "", description), 9).ChecklistEntrySetIDTag("Shrunken Head Targets"));
-}
-//crimbo skeleton
-RegisterTaskGenerationFunction("IOTMSkeletonOfCrimboPastGenerateTasks");
-// TODO: minor clean-up
-//   - add conditional URL to send to familiar if not equipped w/in resource
-//   - keep the % phylum table in a hoverover but if they have skellies left just point to skellies
-
-void IOTMSkeletonOfCrimboPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
-	if (!lookupFamiliar("skeleton of crimbo past").familiar_is_usable() || my_familiar() != lookupFamiliar("skeleton of crimbo past")) return;
-	string url = "main.php?talktosocp=1";
-	string [int] description;
-	
-	int fightKnucklebones = get_property_int("_knuckleboneDrops");
-	int restKnucklebones = get_property_int("_knuckleboneRests");
-	int totalKnucklebonesLeft = clampi(100 - (fightKnucklebones + restKnucklebones), 0, 100);
-	if (restKnucklebones < 5) {
-		description.listAppend(5 - restKnucklebones + " rest knucklebones available.");
-	}
-	
-	if (totalKnucklebonesLeft == 0) {
-		task_entries.listAppend(ChecklistEntryMake("__familiar skeleton of crimbo past", url, ChecklistSubentryMake(HTMLGenerateSpanFont("No more knucklebone drops", "red"), description), -11).ChecklistEntrySetIDTag("crimbo skeleton knucklebones"));
-	} else {
-		task_entries.listAppend(ChecklistEntryMake("__familiar skeleton of crimbo past", url, ChecklistSubentryMake(HTMLGenerateSpanFont(totalKnucklebonesLeft + " knucklebone drops left", "green"), description), -11).ChecklistEntrySetIDTag("crimbo skeleton knucklebones"));
-	}
-}
-
-RegisterResourceGenerationFunction("IOTMSkeletonOfCrimboPastGenerateResource");
-void IOTMSkeletonOfCrimboPastGenerateResource(ChecklistEntry [int] resource_entries) {
-	if (!lookupFamiliar("skeleton of crimbo past").familiar_is_usable()) return;
-
-	int fightKnucklebones = get_property_int("_knuckleboneDrops");
-	int restKnucklebones = get_property_int("_knuckleboneRests");
-	int totalKnucklebonesLeft = clampi(100 - (fightKnucklebones + restKnucklebones), 0, 100);
-	if (totalKnucklebonesLeft == 0) return;
-	
-	string [int] description;
-
-	if (restKnucklebones < 5) {
-		description.listAppend(5 - restKnucklebones + " rest knucklebones available.");
-	}
-	
-	string title = (HTMLGenerateSpanFont(totalKnucklebonesLeft + " knucklebone drops left", "green"));
-	description.listAppend("|*90% - skeleton");
-	description.listAppend("|*70% - orc / pirate");
-	description.listAppend("|*50% - dude / elf / hobo");
-	description.listAppend("|*30% - beast / demon / goblin / humanoid / undead");
-	description.listAppend("|*20% - fish / penguin / weird");
-	description.listAppend("|*10% - construct / bug");
-	description.listAppend("|*0% - constellation / elemental / hippy / horror / mer-kin / plant / slime");
-	resource_entries.listAppend(ChecklistEntryMake("__familiar skeleton of crimbo past", "main.php?talktosocp=1", ChecklistSubentryMake(title, description), 11));
 }
 
 // 2026
