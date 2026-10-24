@@ -1618,7 +1618,6 @@ void QAirportGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [in
     QSleazeAirportGenerateTasks(chosen_entries);
     QSpookyAirportGenerateTasks(chosen_entries);
     QStenchAirportGenerateTasks(chosen_entries);
-    QHotAirportGenerateTasks(chosen_entries);
     QColdAirportGenerateTasks(chosen_entries);
 }
 
