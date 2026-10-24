@@ -35125,7 +35125,7 @@ void SFamiliarDropsGenerateResource(ChecklistEntry [int] resource_entries)
     entry.url = "familiar.php";
     entry.image_lookup_name = "__item Familiar-Gro&trade; Terrarium"; // TODO: pick better image lol
     entry.tags.id = "Familiar Drops Megatile";
-    entry.importance_level = 8;
+    entry.importance_level = -1;
 	entry.should_indent_after_first_subentry = true;
 	entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("★ Familiar Drops Available ★","#165e61"),"","Consider these familiars for useful drops!<br>"));
 
