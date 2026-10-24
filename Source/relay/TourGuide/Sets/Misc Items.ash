@@ -1307,20 +1307,15 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
     }
 
     // Due to out-of-standard combat items being usable, this is outside of the payphone tile.
-    int shadowBricks = $item[shadow brick].item_amount();
-    int shadowBricksUsed = get_property_int("_shadowBricksUsed");
     int shadowBrickUsesLeft = clampi(13 - get_property_int("_shadowBricksUsed"), 0, 13);
-
-    string subtitle = shadowBricksUsed > 0 ? "have used "+pluralise(shadowBricksUsed, "brick", "bricks") : "";
-    
-    if ($item[shadow brick].item_amount() > 0) {
+    if ($item[shadow brick].item_amount() > 0 && shadowBrickUsesLeft > 0) {
+        int shadowBricks = $item[shadow brick].item_amount();
+        int shadowBricksUsed = get_property_int("_shadowBricksUsed");
         string header = pluralise(shadowBricks, "shadow brick", "shadow bricks");
-        if (shadowBrickUsesLeft < shadowBricks) {
-            if (shadowBrickUsesLeft == 0)
-                header += " (not usable today)";
-            else
-                header += " (" + shadowBrickUsesLeft + " usable today)";
+        if (shadowBrickUsesLeft < shadowBricks && shadowBrickUsesLeft > 0) {
+            header += " (" + shadowBrickUsesLeft + " usable today)";
         }
+        string subtitle = shadowBricksUsed > 0 ? "have used "+pluralise(shadowBricksUsed, "brick", "bricks") : "";
         resource_entries.listAppend(ChecklistEntryMake("__item shadow brick", "", ChecklistSubentryMake(header, subtitle, "Win a fight without taking a turn.")).ChecklistEntrySetCombinationTag("free instakill"));
     }
 }
