@@ -4079,21 +4079,8 @@ boolean item_is_pvp_stealable(item it)
 
 int effective_familiar_weight(familiar f)
 {
-	if (f == $familiar[none]) return 0;
-    int weight = f.familiar_weight();
-    
-    boolean is_moved = false;
-    string [int] familiars_used_on = get_property("_feastedFamiliars").split_string_alternate(";");
-    foreach key, f_name in familiars_used_on
-    {
-        if (f_name.to_familiar() == f)
-        {
-            is_moved = true;
-            break;
-        }
-    }
-    if (is_moved)
-        weight += 10;
+    if (f == $familiar[none]) return 0;
+    int weight =familiar_weight(f) + f.soup_weight + (f.feasted ? 10 : 0);
 
     // due to drunkula's wineglass you can sometimes get negative weights. 
     //   this messes up any sqrt calcs. do not return negative weights.
@@ -5047,6 +5034,7 @@ void initialiseIOTMsUsable()
     	//FIXME all
         __iotms_usable[lookupItem("Clan Carnival Game")] = true;
         __iotms_usable[$item[clan floundry]] = true;
+        __iotms_usable[lookupItem("photo booth sized crate")] = true;
     }
 
     if (lookupItem("candy cane sword cane").available_amount() > 0) //Dec 2023
@@ -5069,7 +5057,7 @@ void initialiseIOTMsUsable()
         
     if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
         __iotms_usable[lookupItem("tearaway pants")] = true;
-        
+	        
     if (lookupItem("sept-ember censer").available_amount() > 0) //Sep 2024
         __iotms_usable[lookupItem("sept-ember censer")] = true;
         
@@ -5079,6 +5067,9 @@ void initialiseIOTMsUsable()
     // Nov 2024 -- peace turkey, unneedded
     // Dec 2024 -- takerspace, in campground above 
     
+    if (get_property_boolean("crAlways") || get_property_boolean("_crToday")) // 2025 IotY
+        __iotms_usable[lookupItem("CyberRealm keycode")] = true;
+
     if (lookupItem("McHugeLarge duffel bag").available_amount() > 0) //Jan 2025
         __iotms_usable[lookupItem("McHugeLarge duffel bag")] = true;
         
@@ -24161,30 +24152,6 @@ void QHotAirportLavaCoLampGenerateTasks(ChecklistEntry [int] task_entries)
     
     
     task_entries.listAppend(ChecklistEntryMake("__item " + missing_lamps[0], url, ChecklistSubentryMake("Make a " + colours_missing.listJoinComponents(", ", "and") + " LavaCo Lamp&trade;", modifiers, description), $locations[LavaCo&trade; Lamp Factory]).ChecklistEntrySetIDTag("Airport hot lavaco_lamp"));
-}
-
-void QHotAirportSuperduperheatedMetalGenerateTasks(ChecklistEntry [int] task_entries)
-{
-    int metal_sheets = lookupItem("Heat-resistant sheet metal").item_amount();
-    string image;
-    string header;
-    string [int] description;
-
-    if (!get_property_boolean("_volcanoSuperduperheatedMetal") && (__last_adventure_location == $location[The Bubblin\' Caldera] || !__misc_state["in run"])) {
-        image = "__item superduperheated metal";
-        header = "Get superduperheated metal";
-            if (metal_sheets > 0)
-                description.listAppend("Adventure in the Bubblin' Caldera. ~1/20 chance of superduperheated metal.");
-            else
-                description.listAppend("Get some (scraps of) heat-resistant sheet metal in your inventory.");
-    } else if (__last_adventure_location == $location[The Bubblin\' Caldera] && metal_sheets > 0) {
-        image = "__item superheated metal";
-        header = "Don't waste more Heat-resistant sheet metal";
-        description.listAppend("Already got Superduperheated metal today. Closet your Heat-resistant sheet metal (unless you want Superheated metal for the SMOOCH uniform).");
-    }
-
-    if (description.count() > 0)
-        task_entries.listAppend(ChecklistEntryMake(image, "place.php?whichplace=airport_hot", ChecklistSubentryMake(header, "", description), $locations[The Bubblin\' Caldera]).ChecklistEntrySetIDTag("Airport hot superduperheated"));
 }
 
 void QHotAirportWLFBunkerGenerateTasks(ChecklistEntry [int] task_entries)
@@ -47208,26 +47175,6 @@ void IOTMSpeakeasyGenerateResource(ChecklistEntry [int] resource_entries)
     if (__misc_state["in run"] || drinks_remaining > 0)
         resource_entries.listAppend(ChecklistEntryMake("__item observational glasses", "clan_viplounge.php?action=speakeasy", ChecklistSubentryMake(pluralise(drinks_remaining, "speakeasy drink", "speakeasy drinks"), "", description), 8).ChecklistEntrySetIDTag("Clan VIP speakeasy resource")); //the eyes of T.J. Eckleburg
     
-}
-//Spring Break Beach cash register
-RegisterTaskGenerationFunction("IOTMSpringBreakBeachGenerateTasks");
-void IOTMSpringBreakBeachGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    if (!__misc_state["sleaze airport available"])
-        return;
-	int dinerBucksLeft = clampi(4 - get_property_int("_sloppyDinerBeachBucks"), 0, 4);
-	string url;
-	string [int] description;
-	if (dinerBucksLeft > 0)
-	{
-        string title = (dinerBucksLeft + " Sloppy Seconds Diner cash register raids");
-		url = "place.php?whichplace=airport_sleaze";
-		description.listAppend("Money money money money monay!");
-		if (!lookupSkill("sloppy secrets").have_skill()) {
-			description.listAppend("Learn Sloppy Secrets for more Beach Bucks.");
-		}
-		optional_task_entries.listAppend(ChecklistEntryMake("__item beach buck", url, ChecklistSubentryMake(title, "", description), 8));
-	}
 }
 
 // 2015
