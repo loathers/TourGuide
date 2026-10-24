@@ -50808,47 +50808,38 @@ void IOTMGodLobsterGenerateResource(ChecklistEntry [int] resource_entries)
 }
 
 //Songboom
-RegisterTaskGenerationFunction("IOTMBoomBoxGenerateTasks");
-void IOTMBoomBoxGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
+RegisterResourceGenerationFunction("IOTMBoomBoxGenerateResource");
+void IOTMBoomBoxGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (lookupItem("SongBoom&trade; BoomBox").available_amount() == 0) return;
 	
 	// leaving this for aftercore because TES likes this tile, but it is not needed in-run
 	if (__misc_state["in run"]) return;
  
 	string song = get_property("boomBoxSong");
-	int changes_left = get_property_int("_boomBoxSongsLeft"); //the boys are back in town, eleven times. everyone will love it
-	
+	int changes_left = get_property_int("_boomBoxSongsLeft");
 	int boomboxProgress = get_property_int("_boomBoxFights");
 	string [int] description;
-	{
-		description.listAppend("Now playing: " + HTMLGenerateSpanOfClass(song, "r_bold")); //+ " (" + changes_left + " song swaps today)");
-		if (boomboxProgress < 9)
-		{
-            description.listAppend((11 - boomboxProgress).pluralise("combat", "combats") + " until next drop.");
-			optional_task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), 8));
-        }	
-		if (boomboxProgress == 9)
-		{
-            task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop in 2 fights", "", description), -11));
-        }	
-		
-		if (boomboxProgress == 10)
-        {
-            task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop this fight", "", description), -11));
-        }
-	}	
- 
-	if (song == "" && changes_left > 0)
-	{
-        string [int] description;
-        if (!__quest_state["Level 7"].finished && my_path().id != PATH_COMMUNITY_SERVICE)
-        	description.listAppend("Eye of the Giger: Nightmare Fuel for the cyrpt.");
-        if (fullness_limit() > 0)
-	        description.listAppend("Food Vibrations: extra adventures from food" + (__misc_state["in run"] ? ", +30% food drop" : "") + ".");
-        description.listAppend("Total Eclipse of Your Meat: extra meat, +30% meat.");
-  
-        optional_task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Set BoomBox song", "", description), 8).ChecklistEntrySetIDTag("SongBoom BoomBox turn on"));
+	description.listAppend("Now playing: " + HTMLGenerateSpanOfClass(song, "r_bold"));
+	if (boomboxProgress < 9) {
+		description.listAppend((11 - boomboxProgress).pluralise("combat", "combats") + " until next drop.");
+		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox song stuff", "", description), 8));
+	}
+	if (boomboxProgress == 9) {
+		task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop in 2 fights", "", description), -11));
+	}
+	
+	if (boomboxProgress == 10) {
+		task_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Boombox drop this fight", "", description), -11));
+	}
+	
+	if (song == "" && changes_left > 0) {
+		string [int] description;
+		if (!__quest_state["Level 7"].finished && my_path().id != PATH_COMMUNITY_SERVICE)
+			description.listAppend("Eye of the Giger: Nightmare Fuel for the cyrpt.");
+		if (fullness_limit() > 0)
+			description.listAppend("Food Vibrations: extra adventures from food" + (__misc_state["in run"] ? ", +30% food drop" : "") + ".");
+		description.listAppend("Total Eclipse of Your Meat: extra meat, +30% meat.");
+		resource_entries.listAppend(ChecklistEntryMake("__item SongBoom&trade; BoomBox", "inv_use.php?pwd=" + my_hash() + "&whichitem=9919", ChecklistSubentryMake("Set BoomBox song", "", description), 8).ChecklistEntrySetIDTag("SongBoom BoomBox turn on"));
 	}
 }	
 RegisterResourceGenerationFunction("IOTMCatBurglarGenerateResource");
@@ -55764,20 +55755,13 @@ void IOTMSITCertificateGenerateTasks(ChecklistEntry [int] task_entries, Checklis
             // If in-run, generate a supernag
             description.listAppend("Try changing your S.I.T. course to accumulate different items.");
             task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
-        } 
-        else {
-            // If not, generate an optional task
-            main_title = "Could change your S.I.T. skill, for new items...";
-            optional_task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), 1).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
         }
-    } 
-    else {
+    } else {
         // If they don't have a skill, generate a supernag.
         string miscPhrase = miscPhrases[random(count(miscPhrases))];
         description.listAppend(HTMLGenerateSpanFont(miscPhrase + " Take your S.I.T. course!", "red"));
         task_entries.listAppend(ChecklistEntryMake("__item S.I.T. Course Completion Certificate", url, ChecklistSubentryMake(main_title, subtitle, description), -11).ChecklistEntrySetIDTag("S.I.T. Course Completion Certificate"));
     }
-
 }
 //shadow phone
 QuestState parseRufusQuestState() {
@@ -58518,9 +58502,9 @@ void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
 // 2025
 //CyberRealm
 RegisterTaskGenerationFunction("IOTYCyberRealmGenerateTasks");
-void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-	if ($item[server room key].available_amount() < 1) return;
+void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+
+	if (!__iotms_usable[lookupItem("CyberRealm keycode")]) return;
 	
 	int CyberFree = lookupSkill("OVERCLOCK(10)").have_skill() ? clampi(10 - get_property_int("_cyberFreeFights"), 0, 10) : 0;
 	int zone1Turns = get_property_int("_cyberZone1Turns");
@@ -58531,125 +58515,85 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 	string url = "place.php?whichplace=CyberRealm";
 	string image_name = "__skill stats+++";
 		
-		// If in-run, do not show the FITMW nag.
-		if ($item[familiar-in-the-middle wrapper].equipped_amount() == 1) {
-			description.listAppend(HTMLGenerateSpanFont("FITMW equipped. Extra 1 per fight.", "blue"));
-		}
-		else if ($item[familiar-in-the-middle wrapper].equipped_amount() == 0 && !__misc_state["in run"]) {
-			description.listAppend(HTMLGenerateSpanFont("Equip your FITMW for an extra 1 per fight.", "red"));
-		}
-		
-		#if (zone1Turns < 20)
-		{
-			if (zone1Turns < 9) {			
-				description.listAppend(9 - zone1Turns + " combats until Zone 1 Eleres test.");
-			}
-			else if (zone1Turns == 9)
-			{
-				description.listAppend(HTMLGenerateSpanFont("Get 11 eleres for the Cyberzone 1 test", "blue"));
-				image_name = "__skill overclock(10)";
-			}
-			else if (zone1Turns < 19) 
-			{			
-				description.listAppend(19 - zone1Turns + " combats until Zone 1 reward.");
-			}
-			else if (zone1Turns == 19)
-			{
-				description.listAppend(HTMLGenerateSpanFont("Cyberzone 1 reward!", "green"));
-				image_name = "__skill sleep(5)";
-			}
-			else if (zone1Turns > 19) {			
-				description.listAppend(HTMLGenerateSpanFont("Cyberzone 1 finished.", "grey"));
-			}
-		}
-		
-		#if (zone2Turns < 20)
-		{
-			if (zone2Turns < 9) {			
-				description.listAppend(9 - zone2Turns + " combats until Zone 2 Eleres test.");
-			}
-			else if (zone2Turns == 9)
-			{
-				description.listAppend(HTMLGenerateSpanFont("Get 11 eleres for the Cyberzone 2 test", "blue"));
-				image_name = "__skill overclock(10)";
-			}
-			else if (zone2Turns < 19) 
-			{			
-				description.listAppend(19 - zone2Turns + " combats until Zone 2 reward.");
-			}
-			else if (zone2Turns == 19)
-			{
-				description.listAppend(HTMLGenerateSpanFont("Cyberzone 2 reward!", "green"));
-				image_name = "__skill sleep(5)";
-			}
-			else if (zone2Turns > 19) {			
-				description.listAppend(HTMLGenerateSpanFont("Cyberzone 2 finished.", "grey"));
-			}
-		}
-		
-		#if (zone3Turns < 20)
-		{
-			if (zone3Turns < 9) {			
-				description.listAppend(9 - zone3Turns + " combats until Zone 3 Eleres test.");
-			}
-			else if (zone3Turns == 9)
-			{
-				description.listAppend(HTMLGenerateSpanFont("Get 11 eleres for the Cyberzone 3 test", "blue"));
-				image_name = "__skill overclock(10)";
-			}
-			else if (zone3Turns < 19) 
-			{			
-				description.listAppend(19 - zone3Turns + " combats until Zone 3 reward.");
-			}
-			else if (zone3Turns == 19)
-			{
-				description.listAppend(HTMLGenerateSpanFont("Cyberzone 3 reward!", "green"));
-				image_name = "__skill sleep(5)";
-			}
-			else if (zone3Turns > 19) {			
-				description.listAppend(HTMLGenerateSpanFont("Cyberzone 3 finished.", "grey"));
-			}
-		}
-				
-		if (($locations[Cyberzone 1,Cyberzone 2,Cyberzone 3] contains __last_adventure_location))
-		{
-			description.listAppend(HTMLGenerateSpanFont("Have " + CyberFree + " free fights left!", "green"));
-			task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), -11));
-		}
-		else
-		{
-			if (CyberFree > 0) {
-				description.listAppend(HTMLGenerateSpanFont("Have " + CyberFree + " free fights left!", "green"));
-				optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
+	// If in-run, do not show the FITMW nag.
+	if (lookupItem("familiar-in-the-middle wrapper").have() && !lookupItem("familiar-in-the-middle wrapper").equipped() && !__misc_state["in run"]) {
+		description.listAppend(HTMLGenerateSpanFont("Equip your FITMW for an extra 1 per fight.", "red"));
+	}
+	
+	if (zone1Turns < 9) {
+		description.listAppend(9 - zone1Turns + " combats until Zone 1 Eleres test.");
+	}	else if (zone1Turns == 9) {
+		description.listAppend(HTMLGenerateSpanFont("Get 11 eleres for the Cyberzone 1 test", "blue"));
+		image_name = "__skill overclock(10)";
+	}	else if (zone1Turns < 19) {
+		description.listAppend(19 - zone1Turns + " combats until Zone 1 reward.");
+	}	else if (zone1Turns == 19) {
+		description.listAppend(HTMLGenerateSpanFont("Cyberzone 1 reward!", "green"));
+		image_name = "__skill sleep(5)";
+	}	else if (zone1Turns > 19) {
+		description.listAppend(HTMLGenerateSpanFont("Cyberzone 1 finished.", "grey"));
+	}
 
-			}
-			else	{
-				// In the event the user doesn't have free fights remaining, you don't need to enumerate the whole tile in-run.
-				description.listAppend(HTMLGenerateSpanFont("No free fights left", "red"));
-				if (__misc_state["in run"]) {
-					optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", HTMLGenerateSpanFont("No free fights left!", "red")), 10));
-				}
-				else {
-					optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
-				}
+	if (zone2Turns < 9) {
+		description.listAppend(9 - zone2Turns + " combats until Zone 2 Eleres test.");
+	}	else if (zone2Turns == 9)	{
+		description.listAppend(HTMLGenerateSpanFont("Get 11 eleres for the Cyberzone 2 test", "blue"));
+		image_name = "__skill overclock(10)";
+	}	else if (zone2Turns < 19) {
+		description.listAppend(19 - zone2Turns + " combats until Zone 2 reward.");
+	}	else if (zone2Turns == 19) {
+		description.listAppend(HTMLGenerateSpanFont("Cyberzone 2 reward!", "green"));
+		image_name = "__skill sleep(5)";
+	} else if (zone2Turns > 19) {
+		description.listAppend(HTMLGenerateSpanFont("Cyberzone 2 finished.", "grey"));
+	}
+
+	if (zone3Turns < 9) {
+		description.listAppend(9 - zone3Turns + " combats until Zone 3 Eleres test.");
+	}	else if (zone3Turns == 9)	{
+		description.listAppend(HTMLGenerateSpanFont("Get 11 eleres for the Cyberzone 3 test", "blue"));
+		image_name = "__skill overclock(10)";
+	}	else if (zone3Turns < 19) {
+		description.listAppend(19 - zone3Turns + " combats until Zone 3 reward.");
+	}	else if (zone3Turns == 19) {
+		description.listAppend(HTMLGenerateSpanFont("Cyberzone 3 reward!", "green"));
+		image_name = "__skill sleep(5)";
+	}	else if (zone3Turns > 19) {
+		description.listAppend(HTMLGenerateSpanFont("Cyberzone 3 finished.", "grey"));
+	}
+
+	if (lookupLocations("Cyberzone 1,Cyberzone 2,Cyberzone 3") contains __last_adventure_location) {
+		description.listAppend(HTMLGenerateSpanFont("Have " + CyberFree + " free fights left!", "green"));
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), -11));
+	}	else {
+		if (CyberFree > 0) {
+			description.listAppend(HTMLGenerateSpanFont("Have " + CyberFree + " free fights left!", "green"));
+			optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
+		} else {
+			// In the event the user doesn't have free fights remaining, you don't need to enumerate the whole tile in-run.
+			if (__misc_state["in run"]) {
+				optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", HTMLGenerateSpanFont("No free fights left!", "red")), 10));
+			} else {
+				optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
 			}
 		}
+	}
 }
 
-RegisterResourceGenerationFunction("IOTYCyberRealmGenerateResource");
-void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if ($item[server room key].available_amount() < 1) return;
-    
-    int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
+RegisterResourceGenerationFunction("IOTYCyberRealmFreeFightsGenerateResource");
+void IOTYCyberRealmFreeFightsGenerateResource(ChecklistEntry [int] resource_entries) {
+
+	if (!__iotms_usable[lookupItem("CyberRealm keycode")]) return;
+	
+	int CyberFree = clampi(10 - get_property_int("_cyberFreeFights"), 0, 10);
 	string url;
 	string [int] description;
 
-    if (get_property_int("_cyberFreeFights") < 10 && lookupSkill("OVERCLOCK(10)").have_skill()) {
-        string url = "place.php?whichplace=CyberRealm";
+	if (CyberFree > 0 && lookupSkill("OVERCLOCK(10)").skill_is_usable()) {
+		string url = "place.php?whichplace=CyberRealm";
 		description.listAppend("Hack into the system!");
 		resource_entries.listAppend(ChecklistEntryMake("__skill stats+++", url, ChecklistSubentryMake(pluralise(CyberFree, "CyberRealm fight", "CyberRealm fights"), "", description), 0).ChecklistEntrySetCombinationTag("daily free fight").ChecklistEntrySetIDTag("CyberRealm free fight"));
-    }
+	}
 }
 
 
@@ -59609,44 +59553,40 @@ RegisterTaskGenerationFunction("IOTMSkeletonOfCrimboPastGenerateTasks");
 //   - add conditional URL to send to familiar if not equipped w/in resource
 //   - keep the % phylum table in a hoverover but if they have skellies left just point to skellies
 
-void IOTMSkeletonOfCrimboPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
-{
-    if (!lookupFamiliar("skeleton of crimbo past").familiar_is_usable()) return;
+void IOTMSkeletonOfCrimboPastGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+	if (!lookupFamiliar("skeleton of crimbo past").familiar_is_usable() || my_familiar() != lookupFamiliar("skeleton of crimbo past")) return;
 	string url = "main.php?talktosocp=1";
 	string [int] description;
 	
 	int fightKnucklebones = get_property_int("_knuckleboneDrops");
 	int restKnucklebones = get_property_int("_knuckleboneRests");
 	int totalKnucklebonesLeft = clampi(100 - (fightKnucklebones), 0, 100);
-	description.listAppend(5 - restKnucklebones + " rest knucklebones available.");
-	
-	if (totalKnucklebonesLeft == 0 && my_familiar() == lookupFamiliar("skeleton of crimbo past")) {
-		task_entries.listAppend(ChecklistEntryMake("__familiar skeleton of crimbo past", url, ChecklistSubentryMake(HTMLGenerateSpanFont("No more knucklebone drops", "red"), description), -11).ChecklistEntrySetIDTag("crimbo skeleton knucklebones"));
+	if (restKnucklebones < 5) {
+		description.listAppend(5 - restKnucklebones + " rest knucklebones available.");
 	}
-	else if (totalKnucklebonesLeft > 0 && my_familiar() == lookupFamiliar("skeleton of crimbo past")) {
+	
+	if (totalKnucklebonesLeft == 0) {
+		task_entries.listAppend(ChecklistEntryMake("__familiar skeleton of crimbo past", url, ChecklistSubentryMake(HTMLGenerateSpanFont("No more knucklebone drops", "red"), description), -11).ChecklistEntrySetIDTag("crimbo skeleton knucklebones"));
+	} else {
 		task_entries.listAppend(ChecklistEntryMake("__familiar skeleton of crimbo past", url, ChecklistSubentryMake(HTMLGenerateSpanFont(totalKnucklebonesLeft + " knucklebone drops left", "green"), description), -11).ChecklistEntrySetIDTag("crimbo skeleton knucklebones"));
 	}
 }
 
 RegisterResourceGenerationFunction("IOTMSkeletonOfCrimboPastGenerateResource");
-void IOTMSkeletonOfCrimboPastGenerateResource(ChecklistEntry [int] resource_entries)
-{
+void IOTMSkeletonOfCrimboPastGenerateResource(ChecklistEntry [int] resource_entries) {
 	if (!lookupFamiliar("skeleton of crimbo past").familiar_is_usable()) return;
-	string url = "main.php?talktosocp=1";
 	string [int] description;
-	string title;
 	
 	int fightKnucklebones = get_property_int("_knuckleboneDrops");
 	int restKnucklebones = get_property_int("_knuckleboneRests");
 	int totalKnucklebonesLeft = clampi(100 - (fightKnucklebones), 0, 100);
 	
-	description.listAppend(5 - restKnucklebones + " rest knucklebones available.");
-	
-	if (totalKnucklebonesLeft == 0) {
-		title = (HTMLGenerateSpanFont("No more knucklebone drops", "red"));
+	if (restKnucklebones < 5) {
+		description.listAppend(5 - restKnucklebones + " rest knucklebones available.");
 	}
-	else if (totalKnucklebonesLeft > 0) {
-		title = (HTMLGenerateSpanFont(totalKnucklebonesLeft + " knucklebone drops left", "green"));
+	
+	if (totalKnucklebonesLeft > 0) {
+		string title = (HTMLGenerateSpanFont(totalKnucklebonesLeft + " knucklebone drops left", "green"));
 		description.listAppend("|*90% - skeleton");
 		description.listAppend("|*70% - orc / pirate");
 		description.listAppend("|*50% - dude / elf / hobo");
@@ -59655,7 +59595,7 @@ void IOTMSkeletonOfCrimboPastGenerateResource(ChecklistEntry [int] resource_entr
 		description.listAppend("|*10% - construct / bug");
 		description.listAppend("|*0% - constellation / elemental / hippy / horror / mer-kin / plant / slime");
 	}
-	resource_entries.listAppend(ChecklistEntryMake("__familiar skeleton of crimbo past", url, ChecklistSubentryMake(title, description), 11));
+	resource_entries.listAppend(ChecklistEntryMake("__familiar skeleton of crimbo past", "main.php?talktosocp=1", ChecklistSubentryMake(title, description), 11));
 }
 
 // 2026
@@ -59795,7 +59735,7 @@ RegisterTaskGenerationFunction("IOTMHeartstoneGenerateTasks");
 void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) 
 {
 	// This is a TAPE-helper optional task tile.
-	if (!__iotms_usable[lookupItem("Heartstone")]) return;
+	if (!__iotms_usable[lookupItem("Heartstone")] || !__misc_state["in run"]) return;
 
     // What are the heartstone's letters?
     string heartLetters = get_property("heartstoneLetters");
