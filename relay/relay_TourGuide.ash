@@ -24336,26 +24336,6 @@ void QHotAirportWLFBunkerGenerateTasks(ChecklistEntry [int] task_entries)
     task_entries.listAppend(ChecklistEntryMake("__item volcoino", url, ChecklistSubentryMake("Help smash the system!", subtitle, description), relevant_locations).ChecklistEntrySetIDTag("Airport hot WLF quest"));
 }
 
-void QHotAirportGenerateTasks(ChecklistEntry [int] task_entries)
-{
-    if (!__misc_state["hot airport available"])
-        return;
-    
-    QHotAirportLavaCoLampGenerateTasks(task_entries);
-    QHotAirportSuperduperheatedMetalGenerateTasks(task_entries);
-    QHotAirportWLFBunkerGenerateTasks(task_entries);
-    
-    if ($item[lucky gold ring].available_amount() > 0 && !get_property_boolean("_luckyGoldRingVolcoino")) {
-        string url;
-        string title = "Adventure with ";
-        if ($item[lucky gold ring].equipped_amount() == 0) {
-            title = "Equip ";
-            url = $item[lucky gold ring].invSearch();
-        }
-        task_entries.listAppend(ChecklistEntryMake("__item lucky gold ring", url, ChecklistSubentryMake(title + " your Lucky Gold Ring", "~1% volcoino/combat", "Can give 1 volcoino per day.")).ChecklistEntrySetIDTag("Airport hot lucky_gold_ring"));
-    }
-}
-
 void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
 {
     if (!__misc_state["hot airport available"])
