@@ -207,5 +207,5 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
 		
 	string stillSweatTypeTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Suggested Stillsuit Familiars", "r_tooltip_outer_class");
 	description.listAppend(stillSweatTypeTooltip);
-    resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
+    resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), 2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
 }

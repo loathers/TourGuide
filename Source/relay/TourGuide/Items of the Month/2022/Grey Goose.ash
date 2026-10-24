@@ -107,6 +107,6 @@ void IOTMGreyGooseGenerateResource(ChecklistEntry [int] resource_entries)
 			else if (famExperienceGain < 11) //cannot gooso
 				description.listAppend(HTMLGenerateSpanFont("Cannot GOOSO any drops per fight!", "red") + "");
 		}
-		resource_entries.listAppend(ChecklistEntryMake("__familiar Grey Goose", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Grey goose skills ready!", "grey"), "", description), -2));
+		resource_entries.listAppend(ChecklistEntryMake("__familiar Grey Goose", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Grey goose skills ready!", "grey"), "", description), 2));
 	}
 }
