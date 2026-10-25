@@ -62,17 +62,17 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 
 	if (lookupLocations("Cyberzone 1,Cyberzone 2,Cyberzone 3") contains __last_adventure_location) {
 		description.listAppend(HTMLGenerateSpanFont("Have " + CyberFree + " free fights left!", "green"));
-		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), -11));
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures remaining", "", description), -11));
 	}	else {
 		if (CyberFree > 0) {
 			description.listAppend(HTMLGenerateSpanFont("Have " + CyberFree + " free fights left!", "green"));
-			optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
+			optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures remaining", "", description), 10));
 		} else {
 			// In the event the user doesn't have free fights remaining, you don't need to enumerate the whole tile in-run.
 			if (__misc_state["in run"]) {
-				optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", HTMLGenerateSpanFont("No free fights left!", "red")), 10));
+				optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures remaining", "", HTMLGenerateSpanFont("No free fights left!", "red")), 10));
 			} else {
-				optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures!", "", description), 10));
+				optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(60 - CyberZoneLeft + " CyberRealm adventures remaining", "", description), 10));
 			}
 		}
 	}

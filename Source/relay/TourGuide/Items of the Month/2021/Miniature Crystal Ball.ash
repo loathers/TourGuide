@@ -1,6 +1,6 @@
 // Miniature Crystal ball
 RegisterResourceGenerationFunction("IOTMCrystalBallGenerateTasks");
-void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) {
+void IOTMCrystalBallGenerateResource(ChecklistEntry [int] resource_entries) {
 	string title;
  
 	title = "Miniature crystal ball monster prediction(s)";
