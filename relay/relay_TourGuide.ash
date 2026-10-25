@@ -53406,7 +53406,7 @@ void IOTMCommerceGhostGenerateTasks(ChecklistEntry [int] task_entries, Checklist
 
 // 2021
 // Miniature Crystal ball
-RegisterResourceGenerationFunction("IOTMCrystalBallGenerateTasks");
+RegisterResourceGenerationFunction("IOTMCrystalBallGenerateResource");
 void IOTMCrystalBallGenerateResource(ChecklistEntry [int] resource_entries) {
 	string title;
  
