@@ -25658,8 +25658,7 @@ string [int] luckyOptions(int cloversAvailable) {
 
 //Clovers and Lucky
 RegisterResourceGenerationFunction("LuckyGenerateResource");
-void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
-{
+void LuckyGenerateResource(ChecklistEntry [int] resource_entries) {
 
 	// SYNTAX FOR NEW LUCKY SOURCES
 	//   In order to centralize, we are using the SneakSource concept from the sneaks megatile.
@@ -25674,11 +25673,10 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 	};
 
 	// Refactoring lucky to reflect/use TES megatile suggestion
-    // if (!__misc_state["in run"]) return;
 
 	// useful state variables
-    int spleenRemaining = spleen_limit() - my_spleen_use();
-    int stomachLeft = availableFullness();
+	int spleenRemaining = spleen_limit() - my_spleen_use();
+	int stomachLeft = availableFullness();
 
 	// Build out all the lucky sources.
 
@@ -25688,20 +25686,16 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 		final.sourceName = "clover";
 		final.url = invSearch("11-leaf clover");
 		final.imageLookupName = "__item 11-leaf clover";
-		
 		// # of clovers available
 		int cloversAvailable = clampi(3 - get_property_int("_cloversPurchased"), 0, 3);
 		if (my_path().id == PATH_ZOMBIE_SLAYER) cloversAvailable = 0;
 		if (my_path().id == PATH_NUCLEAR_AUTUMN) cloversAvailable = 0;
 		int cloversPossible = $item[11-leaf clover].available_amount() + cloversAvailable;
-	
 		// usable if we have any clovers available/possible
-		final.luckyCondition = cloversPossible > 0;
-
+		final.luckyCondition = cloversPossible > 0 && __misc_state["in run"]; // kind of useless to show out of run when they can be bought from the mall.
 		final.luckyCount = cloversPossible;
 		final.tileDescription = `<b>{cloversPossible}x clovers</b> left`;
 		final.tileDescription = cloversAvailable > 0 ? final.tileDescription + `, with {cloversAvailable}x at the Hermit` : final.tileDescription;
-
 		return final;
 	}
 
@@ -25711,107 +25705,100 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 		final.sourceName = "astral energy drink";
 		final.url = invSearch("astral energy");
 		final.imageLookupName = "__item astral energy drink";
-		
 		// # of AEDs available or possible
 		int availableAEDs = available_amount($item[[10883]astral energy drink]) + available_amount($item[[10882]carton of astral energy drinks])*6;
 		int spleenFitsThisManyAEDs = min(floor(spleenRemaining / 5),availableAEDs);
-
 		// usable if we have any clovers available/possible
 		final.luckyCondition = availableAEDs > 0 && spleenFitsThisManyAEDs > 0;
-
 		final.luckyCount = spleenFitsThisManyAEDs;
 		final.tileDescription = `<b>{spleenFitsThisManyAEDs}x AEDs</b> to consume`;
 		final.tileDescription = availableAEDs - spleenFitsThisManyAEDs > 0 ? final.tileDescription + `, with {availableAEDs - spleenFitsThisManyAEDs}x ready for tomorrow` : final.tileDescription;
-
 		return final;
 	}
 
+	// 2026: Use black thorn key to open a locked chest in the Black Rose Garden"
+	LuckySource getBlackThornKeys() {
+		LuckySource final;
+		final.sourceName = `black thorn key`;
+		final.url = 'campground.php';
+		final.imageLookupName = "__item black thorn key";
+		int keysAvailable = lookupItem("black thorn key").available_amount(); // when mafia tracks how many chests are available in the garden this needs updated.
+		boolean gardenAvailable = get_property_boolean("_blackRoseGardenToday") || __campground[lookupItem("black garden rose") > 0];
+		final.luckyCondition = __iotms_usable[lookupItem("black garden rose")] && keysAvailable > 0 && gardenAvailable;
+		final.luckyCount = keysAvailable;
+		final.tileDescription = `<b>{final.luckyCount}x black thorn keys</b> left`;
+		return final;
+  }
+
 	// 2026: Cast 1x "Heartstone: LUCK"
 	LuckySource getHeartstone() {
-        LuckySource final;
-
-        final.sourceName = `heartstone`;
-        final.url = 'skillz.php';
-        final.imageLookupName = "__item heartstone";
-    	boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
-    	int usesLUCK = get_property_boolean("_heartstoneLuckUsed").to_int();
-
-        final.luckyCondition = accessLUCK && usesLUCK == 0 && __iotms_usable[lookupItem("heartstone")];
-        final.luckyCount = usesLUCK == 1 ? 0 : 1; 
-        final.tileDescription = `<b>{final.luckyCount}x Heartstone: LUCK</b> cast left`;
-
-        return final;
-    }
+		LuckySource final;
+		final.sourceName = `heartstone`;
+		final.url = 'skillz.php';
+		final.imageLookupName = "__item heartstone";
+		boolean accessLUCK = get_property_boolean("heartstoneLuckUnlocked");
+		int usesLUCK = get_property_boolean("_heartstoneLuckUsed").to_int();
+		final.luckyCondition = accessLUCK && usesLUCK == 0 && __iotms_usable[lookupItem("heartstone")];
+		final.luckyCount = usesLUCK == 1 ? 0 : 1; 
+		final.tileDescription = `<b>{final.luckyCount}x Heartstone: LUCK</b> cast left`;
+		return final;
+	}
 
 	// 2024: 3x plays of the apriling band saxophone 
 	LuckySource getSaxophones() {
-        LuckySource final;
+		LuckySource final;
+		final.sourceName = 'apriling sax';
+		final.url = "inventory.php?ftext=apriling+band+saxophone";
+		final.imageLookupName = "__item Apriling band saxophone";
+		int aprilingBandSaxUsesLeft = clampi(3 - get_property_int("_aprilBandSaxophoneUses"), 0, 3);
+		final.luckyCondition = (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band saxophone]) > 0);
+		final.luckyCount = aprilingBandSaxUsesLeft;
+		final.tileDescription = `<b>{aprilingBandSaxUsesLeft}x apriling sax solos</b> left`;
+		return final;
+	}
 
-        final.sourceName = 'apriling sax';
-        final.url = "inventory.php?ftext=apriling+band+saxophone";
-        final.imageLookupName = "__item Apriling band saxophone";
-
-        int aprilingBandSaxUsesLeft = clampi(3 - get_property_int("_aprilBandSaxUses"), 0, 3);
-        
-        final.luckyCondition = (aprilingBandSaxUsesLeft > 0 && available_amount($item[apriling band saxophone]) > 0);
-        final.luckyCount = aprilingBandSaxUsesLeft;
-        final.tileDescription = `<b>{aprilingBandSaxUsesLeft}x apriling sax solos</b> left`;
-        return final;
-
-    }
 	// 2024: moai statues (cool); no clovermint tho, no thank you
 	LuckySource getMoaiStatues() {
-        LuckySource final;
-
-        final.sourceName = `moai statuette`;
-        final.url = invSearch("lucky moai statuette");
-        final.imageLookupName = "__item lucky moai statuette";
-
-        final.luckyCondition = available_amount($item[lucky moai statuette]) > 0;
-        final.luckyCount = available_amount($item[lucky moai statuette])*3; 
-        final.tileDescription = `<b>{final.luckyCount}x clovers</b> via lucky moai`;
-
-        return final;
-    }
+		LuckySource final;
+		final.sourceName = `moai statuette`;
+		final.url = invSearch("lucky moai statuette");
+		final.imageLookupName = "__item lucky moai statuette";
+		final.luckyCondition = available_amount($item[lucky moai statuette]) > 0;
+		final.luckyCount = available_amount($item[lucky moai statuette])*3; 
+		final.tileDescription = `<b>{final.luckyCount}x clovers</b> via lucky moai`;
+		return final;
+	}
 
 	// 2023: Cast 1x "Aug. 2nd: Find an Eleven-Leaf Clover Day"
-    LuckySource getScepter() {
-        LuckySource final;
-
-        final.sourceName = `august scepter`;
-        final.url = 'skillz.php';
-        final.imageLookupName = "__item august scepter";
-
-        final.luckyCondition = __iotms_usable[$item[August Scepter]];
-        final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
-        final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug 2)`;
-
-        return final;
-    }
+	LuckySource getScepter() {
+		LuckySource final;
+		final.sourceName = `august scepter`;
+		final.url = 'skillz.php';
+		final.imageLookupName = "__item august scepter";
+		final.luckyCondition = __iotms_usable[$item[August Scepter]];
+		final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
+		final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug 2)`;
+		return final;
+	}
 
 	// 2019: Select "Surprise Me" from the Eight Days a Week Pill Keeper
 	LuckySource getPillkeeper() {
-        LuckySource final;
-
-        final.sourceName = "pillkeeper";
-        final.url = "main.php?eowkeeper=1";
-        final.imageLookupName = "__item Eight Days a Week Pill Keeper";
-
-        // see # of free pillkeeepers remaining
-        int freeLuckLeft = get_property_boolean("_freePillKeeperUsed") ? 0 : 1;
-
-        // calculate possible spleen-based lucky
-        int spleenLucks = floor(spleenRemaining / 3);
-
-        // usable if we have pill keeper plus free lucky or spleen lucky available
-        final.luckyCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeLuckLeft + spleenLucks > 0);
-
-        // never noticed I didn't explicitly say this was pillkeeper in the tile lol
-        final.luckyCount = freeLuckLeft + spleenLucks;
-        final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x Pillkeeper</b> free lucky, `;
-        if (spleenLucks > 0) final.tileDescription = final.tileDescription + `and <b>{spleenLucks}x</b> more for 3 spleen each`;
-        return final;
-    }
+		LuckySource final;
+		final.sourceName = "pillkeeper";
+		final.url = "main.php?eowkeeper=1";
+		final.imageLookupName = "__item Eight Days a Week Pill Keeper";
+		// see # of free pillkeeepers remaining
+		int freeLuckLeft = get_property_boolean("_freePillKeeperUsed") ? 0 : 1;
+		// calculate possible spleen-based lucky
+		int spleenLucks = floor(spleenRemaining / 3);
+		// usable if we have pill keeper plus free lucky or spleen lucky available
+		final.luckyCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeLuckLeft + spleenLucks > 0);
+		// never noticed I didn't explicitly say this was pillkeeper in the tile lol
+		final.luckyCount = freeLuckLeft + spleenLucks;
+		final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x Pillkeeper</b> free lucky, `;
+		if (spleenLucks > 0) final.tileDescription = final.tileDescription + `and <b>{spleenLucks}x</b> more for 3 spleen each`;
+		return final;
+	}
 
 	// 2014: 1x Lucky Lindy -- not including to start, too old
 	// 2013: 1x optimal dog -- not including to start, too old
@@ -25821,6 +25808,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 
 	luckySources["clovo"] = getClovers();
 	luckySources["astro"] = getAEDs();
+	luckySources["roseo"] = getBlackThornKeys();
 	luckySources["stono"] = getHeartstone();
 	luckySources["saxxo"] = getSaxophones();
 	luckySources["mohio"] = getMoaiStatues();
@@ -25828,40 +25816,38 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries)
 	luckySources["pillo"] = getPillkeeper();
 
 	// For order, I am starting from things that are daily refresh -> can be saved
-	string [int] luckyOrder = listMake("stono","scepo","saxxo","pillo","clovo","astro","mohio");
+	string [int] luckyOrder = listMake("stono","scepo","saxxo","pillo","roseo","clovo","astro","mohio");
 
-    ChecklistEntry entry;
+	ChecklistEntry entry;
     
 	entry.url = "";
 	entry.image_lookup_name = "__item 11-leaf clover";
-    entry.tags.id = "Lucky sources available";
-    entry.importance_level = -1;
+	entry.tags.id = "Lucky sources available";
+	entry.importance_level = -1;
 
-    string [int] description;
-    int totalLuckyCharges = 0;
+	string [int] description;
+	int totalLuckyCharges = 0;
 	string line = HTMLGenerateSpanOfClass("Get a Lucky! adventure", "r_bold r_element_stench_desaturated");
 	string ll = HTMLGenerateSpanOfClass("✾ ", "r_element_stench");
 	string luckyText = HTMLGenerateSpanOfClass("Lucky!", "r_element_stench_desaturated");
 
-	foreach it, luckyType in luckyOrder
-    {
-        LuckySource lucko = luckySources[luckyType];
-        if (lucko.luckyCount > 0 && lucko.luckyCondition) {
+	foreach it, luckyType in luckyOrder {
+		LuckySource lucko = luckySources[luckyType];
+		if (lucko.luckyCount > 0 && lucko.luckyCondition) {
 			if (totalLuckyCharges == 0) entry.url = lucko.url;
             totalLuckyCharges += lucko.luckyCount;
 
-            line += "|*"+ll+lucko.tileDescription;
-        }
+			line += "|*"+ll+lucko.tileDescription;
+		}
+	}
 
-    }
+	if (totalLuckyCharges == 0) return;
 
-    if (totalLuckyCharges == 0) return;
+	// Append all the lines to a description
+	description.listAppend(line);
 
-    // Append all the lines to a description
-    description.listAppend(line);
-	
-    // Add a description that falls away when you hoverover
-    entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalLuckyCharges, luckyText+" charge available", luckyText+" charges available"), "", description));
+	// Add a description that falls away when you hoverover
+	entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalLuckyCharges, luckyText+" charge available", luckyText+" charges available"), "", description));
 
 	if (entry.subentries.count() > 0) resource_entries.listAppend(entry);
 
