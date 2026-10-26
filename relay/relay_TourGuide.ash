@@ -25723,7 +25723,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries) {
 		final.url = 'campground.php';
 		final.imageLookupName = "__item black thorn key";
 		int keysAvailable = lookupItem("black thorn key").available_amount(); // when mafia tracks how many chests are available in the garden this needs updated.
-		boolean gardenAvailable = get_property_boolean("_blackRoseGardenToday") || __campground[lookupItem("black garden rose") > 0];
+		boolean gardenAvailable = get_property_boolean("_blackRoseGardenToday") || __campground[lookupItem("black garden rose")] > 0;
 		final.luckyCondition = __iotms_usable[lookupItem("black garden rose")] && keysAvailable > 0 && gardenAvailable;
 		final.luckyCount = keysAvailable;
 		final.tileDescription = `<b>{final.luckyCount}x black thorn keys</b> left`;
@@ -58310,6 +58310,7 @@ void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries) {
     resource_entries.listAppend(ChecklistEntryMake("__item handful of split pea soup", "", ChecklistSubentryMake(pluralise($item[handful of split pea soup]), "also, have " + available_amount($item[whirled peas]) + " peas", "Free run, 30-turn banish. "), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Purkey banish"));
   }
 }
+
 //Takerspace
 RegisterResourceGenerationFunction("IOTMTakerspaceGenerateResource");
 void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
