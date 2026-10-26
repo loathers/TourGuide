@@ -27953,7 +27953,7 @@ void SMiscItemsGenerateResource(ChecklistEntry [int] resource_entries)
         resource_entries.listAppend(ChecklistEntryMake("__item chest of the Bonerdagon", "inventory.php?ftext=chest+of+the+Bonerdagon", ChecklistSubentryMake("chest of the Bonerdagon", "", description), importance_level_unimportant_item).ChecklistEntrySetIDTag("Bonerdagon chest resource"));
     }
     
-    if ($item[smoke grenade].available_amount() > 0) {
+    if ($item[smoke grenade].available_amount() > 0 && in_run) {
         string description = "Turn-taking run, 20-turn banish.";
         resource_entries.listAppend(ChecklistEntryMake("__item smoke grenade", "", ChecklistSubentryMake(pluralise($item[Smoke grenade]), "", description), 0).ChecklistEntrySetCombinationTag("banish").ChecklistEntrySetIDTag("Smoke grenade banish"));
     }
@@ -58054,60 +58054,47 @@ void IOTMTearawayPantsGenerateTask(ChecklistEntry [int] task_entries, ChecklistE
 }
 // Sept-Ember Censer
 RegisterResourceGenerationFunction("IOTMSeptemberCenserGenerateResource");
-void IOTMSeptemberCenserGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if ($item[Sept-Ember Censer].available_amount() == 0) return;
+void IOTMSeptemberCenserGenerateResource(ChecklistEntry [int] resource_entries) {
+	if (!__iotms_usable[lookupItem("Sept-Ember Censer")]) return;
 
-    int septEmbers = get_property_int("availableSeptEmbers");
+	int septEmbers = get_property_int("availableSeptEmbers");
 
     // Tile is unnecessary if you don't have embers remaining.
-    if (septEmbers == 0) return;
+	if (septEmbers == 0) return;
 
-    string [int] description;    
-    string url = "shop.php?whichshop=september";
-    string title = "Spend your "+pluralise(septEmbers,"ember","embers");
+	string [int] description;
+	string title = "Spend your "+pluralise(septEmbers,"ember","embers");
 
-    // Math for the statgain from spading
-    float coldResistance = numeric_modifier("cold resistance");
-    int mainstatGain = (7 * (coldResistance) ** 1.7) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
+	// General amount counts
+	int bembershootCount = lookupItem("bembershoot").available_amount();
+	boolean canUseMouthwash = true;
 
-    // General amount counts
-    int bembershootCount = $item[bembershoot].available_amount();
-    int mouthwashCount = $item[Mmm-brr! brand mouthwash].available_amount();
-    int structureCount = $item[structural ember].available_amount();
-    int hunkCount = $item[embering hunk].available_amount();
-    boolean hulkFought = get_property_boolean("_emberingHulkFought");
-    boolean structureUsed = get_property_boolean("_structuralEmberUsed");
-    boolean canUseMouthwash = true;
+	if (my_path().id == PATH_GREY_YOU) canUseMouthwash = false;
+	if (my_path().id == PATH_ZOOTOMIST) canUseMouthwash = false;
+	if (my_path().id == PATH_MEAT) canUseMouthwash = false;
 
-    if (my_path().id == PATH_GREY_YOU) canUseMouthwash = false;
-    if (my_path().id == PATH_ZOOTOMIST) canUseMouthwash = false;
-    if (my_path().id == PATH_MEAT) canUseMouthwash = false;
+	description.listAppend("Stoke the embers in your Sept-Ember Censer");
+	description.listAppend(`|*1 embers: +5 cold res accessory (You have {HTMLGenerateSpanFont(bembershootCount, "red")})`);
+	if (canUseMouthwash && septEmbers > 1 && my_level() < 13 && __misc_state["in run"]) {
+		// Math for the statgain from spading
+		float coldResistance = numeric_modifier("cold resistance");
+		int mainstatGain = (7 * (coldResistance) ** 1.7) * (1.0 + numeric_modifier(my_primestat().to_string() + " Experience Percent") / 100.0);
+		int mouthwashCount = lookupItem("Mmm-brr! brand mouthwash").available_amount();
+		description.listAppend(`|*2 embers: mmm-brr! mouthwash for {HTMLGenerateSpanFont(mainstatGain, "blue")} mainstat. (You have {HTMLGenerateSpanFont(mouthwashCount, "red")})`);
+	}
 
-    if (septEmbers > 0)
-    {
-        description.listAppend("Stoke the embers in your Sept-Ember Censer");
-    }
+	if (!get_property_boolean("_structuralEmberUsed") && septEmbers > 3 && get_property_int("chasmBridgeProgress") < 30 && !questPropertyPastInternalStepNumber("questL09Topping", 2)) {
+		description.listAppend("|*4 embers: +5/5 bridge parts (1/day)");
+	}
 
-    description.listAppend(`|*1 embers: +5 cold res accessory (You have {HTMLGenerateSpanFont(bembershootCount, "red")})`);
-    if (canUseMouthwash)
-        description.listAppend(`|*2 embers: mmm-brr! mouthwash for {HTMLGenerateSpanFont(mainstatGain, "blue")} mainstat. (You have {HTMLGenerateSpanFont(mouthwashCount, "red")})`);
-
-    if (structureUsed) {
-        description.listAppend((HTMLGenerateSpanFont("|*Already used structural ember today", "blue")));
-    } else {
-        description.listAppend("|*4 embers: +5/5 bridge parts (1/day)");
-    }
-
-    if (hulkFought) {
-        description.listAppend((HTMLGenerateSpanFont("|*Already fought embering hulk today", "blue")));
-    } else {
-        description.listAppend("|*6 embers: embering hulk (1/day)");
-    }
-
-    if (!__misc_state["in run"]) description.listAppend(`(You have {HTMLGenerateSpanFont(hunkCount, "blue")} hunks)`);
-
-    resource_entries.listAppend(ChecklistEntryMake("__item sept-ember censer", url, ChecklistSubentryMake(title, "", description), 8));
+	if (!lookupFamiliar("Emberiza Aureola").have_familiar()) {
+		if (!get_property_boolean("_emberingHulkFought") && septEmbers > 5) {
+			description.listAppend("|*6 embers: embering hulk (1/day)");
+		}
+		int hunkCount = lookupItem("embering hunk").available_amount();
+		if (!__misc_state["in run"]) description.listAppend(`(You have {HTMLGenerateSpanFont(hunkCount, "blue")} hunks)`);
+	}
+	resource_entries.listAppend(ChecklistEntryMake("__item sept-ember censer", "shop.php?whichshop=september", ChecklistSubentryMake(title, "", description), 8));
 }
 
 // Helper function on the KoLmafia wiki that I just decided to use for this
@@ -58264,45 +58251,34 @@ void IOTMBatWingsGenerateResource(ChecklistEntry [int] resource_entries)
 
 // Clan VIP Photo booth
 RegisterResourceGenerationFunction("IOTMVIPPhotoBoothGenerateResource");
-void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries)
-{
-    if (available_amount($item[Clan VIP Lounge key]) < 1)
-        return;
-
-    string [int] description;
-	string url = "clan_viplounge.php?action=photobooth";
-	
-    int photosLeft = clampi(3 - get_property_int("_photoBoothEffects"), 0, 3);
-	if (photosLeft > 0)
-	{
-		description.listAppend(HTMLGenerateSpanFont("Get your photo taken:", "black"));
+void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries) {
+	if (!__iotms_usable[lookupItem("photo booth sized crate")]) return;
+	int photosLeft = clampi(3 - get_property_int("_photoBoothEffects"), 0, 3);
+	if (photosLeft > 0) {
+		string [int] description;
 		description.listAppend(HTMLGenerateSpanFont("|*photobooth west: +50% init, +noncom%", "black"));
 		description.listAppend(HTMLGenerateSpanFont("|*photobooth tower: +com%", "black"));
 		description.listAppend(HTMLGenerateSpanFont("|*photobooth space: this sucks", "black"));
-		
-		resource_entries.listAppend(ChecklistEntryMake("__item expensive camera", url, ChecklistSubentryMake(photosLeft + " clan photos takeable", description), 8));
+		resource_entries.listAppend(ChecklistEntryMake("__item expensive camera", "clan_viplounge.php?action=photobooth", ChecklistSubentryMake(photosLeft + " clan photos takeable", description), 8).ChecklistEntrySetCombinationTag("daily buffs").ChecklistEntrySetIDTag("Clan Photobooth daily buffs"));
 	}
 
-	//Assert Your Authority: item-crunching instakill
-	//  "this here town ain't big enough for the two of us"
+	// Assert Your Authority: item-crunching instakill
+	// "this here town ain't big enough for the two of us"
 
-    int sheriffings_left = clampi(3 - get_property_int("_assertYourAuthorityCast"), 0, 3);
-    boolean you_are_the_sheriff = (lookupItem("sheriff badge").available_amount() > 0 && lookupItem("sheriff moustache").available_amount() > 0 && lookupItem("sheriff pistol").available_amount() > 0);
-    boolean instakills_usable = my_path().id != PATH_G_LOVER && my_path().id != PATH_POCKET_FAMILIARS && my_path().id != 52; // avant guard
+	int sheriffings_left = clampi(3 - get_property_int("_assertYourAuthorityCast"), 0, 3);
+	boolean you_are_the_sheriff = (lookupItem("sheriff badge").available_amount() > 0 && lookupItem("sheriff moustache").available_amount() > 0 && lookupItem("sheriff pistol").available_amount() > 0);
+	boolean instakills_usable = my_path().id != PATH_G_LOVER && my_path().id != PATH_POCKET_FAMILIARS && my_path().id != 52; // avant guard
 
-    if (sheriffings_left > 0 && instakills_usable && you_are_the_sheriff)
-    {
-        string [int] authorityDescription;
-        authorityDescription.listAppend("Assert Your Authority for a no-drop freekill.");
-        
-		if (lookupItem("sheriff badge").equipped_amount() != 1 && lookupItem("sheriff moustache").equipped_amount() != 1 && lookupItem("sheriff pistol").equipped_amount() != 1)
-        {
-        	authorityDescription.listAppend(HTMLGenerateSpanFont("Equip your sheriff gear first.", "red"));
-            url = "inventory.php?ftext=sheriff";
-        }
-        resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", url, ChecklistSubentryMake(pluralise(sheriffings_left, "authority assertion", "authority assertions"), "", authorityDescription), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("assert your authority free kill"));
-        
-    }
+	if (sheriffings_left > 0 && instakills_usable && you_are_the_sheriff) {
+		string [int] authorityDescription;
+		authorityDescription.listAppend("Assert Your Authority for a no-drop freekill.");
+			
+		if (!lookupItem("sheriff badge").equipped() && !lookupItem("sheriff moustache").equipped() && !lookupItem("sheriff pistol").equipped()) {
+			authorityDescription.listAppend(HTMLGenerateSpanFont("Equip your sheriff gear first.", "red"));
+			url = "inventory.php?ftext=sheriff";
+		}
+		resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", url, ChecklistSubentryMake(pluralise(sheriffings_left, "authority assertion", "authority assertions"), "", authorityDescription), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("assert your authority free kill"));
+	}
 }
 RegisterResourceGenerationFunction("IOTMPeaceTurkeyGenerateResource");
 void IOTMPeaceTurkeyGenerateResource(ChecklistEntry [int] resource_entries) {
