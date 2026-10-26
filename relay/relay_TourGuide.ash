@@ -54525,7 +54525,7 @@ void IOTMGreyGooseGenerateResource(ChecklistEntry [int] resource_entries)
 			description.listAppend("Currently have " + HTMLGenerateSpanOfClass(gooseWeight, "r_bold") + " weight (" + HTMLGenerateSpanOfClass(gooseExperience, "r_bold") + " experience), currently gain " + HTMLGenerateSpanOfClass(famExperienceGain, "r_bold") + " fam exp per fight. (Will become " + HTMLGenerateSpanFont(newGooseExp, "blue") +")");
 		}
 		description.listAppend("" + HTMLGenerateSpanOfClass((CEIL(famExpNeededForNextPound / famExperienceGain)), "r_bold") + " combats until next pound, or " + HTMLGenerateSpanOfClass((CEIL(horribleFamExpCalculation)), "r_bold") + " combats for 6 weight.");
-		resource_entries.listAppend(ChecklistEntryMake("__familiar Grey Goose", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Grey goose skills charging", "grey"), "", description), -2));
+		resource_entries.listAppend(ChecklistEntryMake("__familiar Grey Goose", url, ChecklistSubentryMake(HTMLGenerateSpanFont("Grey goose skills charging", "grey"), "", description), 2));
 	}
 	if (gooseWeight >= 6)
 	{
