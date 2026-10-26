@@ -34734,7 +34734,7 @@ void ActiveBanishesList(ChecklistEntry [int] resource_entries)
 
 	}
 	
-	if (subentries.count() > 0) {
+	if (subentries.count() > 0 && monsterCount > 0) {
 
         // Want this atop resources for testing. Also, maybe just want it there period?
         int priority = -69; 
