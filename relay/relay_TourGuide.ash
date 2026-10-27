@@ -24337,7 +24337,8 @@ void QHotAirportGenerateTasks(ChecklistEntry [int] task_entries)
     //QHotAirportSuperduperheatedMetalGenerateTasks(task_entries);
     QHotAirportWLFBunkerGenerateTasks(task_entries);
     
-    if ($item[lucky gold ring].available_amount() > 0 && !get_property_boolean("_luckyGoldRingVolcoino")) {        string url;
+    if (false && $item[lucky gold ring].available_amount() > 0 && !get_property_boolean("_luckyGoldRingVolcoino")) {
+        string url;
         string title = "Adventure with ";
         if ($item[lucky gold ring].equipped_amount() == 0) {
             title = "Equip ";
