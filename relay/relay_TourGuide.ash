@@ -35051,7 +35051,7 @@ void SFamiliarDropsGenerateResource(ChecklistEntry [int] resource_entries)
     entry.url = "familiar.php";
     entry.image_lookup_name = "__item Familiar-Gro&trade; Terrarium"; // TODO: pick better image lol
     entry.tags.id = "Familiar Drops Megatile";
-    entry.importance_level = -1;
+    entry.importance_level = -68;
 	entry.should_indent_after_first_subentry = true;
 	entry.subentries.listAppend(ChecklistSubentryMake(HTMLGenerateSpanFont("★ Familiar Drops Available ★","#165e61"),"","Consider these familiars for useful drops!<br>"));
 
@@ -51375,7 +51375,7 @@ void IOTMKramcoSausageOMaticGenerateResource(ChecklistEntry [int] resource_entri
     entry.image_lookup_name = "__item Kramco Sausage-o-Matic&trade;";
     entry.url = "inventory.php?action=grind";
     entry.tags.id = "Kramco sausage grinder resource";
-    entry.importance_level = 2;
+    entry.importance_level = -2;
     
     string [int] main_description;
     string main_title;
@@ -54994,7 +54994,7 @@ void IOTMTinyStillsuitGenerateResource(ChecklistEntry [int] resource_entries)
 		
 	string stillSweatTypeTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Suggested Stillsuit Familiars", "r_tooltip_outer_class");
 	description.listAppend(stillSweatTypeTooltip);
-    resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), 2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
+    resource_entries.listAppend(ChecklistEntryMake("__item tiny stillsuit", url, ChecklistSubentryMake(title, description), -2).ChecklistEntrySetIDTag("tiny stillsuit resource"));
 }
 //Jurassic parka
 RegisterTaskGenerationFunction("IOTMJurassicParkaGenerateTasks");
@@ -57672,7 +57672,7 @@ void IOTMChestMimicGenerateResource(ChecklistEntry [int] resource_entries)
 	description.listAppend(`Need {HTMLGenerateSpanOfClass(famExpNeededForNextEgg, "r_bold")} more famxp for next egg. ({fightsForNextEgg})`);
 	description.listAppend(`Can lay {HTMLGenerateSpanOfClass(mimicEggsLeft, "r_bold")} more eggs today.`);
 
-	resource_entries.listAppend(ChecklistEntryMake("__familiar chest mimic", url, ChecklistSubentryMake("Chest mimic fxp", "", description), 2));
+	resource_entries.listAppend(ChecklistEntryMake("__familiar chest mimic", url, ChecklistSubentryMake("Chest mimic fxp", "", description), -2));
 
 	// Nice little tile to show what you've got in your mimic eggs
 	if ($item[mimic egg].available_amount() > 0) {
