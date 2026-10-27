@@ -24178,7 +24178,9 @@ void QHotAirportSuperduperheatedMetalGenerateTasks(ChecklistEntry [int] task_ent
         task_entries.listAppend(ChecklistEntryMake(image, "place.php?whichplace=airport_hot", ChecklistSubentryMake(header, "", description), $locations[The Bubblin\' Caldera]).ChecklistEntrySetIDTag("Airport hot superduperheated"));
 }
 
-void QHotAirportWLFBunkerGenerateTasks(ChecklistEntry [int] task_entries){
+
+void QHotAirportWLFBunkerGenerateTasks(ChecklistEntry [int] task_entries)
+{
     if (get_property_boolean("_volcanoItemRedeemed"))
         return;
     
@@ -24330,13 +24332,12 @@ void QHotAirportGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (!__misc_state["hot airport available"])
         return;
-
+    
     QHotAirportLavaCoLampGenerateTasks(task_entries);
     //QHotAirportSuperduperheatedMetalGenerateTasks(task_entries);
     QHotAirportWLFBunkerGenerateTasks(task_entries);
-
-    if ($item[lucky gold ring].available_amount() > 0 && !get_property_boolean("_luckyGoldRingVolcoino")) {
-        string url;
+    
+    if ($item[lucky gold ring].available_amount() > 0 && !get_property_boolean("_luckyGoldRingVolcoino")) {        string url;
         string title = "Adventure with ";
         if ($item[lucky gold ring].equipped_amount() == 0) {
             title = "Equip ";
@@ -24346,7 +24347,8 @@ void QHotAirportGenerateTasks(ChecklistEntry [int] task_entries)
     }
 }
 
-void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries){
+void QHotAirportGenerateResource(ChecklistEntry [int] resource_entries)
+{
     if (!__misc_state["hot airport available"])
         return;
     //Elevator:
