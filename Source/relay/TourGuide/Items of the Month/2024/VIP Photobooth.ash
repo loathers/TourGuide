@@ -24,7 +24,6 @@ void IOTMVIPPhotoBoothGenerateResource(ChecklistEntry [int] resource_entries) {
 			
 		if (!lookupItem("sheriff badge").equipped() && !lookupItem("sheriff moustache").equipped() && !lookupItem("sheriff pistol").equipped()) {
 			authorityDescription.listAppend(HTMLGenerateSpanFont("Equip your sheriff gear first.", "red"));
-			url = "inventory.php?ftext=sheriff";
 		}
 		resource_entries.listAppend(ChecklistEntryMake("__item badge of authority", "inventory.php?ftext=sheriff", ChecklistSubentryMake(pluralise(sheriffings_left, "authority assertion", "authority assertions"), "", authorityDescription), 0).ChecklistEntrySetCombinationTag("free instakill").ChecklistEntrySetIDTag("assert your authority free kill"));
 	}
