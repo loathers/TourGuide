@@ -5057,7 +5057,7 @@ void initialiseIOTMsUsable()
         
     if (lookupItem("tearaway pants").available_amount() > 0) //Aug 2024
         __iotms_usable[lookupItem("tearaway pants")] = true;
-	        
+
     if (lookupItem("sept-ember censer").available_amount() > 0) //Sep 2024
         __iotms_usable[lookupItem("sept-ember censer")] = true;
         
