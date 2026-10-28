@@ -25870,7 +25870,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries) {
 	entry.url = "";
 	entry.image_lookup_name = "__item 11-leaf clover";
 	entry.tags.id = "Lucky sources available";
-	entry.importance_level = -1;
+	entry.importance_level = -11;
 
 	string [int] description;
 	int totalLuckyCharges = 0;
