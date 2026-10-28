@@ -42,7 +42,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
 
         // never noticed I didn't explicitly say this was pillkeeper in the tile lol
         final.sneakCount = freeSneakLeft + spleenSneaks;
-        final.tileDescription = `<b>PillKeeper</b>`;
+        final.tileDescription = `<b>Pill Keeper</b> `;
         final.tileDescription += get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x free sneak, </b>`;
 		if (spleenSneaks > 0 && !get_property_boolean("_freePillKeeperUsed")) final.tileDescription += `and`;
 		if (spleenSneaks > 0) final.tileDescription += `<b>{spleenSneaks}x sneaks</b> for 3 spleen each`;
