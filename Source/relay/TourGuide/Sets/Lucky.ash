@@ -216,10 +216,10 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries) {
 		final.luckyCondition = __iotms_usable[lookupItem("Eight Days a Week Pill Keeper")] && (freeLuckLeft + spleenLucks > 0);
 		// never noticed I didn't explicitly say this was pillkeeper in the tile lol
 		final.luckyCount = freeLuckLeft + spleenLucks;
-		final.tileDescription = `<b>1x Pillkeeper</b> `;
-		final.tileDescription = get_property_boolean("_freePillKeeperUsed") ? "" : `free lucky, `;
-		if (spleenLucks > 0 && get_property_boolean("_freePillKeeperUsed")) final.tileDescription = final.tileDescription + `and`;
-		if (spleenLucks > 0) final.tileDescription = final.tileDescription + `<b>{spleenLucks}x</b> for 3 spleen each`;
+		final.tileDescription = `<b>Pillkeeper</b> `;
+		final.tileDescription += get_property_boolean("_freePillKeeperUsed") ? "" : `1x free lucky, `;
+		if (spleenLucks > 0 && !get_property_boolean("_freePillKeeperUsed")) final.tileDescription += `and`;
+		if (spleenLucks > 0) final.tileDescription += `<b>{spleenLucks}x</b> for 3 spleen each`;
 		return final;
 	}
 
