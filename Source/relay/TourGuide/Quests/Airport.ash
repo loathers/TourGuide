@@ -1287,7 +1287,6 @@ void QHotAirportSuperduperheatedMetalGenerateTasks(ChecklistEntry [int] task_ent
         task_entries.listAppend(ChecklistEntryMake(image, "place.php?whichplace=airport_hot", ChecklistSubentryMake(header, "", description), $locations[The Bubblin\' Caldera]).ChecklistEntrySetIDTag("Airport hot superduperheated"));
 }
 
-
 void QHotAirportWLFBunkerGenerateTasks(ChecklistEntry [int] task_entries)
 {
     if (get_property_boolean("_volcanoItemRedeemed"))
