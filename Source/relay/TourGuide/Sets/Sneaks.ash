@@ -228,6 +228,9 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     int totalSneaks = 0;
 
     string line = HTMLGenerateSpanOfClass("Force an NC with sneaky tricks!", "r_bold r_element_cold_desaturated");
+	string zz = HTMLGenerateSpanOfClass("⚇ ", "r_element_cold");
+	string sneakText = HTMLGenerateSpanOfClass("Sneak", "r_element_cold_desaturated");
+	string sneaksText = HTMLGenerateSpanOfClass("Sneaks", "r_element_cold_desaturated");
 
     foreach it, sneakType in sneakOrder
     {
@@ -236,7 +239,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
             totalSneaks += sneaker.sneakCount;
             entry.url = sneaker.url;
 
-            line += "|*"+sneaker.tileDescription;
+            line += "|*"+zz+sneaker.tileDescription;
         }
 
     }
@@ -247,10 +250,10 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
     description.listAppend(line);
 
     // Store the base description within the mouseover subentries
-    entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalSneaks, "sneak usable", "sneaks usable"), "", description));
+    entry.subentries_on_mouse_over.listAppend(ChecklistSubentryMake(pluralise(totalSneaks, sneakText+" usable", sneaksText+" usable"), "", description));
     
     // Add a description that falls away when you hoverover
-    entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalSneaks, "sneak usable", "sneaks usable"), "", description));
+    entry.subentries.listAppend(ChecklistSubentryMake(pluralise(totalSneaks, sneakText+" usable", sneaksText+" usable"), "", description));
 
     // OK, now we're going to make a big table with the NC recommendations. Yeesh. 
     //   This tile is complicated, dude! First, start by initializing variables. 
