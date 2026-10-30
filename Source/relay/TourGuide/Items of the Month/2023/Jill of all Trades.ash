@@ -41,8 +41,6 @@ void IOTMJillMapGenerateTask(ChecklistEntry [int] task_entries, ChecklistEntry [
     }
 
     optional_task_entries.listAppend(ChecklistEntryMake("__item plastic pumpkin bucket", url, ChecklistSubentryMake(main_title, "", description), 7).ChecklistEntrySetIDTag("map to a candy-rich block"));
-    
-
 }
 
 // TILE SPEC: 
@@ -69,13 +67,7 @@ void IOTMJillv2GenerateResource(ChecklistEntry [int] resource_entries)
     float turnsToMap = 1/(estimatedMapProbability/100);
 
     string [int] description;
-    if (mapsDropped == 0) {
-        description.listAppend("You haven't gotten a map to halloween town yet! Try using your Jill for a map at ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
-    }
-    else if (mapsDropped < 2) { // The third map drop chance is less than 1 in a thousand - not something that is particularly useful to hunt for
-        description.listAppend("You already got a map; the next map is at a ~"+round(estimatedMapProbability)+"% chance, or approximately "+round(turnsToMap,1)+" turns.");
-    }
-    
+   
 	int habitatRecallsLeft = clampi(3 - get_property_int("_monsterHabitatsRecalled"), 0, 3);
     if (!lookupSkill("Just the Facts").have_skill() && !__iotms_usable[$item[book of facts (dog-eared)]]) habitatRecallsLeft = 0;
     if (habitatRecallsLeft > 0)
