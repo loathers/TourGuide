@@ -44,7 +44,7 @@ void SocialDistanceGenerator(ChecklistEntry [int] resource_entries)
         final.sneakCount = freeSneakLeft + spleenSneaks;
         final.tileDescription = `<b>Pill Keeper</b> `;
         final.tileDescription += get_property_boolean("_freePillKeeperUsed") ? "" : `<b>1x free sneak, </b>`;
-		if (spleenSneaks > 0 && !get_property_boolean("_freePillKeeperUsed")) final.tileDescription += `and`;
+		if (spleenSneaks > 0 && !get_property_boolean("_freePillKeeperUsed")) final.tileDescription += `and `;
 		if (spleenSneaks > 0) final.tileDescription += `<b>{spleenSneaks}x sneaks</b> for 3 spleen each`;
         return final;
     }

@@ -218,7 +218,7 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries) {
 		final.luckyCount = freeLuckLeft + spleenLucks;
 		final.tileDescription = `<b>Pill Keeper</b> `;
 		final.tileDescription += get_property_boolean("_freePillKeeperUsed") ? "" : `1x free lucky, `;
-		if (spleenLucks > 0 && !get_property_boolean("_freePillKeeperUsed")) final.tileDescription += `and`;
+		if (spleenLucks > 0 && !get_property_boolean("_freePillKeeperUsed")) final.tileDescription += `and `;
 		if (spleenLucks > 0) final.tileDescription += `<b>{spleenLucks}x</b> for 3 spleen each`;
 		return final;
 	}
