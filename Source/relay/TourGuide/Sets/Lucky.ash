@@ -196,7 +196,9 @@ void LuckyGenerateResource(ChecklistEntry [int] resource_entries) {
 		final.sourceName = `august scepter`;
 		final.url = 'skillz.php';
 		final.imageLookupName = "__item august scepter";
-		final.luckyCondition = __iotms_usable[$item[August Scepter]];
+		// usable if we have the skepta plus either a skill use available or it is the daily special.
+		boolean isDailySpecial = (7451 + format_date_time("yyyyMMdd", today_to_string(), "dd").to_int() == 7453);
+		final.luckyCondition = __iotms_usable[$item[August Scepter]] && (get_property_int("_augSkillsCast") < 5 || (get_property_boolean("_augTodayCast") && isDailySpecial));
 		final.luckyCount = get_property_boolean("_aug2Cast") ? 0 : 1; 
 		final.tileDescription = `<b>{final.luckyCount}x August Scepter</b> cast left (Aug 2)`;
 		return final;
