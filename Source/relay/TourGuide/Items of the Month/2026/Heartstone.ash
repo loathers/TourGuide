@@ -2,6 +2,37 @@
 RegisterTaskGenerationFunction("IOTMHeartstoneGenerateTasks");
 void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries) 
 {
+	string url = "inventory.php?ftext=heartstone";
+	string [int] description;
+	
+		//love letters
+		string [int][int] tooltip_table2;
+		tooltip_table2.listAppend(listMake("GOAT", "summon dairy goat"));
+		tooltip_table2.listAppend(listMake("SOUP", "split pea soup"));
+		tooltip_table2.listAppend(listMake("STEW", "wet stew"));
+		tooltip_table2.listAppend(listMake("TOMB", "tomb ratchet"));
+		tooltip_table2.listAppend(listMake("VIEW", "+100% meat buff"));
+		tooltip_table2.listAppend(listMake("WAYS", "+100 sleaze dmg"));
+			
+		buffer tooltip_text2;
+		tooltip_text2.append(HTMLGenerateTagWrap("div", "Heartstone Love Letters", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
+		tooltip_text2.append(HTMLGenerateSimpleTableLines(tooltip_table2));
+			
+		string LoveLetters = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Heartstone Love Letters", "r_tooltip_outer_class");
+		description.listAppend(LoveLetters);
+		
+	if (lookupItem("heartstone").equipped_amount() > 0 || (lookupItem("the eternity codpiece").equipped_amount() > 0 && $item[heartstone].available_amount() == 0))
+	{
+		string image_name = "__item heartstone";
+		if (lookupItem("the eternity codpiece").equipped_amount() > 0 && $item[heartstone].available_amount() == 0) {
+			image_name = "__item the eternity codpiece";
+			url = "inventory.php?action=docodpiece&pwd=" + my_hash();
+		}
+		
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(HTMLGenerateSpanFont("Heartstone letters:" + (get_property("heartstoneLetters")), "fuchsia"), description), -11).ChecklistEntrySetIDTag("heartstone letters"));
+	}
+
+
 	// This is a TAPE-helper optional task tile.
 	if (!__iotms_usable[lookupItem("Heartstone")]) return;
 
@@ -44,8 +75,6 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     string nextLetter;
     string title;
     string subtitle;
-    string url;
-    string [int] description;
     string [int] monsterList;
 
     if (heartLetters == "") { 
@@ -169,11 +198,12 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
         }
     
     if (!heartstoneEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
-	if (gemstoneInCodpiece(lookupItem("heartstone"))) description.listAppend("Currently in <b>Eternity Codpiece</b>");
-    
+	if (gemstoneInCodpiece(lookupItem("heartstone"))) {
+			description.listAppend("Currently in <b>Eternity Codpiece</b>");
+			url = "inventory.php?action=docodpiece&pwd=" + my_hash();
+		}
+	    
     resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Heartstone skills"));
-            
-
     }
 
 }
