@@ -58609,19 +58609,15 @@ void IOTYCyberRealmGenerateResource(ChecklistEntry [int] resource_entries)
     }
 }
 
-
 //Ski set
 RegisterTaskGenerationFunction("IOTMSkiSetGenerateTasks");
 void IOTMSkiSetGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-	if ($item[McHugeLarge duffel bag].available_amount() < 1) return;
-
-	if ($item[McHugeLarge duffel bag].available_amount() > 0 && $item[McHugeLarge right ski].available_amount() == 0)
-	{
-		task_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", "inventory.php?ftext=McHugeLarge+duffel+bag", ChecklistSubentryMake("McHugeLarge duffel bag", "", "Open it!"), -10).ChecklistEntrySetIDTag("McHugeLarge duffel bag resource"));
+	if ($item[McHugeLarge duffel bag].available_amount() > 0 && $item[McHugeLarge right ski].available_amount() == 0) {
+		string url = "inventory.php?action=skiduffel&pwd=" + my_hash();
+		task_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", url, ChecklistSubentryMake("McHugeLarge duffel bag", "", "Open it!"), -11).ChecklistEntrySetIDTag("McHugeLarge duffel bag resource"));
     }
 }
-
 
 RegisterResourceGenerationFunction("IOTMSkiSetGenerateResource");
 void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
@@ -58660,6 +58656,7 @@ void IOTMSkiSetGenerateResource(ChecklistEntry [int] resource_entries)
 	}
 	resource_entries.listAppend(ChecklistEntryMake("__item McHugeLarge duffel bag", url, ChecklistSubentryMake("McHugeLarge ski set skills", description), 1));
 }
+
 //leprecondo
 RegisterTaskGenerationFunction("IOTMLeprecondoGenerateTasks");
 void IOTMLeprecondoGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
