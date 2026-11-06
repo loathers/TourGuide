@@ -58969,7 +58969,7 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
         boolean hatrackEquipped = equipped_item($slot[familiar]) == lookupItem("prismatic beret");
         if (hatrackEquipped) hatrackText = "";
 		total = hatpower + pantspower;
-		if (lookupSkill("tao of the terrapin").have_skill()) total += hatpower*2 + pantspower*2;
+		if (lookupSkill("tao of the terrapin").have_skill()) total += hatpower + pantspower;
         if ($effect[Hammertime].have_effect() > 0) total += pantspower*3;
 		description.listAppend("Currently " + (HTMLGenerateSpanFont(shartpower+total, "blue")) + " total hat/shirt/pants power. ");
 		
@@ -58982,6 +58982,7 @@ void IOTMPrismaticBeretGenerateResource(ChecklistEntry [int] resource_entries)
 		resource_entries.listAppend(ChecklistEntryMake("__item prismatic beret", url, ChecklistSubentryMake(title, "", description)));
 	}
 }
+
 //cooler yeti
 RegisterTaskGenerationFunction("IOTMCoolerYetiGenerateTasks");
 void IOTMCoolerYetiGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
