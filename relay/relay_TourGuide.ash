@@ -59768,18 +59768,6 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		string LoveLetters = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + "Heartstone Love Letters", "r_tooltip_outer_class");
 		description.listAppend(LoveLetters);
 		
-	if (lookupItem("heartstone").equipped_amount() > 0 || (lookupItem("the eternity codpiece").equipped_amount() > 0 && $item[heartstone].available_amount() == 0))
-	{
-		string image_name = "__item heartstone";
-		if (lookupItem("the eternity codpiece").equipped_amount() > 0 && $item[heartstone].available_amount() == 0) {
-			image_name = "__item the eternity codpiece";
-			url = "inventory.php?action=docodpiece&pwd=" + my_hash();
-		}
-		
-		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(HTMLGenerateSpanFont("Heartstone letters:" + (get_property("heartstoneLetters")), "fuchsia"), description), -11).ChecklistEntrySetIDTag("heartstone letters"));
-	}
-
-
 	// This is a TAPE-helper optional task tile.
 	if (!__iotms_usable[lookupItem("Heartstone")]) return;
 
@@ -59791,7 +59779,26 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
     // Is the heartstone equipped?
     boolean heartstoneEquipped = gemstoneEquipped(lookupItem("Heartstone"));
 
-    // TODO:
+	if (heartstoneEquipped) {
+		string image_name = "__item heartstone";
+		if (lookupItem("the eternity codpiece").equipped_amount() > 0 && $item[heartstone].available_amount() == 0) {
+			image_name = "__item the eternity codpiece";
+			url = "inventory.php?action=docodpiece&pwd=" + my_hash();
+		}
+		
+		task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(HTMLGenerateSpanFont("Heartstone letters:" + (get_property("heartstoneLetters")), "fuchsia"), description), -11).ChecklistEntrySetIDTag("heartstone letters"));
+	}
+	else if (__misc_state["in run"]) {
+		string image_name = "__item heartstone";
+		if (lookupItem("the eternity codpiece").equipped_amount() > 0 && $item[heartstone].available_amount() == 0) {
+			image_name = "__item the eternity codpiece";
+			url = "inventory.php?action=docodpiece&pwd=" + my_hash();
+		}
+		
+		optional_task_entries.listAppend(ChecklistEntryMake(image_name, url, ChecklistSubentryMake(HTMLGenerateSpanFont("Heartstone letters:" + (get_property("heartstoneLetters")), "fuchsia"), description), -1).ChecklistEntrySetIDTag("heartstone letters"));
+	}
+	
+/*   // TODO:
     //   The availability conditions are a little messed up here. 
 
     // Generate boolean flags for accessibility of each monster
@@ -59869,13 +59876,13 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
         return;
     }
 
-    // If unequipped, go to heartstone in inventory. Else, no URL.
-    if (!heartstoneEquipped) url = invSearch("heartstone");
-
     // Generate tile description
     description.listAppend("You need "+nextLetter+"; look for these monsters:|*");
     description.listAppend("<hr>|*"+monsterList.listJoinComponents("<hr>|*"));
-    if (!heartstoneEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
+*/
+    // If unequipped, go to heartstone in inventory. Else, no URL.
+    if (!heartstoneEquipped) url = invSearch("heartstone");
+	if (!heartstoneEquipped) description.listAppend(HTMLGenerateSpanFont("Equip your Heartstone!","red"));
 
     optional_task_entries.listAppend(ChecklistEntryMake("__item heartstone", url, ChecklistSubentryMake(title, subtitle, description)).ChecklistEntrySetIDTag("Heartstone spell TAPE"));
 
@@ -59952,7 +59959,6 @@ void IOTMHeartstoneGenerateResource(ChecklistEntry [int] resource_entries)
 	    
     resource_entries.listAppend(ChecklistEntryMake("__item Heartstone", url, ChecklistSubentryMake(title, "", description)).ChecklistEntrySetIDTag("Heartstone skills"));
     }
-
 }
 
 // archaeologist's spade
