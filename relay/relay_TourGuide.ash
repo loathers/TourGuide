@@ -59751,7 +59751,9 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 {
 	string url = "inventory.php?ftext=heartstone";
 	string [int] description;
-	
+    string title;
+    string subtitle;
+
 		//love letters
 		string [int][int] tooltip_table2;
 		tooltip_table2.listAppend(listMake("GOAT", "summon dairy goat"));
@@ -59827,8 +59829,6 @@ void IOTMHeartstoneGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 
     // Only generate tile if TAPE is achievable in this cycle
     string nextLetter;
-    string title;
-    string subtitle;
     string [int] monsterList;
 
     if (heartLetters == "") { 
