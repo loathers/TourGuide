@@ -3,6 +3,7 @@ RegisterTaskGenerationFunction("IOTMLegendaryWandGenerateTasks");
 void IOTMLegendaryWandGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
     int LegendaryAmy = get_property_int("legendaryNoodlesAmygdala");
+	string [int] description;
 	if (LegendaryAmy > 0) {
 		description.listAppend("Ninja snowman assassin / LFMs?");
 		task_entries.listAppend(ChecklistEntryMake("__item formica e pepe", "", ChecklistSubentryMake(HTMLGenerateSpanFont(LegendaryAmy + " Legendary Noodle Combat Forces", "blue"), description), -11).ChecklistEntrySetIDTag("legendary noodles"));
