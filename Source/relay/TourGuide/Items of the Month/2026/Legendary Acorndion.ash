@@ -7,7 +7,7 @@ void IOTMLegendaryAcorndionGenerateTasks(ChecklistEntry [int] task_entries, Chec
 		string [int] description;
 		string title;
 		int acornsLeft = clampi(12 - get_property_int("_legendaryAcornsUsed"), 0, 12);
-		
+		int acornBridgeParts = (get_property_int("legendaryAcornBridgeParts"));
 		if (lookupItem("legendary acorndion").equipped_amount() > 0 && (acornsLeft > 0)) {
 			
 			//indoor zone chart
@@ -27,7 +27,7 @@ void IOTMLegendaryAcorndionGenerateTasks(ChecklistEntry [int] task_entries, Chec
 			tooltip_text2.append(HTMLGenerateTagWrap("div", "Indoor Bawdy zones", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
 			tooltip_text2.append(HTMLGenerateSimpleTableLines(tooltip_table2));
 				
-			string bawdyTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + HTMLGenerateSpanFont("Indoor + Bawdy = bridge parts (#)", "blue"), "r_tooltip_outer_class");
+			string bawdyTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + HTMLGenerateSpanFont("(!) Indoor + Bawdy = bridge parts " + acornBridgeParts + "/10", "blue"), "r_tooltip_outer_class");
 			description.listAppend(bawdyTooltip);
 			
 			description.listAppend(HTMLGenerateSpanFont("Indoor + Bash = banish", "blue"));
@@ -49,8 +49,8 @@ void IOTMLegendaryAcorndionGenerateResource(ChecklistEntry [int] resource_entrie
 		string title;
 		
 		int acornsLeft = clampi(12 - get_property_int("_legendaryAcornsUsed"), 0, 12);
-		
-		if (acornsLeft > 0) {
+		int acornBridgeParts = (get_property_int("legendaryAcornBridgeParts"));
+		if (lookupItem("legendary acorndion").equipped_amount() > 0 && (acornsLeft > 0)) {
 			
 			//indoor zone chart
 			string [int][int] tooltip_table2;
@@ -69,7 +69,7 @@ void IOTMLegendaryAcorndionGenerateResource(ChecklistEntry [int] resource_entrie
 			tooltip_text2.append(HTMLGenerateTagWrap("div", "Indoor Bawdy zones", mapMake("class", "r_bold r_centre", "style", "padding-bottom:0.25em;")));
 			tooltip_text2.append(HTMLGenerateSimpleTableLines(tooltip_table2));
 				
-			string bawdyTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + HTMLGenerateSpanFont("Indoor + Bawdy = bridge parts (#)", "blue"), "r_tooltip_outer_class");
+			string bawdyTooltip = HTMLGenerateSpanOfClass(HTMLGenerateSpanOfClass(tooltip_text2, "r_tooltip_inner_class r_tooltip_inner_class_margin") + HTMLGenerateSpanFont("(!) Indoor + Bawdy = bridge parts " + acornBridgeParts + "/10", "blue"), "r_tooltip_outer_class");
 			description.listAppend(bawdyTooltip);
 			
 			description.listAppend(HTMLGenerateSpanFont("Indoor + Bash = banish", "blue"));
