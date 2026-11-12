@@ -7,7 +7,7 @@ void IOTMLegendaryAcorndionGenerateTasks(ChecklistEntry [int] task_entries, Chec
 		string [int] description;
 		string title;
 		int acornsLeft = clampi(12 - get_property_int("_legendaryAcornsUsed"), 0, 12);
-		int acornBridgeParts = (get_property_int("legendaryAcornBridgeParts"));
+		int acornBridgeParts = (get_property_int("_legendaryAcornBridgeParts"));
 		if (lookupItem("legendary acorndion").equipped_amount() > 0 && (acornsLeft > 0)) {
 			
 			//indoor zone chart
@@ -49,7 +49,7 @@ void IOTMLegendaryAcorndionGenerateResource(ChecklistEntry [int] resource_entrie
 		string title;
 		
 		int acornsLeft = clampi(12 - get_property_int("_legendaryAcornsUsed"), 0, 12);
-		int acornBridgeParts = (get_property_int("legendaryAcornBridgeParts"));
+		int acornBridgeParts = (get_property_int("_legendaryAcornBridgeParts"));
 		if (lookupItem("legendary acorndion").equipped_amount() > 0 && (acornsLeft > 0)) {
 			
 			//indoor zone chart
