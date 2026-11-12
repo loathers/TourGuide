@@ -8,7 +8,7 @@ void IOTMInterestingCoinGenerateResource(ChecklistEntry [int] resource_entries)
 		string [int] description;
 		string title = (available_amount($item[interesting coin]) + " interesting coins");
 		description.listAppend("Collects interest and makes... stuff");
-		description.listAppend("Gain " + floor(available_amount($item[interesting coin]) * 0.2) + " coins on rollover.");
+		description.listAppend("Gain " + max(3, floor(available_amount($item[interesting coin]) * 0.2)) + " coins on rollover.");
 		
 		boolean coinFlipped = get_property_boolean("_interestingCoinHeads");
 		if (!coinFlipped) {
