@@ -58473,6 +58473,7 @@ void IOTMTakerspaceGenerateResource(ChecklistEntry [int] resource_entries)
 
 
 // 2025
+// 2025
 //CyberRealm
 RegisterTaskGenerationFunction("IOTYCyberRealmGenerateTasks");
 void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
@@ -58546,6 +58547,43 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 		
 		#if (zone3Turns < 20)
 		{
+			int calendarday = ((gameday_to_int() % 8) + 1);
+			string cyberrealm3reward;
+			string color;
+			switch (calendarday % 8) {
+				case 1:
+					cyberrealm3reward = "cybertattoo";
+					color = "grey";
+				break;
+				case 2:
+					cyberrealm3reward = "SLEEP rom";
+					color = "blue";
+				break;
+				case 3:
+					cyberrealm3reward = "insignificant familiar";
+					color = "grey";
+				break;
+				case 4:
+					cyberrealm3reward = "OVERCLOCK rom";
+					color = "blue";
+				break;
+				case 5:
+					cyberrealm3reward = "hashing vise";
+					color = "grey";
+				break;
+				case 6:
+					cyberrealm3reward = "geofencing rapier";
+					color = "grey";
+				break;
+				case 7:
+					cyberrealm3reward = "SLEEP rom";
+					color = "blue";
+				break;
+				case 8:
+					cyberrealm3reward = "geofencing shield";
+					color = "grey";
+				break;
+			}			
 			if (zone3Turns < 9) {			
 				description.listAppend(9 - zone3Turns + " combats until Zone 3 Eleres test.");
 			}
@@ -58566,6 +58604,7 @@ void IOTYCyberRealmGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEnt
 			else if (zone3Turns > 19) {			
 				description.listAppend(HTMLGenerateSpanFont("Cyberzone 3 finished.", "grey"));
 			}
+			description.listAppend(HTMLGenerateSpanFont("Zone 3 reward: " + cyberrealm3reward, color));
 		}
 				
 		if (($locations[Cyberzone 1,Cyberzone 2,Cyberzone 3] contains __last_adventure_location))
